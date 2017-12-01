@@ -7,11 +7,8 @@ object Day1 {
     def cyclicDrop(n: Int): Seq[A] = s.drop(n) ++ s.take(n)
   }
 
-  object Part1 {
-    def captcha(digits: Seq[Int]): Int =
-      (digits, digits.cyclicTail).zipped
-        .map((digit, nextDigit) => if (digit == nextDigit) digit else 0)
-        .sum
+  trait Part {
+    def captcha(digits: Seq[Int]): Int
 
     def captcha(digitsStr: String): Int = {
       val digits = digitsStr.toSeq.map(_.asDigit)
@@ -19,18 +16,20 @@ object Day1 {
     }
   }
 
-  object Part2 {
+  object Part1 extends Part {
+    def captcha(digits: Seq[Int]): Int =
+      (digits, digits.cyclicTail).zipped
+        .map((digit, nextDigit) => if (digit == nextDigit) digit else 0)
+        .sum
+  }
+
+  object Part2 extends Part {
     def captcha(digits: Seq[Int]): Int = {
       require(digits.length % 2 == 0)
 
       (digits, digits.cyclicDrop(digits.length / 2)).zipped
         .map((digit, nextDigit) => if (digit == nextDigit) digit else 0)
         .sum
-    }
-
-    def captcha(digitsStr: String): Int = {
-      val digits = digitsStr.toSeq.map(_.asDigit)
-      captcha(digits)
     }
   }
 
