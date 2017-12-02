@@ -19,12 +19,12 @@ object Day2 {
 
   object Part2 extends Part {
     override def rowChecksum(row: Seq[Int]): Int = {
-      val sortedRow = row.sorted.reverse
+      val descRow = row.sorted(Ordering[Int].reverse)
       val dividePairs = for {
-        i <- 0 until sortedRow.size
-        j <- (i + 1) until sortedRow.size
-        p = sortedRow(i)
-        q = sortedRow(j)
+        i <- descRow.indices
+        j <- (i + 1) until descRow.size
+        p = descRow(i)
+        q = descRow(j)
         if p % q == 0
       } yield (p, q)
 
