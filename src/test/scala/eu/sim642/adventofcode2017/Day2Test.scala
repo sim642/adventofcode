@@ -6,7 +6,10 @@ import org.scalatest.FunSuite
 class Day2Test extends FunSuite {
 
   test("Part 1 example") {
-    assert(Part1.checksum("5 1 9 5\n7 5 3\n2 4 6 8") == 18)
+    assert(Part1.checksum(
+      """5 1 9 5
+        |7 5 3
+        |2 4 6 8""".stripMargin) == 18)
   }
 
   test("Part 1 input answer") {
@@ -14,7 +17,10 @@ class Day2Test extends FunSuite {
   }
 
   test("Part 2 example") {
-    assert(Part2.checksum("5 9 2 8\n9 4 7 3\n3 8 6 5") == 9)
+    assert(Part2.checksum(
+      """5 9 2 8
+        |9 4 7 3
+        |3 8 6 5""".stripMargin) == 9)
   }
 
   test("Part 2 input answer") {
