@@ -47,6 +47,9 @@ object Day3 {
     squarePos(square) manhattanDistance Pos(0, 0)
   }
 
+  /**
+    * https://oeis.org/A141481
+    */
   class SpiralSumIterator extends AbstractIterator[Int] {
 
     private val sums = mutable.Map[Pos, Int]()
