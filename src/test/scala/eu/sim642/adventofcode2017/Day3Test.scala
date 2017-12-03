@@ -45,4 +45,27 @@ class Day3Test extends FunSuite {
   test("Part 1 input answer") {
     assert(distance(input) == 419)
   }
+
+  test("SumIterator") {
+    val it = new SumIterator
+    assert(it.next() == 1)
+    assert(it.next() == 1)
+    assert(it.next() == 2)
+    assert(it.next() == 4)
+    assert(it.next() == 5)
+    assert(it.next() == 10)
+    assert(it.next() == 11)
+    assert(it.next() == 23)
+    assert(it.next() == 25)
+    assert(it.next() == 26)
+    assert(it.next() == 54)
+    assert(it.next() == 57)
+    assert(it.next() == 59)
+    assert(it.next() == 122)
+    // ...
+  }
+
+  test("Part 2 input answer") {
+    assert(sumLarger(input) == 295229)
+  }
 }

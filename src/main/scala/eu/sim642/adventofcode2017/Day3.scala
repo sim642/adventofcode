@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import scala.collection.{AbstractIterator, mutable}
+
 object Day3 {
 
   def coord(square: Int): (Int, Int) = {
@@ -27,13 +29,57 @@ object Day3 {
 
   def distance(square: Int): Int = {
     val (x, y) = coord(square)
-    println((x, y))
     x.abs + y.abs
+  }
+
+  class SumIterator extends AbstractIterator[Int] {
+
+    implicit class CoordPair(p: (Int, Int)) {
+      def +(q: (Int, Int)): (Int, Int) = (p._1 + q._1, p._2 + q._2)
+    }
+
+    private val sums = mutable.Map[(Int, Int), Int]()
+    private var square = 1
+
+    private val offsetCoords = Seq(
+      (-1, 1), (0, 1), (1, 1),
+      (-1, 0), (1, 0),
+      (-1, -1), (0, -1), (1, -1)
+    )
+
+    override def hasNext: Boolean = true
+
+    override def next(): Int = {
+      val squareCoord = coord(square)
+      if (square == 1) {
+        sums += squareCoord -> 1
+        square += 1
+        1
+      }
+      else {
+        val neighSums = for {
+          offsetCoord <- offsetCoords
+          coord = squareCoord + offsetCoord
+          if sums.contains(coord)
+        } yield sums(coord)
+
+        val sum = neighSums.sum
+        sums += squareCoord -> sum
+        square += 1
+        sum
+      }
+    }
+  }
+
+  def sumLarger(input: Int): Int = {
+    val it = new SumIterator
+    it.find(x => x > input).get
   }
 
   val input: Int = 289326
 
   def main(args: Array[String]): Unit = {
     println(distance(input))
+    println(sumLarger(input))
   }
 }
