@@ -65,10 +65,7 @@ object Day3 {
       val sum = if (square == 1)
         1
       else {
-        val adjacentSums = for {
-          offset <- Pos.allOffsets
-          offsetPos = pos + offset
-        } yield sums.getOrElse(offsetPos, 0)
+        val adjacentSums: Seq[Int] = Pos.allOffsets.flatMap(offset => sums.get(pos + offset))
         adjacentSums.sum
       }
 
