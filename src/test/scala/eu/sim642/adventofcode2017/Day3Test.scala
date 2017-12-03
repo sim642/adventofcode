@@ -1,38 +1,47 @@
 package eu.sim642.adventofcode2017
 
 import Day3._
+import org.scalacheck.Gen
 import org.scalatest.FunSuite
+import org.scalatest.prop.PropertyChecks
 
-class Day3Test extends FunSuite {
+class Day3Test extends FunSuite with PropertyChecks {
 
   test("coord") {
-    assert(coord(1) == (0, 0))
+    val coords = Table(
+      ("square", "expectedCoord"),
+      (1,       (0, 0)),
 
-    assert(coord(2) == (1, 0))
-    assert(coord(3) == (1, 1))
-    assert(coord(4) == (0, 1))
-    assert(coord(5) == (-1, 1))
-    assert(coord(6) == (-1, 0))
-    assert(coord(7) == (-1, -1))
-    assert(coord(8) == (0, -1))
-    assert(coord(9) == (1, -1))
+      (2,       (1, 0)),
+      (3,       (1, 1)),
+      (4,       (0, 1)),
+      (5,       (-1, 1)),
+      (6,       (-1, 0)),
+      (7,       (-1, -1)),
+      (8,       (0, -1)),
+      (9,       (1, -1)),
 
-    assert(coord(10) == (2, -1))
-    assert(coord(11) == (2, 0))
-    assert(coord(12) == (2, 1))
-    assert(coord(13) == (2, 2))
-    assert(coord(14) == (1, 2))
-    assert(coord(15) == (0, 2))
-    assert(coord(16) == (-1, 2))
-    assert(coord(17) == (-2, 2))
-    assert(coord(18) == (-2, 1))
-    assert(coord(19) == (-2, 0))
-    assert(coord(20) == (-2, -1))
-    assert(coord(21) == (-2, -2))
-    assert(coord(22) == (-1, -2))
-    assert(coord(23) == (0, -2))
-    assert(coord(24) == (1, -2))
-    assert(coord(25) == (2, -2))
+      (10,      (2, -1)),
+      (11,      (2, 0)),
+      (12,      (2, 1)),
+      (13,      (2, 2)),
+      (14,      (1, 2)),
+      (15,      (0, 2)),
+      (16,      (-1, 2)),
+      (17,      (-2, 2)),
+      (18,      (-2, 1)),
+      (19,      (-2, 0)),
+      (20,      (-2, -1)),
+      (21,      (-2, -2)),
+      (22,      (-1, -2)),
+      (23,      (0, -2)),
+      (24,      (1, -2)),
+      (25,      (2, -2))
+    )
+
+    forAll (coords) { (square, expectedCoord) =>
+      assert(coord(square) == expectedCoord)
+    }
   }
 
   test("Part 1 example") {
@@ -47,22 +56,23 @@ class Day3Test extends FunSuite {
   }
 
   test("SumIterator") {
+    val sums = Table("sum", 1, 1, 2, 4, 5, 10, 11, 23, 25, 26, 54, 57, 59, 122, 133, 142, 147, 304, 330, 351, 362, 747, 806)
     val it = new SumIterator
-    assert(it.next() == 1)
-    assert(it.next() == 1)
-    assert(it.next() == 2)
-    assert(it.next() == 4)
-    assert(it.next() == 5)
-    assert(it.next() == 10)
-    assert(it.next() == 11)
-    assert(it.next() == 23)
-    assert(it.next() == 25)
-    assert(it.next() == 26)
-    assert(it.next() == 54)
-    assert(it.next() == 57)
-    assert(it.next() == 59)
-    assert(it.next() == 122)
-    // ...
+    forAll (sums) { sum =>
+      assert(it.next() == sum)
+    }
+  }
+
+  test("sumLarger") {
+    forAll (Gen.choose(0, 1000000)) { (input: Int) =>
+      println(input)
+      val sum = sumLarger(input)
+
+      assert(sum > input)
+
+      val it = new SumIterator
+      assert(it.contains(sum))
+    }
   }
 
   test("Part 2 input answer") {
