@@ -16,8 +16,8 @@ object Day4 {
 
   object Part2 extends Part {
     override def isValidPassphrase(words: Seq[String]): Boolean = {
-      val sortedWords = words.map(word => word.sorted)
-      sortedWords.distinct == sortedWords
+      val sortedWords = words.map(_.sorted)
+      Part1.isValidPassphrase(sortedWords)
     }
   }
 
