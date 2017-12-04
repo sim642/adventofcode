@@ -6,12 +6,24 @@ import org.scalatest.FunSuite
 class Day4Test extends FunSuite {
 
   test("Part 1 examples") {
-    assert(isValidPassphrase("aa bb cc dd ee"))
-    assert(!isValidPassphrase("aa bb cc dd aa"))
-    assert(isValidPassphrase("aa bb cc dd aaa"))
+    assert(Part1.isValidPassphrase("aa bb cc dd ee"))
+    assert(!Part1.isValidPassphrase("aa bb cc dd aa"))
+    assert(Part1.isValidPassphrase("aa bb cc dd aaa"))
   }
 
   test("Part 1 input answer") {
-    assert(countValidPassphrases(inputLines) == 325)
+    assert(Part1.countValidPassphrases(inputLines) == 325)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.isValidPassphrase("abcde fghij"))
+    assert(!Part2.isValidPassphrase("abcde xyz ecdab"))
+    assert(Part2.isValidPassphrase("a ab abc abd abf abj"))
+    assert(Part2.isValidPassphrase("iiii oiii ooii oooi oooo"))
+    assert(!Part2.isValidPassphrase("oiii ioii iioi iiio"))
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.countValidPassphrases(inputLines) == 119)
   }
 }
