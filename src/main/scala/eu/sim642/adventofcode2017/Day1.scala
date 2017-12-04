@@ -17,14 +17,14 @@ object Day1 {
   }
 
   object Part1 extends Part {
-    def captcha(digits: Seq[Int]): Int =
+    override def captcha(digits: Seq[Int]): Int =
       (digits, digits.cyclicTail).zipped
         .map((digit, nextDigit) => if (digit == nextDigit) digit else 0)
         .sum
   }
 
   object Part2 extends Part {
-    def captcha(digits: Seq[Int]): Int = {
+    override def captcha(digits: Seq[Int]): Int = {
       require(digits.length % 2 == 0)
 
       (digits, digits.cyclicDrop(digits.length / 2)).zipped
