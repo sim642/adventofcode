@@ -21,8 +21,8 @@ object Day4 {
     }
   }
 
-  val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
-  val inputLines: Seq[String] = input.lines.toSeq
+  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
+  lazy val inputLines: Seq[String] = input.lines.toSeq
 
   def main(args: Array[String]): Unit = {
     println(Part1.countValidPassphrases(inputLines))

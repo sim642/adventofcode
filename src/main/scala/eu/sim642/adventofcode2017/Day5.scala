@@ -48,7 +48,7 @@ object Day5 {
     override def updatedOffset(offset: Int): Int = if (offset >= 3) offset - 1 else offset + 1
   }
 
-  val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
+  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.exitSteps(input))
