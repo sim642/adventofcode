@@ -4,42 +4,55 @@ import scala.collection.AbstractIterator
 
 object Day5 {
 
-  case class OffsetState(offsets: Seq[Int], index: Int = 0) {
-    def jump: OffsetState = {
-      val offset = offsets(index)
-      OffsetState(offsets.updated(index, offset + 1), index + offset)
+  trait Part {
+    def updatedOffset(offset: Int): Int
+
+    case class OffsetState(offsets: Seq[Int], index: Int = 0) {
+      def jump: OffsetState = {
+        val offset = offsets(index)
+        OffsetState(offsets.updated(index, updatedOffset(offset)), index + offset)
+      }
+
+      def exited: Boolean = !offsets.indices.contains(index)
     }
 
-    def exited: Boolean = !offsets.indices.contains(index)
-  }
+    class OffsetIterator(private var offsetState: OffsetState) extends AbstractIterator[OffsetState] {
+      override def hasNext: Boolean = {
+        !offsetState.exited
+      }
 
-  class OffsetIterator(private var offsetState: OffsetState) extends AbstractIterator[OffsetState] {
-    override def hasNext: Boolean = {
-      !offsetState.exited
+      override def next(): OffsetState = {
+        //println(offsetState.index)
+        val currentState = offsetState
+        offsetState = offsetState.jump
+        currentState
+      }
     }
 
-    override def next(): OffsetState = {
-      println(offsetState.index)
-      val currentState = offsetState
-      offsetState = offsetState.jump
-      currentState
+    def exitSteps(offsets: Seq[Int]): Int = {
+      val initialState = OffsetState(offsets)
+      val it = new OffsetIterator(initialState)
+      it.size
+    }
+
+    def exitSteps(offsetsStr: String): Int = {
+      val offsets = offsetsStr.lines.map(_.toInt).toIndexedSeq // IndexedSeq is much faster because we index a lot
+      exitSteps(offsets)
     }
   }
 
-  def exitSteps(offsets: Seq[Int]): Int = {
-    val initialState = OffsetState(offsets)
-    val it = new OffsetIterator(initialState)
-    it.size
+  object Part1 extends Part {
+    override def updatedOffset(offset: Int): Int = offset + 1
   }
 
-  def exitSteps(offsetsStr: String): Int = {
-    val offsets = offsetsStr.lines.map(_.toInt).toSeq
-    exitSteps(offsets)
+  object Part2 extends Part {
+    override def updatedOffset(offset: Int): Int = if (offset >= 3) offset - 1 else offset + 1
   }
 
   val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(exitSteps(input))
+    println(Part1.exitSteps(input))
+    println(Part2.exitSteps(input))
   }
 }
