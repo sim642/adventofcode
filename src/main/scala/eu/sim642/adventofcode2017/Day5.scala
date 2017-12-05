@@ -22,10 +22,9 @@ object Day5 {
       }
 
       override def next(): OffsetState = {
-        //println(offsetState.index)
-        val currentState = offsetState
+        val returnState = offsetState
         offsetState = offsetState.jump
-        currentState
+        returnState
       }
     }
 
