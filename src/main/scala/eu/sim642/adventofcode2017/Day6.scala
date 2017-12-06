@@ -22,44 +22,94 @@ object Day6 {
     })
   }
 
-  class ReallocIterator(private var memory: Memory) extends AbstractIterator[Memory] {
-    override def hasNext: Boolean = true
+  trait Solution {
+    def reallocCycleCount(initialMemory: Memory): Int
+    def reallocCycleLoop(initialMemory: Memory): Int
+  }
 
-    override def next(): Memory = {
-      val returnMemory = memory
-      memory = reallocCycle(memory)
-      returnMemory
+  object NaiveSolution extends Solution {
+    class ReallocIterator(private var memory: Memory) extends AbstractIterator[Memory] {
+      override def hasNext: Boolean = true
+
+      override def next(): Memory = {
+        val returnMemory = memory
+        memory = reallocCycle(memory)
+        returnMemory
+      }
+    }
+
+    override def reallocCycleCount(initialMemory: Memory): Int = {
+      val it = new ReallocIterator(initialMemory)
+      val prevMemories = mutable.Set[Memory]()
+
+      while (prevMemories.add(it.next())) {}
+
+      prevMemories.size
+    }
+
+    override def reallocCycleLoop(initialMemory: Memory): Int = {
+      val it = new ReallocIterator(initialMemory)
+      val prevMemories = mutable.Map[Memory, Int]()
+
+      var n = 0
+      var prevN: Option[Int] = None
+      do {
+        val memory = it.next()
+        prevN = prevMemories.put(memory, n)
+        n += 1
+      } while (prevN.isEmpty)
+
+      n - prevN.get - 1
     }
   }
 
-  def reallocCycleCount(initialMemory: Memory): Int = {
-    val it = new ReallocIterator(initialMemory)
-    val prevMemories = mutable.Set[Memory]()
+  object FloydSolution extends Solution {
+    /**
+      * https://en.wikipedia.org/wiki/Cycle_detection#Floyd's_Tortoise_and_Hare
+      */
+    def floyd[A](x0: A, f: A => A): (Int, Int) = {
+      var tortoise = f(x0)
+      var hare = f(f(x0))
+      while (tortoise != hare) {
+        tortoise = f(tortoise)
+        hare = f(f(hare))
+      }
 
-    while (prevMemories.add(it.next())) {}
+      var mu = 0
+      tortoise = x0
+      while (tortoise != hare) {
+        tortoise = f(tortoise)
+        hare = f(hare)
+        mu += 1
+      }
 
-    prevMemories.size
-  }
+      var lam = 1
+      hare = f(tortoise)
+      while (tortoise != hare) {
+        hare = f(hare)
+        lam += 1
+      }
 
-  def reallocCycleLoop(initialMemory: Memory): Int = {
-    val it = new ReallocIterator(initialMemory)
-    val prevMemories = mutable.Map[Memory, Int]()
+      (mu, lam)
+    }
 
-    var n = 0
-    var prevN: Option[Int] = None
-    do {
-      val memory = it.next()
-      prevN = prevMemories.put(memory, n)
-      n += 1
-    } while (prevN.isEmpty)
+    override def reallocCycleCount(initialMemory: Memory): Int = {
+      val (mu, lam) = floyd(initialMemory, reallocCycle)
+      mu + lam
+    }
 
-    n - prevN.get - 1
+    override def reallocCycleLoop(initialMemory: Memory): Int = {
+      val (mu, lam) = floyd(initialMemory, reallocCycle)
+      lam
+    }
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
   lazy val inputSeq: IndexedSeq[Int] = input.split("\\s+").toIndexedSeq.map(_.toInt)
 
   def main(args: Array[String]): Unit = {
+    import FloydSolution._
+
     println(reallocCycleCount(inputSeq))
     println(reallocCycleLoop(inputSeq))
   }
