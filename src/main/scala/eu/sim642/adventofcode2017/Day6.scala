@@ -75,32 +75,32 @@ object Day6 {
         hare = f(f(hare))
       }
 
-      var mu = 0
+      var μ = 0
       tortoise = x0
       while (tortoise != hare) {
         tortoise = f(tortoise)
         hare = f(hare)
-        mu += 1
+        μ += 1
       }
 
-      var lam = 1
+      var λ = 1
       hare = f(tortoise)
       while (tortoise != hare) {
         hare = f(hare)
-        lam += 1
+        λ += 1
       }
 
-      (mu, lam)
+      (μ, λ)
     }
 
     override def reallocCycleCount(initialMemory: Memory): Int = {
-      val (mu, lam) = floyd(initialMemory, reallocCycle)
-      mu + lam
+      val (μ, λ) = floyd(initialMemory, reallocCycle)
+      μ + λ
     }
 
     override def reallocCycleLoop(initialMemory: Memory): Int = {
-      val (mu, lam) = floyd(initialMemory, reallocCycle)
-      lam
+      val (μ, λ) = floyd(initialMemory, reallocCycle)
+      λ
     }
   }
 
