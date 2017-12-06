@@ -41,10 +41,26 @@ object Day6 {
     prevMemories.size
   }
 
+  def reallocCycleLoop(initialMemory: Memory): Int = {
+    val it = new ReallocIterator(initialMemory)
+    val prevMemories = mutable.Map[Memory, Int]()
+
+    var n = 0
+    var prevN: Option[Int] = None
+    do {
+      val memory = it.next()
+      prevN = prevMemories.put(memory, n)
+      n += 1
+    } while (prevN.isEmpty)
+
+    n - prevN.get - 1
+  }
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
   lazy val inputSeq: IndexedSeq[Int] = input.split("\\s+").toIndexedSeq.map(_.toInt)
 
   def main(args: Array[String]): Unit = {
     println(reallocCycleCount(inputSeq))
+    println(reallocCycleLoop(inputSeq))
   }
 }

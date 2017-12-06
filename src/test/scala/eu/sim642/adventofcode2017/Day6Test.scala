@@ -40,4 +40,12 @@ class Day6Test extends FunSuite with PropertyChecks {
   test("Part 1 input answer") {
     assert(reallocCycleCount(inputSeq) == 3156)
   }
+
+  test("Part 2 examples") {
+    assert(reallocCycleLoop(IndexedSeq(0, 2, 7, 0)) == 4)
+  }
+
+  test("Part 2 input answer") {
+    assert(reallocCycleLoop(inputSeq) == 1610)
+  }
 }
