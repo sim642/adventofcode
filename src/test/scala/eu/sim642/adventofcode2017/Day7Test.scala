@@ -35,6 +35,26 @@ class Day7Test extends FunSuite {
     assert(bottomProgram(input) == "gynfwly")
   }
 
+  test("sequence") {
+    assert(sequence(Seq()) == Right(Seq()))
+    assert(sequence(Seq(Right(1))) == Right(Seq(1)))
+    assert(sequence(Seq(Right(1), Right(2))) == Right(Seq(1, 2)))
+    assert(sequence(Seq(Left("a"))) == Left("a"))
+    assert(sequence(Seq(Right(1), Left("a"))) == Left("a"))
+    assert(sequence(Seq(Left("a"), Right(1))) == Left("a"))
+    assert(sequence(Seq(Left("a"), Left("b"))) == Left("a"))
+  }
+
+  test("sequenceValues") {
+    assert(sequenceValues(Map()) == Right(Map()))
+    assert(sequenceValues(Map('x' -> Right(1))) == Right(Map('x' -> 1)))
+    assert(sequenceValues(Map('x' -> Right(1), 'y' -> Right(2))) == Right(Map('x' -> 1, 'y' -> 2)))
+    assert(sequenceValues(Map('x' -> Left("a"))) == Left("a"))
+    assert(sequenceValues(Map('x' -> Right(1), 'y' -> Left("a"))) == Left("a"))
+    assert(sequenceValues(Map('x' -> Left("a"), 'y' -> Right(1))) == Left("a"))
+    assert(sequenceValues(Map('x' -> Left("a"), 'y' -> Left("b"))) == Left("a"))
+  }
+
   test("Part 2 example") {
     val input =
       """pbga (66)

@@ -33,28 +33,47 @@ object Day7 {
     bottomProgram(parsePrograms(programsStr))
   }
 
+  /**
+    * https://stackoverflow.com/a/7231180/854540
+    */
+  def sequence[A, B](s: Seq[Either[A, B]]): Either[A, Seq[B]] = {
+    s.foldRight(Right(Nil): Either[A, List[B]]) { (e, acc) =>
+      for {
+        x <- e
+        xs <- acc
+      } yield x :: xs
+    }
+  }
+
+  def sequenceValues[K, A, B](m: Map[K, Either[A, B]]): Either[A, Map[K, B]] = {
+    m.foldLeft(Right(Map.empty): Either[A, Map[K, B]]) { case (acc, (key, e)) =>
+      for {
+        map <- acc
+        value <- e
+      } yield map + (key -> value)
+    }
+  }
+
   def correctBalanceWeight(programs: Map[String, Program]): Int = {
     def helper(program: Program): Either[Int, Int] = {
       val childResults = program.children.map(programs).map(child => child.name -> helper(child)).toMap
-      childResults.values.find(_.isLeft) match {
-        case Some(left) => left
-        case None =>
-          val childTotalWeights = childResults.mapValues(_.right.get)
-          val totalWeightChildren = program.children.groupBy(childTotalWeights)
 
-          if (totalWeightChildren.size <= 1)
-            Right(program.weight + childTotalWeights.values.sum) // no children or balanced
-          else {
-            require(totalWeightChildren.size == 2) // imbalanced
+      sequenceValues(childResults).flatMap(childTotalWeights => {
+        val totalWeightChildren = program.children.groupBy(childTotalWeights)
 
-            val badChild = totalWeightChildren.find(_._2.size == 1).get._2.head // only one is imbalanced
-            val badChildWeight = programs(badChild).weight
-            val badChildTotalWeight = childTotalWeights(badChild)
-            val goodTotalWeight = totalWeightChildren.find(_._2.size > 1).get._1 // imbalance is not ambiguous, more of other
+        if (totalWeightChildren.size <= 1)
+          Right(program.weight + childTotalWeights.values.sum) // no children or balanced
+        else {
+          require(totalWeightChildren.size == 2) // imbalanced
 
-            Left(goodTotalWeight - (badChildTotalWeight - badChildWeight))
-          }
-      }
+          val badChild = totalWeightChildren.find(_._2.size == 1).get._2.head // only one is imbalanced
+          val badChildWeight = programs(badChild).weight
+          val badChildTotalWeight = childTotalWeights(badChild)
+          val goodTotalWeight = totalWeightChildren.find(_._2.size > 1).get._1 // imbalance is not ambiguous, more of other
+
+          Left(goodTotalWeight - (badChildTotalWeight - badChildWeight))
+        }
+      })
     }
 
     val bottom = programs(bottomProgram(programs))
