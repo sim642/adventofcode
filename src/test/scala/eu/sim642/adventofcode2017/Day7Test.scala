@@ -5,6 +5,13 @@ import org.scalatest.FunSuite
 
 class Day7Test extends FunSuite {
 
+  test("parseProgram") {
+    assert(parseProgram("fwft (72)") == Program("fwft", 72, Seq()))
+    assert(parseProgram("fwft (72) -> ktlj") == Program("fwft", 72, Seq("ktlj")))
+    assert(parseProgram("fwft (72) -> ktlj, cntj") == Program("fwft", 72, Seq("ktlj", "cntj")))
+    assert(parseProgram("fwft (72) -> ktlj, cntj, xhth") == Program("fwft", 72, Seq("ktlj", "cntj", "xhth")))
+  }
+
   test("Part 1 example") {
     val input =
       """pbga (66)
@@ -44,11 +51,11 @@ class Day7Test extends FunSuite {
         |gyxo (61)
         |cntj (57)""".stripMargin
 
-    assert(wrongHeight(input) == 60)
+    assert(correctBalanceWeight(input) == 60)
   }
 
   test("Part 2 input answer") {
-    assert(wrongHeight(input) == 1526)
+    assert(correctBalanceWeight(input) == 1526)
   }
 
 }

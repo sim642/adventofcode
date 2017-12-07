@@ -2,75 +2,73 @@ package eu.sim642.adventofcode2017
 
 object Day7 {
 
-  val lineRe = "(\\w+) \\((\\d+)\\)(?: -> (\\w+(?:, \\w+)*))?".r
+  case class Program(name: String, weight: Int, children: Seq[String])
 
-  case class Program(name: String, weight: Int, children: Set[String])
+  private val programRegex = """(\w+) \((\d+)\)(?: -> (\w+(?:, \w+)*))?""".r("name", "weight", "children") // IDEA doesn't seem to support raw string interpolator
+
+  def parseProgram(programStr: String): Program = programStr match {
+    case programRegex(name, weight, childrenStr) =>
+      val children = Option(childrenStr).map(_.split(", ").toSeq).getOrElse(Seq())
+      Program(name, weight.toInt, children)
+  }
+
+  def parsePrograms(programsStr: String): Map[String, Program] = {
+    programsStr.lines.map(_.trim).map(line => {
+      val program = parseProgram(line)
+      program.name -> program
+    }).toMap
+  }
 
   def bottomProgram(programs: Map[String, Program]): String = {
     val parents: Map[String, String] =
       for {
-        (prog, prog2) <- programs
-        child <- prog2.children
-      } yield child -> prog
+        (name, program) <- programs
+        child <- program.children
+      } yield child -> name
 
     programs.keys.find(!parents.contains(_)).get
   }
 
-  def bottomProgram(input: String): String = {
-    bottomProgram(parseInput(input))
+  def bottomProgram(programsStr: String): String = {
+    bottomProgram(parsePrograms(programsStr))
   }
 
-  private def parseInput(input: String) = {
-    val children = input.lines.map(_.trim).map({
-      case lineRe(program, weight, childPrograms) =>
-        val childs = if (childPrograms != null) childPrograms.split(", ").toSet else Set[String]()
-        program -> Program(program, weight.toInt, childs)
-    }).toMap
-    children
-  }
-
-  def wrongHeight(programs: Map[String, Program]): Int = {
-    val bottom = bottomProgram(programs)
-
-    def helper(program: String): Either[Int, Int] = {
-      val childSeq = programs(program).children.toSeq
-      val cs = childSeq.map(helper)
-      cs.find(_.isLeft) match {
-        case Some(either) => either
+  def correctBalanceWeight(programs: Map[String, Program]): Int = {
+    def helper(program: Program): Either[Int, Int] = {
+      val childResults = program.children.map(programs).map(child => child.name -> helper(child)).toMap
+      childResults.values.find(_.isLeft) match {
+        case Some(left) => left
         case None =>
-          val recWeights = cs.map(_.right.get)
-          if (recWeights.distinct.size <= 1) {
-            // all balanced
-            Right(programs(program).weight + recWeights.sum)
-          }
+          val childTotalWeights = childResults.mapValues(_.right.get)
+          val totalWeightChildren = program.children.groupBy(childTotalWeights)
+
+          if (totalWeightChildren.size <= 1)
+            Right(program.weight + childTotalWeights.values.sum) // no children or balanced
           else {
-            // imbalanced
-            val childWeight = childSeq.zip(recWeights).toMap
-            val weightChild = (for {
-              (prog, w) <- childWeight.toSeq
-            } yield w -> prog).groupBy(_._1).mapValues(_.map(_._2))
+            require(totalWeightChildren.size == 2) // imbalanced
 
-            val badChild = weightChild.find(_._2.size == 1).get._2.head
-            val badWeight = childWeight(badChild)
-            val badw = programs(badChild).weight
-            val goodWeight = weightChild.find(_._2.size > 1).get._1
+            val badChild = totalWeightChildren.find(_._2.size == 1).get._2.head // only one is imbalanced
+            val badChildWeight = programs(badChild).weight
+            val badChildTotalWeight = childTotalWeights(badChild)
+            val goodTotalWeight = totalWeightChildren.find(_._2.size > 1).get._1 // imbalance is not ambiguous, more of other
 
-            Left(goodWeight - (badWeight - badw))
+            Left(goodTotalWeight - (badChildTotalWeight - badChildWeight))
           }
       }
     }
 
+    val bottom = programs(bottomProgram(programs))
     helper(bottom).left.get
   }
 
-  def wrongHeight(input: String): Int = {
-    wrongHeight(parseInput(input))
+  def correctBalanceWeight(programsStr: String): Int = {
+    correctBalanceWeight(parsePrograms(programsStr))
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(bottomProgram(input))
-    println(wrongHeight(input))
+    println(correctBalanceWeight(input))
   }
 }
