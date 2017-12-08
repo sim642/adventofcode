@@ -2,8 +2,14 @@ package eu.sim642.adventofcode2017
 
 import Day8._
 import org.scalatest.FunSuite
+import org.scalatest.prop.PropertyChecks
 
-class Day8Test extends FunSuite {
+class Day8Test extends FunSuite with PropertyChecks {
+
+  val exampleInstructionsStr = """b inc 5 if a > 1
+                          |a inc 1 if b < 5
+                          |c dec -10 if a >= 1
+                          |c inc -20 if c == 10""".stripMargin
 
   test("parseInstruction") {
     assert(parseInstruction("b inc 5 if a > 1") == Instruction("b", Inc(5), Condition("a", Greater, 1)))
@@ -13,11 +19,23 @@ class Day8Test extends FunSuite {
   }
 
   test("Part 1 example") {
-    val instructionsStr = """b inc 5 if a > 1
-                            |a inc 1 if b < 5
-                            |c dec -10 if a >= 1
-                            |c inc -20 if c == 10""".stripMargin
-    assert(largestValueAfter(instructionsStr) == 1)
+    assert(largestValueAfter(exampleInstructionsStr) == 1)
+  }
+
+  test("Part 1 example states") {
+    val registerss = Table(
+      "registers",
+      Map(),
+      Map(),
+      Map("a" -> 1),
+      Map("a" -> 1, "c" -> 10),
+      Map("a" -> 1, "c" -> -10)
+    )
+
+    val registersIt = Day8.run(parseInstructions(exampleInstructionsStr))
+    forAll (registerss) { registers =>
+      assert(registersIt.next() == registers)
+    }
   }
 
   test("Part 1 input answer") {
@@ -25,11 +43,7 @@ class Day8Test extends FunSuite {
   }
 
   test("Part 2 example") {
-    val instructionsStr = """b inc 5 if a > 1
-                            |a inc 1 if b < 5
-                            |c dec -10 if a >= 1
-                            |c inc -20 if c == 10""".stripMargin
-    assert(largestValueDuring(instructionsStr) == 10)
+    assert(largestValueDuring(exampleInstructionsStr) == 10)
   }
 
   test("Part 2 input answer") {
