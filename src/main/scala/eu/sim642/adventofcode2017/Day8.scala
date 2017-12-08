@@ -24,10 +24,10 @@ object Day8 {
 
   def parseInstruction(instructionStr: String): Instruction = instructionStr match {
     case instructionRegex(register, op, amount, conditionRegister, comp, conditionAmount) =>
-      val operation = op match {
-        case "inc" => Inc(amount.toInt)
-        case "dec" => Dec(amount.toInt)
-      }
+      val operation = (op match {
+        case "inc" => Inc
+        case "dec" => Dec
+      })(amount.toInt)
 
       val comparison = comp match {
         case "==" => Eq
@@ -47,8 +47,7 @@ object Day8 {
 
   type Registers = Map[Register, Int]
 
-  def evalCondition(condition: Condition, registers: Registers): Boolean = {
-    val registerAmount = registers(condition.register)
+  def evalCondition(condition: Condition, registerAmount: Int): Boolean = {
     condition.comparison match {
       case Eq => registerAmount == condition.amount
       case NotEq => registerAmount != condition.amount
@@ -64,18 +63,19 @@ object Day8 {
     case Dec(amount) => registerAmount - amount
   }
 
-  def run(instructions: Instructions): Registers = {
-    instructions.foldLeft(Map.empty.withDefaultValue(0): Registers) { (registers, instruction) =>
-      if (evalCondition(instruction.condition, registers))
-        registers.updated(instruction.register, execOperation(instruction.operation, registers(instruction.register)))
-      else
-        registers
-    }
+  implicit class LastIterator[A](iterator: Iterator[A]) {
+    def last: A = iterator.reduce((_, x) => x)
   }
 
-  def run2(instructions: Instructions): Iterator[Registers] = {
-    instructions.toIterator.scanLeft(Map.empty.withDefaultValue(0): Registers) { (registers, instruction) =>
-      if (evalCondition(instruction.condition, registers))
+  implicit class OptionIntIterable(iterable: Iterable[Int]) {
+    def maxOption: Option[Int] = iterable.reduceOption(_ max _)
+  }
+
+  private val defaultAmount = 0
+
+  def run(instructions: Instructions): Iterator[Registers] = {
+    instructions.toIterator.scanLeft(Map.empty.withDefaultValue(defaultAmount): Registers) { (registers, instruction) =>
+      if (evalCondition(instruction.condition, registers(instruction.condition.register)))
         registers.updated(instruction.register, execOperation(instruction.operation, registers(instruction.register)))
       else
         registers
@@ -83,17 +83,15 @@ object Day8 {
   }
 
   def largestValueAfter(instructions: Instructions): Int = {
-    val registers = run(instructions)
+    val registers = run(instructions).last
     registers.values.max
   }
 
   def largestValueAfter(instructionsStr: String): Int = largestValueAfter(parseInstructions(instructionsStr))
 
   def largestValueDuring(instructions: Instructions): Int = {
-    val registerss = run2(instructions)
-    registerss.foldLeft(0) { (largestValue, registers) =>
-        largestValue max registers.values.reduceOption(_ max _).getOrElse(0)
-    }
+    val registerss = run(instructions)
+    registerss.flatMap(_.values.maxOption).max
   }
 
   def largestValueDuring(instructionsStr: String): Int = largestValueDuring(parseInstructions(instructionsStr))
