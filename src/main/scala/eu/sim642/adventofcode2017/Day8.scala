@@ -73,16 +73,35 @@ object Day8 {
     }
   }
 
-  def largestValue(instructions: Instructions): Int = {
+  def run2(instructions: Instructions): Iterator[Registers] = {
+    instructions.toIterator.scanLeft(Map.empty.withDefaultValue(0): Registers) { (registers, instruction) =>
+      if (evalCondition(instruction.condition, registers))
+        registers.updated(instruction.register, execOperation(instruction.operation, registers(instruction.register)))
+      else
+        registers
+    }
+  }
+
+  def largestValueAfter(instructions: Instructions): Int = {
     val registers = run(instructions)
     registers.values.max
   }
 
-  def largestValue(instructionsStr: String): Int = largestValue(parseInstructions(instructionsStr))
+  def largestValueAfter(instructionsStr: String): Int = largestValueAfter(parseInstructions(instructionsStr))
+
+  def largestValueDuring(instructions: Instructions): Int = {
+    val registerss = run2(instructions)
+    registerss.foldLeft(0) { (largestValue, registers) =>
+        largestValue max registers.values.reduceOption(_ max _).getOrElse(0)
+    }
+  }
+
+  def largestValueDuring(instructionsStr: String): Int = largestValueDuring(parseInstructions(instructionsStr))
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(largestValue(input))
+    println(largestValueAfter(input))
+    println(largestValueDuring(input))
   }
 }

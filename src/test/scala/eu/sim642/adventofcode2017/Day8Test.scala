@@ -17,11 +17,23 @@ class Day8Test extends FunSuite {
                             |a inc 1 if b < 5
                             |c dec -10 if a >= 1
                             |c inc -20 if c == 10""".stripMargin
-    assert(largestValue(instructionsStr) == 1)
+    assert(largestValueAfter(instructionsStr) == 1)
   }
 
   test("Part 1 input answer") {
-    assert(largestValue(input) == 5752)
+    assert(largestValueAfter(input) == 5752)
+  }
+
+  test("Part 2 example") {
+    val instructionsStr = """b inc 5 if a > 1
+                            |a inc 1 if b < 5
+                            |c dec -10 if a >= 1
+                            |c inc -20 if c == 10""".stripMargin
+    assert(largestValueDuring(instructionsStr) == 10)
+  }
+
+  test("Part 2 input answer") {
+    assert(largestValueDuring(input) == 6366)
   }
 
 }
