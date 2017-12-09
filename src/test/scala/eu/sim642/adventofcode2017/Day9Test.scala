@@ -76,4 +76,29 @@ class Day9Test extends FunSuite with PropertyChecks {
       assert(countScore(str) == score)
     }
   }
+
+  test("Part 1 input answer") {
+    assert(countScore(input) == 10050)
+  }
+
+  test("stripGarbageCount") {
+    val strCounts = Table(
+      ("str", "count"),
+      ("<>", 0),
+      ("<random characters>", 17),
+      ("<<<<>", 3),
+      ("<{!>}>", 2),
+      ("<!!>", 0),
+      ("<!!!>>", 0),
+      ("<{o\"i!a,<{i<a>", 10)
+    )
+
+    forAll (strCounts) { (str, count) =>
+      assert(stripGarbageCount(str) == count)
+    }
+  }
+
+  test("Part 2 input answer") {
+    assert(stripGarbageCount(input) == 4482)
+  }
 }

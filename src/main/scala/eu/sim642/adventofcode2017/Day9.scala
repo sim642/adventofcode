@@ -34,9 +34,30 @@ object Day9 {
 
   def countScore(str: String): Int = countScore(str.toList)
 
+  def skipGarbageCount(chars: List[Char]): (List[Char], Int) = chars match {
+    case '>' :: xs => (xs, 0)
+    case '!' :: _ :: xs =>
+      val (rest, cnt) = skipGarbageCount(xs)
+      (rest, cnt)
+    case _ :: xs =>
+      val (rest, cnt) = skipGarbageCount(xs)
+      (rest, 1 + cnt)
+  }
+
+  def stripGarbageCount(chars: List[Char]): Int = chars match {
+    case Nil => 0
+    case '<' :: xs =>
+      val (rest, cnt) = skipGarbageCount(xs)
+      cnt + stripGarbageCount(rest)
+    case _ :: xs => stripGarbageCount(xs)
+  }
+
+  def stripGarbageCount(str: String): Int = stripGarbageCount(str.toList)
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countScore(input))
+    println(stripGarbageCount(input))
   }
 }
