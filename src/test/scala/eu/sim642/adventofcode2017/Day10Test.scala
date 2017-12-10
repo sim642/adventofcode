@@ -19,17 +19,17 @@ class Day10Test extends FunSuite with PropertyChecks {
 
     var currentState = exampleInitialState
     forAll (lengthStates) { (length, state) =>
-      currentState = currentState.reverse(length)
+      currentState = currentState.reversed(length)
       assert(currentState == state)
     }
   }
 
-  test("Part 1 example hash") {
-    assert(simulate(exampleInitialState, Seq(3, 4, 1, 5)).hash == 12)
+  test("Part 1 example check product") {
+    assert(simulate(exampleInitialState, Seq(3, 4, 1, 5)).checkProduct == 12)
   }
 
   test("Part 1 input answer") {
-    assert(simulate(KnotState(), inputLengths).hash == 46600)
+    assert(knotCheckProduct(input) == 46600)
   }
 
   test("Part 2 example lengths") {
@@ -54,7 +54,7 @@ class Day10Test extends FunSuite with PropertyChecks {
     )
 
     forAll (hashes) { (input, hash) =>
-      assert(hash2(input) == hash)
+      assert(knotHash(input) == hash)
     }
   }
 }

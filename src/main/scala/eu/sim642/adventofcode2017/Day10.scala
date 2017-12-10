@@ -6,7 +6,7 @@ object Day10 {
                        pos: Int = 0,
                        skipSize: Int = 0) {
 
-    def reverse(length: Int): KnotState = {
+    def reversed(length: Int): KnotState = {
       val buf = elems.toBuffer
       for (i <- 0 until length) {
         buf((pos + i) % buf.size) = elems((pos + length - i - 1) % buf.size)
@@ -15,10 +15,15 @@ object Day10 {
       KnotState(buf.toVector, (pos + length + skipSize) % buf.size, skipSize + 1)
     }
 
-    def hash: Int = elems.take(2).product
+    def checkProduct: Int = elems.take(2).product
   }
 
-  def simulate(knotState: KnotState, lengths: Seq[Int]): KnotState = lengths.foldLeft(knotState)(_.reverse(_))
+  def simulate(initialKnotState: KnotState, lengths: Seq[Int]): KnotState = lengths.foldLeft(initialKnotState)(_.reversed(_))
+
+  def knotCheckProduct(input: String): Int = {
+    val lengths = input.split(",").toSeq.map(_.toInt)
+    simulate(KnotState(), lengths).checkProduct
+  }
 
   def asciiLengths(input: String): Seq[Int] = input.map(_.toInt) ++ Seq(17, 31, 73, 47, 23)
 
@@ -32,13 +37,12 @@ object Day10 {
 
   def mkHexString(dense: Seq[Int]): String = dense.map(_.formatted("%02x")).mkString
 
-  def hash2(input: String): String = mkHexString(sparse2dense(simulate64(KnotState(), asciiLengths(input)).elems))
+  def knotHash(input: String): String = mkHexString(sparse2dense(simulate64(KnotState(), asciiLengths(input)).elems))
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
-  lazy val inputLengths: Seq[Int] = input.split(",").toSeq.map(_.toInt)
 
   def main(args: Array[String]): Unit = {
-    println(simulate(KnotState(), inputLengths).hash)
-    println(hash2(input))
+    println(knotCheckProduct(input))
+    println(knotHash(input))
   }
 }
