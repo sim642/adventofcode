@@ -10,6 +10,8 @@ object Day11 {
     def manhattanDistance(that: HexPos): Int = ((this.x - that.x).abs + (this.y - that.y).abs + (this.z - that.z).abs) / 2
 
     def move(moves: Seq[String]): HexPos = moves.foldLeft(this)(_ + HexPos.neighbors(_))
+
+    def movePoss(moves: Seq[String]): Seq[HexPos] = moves.scanLeft(this)(_ + HexPos.neighbors(_))
   }
 
   object HexPos {
@@ -29,9 +31,15 @@ object Day11 {
 
   def fewestSteps(input: String): Int = fewestSteps(input.split(","))
 
+
+  def furthestSteps(moves: Seq[String]): Int = HexPos.zero.movePoss(moves).map(_ manhattanDistance HexPos.zero).max
+
+  def furthestSteps(input: String): Int = furthestSteps(input.split(","))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(fewestSteps(input))
+    println(furthestSteps(input))
   }
 }

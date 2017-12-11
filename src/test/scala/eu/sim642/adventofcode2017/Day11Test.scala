@@ -23,4 +23,8 @@ class Day11Test extends FunSuite with PropertyChecks {
   test("Part 1 input answer") {
     assert(fewestSteps(input) == 675)
   }
+
+  test("Part 2 input answer") {
+    assert(furthestSteps(input) == 1424)
+  }
 }
