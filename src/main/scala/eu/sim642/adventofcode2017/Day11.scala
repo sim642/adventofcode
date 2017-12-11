@@ -2,6 +2,9 @@ package eu.sim642.adventofcode2017
 
 object Day11 {
 
+  /**
+    * https://www.redblobgames.com/grids/hexagons/
+    */
   case class HexPos(x: Int, y: Int, z: Int) {
     require(x + y + z == 0)
 
@@ -9,9 +12,11 @@ object Day11 {
 
     def manhattanDistance(that: HexPos): Int = ((this.x - that.x).abs + (this.y - that.y).abs + (this.z - that.z).abs) / 2
 
-    def move(moves: Seq[String]): HexPos = moves.foldLeft(this)(_ + HexPos.neighbors(_))
+    def move(move: String): HexPos = this + HexPos.neighbors(move)
 
-    def movePoss(moves: Seq[String]): Seq[HexPos] = moves.scanLeft(this)(_ + HexPos.neighbors(_))
+    def move(moves: Seq[String]): HexPos = moves.foldLeft(this)(_.move(_))
+
+    def moves(moves: Seq[String]): Seq[HexPos] = moves.scanLeft(this)(_.move(_))
   }
 
   object HexPos {
@@ -32,7 +37,7 @@ object Day11 {
   def fewestSteps(input: String): Int = fewestSteps(input.split(","))
 
 
-  def furthestSteps(moves: Seq[String]): Int = HexPos.zero.movePoss(moves).map(_ manhattanDistance HexPos.zero).max
+  def furthestSteps(moves: Seq[String]): Int = HexPos.zero.moves(moves).map(_ manhattanDistance HexPos.zero).max
 
   def furthestSteps(input: String): Int = furthestSteps(input.split(","))
 
