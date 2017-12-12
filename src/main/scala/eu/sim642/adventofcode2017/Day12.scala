@@ -18,11 +18,12 @@ object Day12 {
 
     def helper(visited: Set[Node], toVisit: Set[Node]): Set[Node] = {
       val neighbors = toVisit.flatMap(nodeNeighbors)
+      val newVisited = visited union toVisit
       val newToVisit = neighbors diff visited
       if (newToVisit.isEmpty)
-        visited
+        newVisited
       else
-        helper(visited union toVisit, newToVisit)
+        helper(newVisited, newToVisit)
     }
 
     helper(Set.empty, Set(startNode))
@@ -30,9 +31,23 @@ object Day12 {
 
   def groupSize(input: String): Int = bfs(parseNodes(input), 0).size
 
+  def bfsGroups(nodeNeighbors: NodeNeighbors): Set[Set[Node]] = {
+    if (nodeNeighbors.isEmpty)
+      Set.empty
+    else {
+      val (startNode, _) = nodeNeighbors.head
+      val group = bfs(nodeNeighbors, startNode)
+      val restNodeNeighbors = nodeNeighbors.filterKeys(!group(_)).mapValues(_.filterNot(group))
+      bfsGroups(restNodeNeighbors) + group
+    }
+  }
+
+  def groupCount(input: String): Int = bfsGroups(parseNodes(input)).size
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(groupSize(input))
+    println(groupCount(input))
   }
 }
