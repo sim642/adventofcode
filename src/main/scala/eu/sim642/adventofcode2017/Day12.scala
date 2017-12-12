@@ -4,6 +4,7 @@ object Day12 {
 
   type Node = Int
   type NodeNeighbors = Map[Node, Seq[Node]]
+  type NodeComponent = Set[Node]
 
   private val nodeRegex = """(\d+) <-> (\d+(?:, \d+)*)""".r
 
@@ -14,12 +15,12 @@ object Day12 {
 
   def parseNodes(nodesInput: String): NodeNeighbors = nodesInput.lines.map(parseNode).toMap
 
-  def bfs(nodeNeighbors: NodeNeighbors, startNode: Node): Set[Node] = {
+  def bfs(nodeNeighbors: NodeNeighbors, startNode: Node): NodeComponent = {
 
-    def helper(visited: Set[Node], toVisit: Set[Node]): Set[Node] = {
+    def helper(visited: Set[Node], toVisit: Set[Node]): NodeComponent = {
       val neighbors = toVisit.flatMap(nodeNeighbors)
-      val newVisited = visited union toVisit
-      val newToVisit = neighbors diff visited
+      val newVisited = visited ++ toVisit
+      val newToVisit = neighbors -- visited
       if (newToVisit.isEmpty)
         newVisited
       else
@@ -29,15 +30,17 @@ object Day12 {
     helper(Set.empty, Set(startNode))
   }
 
-  def groupSize(input: String): Int = bfs(parseNodes(input), 0).size
+  def groupSize(input: String, startNode: Int = 0): Int = bfs(parseNodes(input), startNode).size
 
-  def bfsGroups(nodeNeighbors: NodeNeighbors): Set[Set[Node]] = {
+  def bfsGroups(nodeNeighbors: NodeNeighbors): Set[NodeComponent] = {
     if (nodeNeighbors.isEmpty)
       Set.empty
     else {
-      val (startNode, _) = nodeNeighbors.head
-      val group = bfs(nodeNeighbors, startNode)
-      val restNodeNeighbors = nodeNeighbors.filterKeys(!group(_)).mapValues(_.filterNot(group))
+      val (startNode, _) = nodeNeighbors.head // take any node
+      val group = bfs(nodeNeighbors, startNode) // find its component
+      val restNodeNeighbors =
+        nodeNeighbors.filterKeys(!group(_)).mapValues(_.filterNot(group))  // remove component from graph (nodes and edges)
+          .view.force // copy map for efficiency rather than chaining FilteredKeys & MappedValues - https://stackoverflow.com/a/14883167/854540
       bfsGroups(restNodeNeighbors) + group
     }
   }
