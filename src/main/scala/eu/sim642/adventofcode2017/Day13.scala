@@ -10,6 +10,7 @@ object Day13 {
 
   def parseRanges(input: String): Map[Int, Int] = input.lines.map(parseRange).toMap
 
+  // not really needed
   def rangePosition(range: Int, time: Int): Int = {
     val range1 = range - 1
     val q = time / range1
@@ -22,8 +23,11 @@ object Day13 {
 
   def rangesPositions(ranges: Map[Int, Int], time: Int): Map[Int, Int] = ranges.mapValues(rangePosition(_, time))
 
+  // only needed to check 0
+  def rangeCaught(range: Int, time: Int): Boolean = time % (2 * (range - 1)) == 0
+
   def rangesCaught(ranges: Map[Int, Int], delay: Int = 0): Set[Int] = {
-    ranges.filter({ case (depth, range) => rangePosition(range, delay + depth) == 0 }).keySet
+    ranges.filter({ case (depth, range) => rangeCaught(range, delay + depth) }).keySet
   }
 
   def tripSeverity(ranges: Map[Int, Int]): Int = {
