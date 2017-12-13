@@ -33,4 +33,16 @@ class Day13Test extends FunSuite with PropertyChecks {
   test("Part 1 input answer") {
     assert(tripSeverity(input) == 1900)
   }
+
+  test("Part 2 example caught") {
+    assert(rangesCaught(exampleRanges, 10) == Set.empty)
+  }
+
+  test("Part 2 example uncaught delay") {
+    assert(uncaughtDelay(exampleRanges) == 10)
+  }
+
+  test("Part 2 input answer") {
+    assert(uncaughtDelay(input) == 3966414)
+  }
 }

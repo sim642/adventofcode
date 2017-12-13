@@ -22,8 +22,8 @@ object Day13 {
 
   def rangesPositions(ranges: Map[Int, Int], time: Int): Map[Int, Int] = ranges.mapValues(rangePosition(_, time))
 
-  def rangesCaught(ranges: Map[Int, Int]): Set[Int] = {
-    ranges.filter({ case (depth, range) => rangePosition(range, depth) == 0 }).keySet
+  def rangesCaught(ranges: Map[Int, Int], delay: Int = 0): Set[Int] = {
+    ranges.filter({ case (depth, range) => rangePosition(range, delay + depth) == 0 }).keySet
   }
 
   def tripSeverity(ranges: Map[Int, Int]): Int = {
@@ -33,9 +33,14 @@ object Day13 {
 
   def tripSeverity(input: String): Int = tripSeverity(parseRanges(input))
 
+  def uncaughtDelay(ranges: Map[Int, Int]): Int = Stream.from(0).find(delay => rangesCaught(ranges, delay).isEmpty).get
+
+  def uncaughtDelay(input: String): Int = uncaughtDelay(parseRanges(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(tripSeverity(input))
+    println(uncaughtDelay(input))
   }
 }
