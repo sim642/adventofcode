@@ -12,4 +12,12 @@ class Day14Test extends FunSuite {
   test("Part 1 input answer") {
     assert(squaresUsed(input) == 8140)
   }
+
+  test("Part 2 example") {
+    assert(regionsCount("flqrgnkx") == 1242)
+  }
+
+  test("Part 2 input answer") {
+    assert(regionsCount(input) == 1182)
+  }
 }
