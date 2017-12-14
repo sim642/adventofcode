@@ -54,7 +54,7 @@ class Day10Test extends FunSuite with PropertyChecks {
     )
 
     forAll (hashes) { (input, hash) =>
-      assert(knotHash(input) == hash)
+      assert(knotHashHex(input) == hash)
     }
   }
 }

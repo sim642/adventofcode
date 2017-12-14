@@ -35,14 +35,18 @@ object Day10 {
 
   def sparse2dense(sparse: Seq[Int]): Seq[Int] = sparse.grouped(16).map(_.reduce(_ ^ _)).toSeq
 
+  def knotHash(input: String): Seq[Int] = {
+    sparse2dense(simulate64(KnotState(), asciiLengths(input)).elems)
+  }
+
   def mkHexString(dense: Seq[Int]): String = dense.map(_.formatted("%02x")).mkString
 
-  def knotHash(input: String): String = mkHexString(sparse2dense(simulate64(KnotState(), asciiLengths(input)).elems))
+  def knotHashHex(input: String): String = mkHexString(knotHash(input))
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(knotCheckProduct(input))
-    println(knotHash(input))
+    println(knotHashHex(input))
   }
 }
