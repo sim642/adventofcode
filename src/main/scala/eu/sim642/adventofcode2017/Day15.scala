@@ -32,15 +32,14 @@ object Day15 {
     override protected val defaultPairs: Int = 5000000
   }
 
-  /*private val inputRegex =
-    """Generator A starts with (\d+)\n
-      |Generator B starts with (\d+)""".r
+  private val inputRegex =
+    """Generator A starts with (\d+)
+      |Generator B starts with (\d+)""".stripMargin.r
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
   lazy val (inputStartA, inputStartB) = input match {
     case inputRegex(a, b) => (a.toInt, b.toInt)
-  }*/
-  val (inputStartA, inputStartB) = (116, 299)
+  }
 
   def main(args: Array[String]): Unit = {
     println(Part1.matchesCount(inputStartA, inputStartB))
