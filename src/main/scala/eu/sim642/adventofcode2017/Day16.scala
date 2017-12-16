@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.adventofcode2017.Day6.FloydSolution.floyd
+
 object Day16 {
 
   type Name = Char
@@ -35,9 +37,23 @@ object Day16 {
 
   def applyMoves(movesStr: String, programsStr: String = ('a' to 'p').mkString): String = applyMoves(parseMoves(movesStr), programsStr.toVector).mkString
 
+  /*def applyMovesRepeat(moves: Seq[DanceMove], programs: Vector[Name], repeat: Int): Vector[Name] =
+    (0 until repeat).foldLeft(programs)((programs, _) => applyMoves(moves, programs))*/
+  def applyMovesRepeat(moves: Seq[DanceMove], programs: Vector[Name], repeat: Int): Vector[Name] = {
+    val (μ, λ) = floyd(programs, (programs: Vector[Name]) => applyMoves(moves, programs))
+    println(μ, λ)
+
+    val reducedRepeat = (repeat - μ) % λ
+    (0 until reducedRepeat).foldLeft(programs)((programs, _) => applyMoves(moves, programs))
+  }
+
+  def applyMovesRepeat(movesStr: String, programsStr: String = ('a' to 'p').mkString, repeat: Int = 1000000000): String =
+    applyMovesRepeat(parseMoves(movesStr), programsStr.toVector, repeat).mkString
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(applyMoves(input))
+    println(applyMovesRepeat(input))
   }
 }

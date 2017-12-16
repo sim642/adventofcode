@@ -34,4 +34,12 @@ class Day16Test extends FunSuite with PropertyChecks {
   test("Part 1 input answer") {
     assert(applyMoves(input) == "cknmidebghlajpfo")
   }
+
+  test("Part 2 example") {
+    assert(applyMovesRepeat("s1,x3/4,pe/b", "abcde", 2) == "ceadb")
+  }
+
+  test("Part 2 input answer") {
+    assert(applyMovesRepeat(input) == "cbolhmkgfpenidaj")
+  }
 }
