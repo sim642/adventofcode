@@ -35,4 +35,8 @@ class Day17Test extends FunSuite with PropertyChecks {
   test("Part 1 input answer") {
     assert(spinlockAfter(input) == 355)
   }
+
+  test("Part 2 input answer") {
+    assert(spinlockAfterZero(input) == 6154117)
+  }
 }
