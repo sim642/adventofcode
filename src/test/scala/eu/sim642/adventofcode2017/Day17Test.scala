@@ -7,6 +7,8 @@ import org.scalatest.prop.PropertyChecks
 class Day17Test extends FunSuite with PropertyChecks {
 
   test("Part 1 example states") {
+    import Part1._
+
     val states = Table(
       "state",
       SpinState(Vector(0), 0),
@@ -29,14 +31,14 @@ class Day17Test extends FunSuite with PropertyChecks {
   }
 
   test("Part 1 example") {
-    assert(spinlockAfter(3) == 638)
+    assert(Part1.spinlockAfter(3) == 638)
   }
 
   test("Part 1 input answer") {
-    assert(spinlockAfter(input) == 355)
+    assert(Part1.spinlockAfter(input) == 355)
   }
 
   test("Part 2 input answer") {
-    assert(spinlockAfterZero(input) == 6154117)
+    assert(Part2.spinlockAfter(input) == 6154117)
   }
 }
