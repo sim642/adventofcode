@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import scala.collection.immutable.Queue
+
 object Day18 {
 
   type Register = Char
@@ -21,13 +23,19 @@ object Day18 {
   type Instructions = Vector[Instruction]
   type Registers = Map[Register, Integer]
 
-  case class AsmState(instructions: Instructions, pc: Int = 0, registers: Registers = Map.empty.withDefaultValue(0), lastSnd: Option[Integer] = None) {
+  case class AsmState(instructions: Instructions,
+                      pc: Int = 0,
+                      registers: Registers = Map.empty.withDefaultValue(0),
+                      lastSnd: Option[Integer] = None,
+                      rcvs: Queue[Integer] = Queue.empty) {
     def get(value: Value): Integer = value match {
       case RegisterValue(register) => registers(register)
       case ConstValue(const) => const
     }
 
     def instruction: Instruction = instructions(pc)
+
+    def terminated: Boolean = !instructions.indices.contains(pc)
   }
 
   private val instructionRegex = """([a-z]+) ([a-z]|-?\d+)(?: ([a-z]|-?\d+))?""".r
@@ -55,7 +63,10 @@ object Day18 {
   def parseInstructions(str: String): Instructions = str.lines.map(parseInstruction).toVector
 
   def execSmallStep(state: AsmState): AsmState = {
-    val AsmState(instructions, pc, registers, lastSnd) = state
+    val AsmState(instructions, pc, registers, lastSnd, rcvs) = state
+
+    if (state.terminated)
+      state
 
     state.instruction match {
       case Snd(x) =>
@@ -65,10 +76,12 @@ object Day18 {
       case Mul(x, y) => state.copy(registers = registers + (x -> (registers(x) * state.get(y))), pc = pc + 1)
       case Mod(x, y) => state.copy(registers = registers + (x -> (registers(x) % state.get(y))), pc = pc + 1)
       case Rcv(x) =>
-        if (registers(x) != 0)
-          state.copy(registers = registers + (x -> lastSnd.get), pc = pc + 1)
-        else
-          state.copy(pc = pc + 1)
+        rcvs.dequeueOption match {
+          case Some((rcv, newRcvs)) =>
+            state.copy(registers = registers + (x -> rcv), rcvs = newRcvs, pc = pc + 1)
+          case None =>
+            state
+        }
       case Jgz(x, y) =>
         if (state.get(x) > 0)
           state.copy(pc = pc + state.get(y).toInt)
@@ -86,9 +99,65 @@ object Day18 {
 
   def firstRcv(input: String): Integer = firstRcv(parseInstructions(input))
 
+
+  type AsmStatePair = (AsmState, AsmState)
+
+  implicit class AsmStatePairExtra(statePair: AsmStatePair) {
+    private val (state0, state1) = statePair
+
+    def deadlocked: Boolean = {
+      if (state0.terminated || state1.terminated)
+        false
+      else {
+        (state0.instruction, state1.instruction) match {
+          case (Rcv(_), Rcv(_)) => state0.rcvs.isEmpty && state1.rcvs.isEmpty
+          case _ => false
+        }
+      }
+    }
+
+    def terminated: Boolean = (state0.terminated && state1.terminated) || deadlocked
+  }
+
+  def execSmallStepPair(statePair: AsmStatePair): AsmStatePair = {
+    val (state0, state1) = statePair
+    var (newState0, newState1) = (execSmallStep(state0), execSmallStep(state1))
+
+    if (newState0.lastSnd.isDefined) {
+      val snd = newState0.lastSnd.get
+      newState0 = newState0.copy(lastSnd = None)
+      newState1 = newState1.copy(rcvs = newState1.rcvs.enqueue(snd))
+    }
+
+    if (newState1.lastSnd.isDefined) {
+      val snd = newState1.lastSnd.get
+      newState1 = newState1.copy(lastSnd = None)
+      newState0 = newState0.copy(rcvs = newState0.rcvs.enqueue(snd))
+    }
+
+    (newState0, newState1)
+  }
+
+  def iterateSmallStepPair(instructions: Instructions): Iterator[AsmStatePair] =
+    Iterator.iterate((
+      AsmState(instructions, registers = Map('p' -> 0L).withDefaultValue(0)),
+      AsmState(instructions, registers = Map('p' -> 1L).withDefaultValue(0))
+    ))(execSmallStepPair)
+
+  def countSnd1(instructions: Instructions): Int = iterateSmallStepPair(instructions).takeWhile(!_.terminated).count(statePair => {
+    val state1 = statePair._2
+    state1.instruction match {
+      case Snd(_) => true
+      case _ => false
+    }
+  })
+
+  def countSnd1(input: String): Int = countSnd1(parseInstructions(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(firstRcv(input))
+    //println(firstRcv(input))
+    println(countSnd1(input))
   }
 }
