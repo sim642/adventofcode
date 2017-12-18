@@ -26,7 +26,7 @@ object Day18 {
   case class AsmState(instructions: Instructions,
                       pc: Int = 0,
                       registers: Registers = Map.empty.withDefaultValue(0),
-                      lastSnd: Option[Integer] = None,
+                      snds: Queue[Integer] = Queue.empty,
                       rcvs: Queue[Integer] = Queue.empty) {
     def get(value: Value): Integer = value match {
       case RegisterValue(register) => registers(register)
@@ -64,14 +64,14 @@ object Day18 {
 
   trait Part {
     def execSmallStep(state: AsmState): AsmState = {
-      val AsmState(instructions, pc, registers, lastSnd, rcvs) = state
+      val AsmState(instructions, pc, registers, snds, rcvs) = state
 
       if (state.terminated)
         state
 
       state.instruction match {
         case Snd(x) =>
-          state.copy(lastSnd = Some(state.get(x)), pc = pc + 1)
+          state.copy(snds = snds.enqueue(state.get(x)), pc = pc + 1)
         case Set(x, y) => state.copy(registers = registers + (x -> state.get(y)), pc = pc + 1)
         case Add(x, y) => state.copy(registers = registers + (x -> (registers(x) + state.get(y))), pc = pc + 1)
         case Mul(x, y) => state.copy(registers = registers + (x -> (registers(x) * state.get(y))), pc = pc + 1)
@@ -93,11 +93,11 @@ object Day18 {
 
   object Part1 extends Part {
     override protected def execRcvSmallStep(state: AsmState): AsmState = {
-      val AsmState(instructions, pc, registers, lastSnd, rcvs) = state
+      val AsmState(instructions, pc, registers, snds, rcvs) = state
       val Rcv(x) = state.instruction
 
       if (registers(x) != 0)
-        state.copy(registers = registers + (x -> lastSnd.get), pc = pc + 1)
+        state.copy(registers = registers + (x -> snds.last), pc = pc + 1)
       else
         state.copy(pc = pc + 1)
     }
@@ -105,14 +105,14 @@ object Day18 {
     def firstRcv(instructions: Instructions): Integer = iterateSmallStep(instructions).find(state => state.instruction match {
       case Rcv(x) => state.registers(x) != 0
       case _ => false
-    }).get.lastSnd.get
+    }).get.snds.last
 
     def firstRcv(input: String): Integer = firstRcv(parseInstructions(input))
   }
 
   object Part2 extends Part {
     override protected def execRcvSmallStep(state: AsmState): AsmState = {
-      val AsmState(instructions, pc, registers, lastSnd, rcvs) = state
+      val AsmState(instructions, pc, registers, snds, rcvs) = state
       val Rcv(x) = state.instruction
 
       rcvs.dequeueOption match {
@@ -146,17 +146,10 @@ object Day18 {
       val (state0, state1) = statePair
       var (newState0, newState1) = (execSmallStep(state0), execSmallStep(state1))
 
-      if (newState0.lastSnd.isDefined) {
-        val snd = newState0.lastSnd.get
-        newState0 = newState0.copy(lastSnd = None)
-        newState1 = newState1.copy(rcvs = newState1.rcvs.enqueue(snd))
-      }
-
-      if (newState1.lastSnd.isDefined) {
-        val snd = newState1.lastSnd.get
-        newState1 = newState1.copy(lastSnd = None)
-        newState0 = newState0.copy(rcvs = newState0.rcvs.enqueue(snd))
-      }
+      val snds0 = newState0.snds
+      val snds1 = newState1.snds
+      newState0 = newState0.copy(snds = Queue.empty, rcvs = newState0.rcvs.enqueue(snds1))
+      newState1 = newState1.copy(snds = Queue.empty, rcvs = newState1.rcvs.enqueue(snds0))
 
       (newState0, newState1)
     }

@@ -44,27 +44,27 @@ class Day18Test extends FunSuite with PropertyChecks {
 
   test("Part 1 example states") {
     val states = Table(
-      ("pc", "registers", "lastSnd"),
-      (0, Map(), None),
-      (1, Map('a' -> 1L), None),
-      (2, Map('a' -> 3L), None),
-      (3, Map('a' -> 9L), None),
-      (4, Map('a' -> 4L), None),
-      (5, Map('a' -> 4L), Some(4L)),
-      (6, Map('a' -> 0L), Some(4L)),
-      (7, Map('a' -> 0L), Some(4L)),
-      (8, Map('a' -> 0L), Some(4L)),
-      (9, Map('a' -> 1L), Some(4L)),
-      (7, Map('a' -> 1L), Some(4L)),
-      (6, Map('a' -> 1L), Some(4L))
+      ("pc", "registers", "snds"),
+      (0, Map(), Queue()),
+      (1, Map('a' -> 1L), Queue()),
+      (2, Map('a' -> 3L), Queue()),
+      (3, Map('a' -> 9L), Queue()),
+      (4, Map('a' -> 4L), Queue()),
+      (5, Map('a' -> 4L), Queue(4L)),
+      (6, Map('a' -> 0L), Queue(4L)),
+      (7, Map('a' -> 0L), Queue(4L)),
+      (8, Map('a' -> 0L), Queue(4L)),
+      (9, Map('a' -> 1L), Queue(4L)),
+      (7, Map('a' -> 1L), Queue(4L)),
+      (6, Map('a' -> 1L), Queue(4L))
     )
 
     val it = Part1.iterateSmallStep(parseInstructions(exampleInput1))
-    forAll (states) { (pc, registers, lastSnd) =>
+    forAll (states) { (pc, registers, snds) =>
       val state = it.next()
       assert(state.pc == pc)
       assert(state.registers == registers)
-      assert(state.lastSnd == lastSnd)
+      assert(state.snds == snds)
     }
   }
 
