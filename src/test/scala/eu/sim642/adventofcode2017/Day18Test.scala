@@ -42,7 +42,7 @@ class Day18Test extends FunSuite with PropertyChecks {
     ))
   }
 
-  ignore("Part 1 example states") {
+  test("Part 1 example states") {
     val states = Table(
       ("pc", "registers", "lastSnd"),
       (0, Map(), None),
@@ -59,7 +59,7 @@ class Day18Test extends FunSuite with PropertyChecks {
       (6, Map('a' -> 1L), Some(4L))
     )
 
-    val it = iterateSmallStep(parseInstructions(exampleInput1))
+    val it = Part1.iterateSmallStep(parseInstructions(exampleInput1))
     forAll (states) { (pc, registers, lastSnd) =>
       val state = it.next()
       assert(state.pc == pc)
@@ -68,12 +68,12 @@ class Day18Test extends FunSuite with PropertyChecks {
     }
   }
 
-  ignore("Part 1 example") {
-    assert(firstRcv(exampleInput1) == 4L)
+  test("Part 1 example") {
+    assert(Part1.firstRcv(exampleInput1) == 4L)
   }
 
-  ignore("Part 1 input answer") {
-    assert(firstRcv(input) == 8600L)
+  test("Part 1 input answer") {
+    assert(Part1.firstRcv(input) == 8600L)
   }
 
   test("Part 2 example states") {
@@ -88,7 +88,7 @@ class Day18Test extends FunSuite with PropertyChecks {
       (6, Map('p' -> 0L, 'a' -> 1L, 'b' -> 2L, 'c' -> 1L), Queue(), 6, Map('p' -> 1L, 'a' -> 1L, 'b' -> 2L, 'c' -> 0L), Queue())
     )
 
-    val it = iterateSmallStepPair(parseInstructions(exampleInput2))
+    val it = Part2.iterateSmallStepPair(parseInstructions(exampleInput2))
     forAll (states) { (pc0, registers0, rcvs0, pc1, registers1, rcvs1) =>
       val (state0, state1) = it.next()
       assert(state0.pc == pc0)
@@ -101,10 +101,10 @@ class Day18Test extends FunSuite with PropertyChecks {
   }
 
   test("Part 2 example") {
-    assert(countSnd1(exampleInput2) == 3)
+    assert(Part2.countSnd1(exampleInput2) == 3)
   }
 
   test("Part 2 input answer") {
-    assert(countSnd1(input) == 7239)
+    assert(Part2.countSnd1(input) == 7239)
   }
 }
