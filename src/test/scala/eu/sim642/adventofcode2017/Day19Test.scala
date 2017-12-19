@@ -14,4 +14,12 @@ class Day19Test extends FunSuite {
   test("Part 1 input answer") {
     assert(pathLetters(input) == "MOABEUCWQS")
   }
+
+  test("Part 2 example") {
+    assert(pathLength(exampleInput) == 38)
+  }
+
+  test("Part 2 input answer") {
+    assert(pathLength(input) == 18058)
+  }
 }
