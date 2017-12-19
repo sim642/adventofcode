@@ -23,9 +23,7 @@ object Day19 {
     def next: PathState = char match {
       case ' ' =>
         this
-      case '|' =>
-        copy(pos = pos + prevOffset)
-      case '-' =>
+      case '|' | '-' =>
         copy(pos = pos + prevOffset)
       case '+' =>
         val offsets = Pos.axisOffsets.toSet - (-prevOffset)
