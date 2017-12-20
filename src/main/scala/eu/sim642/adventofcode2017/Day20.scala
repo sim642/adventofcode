@@ -57,11 +57,21 @@ object Day20 {
     }
   }
 
+  /*
+  t=0 (p, v, a)
+  t=1 (p+v+a, v+a, a)
+  t=2 (p+v+a+v+a+a, v+a+a, a) == (p+2v+3a, v+2a, a)
+  t=3 (p+v+a+v+a+a+v+a+a+a, v+a+a+a, a) == (p+3v+6a, v+3a, a)
+  t=4 (p+v+a+v+a+a+v+a+a+a+v+a+a+a+a, v+a+a+a+a, a) == (p+4v+10a, v+4a, a)
+
+  p + t*v + (t*(t+1)/2)*a = p + t*v + ((t*t+t)/2)*a = p + t*v + (t*t/2)*a + (t/2)*a = p + t*v + t*(a/2) + t*t*(a/2) = p + t*(v + a/2) + t*t*(a/2) =
+   */
+
   case class Particle(p: Pos3, v: Pos3, a: Pos3) {
     def collides(that: Particle): Solution[Int] = Quadratic.solveSimInt(Seq(
-      ((a.x - that.a.x) / 2.0, v.x - that.v.x, p.x - that.p.x),
-      ((a.y - that.a.y) / 2.0, v.y - that.v.y, p.y - that.p.y),
-      ((a.z - that.a.z) / 2.0, v.z - that.v.z, p.z - that.p.z)
+      ((a.x - that.a.x) / 2.0, (v.x + a.x / 2.0) - (that.v.x + that.a.x / 2.0), p.x - that.p.x),
+      ((a.y - that.a.y) / 2.0, (v.y + a.y / 2.0) - (that.v.y + that.a.y / 2.0), p.y - that.p.y),
+      ((a.z - that.a.z) / 2.0, (v.z + a.z / 2.0) - (that.v.z + that.a.z / 2.0), p.z - that.p.z)
     ))
   }
 

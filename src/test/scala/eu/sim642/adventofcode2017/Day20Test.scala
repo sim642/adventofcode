@@ -38,4 +38,8 @@ class Day20Test extends FunSuite {
   test("Part 2 example") {
     assert(particlesLeft(exampleInput2) == 1)
   }
+
+  test("Part 2 input answer") {
+    assert(particlesLeft(input) == 571)
+  }
 }
