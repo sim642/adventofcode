@@ -26,18 +26,29 @@ object Day20 {
 
   def parseParticles(input: String): Seq[Particle] = input.lines.map(parseParticle).toSeq
 
+  val maxIterations = 1000
+
   def staysClosest(particles: Seq[Particle]): Int = {
-    val endParticles = (0 until 1000).foldLeft(particles.toVector)({ case (acc, _) => acc.map(_.updated) })
+    val endParticles = (0 until maxIterations).foldLeft(particles.toVector)({ case (acc, _) => acc.map(_.updated) })
     endParticles.zipWithIndex.minBy({ case (p, i) => p.p manhattanDistance Pos3(0, 0, 0) })._2
   }
 
   def staysClosest(input: String): Int = staysClosest(parseParticles(input))
 
+  def particlesLeft(particles: Seq[Particle]): Int = {
+    val endParticles = (0 until maxIterations).foldLeft(particles.toSet)({ case (acc, _) =>
+      val collided = acc.groupBy(_.p).filter(_._2.size > 1).flatMap(_._2).toSet
+      (acc -- collided).map(_.updated)
+    })
+    endParticles.size
+  }
+
+  def particlesLeft(input: String): Int = particlesLeft(parseParticles(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(staysClosest(input)) // 119 too low
-
-    parseParticles(input).zipWithIndex.sortBy(_._1.a manhattanDistance Pos3(0, 0, 0)).foreach(println)
+    println(staysClosest(input))
+    println(particlesLeft(input))
   }
 }
