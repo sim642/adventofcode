@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.adventofcode2017.Day20.Quadratic.{AnySolution, Solution, Solutions}
+
 object Day20 {
 
   case class Pos3(x: Int, y: Int, z: Int) {
@@ -12,7 +14,56 @@ object Day20 {
 
   private val particleRegex = """p=<\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)>, v=<\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)>, a=<\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)>""".r
 
-  case class Particle(p: Pos3, v: Pos3, a: Pos3)
+  object Quadratic {
+    sealed trait Solution[+A]
+    case class Solutions[A](sols: Set[A]) extends Solution[A]
+    case object AnySolution extends Solution[Nothing]
+
+    def solve(a: Double, b: Double, c: Double): Solution[Double] = {
+      if (a != 0) {
+        val D = b * b - 4 * a * c
+        if (D >= 0) {
+          val d = Math.sqrt(D)
+          Solutions(Set((-b - d) / (2 * a), (-b + d) / (2 * a)))
+        }
+        else
+          Solutions(Set())
+      }
+      else if (b != 0)
+        Solutions(Set(-c / b))
+      else if (c != 0)
+        Solutions(Set())
+      else
+        AnySolution
+    }
+
+    def solveInt(a: Double, b: Double, c: Double): Solution[Int] = solve(a, b, c) match {
+      case Solutions(sols) => Solutions(sols.filter(_.isWhole()).map(_.toInt))
+      case AnySolution => AnySolution
+    }
+
+    def solveSimInt(coeffs: Seq[(Double, Double, Double)]): Solution[Int] = {
+      coeffs.foldLeft(AnySolution: Solution[Int])({
+        case (AnySolution, (a, b, c)) =>
+          solveInt(a, b, c)
+        case (Solutions(sols), (a, b, c)) =>
+          solveInt(a, b, c) match {
+            case Solutions(sols2) =>
+              Solutions(sols intersect sols2)
+            case AnySolution =>
+              Solutions(sols)
+          }
+      })
+    }
+  }
+
+  case class Particle(p: Pos3, v: Pos3, a: Pos3) {
+    def collides(that: Particle): Solution[Int] = Quadratic.solveSimInt(Seq(
+      ((a.x - that.a.x) / 2.0, v.x - that.v.x, p.x - that.p.x),
+      ((a.y - that.a.y) / 2.0, v.y - that.v.y, p.y - that.p.y),
+      ((a.z - that.a.z) / 2.0, v.z - that.v.z, p.z - that.p.z)
+    ))
+  }
 
   def parseParticle(str: String): Particle = str match {
     case particleRegex(px, py, pz, vx, vy, vz, ax, ay, az) =>
@@ -28,11 +79,37 @@ object Day20 {
 
   def staysClosest(input: String): Int = staysClosest(parseParticles(input))
 
+  def particlesLeft(particles: Seq[Particle]): Int = {
+    def helper(collisions: Seq[(Int, Int, Int)], ps: Set[Int]): Set[Int] = collisions match {
+      case Seq() => ps
+      case (i, j, t) +: rest =>
+        val tSet = collisions.filter(_._3 == t).flatMap(p => Seq(p._1, p._2)).toSet
+        helper(rest.filterNot(p => tSet.contains(p._1) || tSet.contains(p._2)), ps -- tSet)
+    }
+
+    val collisions = particles.zipWithIndex.combinations(2).map({ case Seq((p, i), (q, j)) =>
+      (i, j, p collides q)
+    }).flatMap({
+      case (i, j, AnySolution) =>
+        Some((i, j, 0))
+      case (i, j, Solutions(sols)) =>
+        if (sols.nonEmpty)
+          Some((i, j, sols.min))
+        else
+          None
+    }).toSeq.sortBy(_._3)
+
+    println(collisions)
+
+    helper(collisions, particles.indices.toSet).size
+  }
+
+  def particlesLeft(input: String): Int = particlesLeft(parseParticles(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(staysClosest(input)) // 119 too low
-
-    parseParticles(input).zipWithIndex.sortBy(_._1.a manhattanDistance Pos3(0, 0, 0)).foreach(println)
+    println(staysClosest(input))
+    println(particlesLeft(input))
   }
 }
