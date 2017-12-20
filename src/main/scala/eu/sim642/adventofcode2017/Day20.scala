@@ -12,7 +12,12 @@ object Day20 {
 
   private val particleRegex = """p=<\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)>, v=<\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)>, a=<\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)>""".r
 
-  case class Particle(p: Pos3, v: Pos3, a: Pos3)
+  case class Particle(p: Pos3, v: Pos3, a: Pos3) {
+    def updated: Particle = {
+      val v2 = v + a
+      Particle(p + v2, v2, a)
+    }
+  }
 
   def parseParticle(str: String): Particle = str match {
     case particleRegex(px, py, pz, vx, vy, vz, ax, ay, az) =>
@@ -21,10 +26,10 @@ object Day20 {
 
   def parseParticles(input: String): Seq[Particle] = input.lines.map(parseParticle).toSeq
 
-  def staysClosest(particles: Seq[Particle]): Int =
-    particles.zipWithIndex.minBy({ case (pos, i) =>
-      (pos.a manhattanDistance Pos3(0, 0, 0), pos.v manhattanDistance Pos3(0, 0, 0), pos.p manhattanDistance Pos3(0, 0, 0)) // is this asymptote even correct?
-    })._2
+  def staysClosest(particles: Seq[Particle]): Int = {
+    val endParticles = (0 until 1000).foldLeft(particles.toVector)({ case (acc, _) => acc.map(_.updated) })
+    endParticles.zipWithIndex.minBy({ case (p, i) => p.p manhattanDistance Pos3(0, 0, 0) })._2
+  }
 
   def staysClosest(input: String): Int = staysClosest(parseParticles(input))
 
