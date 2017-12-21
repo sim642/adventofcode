@@ -116,6 +116,10 @@ class Day21Test extends FunSuite with PropertyChecks {
   }
 
   test("Part 1 input answer") {
-    assert(countOn(input) == 142)
+    assert(countOn(input, 5) == 142)
+  }
+
+  test("Part 2 input answer") {
+    assert(countOn(input, 18) == 1879071)
   }
 }

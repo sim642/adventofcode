@@ -69,11 +69,12 @@ object Day21 {
 
   def countOn(rules: Map[Pattern, Pattern], iteration: Int): Int = iteratePattern(rules).drop(iteration).next().countGrid(b => b)
 
-  def countOn(input: String, iteration: Int = 5): Int = countOn(parseRules(input), iteration)
+  def countOn(input: String, iteration: Int): Int = countOn(parseRules(input), iteration)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countOn(input))
+    println(countOn(input, 5))
+    println(countOn(input, 18))
   }
 }
