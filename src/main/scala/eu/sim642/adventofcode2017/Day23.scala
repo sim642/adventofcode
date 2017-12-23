@@ -70,18 +70,45 @@ object Day23 {
     }
   }
 
-  def iterateSmallStep(instructions: Instructions): Iterator[AsmState] = Iterator.iterate(AsmState(instructions))(execSmallStep).takeWhile(!_.terminated)
+  trait Part {
+    def iterateSmallStep(instructions: Instructions): Iterator[AsmState]
+  }
 
-  def countMul(instructions: Instructions): Int = iterateSmallStep(instructions).count(state => state.instruction match {
-    case _: Mul => true
-    case _ => false
-  })
+  object Part1 extends Part {
+    override def iterateSmallStep(instructions: Instructions): Iterator[AsmState] = Iterator.iterate(AsmState(instructions))(execSmallStep)
 
-  def countMul(input: String): Int = countMul(parseInstructions(input))
+    def countMul(instructions: Instructions): Int = iterateSmallStep(instructions).takeWhile(!_.terminated).count(state => state.instruction match {
+      case _: Mul => true
+      case _ => false
+    })
+
+    def countMul(input: String): Int = countMul(parseInstructions(input))
+  }
+
+  object Part2 {
+
+    def sieve: Stream[Int] => Stream[Int] = {
+      case p #:: xs => xs.filterNot(_ % p == 0)
+    }
+
+    val primes: Stream[Int] = Stream.iterate(Stream.from(2))(sieve).map(_.head)
+
+    def countPrimes(b: Int, c: Int, bMul: Int, bAdd: Int, cAdd: Int, bInc: Int): Int = {
+      val b2 = b * bMul + bAdd
+      val c2 = b2 + cAdd
+
+      val ps = primes.dropWhile(_ < b2).takeWhile(_ <= c2).toSet
+      println(ps)
+      //cAdd / bInc - ps.count(_ % bInc == b2 % bInc)
+      ((b2 to c2 by bInc).toSet -- ps).size
+    }
+  }
+
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countMul(input))
+    println(Part1.countMul(input))
+    println(Part2.countPrimes(93, 93, 100, 100000, 17000, 17)) // 911
   }
 }

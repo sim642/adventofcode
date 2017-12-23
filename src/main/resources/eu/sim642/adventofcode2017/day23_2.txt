@@ -1,0 +1,33 @@
+set b 93        b = 93
+set c b         c = 93
+jnz a 2         if (a != 0) goto large
+jnz 1 5         goto loop
+mul b 100       large: b *= 100
+sub b -100000   b += 100000
+set c b         c = b
+sub c -17000    c += 17000
+set f 1         loop: f = 1
+set d 2         d = 2
+set e 2         loop2: e = 2
+set g d         loop3: g = d
+mul g e         g *= e
+sub g b         g -= b
+jnz g 2         if (g != 0) goto sf0
+set f 0         f = 0
+sub e -1        sf0: e++
+set g e         g = e
+sub g b         g -= b
+jnz g -8        if (g != 0) goto loop3
+sub d -1        d++
+set g d         g = d
+sub g b         g -= b
+jnz g -13       if (g != 0) goto loop2
+jnz f 2         if (f != 0) goto shinc
+sub h -1        h++
+set g b         shinc: g = b
+sub g c         g -= c
+jnz g 2         if (g != 0) goto binc
+jnz 1 3         goto end
+sub b -17       binc: b += 17
+jnz 1 -23       goto loop
+                end:
