@@ -1,5 +1,5 @@
 b = 93
-c = 93
+c = b // 93
 
 if (a != 0) {
     b *= 100 // 9300
@@ -16,30 +16,21 @@ do {
         e = 2
 
         do {
-            g = d
-            g *= e
-            g -= b
-
-            if (g == 0)
+            if (d * e == b)
                 f = 0
 
             e++
-            g = e
-            g -= b
-        } while (g != 0)
+        } while (e != b)
 
         d++
-        g = d
-        g -= b
-    } while (g != 0)
+    } while (d != b)
 
     if (f == 0)
         h++
 
     g = b
-    g -= c
 
-    if (g != 0)
+    if (b != c)
         b += 17
 
-} while (g != 0)
+} while (g != c)

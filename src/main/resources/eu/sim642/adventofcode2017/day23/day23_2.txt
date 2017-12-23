@@ -1,5 +1,5 @@
 set b 93        b = 93
-set c b         c = 93
+set c b         c = b
 jnz a 2         if (a != 0) goto large
 jnz 1 5         goto loop
 mul b 100       large: b *= 100
