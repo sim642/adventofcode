@@ -8,6 +8,7 @@ object Day23 {
   type Integer = Long
 
   def isPrime(n: Int): Boolean = n >= 2 && (2 to Math.sqrt(n).toInt).forall(n % _ != 0)
+  def isPrime(n: Long): Boolean = n >= 2 && (2 to Math.sqrt(n).toInt).forall(n % _ != 0)
 
   trait Solution {
     def countMul(input: String): Int
@@ -26,6 +27,9 @@ object Day23 {
     case class Mul(x: Register, y: Value) extends Instruction
     case class Jnz(x: Value, y: Value) extends Instruction
 
+    case class IsPrime(x: Register, y: Value) extends Instruction
+    case object Nop extends Instruction
+
     type Instructions = Vector[Instruction]
     type Registers = Map[Register, Integer]
 
@@ -42,7 +46,7 @@ object Day23 {
       def terminated: Boolean = !instructions.indices.contains(pc)
     }
 
-    private val instructionRegex = """([a-z]+) ([a-z]|-?\d+)(?: ([a-z]|-?\d+))?""".r
+    private val instructionRegex = """([A-Za-z]+)(?: ([a-z]|-?\d+)(?: ([a-z]|-?\d+))?)?""".r
 
     def parseValue(str: String): Value = {
       val c = str.head
@@ -58,6 +62,9 @@ object Day23 {
         case "sub" => Sub(x.head, parseValue(y))
         case "mul" => Mul(x.head, parseValue(y))
         case "jnz" => Jnz(parseValue(x), parseValue(y))
+
+        case "isPrime" => IsPrime(x.head, parseValue(y))
+        case "nop" => Nop
       }
     }
 
@@ -78,19 +85,35 @@ object Day23 {
             state.copy(pc = pc + state.get(y).toInt)
           else
             state.copy(pc = pc + 1)
+
+        case IsPrime(x, y) => state.copy(registers = registers + (x -> (if (isPrime(state.get(y))) 1 else 0)), pc = pc + 1)
+        case Nop => state.copy(pc = pc + 1)
       }
     }
 
-    def iterateSmallStep(instructions: Instructions): Iterator[AsmState] = Iterator.iterate(AsmState(instructions))(execSmallStep)
+    def iterateSmallStep(initialState: AsmState): Iterator[AsmState] = Iterator.iterate(initialState)(execSmallStep)
 
-    def countMul(instructions: Instructions): Int = iterateSmallStep(instructions).takeWhile(!_.terminated).count(state => state.instruction match {
+    def countMul(instructions: Instructions): Int = iterateSmallStep(AsmState(instructions)).takeWhile(!_.terminated).count(state => state.instruction match {
       case _: Mul => true
       case _ => false
     })
 
     override def countMul(input: String): Int = countMul(parseInstructions(input))
 
-    override def registerH(input: String): Integer = ???
+
+    lazy val isPrimeRegex: Regex = io.Source.fromInputStream(getClass.getResourceAsStream("day23/isPrime_regex.txt")).mkString.trim.r
+
+    def registerH(instructions: Instructions): Integer = iterateSmallStep(AsmState(instructions, registers = Map('a' -> 1L).withDefaultValue(0L))).dropWhile(!_.terminated).next().registers('h')
+
+    def patch(input: String, regex: Regex, replacement: String): String = {
+      regex.replaceAllIn(input, { m =>
+        val matchOps = m.matched.lines.size
+        val replacementOps = replacement.lines.size
+        replacement + Iterator.fill(matchOps - replacementOps)("\nnop").mkString
+      })
+    }
+
+    override def registerH(input: String): Integer = registerH(parseInstructions(patch(input, isPrimeRegex, "isPrime f b")))
   }
 
   object ReverseEngineeredSolution extends Solution {
