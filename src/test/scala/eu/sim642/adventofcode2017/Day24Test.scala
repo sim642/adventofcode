@@ -2,7 +2,6 @@ package eu.sim642.adventofcode2017
 
 import Day24._
 import org.scalatest.FunSuite
-import org.scalatest.tagobjects.Slow
 
 class Day24Test extends FunSuite {
 
@@ -16,7 +15,7 @@ class Day24Test extends FunSuite {
                        |9/10""".stripMargin
 
   test("Part 1 example bridges") {
-    assert(validBridges(parseComponents(exampleInput)) == Set(
+    assert(validBridges(parseComponents(exampleInput)).toSet == Set(
       Seq(Component(0, 1)),
       Seq(Component(0, 1), Component(10, 1)),
       Seq(Component(0, 1), Component(10, 1), Component(9, 10)),
@@ -32,7 +31,7 @@ class Day24Test extends FunSuite {
   }
 
   test("Part 1 long bridges") {
-    assert(validLongBridges(parseComponents(exampleInput)) == Set(
+    assert(validLongBridges(parseComponents(exampleInput)).toSet == Set(
       Seq(Component(0, 1), Component(10, 1), Component(9, 10)),
       Seq(Component(0, 2), Component(2, 3), Component(3, 4)),
       Seq(Component(0, 2), Component(2, 3), Component(3, 5)),
@@ -47,6 +46,13 @@ class Day24Test extends FunSuite {
 
   test("Part 1 input answer") {
     assert(strongestBridgeStrength(input) == 2006)
+  }
+
+  test("Part 2 longest bridges") {
+    assert(validLongestBridges(parseComponents(exampleInput)).toSet == Set(
+      Seq(Component(0, 2), Component(2, 2), Component(2, 3), Component(3, 4)),
+      Seq(Component(0, 2), Component(2, 2), Component(2, 3), Component(3, 5))
+    ))
   }
 
   test("Part 2 example") {

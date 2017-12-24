@@ -3,10 +3,11 @@ package eu.sim642.adventofcode2017
 object Day24 {
 
   case class Component(a: Int, b: Int) {
-
     def contains(i: Int): Boolean = a == i || b == i
 
     def other(i: Int): Int = if (a == i) b else a
+
+    def strength: Int = a + b
   }
 
   private val componentRegex = """(\d+)/(\d+)""".r
@@ -15,51 +16,59 @@ object Day24 {
     case componentRegex(a, b) => Component(a.toInt, b.toInt)
   }
 
-  def parseComponents(input: String): Seq[Component] = input.lines.map(parseComponent).toSeq
+  type Components = Set[Component]
+
+  def parseComponents(input: String): Components = input.lines.map(parseComponent).toSet
 
   type Bridge = Seq[Component]
 
-  def validBridges(components: Seq[Component]): Set[Bridge] = {
+  implicit class BridgeOps(bridge: Bridge) {
+    def strength: Int = bridge.map(_.strength).sum
+  }
 
-    def helper(components: Seq[Component], port: Int): Set[Bridge] = {
+  def validBridges(components: Components): Iterator[Bridge] = {
+
+    def helper(components: Components, port: Int): Iterator[Bridge] = {
       val portComponents = components.filter(_.contains(port))
-      (for {
-        component <- portComponents
+      for {
+        component <- portComponents.toIterator
         newPort = component.other(port)
-        bridge <- Set(Seq()) ++ helper(components.diff(Seq(component)), newPort)
-      } yield component +: bridge).toSet
+        bridge <- Iterator.single(Nil) ++ helper(components - component, newPort)
+      } yield component +: bridge
     }
 
     helper(components, 0)
   }
 
-  def validLongBridges(components: Seq[Component]): Set[Bridge] = {
+  def validLongBridges(components: Components): Iterator[Bridge] = {
 
-    def helper(components: Seq[Component], port: Int): Set[Bridge] = {
+    def helper(components: Components, port: Int): Iterator[Bridge] = {
       val portComponents = components.filter(_.contains(port))
       if (portComponents.isEmpty)
-        Set(Seq())
+        Iterator.single(Nil)
       else
-        (for {
-          component <- portComponents
+        for {
+          component <- portComponents.toIterator
           newPort = component.other(port)
-          bridge <- helper(components.diff(Seq(component)), newPort)
-        } yield component +: bridge).toSet
+          bridge <- helper(components - component, newPort)
+        } yield component +: bridge
     }
 
     helper(components, 0)
   }
 
-  def strongestBridgeStrength(components: Seq[Component]): Int = validLongBridges(components).map(_.map(c => c.a + c.b).sum).max
+  def strongestBridgeStrength(components: Components): Int = validLongBridges(components).map(_.strength).max
 
   def strongestBridgeStrength(input: String): Int = strongestBridgeStrength(parseComponents(input))
 
 
-  def longestBridgeStrength(components: Seq[Component]): Int = {
-    val bridges = validLongBridges(components)
+  def validLongestBridges(components: Components): Iterator[Bridge] = {
+    val bridges = validLongBridges(components).toSet
     val maxLength = bridges.map(_.length).max
-    bridges.filter(_.length == maxLength).map(_.map(c => c.a + c.b).sum).max
+    bridges.filter(_.length == maxLength).toIterator
   }
+
+  def longestBridgeStrength(components: Components): Int = validLongestBridges(components).map(_.strength).max
 
   def longestBridgeStrength(input: String): Int = longestBridgeStrength(parseComponents(input))
 
