@@ -15,4 +15,16 @@ class Day1Test extends FunSuite {
   test("Part 1 input answer") {
     assert(resultingFreq(inputFreqChanges) == 502)
   }
+
+  test("Part 2 examples") {
+    assert(firstTwiceFreq(Seq(+1, -2, +3, +1)) == 2)
+    assert(firstTwiceFreq(Seq(+1, -1)) == 0)
+    assert(firstTwiceFreq(Seq(+3, +3, +4, -2, -4)) == 10)
+    assert(firstTwiceFreq(Seq(-6, +3, +8, +5, -6)) == 5)
+    assert(firstTwiceFreq(Seq(+7, +7, -2, -7, -4)) == 14)
+  }
+
+  test("Part 2 input answer") {
+    assert(firstTwiceFreq(inputFreqChanges) == 71961)
+  }
 }
