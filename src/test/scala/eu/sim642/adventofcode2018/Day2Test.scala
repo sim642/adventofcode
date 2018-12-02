@@ -20,4 +20,20 @@ class Day2Test extends FunSuite {
   test("Part 1 input answer") {
     assert(checksum(inputLines) == 4712)
   }
+
+  test("Part 2 examples") {
+    assert(commonCorrectIds(
+      """abcde
+        |fghij
+        |klmno
+        |pqrst
+        |fguij
+        |axcye
+        |wvxyz
+      """.stripMargin.lines.toSeq) == "fgij")
+  }
+
+  test("Part 2 input answer") {
+    assert(commonCorrectIds(inputLines) == "lufjygedpvfbhftxiwnaorzmq")
+  }
 }

@@ -15,10 +15,24 @@ object Day2 {
     cnt2 * cnt3
   }
 
+  implicit class HeadIterator[A](it: Iterator[A]) {
+    def headOption: Option[A] = if (it.nonEmpty) Some(it.next) else None
+    def head: A = headOption.get
+  }
+
+  def commonCorrectIds(ids: Seq[String]): String = {
+    (for {
+      Seq(id1, id2) <- ids.combinations(2)
+      common = id1.zip(id2).filter({ case (c1, c2) => c1 == c2 }).map(_._1)
+      if common.length == id1.length - 1
+    } yield common.mkString("")).head
+  }
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
   lazy val inputLines: Seq[String] = input.lines.toSeq
 
   def main(args: Array[String]): Unit = {
     println(checksum(inputLines))
+    println(commonCorrectIds(inputLines))
   }
 }
