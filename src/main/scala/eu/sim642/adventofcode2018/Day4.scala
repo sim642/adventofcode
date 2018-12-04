@@ -42,18 +42,34 @@ object Day4 {
     }
   }
 
-  def strategy1(shifts: List[Shift]): Int = {
-    val guardSleeps = shifts.groupBy(_.guard).mapValues(_.map(_.sleep.toSeq).reduce(_ ++ _))
-    val (guard, sleeps) = guardSleeps.maxBy(_._2.length)
-    val minute = (0 until 60).maxBy(minute => sleeps.count(_ == minute))
-    guard * minute
+  trait Strategy {
+    def choose(shifts: List[Shift]): Int
+    def choose(input: String): Int = choose(parseShifts(parseRecords(input)))
   }
 
-  def strategy1(input: String): Int = strategy1(parseShifts(parseRecords(input)))
+  object Strategy1 extends Strategy {
+    def choose(shifts: List[Shift]): Int = {
+      val guardSleeps = shifts.groupBy(_.guard).mapValues(_.map(_.sleep.toSeq).reduce(_ ++ _))
+      val (guard, sleeps) = guardSleeps.maxBy(_._2.length)
+      val minute = (0 until 60).maxBy(minute => sleeps.count(_ == minute))
+      guard * minute
+    }
+  }
+
+  object Strategy2 extends Strategy {
+    override def choose(shifts: List[Shift]): Int = {
+      val guardSleeps = shifts.groupBy(_.guard).mapValues(_.map(_.sleep.toSeq).reduce(_ ++ _))
+      val guardMinuteCount = guardSleeps.mapValues(_.groupBy(minute => minute).mapValues(_.length))
+      val minuteMaxGuardCount = (0 until 60).map(minute => minute -> guardMinuteCount.mapValues(_.getOrElse(minute, 0)).maxBy(_._2)).toMap
+      val (minute, (guard, count)) = minuteMaxGuardCount.maxBy(_._2._2)
+      minute * guard
+    }
+  }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(strategy1(input))
+    println(Strategy1.choose(input))
+    println(Strategy2.choose(input))
   }
 }

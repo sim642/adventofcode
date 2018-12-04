@@ -41,10 +41,18 @@ class Day4Test extends FunSuite {
   }
 
   test("Part 1 examples") {
-    assert(strategy1(exampleInput) == 240)
+    assert(Strategy1.choose(exampleInput) == 240)
   }
 
   test("Part 1 input answer") {
-    assert(strategy1(input) == 103720)
+    assert(Strategy1.choose(input) == 103720)
+  }
+
+  test("Part 2 examples") {
+    assert(Strategy2.choose(exampleInput) == 4455)
+  }
+
+  test("Part 2 input answer") {
+    assert(Strategy2.choose(input) == 110913)
   }
 }
