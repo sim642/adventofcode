@@ -8,13 +8,18 @@ object Day5 {
   }
 
   def reactPolymer(s: String): String = {
-    def helper(init: List[Char], tail: List[Char]): List[Char] = (init, tail) match {
+    /*def helper(init: List[Char], tail: List[Char]): List[Char] = (init, tail) match {
       case (init, Nil) => init.reverse
       case (a :: it, b :: tl) if opposites(a, b) => helper(it, tl)
       case (init, b :: tl) => helper(b :: init, tl)
     }
 
-    helper(Nil, s.toList).mkString("")
+    helper(Nil, s.toList).mkString("")*/
+
+    s.foldLeft(List[Char]())({
+      case (a :: it, b) if opposites(a, b) => it
+      case (init, b) => b :: init
+    }).reverse.mkString("")
   }
 
   def reactPolymerLength(s: String): Int = reactPolymer(s).length
