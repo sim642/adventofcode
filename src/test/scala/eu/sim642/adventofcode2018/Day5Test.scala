@@ -18,4 +18,12 @@ class Day5Test extends FunSuite {
   test("Part 1 input answer") {
     assert(reactPolymerLength(input) == 10708)
   }
+
+  test("Part 2 examples") {
+    assert(bestPolymerLength("dabAcCaCBAcCcaDA") == 4)
+  }
+
+  test("Part 2 input answer") {
+    assert(bestPolymerLength(input) == 5330)
+  }
 }

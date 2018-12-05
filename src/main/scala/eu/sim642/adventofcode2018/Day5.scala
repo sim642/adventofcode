@@ -8,6 +8,7 @@ object Day5 {
   }
 
   def reactPolymer(s: String): String = {
+    // TODO: optimize helper
     def helper(polymer: Vector[Char], i: Int): Vector[Char] = {
       if (i >= polymer.length - 1)
         polymer
@@ -24,10 +25,16 @@ object Day5 {
 
   def reactPolymerLength(s: String): Int = reactPolymer(s).length
 
+  def bestPolymerLength(s: String): Int = {
+    val lowerUnits = s.toLowerCase.toSet
+    lowerUnits.map(lowerUnit => s.filterNot(c => c == lowerUnit || c == lowerUnit.toUpper)).map(reactPolymerLength).min
+  }
+
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(reactPolymerLength(input))
+    println(bestPolymerLength(input))
   }
 }
