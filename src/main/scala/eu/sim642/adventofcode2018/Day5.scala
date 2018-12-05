@@ -8,19 +8,13 @@ object Day5 {
   }
 
   def reactPolymer(s: String): String = {
-    // TODO: optimize helper
-    def helper(polymer: Vector[Char], i: Int): Vector[Char] = {
-      if (i >= polymer.length - 1)
-        polymer
-      else if (opposites(polymer(i), polymer(i + 1))) {
-        val (before, after) = polymer.splitAt(i)
-        helper(before ++ after.drop(2), math.max(0, i - 1))
-      }
-      else
-        helper(polymer, i + 1)
+    def helper(init: List[Char], tail: List[Char]): List[Char] = (init, tail) match {
+      case (init, Nil) => init.reverse
+      case (a :: it, b :: tl) if opposites(a, b) => helper(it, tl)
+      case (init, b :: tl) => helper(b :: init, tl)
     }
 
-    helper(s.toVector, 0).mkString("")
+    helper(Nil, s.toList).mkString("")
   }
 
   def reactPolymerLength(s: String): Int = reactPolymer(s).length
