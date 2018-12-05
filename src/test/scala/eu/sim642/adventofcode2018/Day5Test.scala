@@ -19,6 +19,13 @@ class Day5Test extends FunSuite {
     assert(reactPolymerLength(input) == 10708)
   }
 
+  test("Part 2 examples for part 1") {
+    assert(reactPolymer("dbcCCBcCcD") == "dbCBcD")
+    assert(reactPolymer("daAcCaCAcCcaDA") == "daCAcaDA")
+    assert(reactPolymer("dabAaBAaDA") == "daDA")
+    assert(reactPolymer("abAcCaCBAcCcaA") == "abCBAc")
+  }
+
   test("Part 2 examples") {
     assert(bestPolymerLength("dabAcCaCBAcCcaDA") == 4)
   }
