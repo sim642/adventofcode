@@ -22,8 +22,9 @@ object Day5 {
   def reactPolymerLength(s: String): Int = reactPolymer(s).length
 
   def bestPolymerLength(s: String): Int = {
-    val lowerUnits = s.toLowerCase.toSet
-    lowerUnits.map(lowerUnit => s.filterNot(_.toLower == lowerUnit)).map(reactPolymerLength).min
+    val preReacted = reactPolymer(s) // pre-react units which get reacted in all cases anyway, 5× shorter string used every time
+    val lowerUnits = preReacted.toLowerCase.toSet
+    lowerUnits.map(lowerUnit => preReacted.filterNot(_.toLower == lowerUnit)).map(reactPolymerLength).min
   }
 
 
