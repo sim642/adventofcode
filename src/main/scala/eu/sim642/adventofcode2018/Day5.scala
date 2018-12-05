@@ -23,7 +23,7 @@ object Day5 {
 
   def bestPolymerLength(s: String): Int = {
     val lowerUnits = s.toLowerCase.toSet
-    lowerUnits.map(lowerUnit => s.filterNot(c => c == lowerUnit || c == lowerUnit.toUpper)).map(reactPolymerLength).min
+    lowerUnits.map(lowerUnit => s.filterNot(_.toLower == lowerUnit)).map(reactPolymerLength).min
   }
 
 
