@@ -2,10 +2,7 @@ package eu.sim642.adventofcode2018
 
 object Day5 {
 
-  def opposites(a: Char, b: Char): Boolean = (a.isLower, b.isLower) match {
-    case (true, false) | (false, true) => a.toLower == b.toLower
-    case _ => false
-  }
+  def opposites(a: Char, b: Char): Boolean = a != b && a.toLower == b.toLower
 
   def reactPolymer(s: String): String = {
     /*def helper(init: List[Char], tail: List[Char]): List[Char] = (init, tail) match {
