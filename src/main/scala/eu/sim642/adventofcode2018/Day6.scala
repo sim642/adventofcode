@@ -4,6 +4,21 @@ import eu.sim642.adventofcode2017.Day3.Pos
 
 object Day6 {
 
+  def boundingRect(coords: Seq[Pos]): (Pos, Pos) = {
+    val minX = coords.minBy(_.x).x
+    val minY = coords.minBy(_.y).y
+    val maxX = coords.maxBy(_.x).x
+    val maxY = coords.maxBy(_.y).y
+    (Pos(minX, minY), Pos(maxX, maxY))
+  }
+
+  def iterateRect(min: Pos, max: Pos): Iterator[Pos] = {
+    for {
+      x <- (min.x to max.x).toIterator
+      y <- (min.y to max.y).toIterator
+    } yield Pos(x, y)
+  }
+
   def largestFiniteArea(coords: Seq[Pos]): Int = {
     def closestCoord(pos: Pos): Option[Pos] = {
       val Seq((coord1, d1), (coord2, d2)) = coords.toSeq.map(coord => coord -> (coord manhattanDistance pos)).sortBy(_._2).take(2) // TODO: optimize taking only smallest 2
@@ -13,41 +28,24 @@ object Day6 {
         None
     }
 
-    val minX = coords.minBy(_.x).x
-    val minY = coords.minBy(_.y).y
-    val maxX = coords.maxBy(_.x).x
-    val maxY = coords.maxBy(_.y).y
+    val (min, max) = boundingRect(coords)
 
     // TODO: optimize with BFS
     val grid = (for {
-      x <- minX to maxX
-      y <- minY to maxY
-      pos = Pos(x, y)
+      pos <- iterateRect(min, max)
       coord <- closestCoord(pos)
     } yield pos -> coord).toMap
 
-    val finiteGrid = grid.filterKeys(pos => pos.x != minX && pos.x != maxX && pos.y != minY && pos.y != maxY)
-    val finiteSizes = finiteGrid.groupBy(_._2).mapValues(_.size)
-    finiteSizes.values.max
+    val finiteGrid = grid.filterKeys(pos => pos.x != min.x && pos.x != max.x && pos.y != min.y && pos.y != max.y)
+    val finiteCoordSizes = finiteGrid.groupBy(_._2).mapValues(_.size)
+    finiteCoordSizes.values.max
   }
 
   def safeArea(coords: Seq[Pos], safeDistance: Int = 10000): Int = {
-    def totalDistance(pos: Pos): Int = {
-      coords.map(coord => coord manhattanDistance pos).sum
-    }
+    def totalDistance(pos: Pos): Int = coords.map(_ manhattanDistance pos).sum
 
-    val minX = coords.minBy(_.x).x
-    val minY = coords.minBy(_.y).y
-    val maxX = coords.maxBy(_.x).x
-    val maxY = coords.maxBy(_.y).y
-
-    (for {
-      x <- minX to maxX
-      y <- minY to maxY
-      pos = Pos(x, y)
-      total = totalDistance(pos)
-      if total < safeDistance
-    } yield pos).size
+    val (min, max) = boundingRect(coords)
+    iterateRect(min, max).count(totalDistance(_) < safeDistance)
   }
 
   private val coordRegex = """(\d+), (\d+)""".r
