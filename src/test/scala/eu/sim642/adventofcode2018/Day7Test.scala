@@ -21,4 +21,12 @@ class Day7Test extends FunSuite {
   test("Part 1 input answer") {
     assert(topologicalSort(parseRequirements(input)) == "MNOUBYITKXZFHQRJDASGCPEVWL")
   }
+
+  test("Part 2 examples") {
+    assert(parallelTopologicalSort(parseRequirements(exampleInput), 2, 0) == 15)
+  }
+
+  test("Part 2 input answer") {
+    assert(parallelTopologicalSort(parseRequirements(input)) == 893)
+  }
 }
