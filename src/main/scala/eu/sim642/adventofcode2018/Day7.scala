@@ -7,13 +7,13 @@ object Day7 {
   type Step = Char
   type Requirements = Map[Step, Set[Step]]
 
-  def topologicalSort(reqs: Requirements): String = {
+  def topologicalSort(reqs: Requirements, revOrder: List[Step] = Nil): String = {
     reqs.values.reduceOption(_ ++ _) match {
-      case None => ""
+      case None => revOrder.reverse.mkString("")
       case Some(haveReqStep) =>
         val step = (reqs.keySet -- haveReqStep).min
         val restReqs = reqs.filterKeys(_ != step)
-        step + topologicalSort(restReqs)
+        topologicalSort(restReqs, step :: revOrder)
     }
   }
 
