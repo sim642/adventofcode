@@ -18,58 +18,51 @@ object Day7 {
   def parallelTopologicalSort(reqs: Requirements, workerCount: Int = 5, baseStepTime: Int = 60): Int = {
 
     case class Work(step: Step, timeLeft: Int)
-    type Workers = Seq[Option[Work]]
 
-    def tickTime(reqs: Requirements, workers: Workers, inProgress: Set[Step]) = {
-      workers.foldLeft((reqs, Seq.empty[Option[Work]], inProgress))({
-        case ((reqs, workers, inProgress), None) =>
-          (reqs, workers :+ None, inProgress)
-
-        case ((reqs, workers, inProgress), Some(Work(step, timeLeft))) =>
+    def tickTime(reqs: Requirements, works: Set[Work]) = {
+      works.foldLeft((reqs, Set.empty[Work]))({
+        case ((reqs, works), Work(step, timeLeft)) =>
           if (timeLeft == 0) {
             val restReqs = reqs.filterKeys(_ != step)
-            (restReqs, workers :+ None, inProgress - step)
+            (restReqs, works)
           }
           else
-            (reqs, workers :+ Some(Work(step, timeLeft - 1)), inProgress)
+            (reqs, works + Work(step, timeLeft - 1))
       })
     }
 
-    def pickWork(reqs: Requirements, workers: Workers, inProgress: Set[Step]) = {
+    def pickWork(reqs: Requirements, works: Set[Work]) = {
       reqs.values.reduceOption(_ ++ _) match {
-        case None => (reqs, workers :+ None, inProgress)
+        case None => None
         case Some(haveReqStep) =>
+          val inProgress = works.map(_.step)
           val possibleSteps = reqs.keySet -- haveReqStep -- inProgress
           if (possibleSteps.nonEmpty) {
             val step = possibleSteps.min
-            (reqs, workers :+ Some(Work(step, baseStepTime + (step.toInt - 'A'.toInt + 1) - 1)), inProgress + step)
+            Some(Work(step, baseStepTime + (step.toInt - 'A'.toInt + 1) - 1))
           }
           else
-            (reqs, workers :+ None, inProgress)
+            None
       }
     }
 
-    def pickWorks(reqs: Requirements, workers: Workers, inProgress: Set[Step]) = {
-      workers.foldLeft((reqs, Seq.empty[Option[Work]], inProgress))({
-        case ((reqs, workers, inProgress), None) =>
-          pickWork(reqs, workers, inProgress)
-
-        case ((reqs, workers, inProgress), s@Some(Work(step, timeLeft))) =>
-          (reqs, workers :+ s, inProgress)
+    def pickWorks(reqs: Requirements, works: Set[Work]) = {
+      (works.size until workerCount).foldLeft(works)({
+        case (works, _) => works ++ pickWork(reqs, works).toSet
       })
     }
 
-    def helper(reqs: Requirements, workers: Workers, inProgress: Set[Step]): Int = {
-      val (reqs2, workers2, inProgress2) = tickTime(reqs, workers, inProgress)
-      val (reqs3, workers3, inProgress3) = pickWorks(reqs2, workers2, inProgress2)
+    def helper(reqs: Requirements, works: Set[Work]): Int = {
+      val (reqs2, works2) = tickTime(reqs, works)
+      val works3 = pickWorks(reqs2, works2)
 
-      if (reqs3.isEmpty && inProgress3.isEmpty)
+      if (reqs2.isEmpty && works3.isEmpty)
         return 0
 
-      1 + helper(reqs3, workers3, inProgress3)
+      1 + helper(reqs2, works3)
     }
 
-    helper(reqs, Seq.fill(workerCount)(None), Set.empty)
+    helper(reqs, Set.empty)
   }
 
 
