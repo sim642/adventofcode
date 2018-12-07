@@ -50,16 +50,16 @@ object Day7 {
       }
     }
 
-    def helper(reqs: Requirements, works: Set[Work]): Int = {
+    def helper(reqs: Requirements, works: Set[Work] = Set.empty, time: Int = 0): Int = {
       if (reqs.isEmpty && works.isEmpty)
-        return 0
+        return time
 
       val works2 = works ++ pickNewWorks(reqs, works)
       val (reqs2, works3, tick) = tickTime(reqs, works2)
-      tick + helper(reqs2, works3)
+      helper(reqs2, works3, time + tick)
     }
 
-    helper(reqs, Set.empty)
+    helper(reqs)
   }
 
 
