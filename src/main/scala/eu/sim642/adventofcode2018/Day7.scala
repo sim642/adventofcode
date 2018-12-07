@@ -17,18 +17,16 @@ object Day7 {
 
   def parallelTopologicalSort(reqs: Requirements, workerCount: Int = 5, baseStepTime: Int = 60): Int = {
 
-    case class Work(step: Step, timeLeft: Int)
+    case class Work(step: Step, timeLeft: Int) {
+      def ticked(time: Int): Work = copy(timeLeft = timeLeft - time)
+    }
 
     def tickTime(reqs: Requirements, works: Set[Work]) = {
-      works.foldLeft((reqs, Set.empty[Work]))({
-        case ((reqs, works), Work(step, timeLeft)) =>
-          if (timeLeft == 0) {
-            val restReqs = reqs.filterKeys(_ != step)
-            (restReqs, works)
-          }
-          else
-            (reqs, works + Work(step, timeLeft - 1))
-      })
+      val (endWorks, tickWorks) = works.partition(_.timeLeft == 0)
+      val endSteps = endWorks.map(_.step)
+      val restReqs = reqs -- endSteps
+      val tickedWorks = tickWorks.map(_.ticked(1))
+      (restReqs, tickedWorks)
     }
 
     def pickWork(reqs: Requirements, works: Set[Work]) = {
