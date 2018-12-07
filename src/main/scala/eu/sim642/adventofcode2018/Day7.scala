@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2018
 
+import scala.collection.immutable.SortedSet
+
 object Day7 {
 
   type Step = Char
@@ -21,6 +23,10 @@ object Day7 {
       def ticked(time: Int): Work = copy(timeLeft = timeLeft - time)
     }
 
+    object Work {
+      def apply(step: Step): Work = Work(step, baseStepTime + (step - 'A' + 1) - 1)
+    }
+
     def tickTime(reqs: Requirements, works: Set[Work]) = {
       val (endWorks, tickWorks) = works.partition(_.timeLeft == 0)
       val endSteps = endWorks.map(_.step)
@@ -29,30 +35,21 @@ object Day7 {
       (restReqs, tickedWorks)
     }
 
-    def pickWork(reqs: Requirements, works: Set[Work]) = {
+    def pickNewWorks(reqs: Requirements, works: Set[Work]): Set[Work] = {
       reqs.values.reduceOption(_ ++ _) match {
-        case None => None
+        case None => Set.empty
         case Some(haveReqStep) =>
           val inProgress = works.map(_.step)
           val possibleSteps = reqs.keySet -- haveReqStep -- inProgress
-          if (possibleSteps.nonEmpty) {
-            val step = possibleSteps.min
-            Some(Work(step, baseStepTime + (step.toInt - 'A'.toInt + 1) - 1))
-          }
-          else
-            None
+          val newSteps = possibleSteps.to[SortedSet].take(workerCount - works.size)
+          val newWorks = newSteps.map(Work(_))
+          newWorks
       }
-    }
-
-    def pickWorks(reqs: Requirements, works: Set[Work]) = {
-      (works.size until workerCount).foldLeft(works)({
-        case (works, _) => works ++ pickWork(reqs, works).toSet
-      })
     }
 
     def helper(reqs: Requirements, works: Set[Work]): Int = {
       val (reqs2, works2) = tickTime(reqs, works)
-      val works3 = pickWorks(reqs2, works2)
+      val works3 = works2 ++ pickNewWorks(reqs2, works2)
 
       if (reqs2.isEmpty && works3.isEmpty)
         return 0
