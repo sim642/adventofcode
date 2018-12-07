@@ -24,15 +24,18 @@ object Day7 {
     }
 
     object Work {
-      def apply(step: Step): Work = Work(step, baseStepTime + (step - 'A' + 1) - 1)
+      def apply(step: Step): Work = Work(step, baseStepTime + (step - 'A' + 1))
     }
 
     def tickTime(reqs: Requirements, works: Set[Work]) = {
-      val (endWorks, tickWorks) = works.partition(_.timeLeft == 0)
+      val tick = works.map(_.timeLeft).min // tick until first work finishes, nothing interesting happens in between anyway
+      val tickedWorks = works.map(_.ticked(tick))
+
+      val (endWorks, restWorks) = tickedWorks.partition(_.timeLeft == 0)
       val endSteps = endWorks.map(_.step)
       val restReqs = reqs -- endSteps
-      val tickedWorks = tickWorks.map(_.ticked(1))
-      (restReqs, tickedWorks)
+
+      (restReqs, restWorks, tick)
     }
 
     def pickNewWorks(reqs: Requirements, works: Set[Work]): Set[Work] = {
@@ -48,13 +51,12 @@ object Day7 {
     }
 
     def helper(reqs: Requirements, works: Set[Work]): Int = {
-      val (reqs2, works2) = tickTime(reqs, works)
-      val works3 = works2 ++ pickNewWorks(reqs2, works2)
-
-      if (reqs2.isEmpty && works3.isEmpty)
+      if (reqs.isEmpty && works.isEmpty)
         return 0
 
-      1 + helper(reqs2, works3)
+      val works2 = works ++ pickNewWorks(reqs, works)
+      val (reqs2, works3, tick) = tickTime(reqs, works2)
+      tick + helper(reqs2, works3)
     }
 
     helper(reqs, Set.empty)
