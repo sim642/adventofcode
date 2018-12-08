@@ -18,16 +18,20 @@ object Day8 {
     }
   }
 
+  def replicateParser[A, B](n: Int, a: A)(f: A => (B, A)): (Seq[B], A) = {
+    if (n <= 0)
+      (Seq.empty, a)
+    else {
+      val (b, a2) = f(a)
+      val (bs, a3) = replicateParser(n - 1, a2)(f)
+      (b +: bs, a3)
+    }
+  }
+
   def parseTree(seq: List[Int]): Tree = {
     def helper(seq: List[Int]): (Tree, List[Int]) = seq match {
       case childrenCount :: metadataCount :: tl =>
-        var seq = tl
-        // TODO: fix this stateful fill
-        val children: Seq[Tree] = Seq.fill(childrenCount)({
-          val (child, seq2) = helper(seq)
-          seq = seq2
-          child
-        })
+        val (children, seq) = replicateParser(childrenCount, tl)(helper)
         val (metadata, seq2) = seq.splitAt(metadataCount)
         (Tree(children, metadata), seq2)
     }
