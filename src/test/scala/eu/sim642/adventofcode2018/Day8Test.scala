@@ -14,4 +14,12 @@ class Day8Test extends FunSuite {
   test("Part 1 input answer") {
     assert(metadataSum(parseTree(input)) == 46578)
   }
+
+  test("Part 2 examples") {
+    assert(value(parseTree(exampleInput)) == 66)
+  }
+
+  test("Part 2 input answer") {
+    assert(value(parseTree(input)) == 31251)
+  }
 }

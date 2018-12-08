@@ -6,6 +6,18 @@ object Day8 {
 
   def metadataSum(tree: Tree): Int = tree.childen.map(metadataSum).sum + tree.metadata.sum
 
+  def value(tree: Tree): Int = {
+    if (tree.childen.isEmpty)
+      tree.metadata.sum
+    else {
+      tree.metadata
+        .filter(i => 1 <= i && i <= tree.childen.length)
+        .map(i => tree.childen(i - 1))
+        .map(value)
+        .sum
+    }
+  }
+
   def parseTree(seq: List[Int]): Tree = {
     def helper(seq: List[Int]): (Tree, List[Int]) = seq match {
       case childrenCount :: metadataCount :: tl =>
@@ -29,5 +41,6 @@ object Day8 {
 
   def main(args: Array[String]): Unit = {
     println(metadataSum(parseTree(input)))
+    println(value(parseTree(input)))
   }
 }
