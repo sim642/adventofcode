@@ -18,25 +18,27 @@ object Day8 {
     }
   }
 
-  def replicateParser[A, B](n: Int, a: A)(f: A => (B, A)): (Seq[B], A) = {
+  type Parser[A, B] = A => (B, A)
+
+  def replicateParser[A, B](n: Int, f: Parser[A, B]): Parser[A, Seq[B]] = { a =>
     if (n <= 0)
       (Seq.empty, a)
     else {
       val (b, a2) = f(a)
-      val (bs, a3) = replicateParser(n - 1, a2)(f)
+      val (bs, a3) = replicateParser(n - 1, f)(a2)
       (b +: bs, a3)
     }
   }
 
   def parseTree(seq: List[Int]): Tree = {
-    def helper(seq: List[Int]): (Tree, List[Int]) = seq match {
+    def treeParser: Parser[List[Int], Tree] = {
       case childrenCount :: metadataCount :: tl =>
-        val (children, seq) = replicateParser(childrenCount, tl)(helper)
+        val (children, seq) = replicateParser(childrenCount, treeParser)(tl)
         val (metadata, seq2) = seq.splitAt(metadataCount)
         (Tree(children, metadata), seq2)
     }
 
-    helper(seq)._1
+    treeParser(seq)._1
   }
 
   def parseTree(input: String): Tree = parseTree(input.split(" ").map(_.toInt).toList)
