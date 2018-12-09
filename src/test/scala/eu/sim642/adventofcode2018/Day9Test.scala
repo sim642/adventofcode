@@ -18,4 +18,8 @@ class Day9Test extends FunSuite {
   test("Part 1 input answer") {
     assert(highscore(input) == 398371)
   }
+
+  test("Part 2 input answer") {
+    assert(highscore(input, 100) == 3212830280L)
+  }
 }

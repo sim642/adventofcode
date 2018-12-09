@@ -2,33 +2,62 @@ package eu.sim642.adventofcode2018
 
 object Day9 {
 
-  def highscore(playerCount: Int, lastMarble: Int): Int = {
-    def helper(marbles: Vector[Int], currentIndex: Int, marble: Int, player: Int, scores: Map[Int, Int]): Map[Int, Int] = {
+  /**
+    * Zipper-like immutable circular buffer.
+    */
+  case class MarbleCircle(init: List[Int], current: Int, tail: List[Int]) {
+    def next: MarbleCircle = tail match {
+      case hd :: tl => MarbleCircle(current :: init, hd, tl)
+      case Nil =>
+        init.reverse match {
+          case hd :: it => MarbleCircle(List(current), hd, it)
+          case Nil => this
+        }
+    }
+
+    def prev: MarbleCircle = init match {
+      case hd :: it => MarbleCircle(it, hd, current :: tail)
+      case Nil =>
+        tail.reverse match {
+          case hd :: tl => MarbleCircle(tl, hd, List(current))
+          case Nil => this
+        }
+    }
+
+    def inserted(elem: Int): MarbleCircle = MarbleCircle(init, elem, current :: tail)
+
+    def removed: MarbleCircle = tail match {
+      case hd :: tl => MarbleCircle(init, hd, tl)
+      case Nil =>
+        val hd :: it = init
+        MarbleCircle(it, hd, tail)
+    }
+  }
+
+  def highscore(playerCount: Int, lastMarble: Int): Long = {
+    def helper(marbles: MarbleCircle, marble: Int, player: Int, scores: Map[Int, Long]): Map[Int, Long] = {
       val nextPlayer = ((player - 1) + 1) % playerCount + 1
 
       if (marble > lastMarble)
         scores
       else if (marble % 23 == 0) {
-        val removeIndex = (currentIndex - 7 + marbles.length) % marbles.length
-        val (init, removed +: tail) = marbles.splitAt(removeIndex)
-        val newMarbles = init ++ tail
-        val newScores = scores.updated(player, scores(player) + marble + removed)
-        helper(newMarbles, removeIndex, marble + 1, nextPlayer, newScores)
+        val beforeRemoved = marbles.prev.prev.prev.prev.prev.prev.prev
+        val newMarbles = beforeRemoved.removed
+        val newScores = scores.updated(player, scores(player) + marble + beforeRemoved.current)
+        helper(newMarbles, marble + 1, nextPlayer, newScores)
       }
       else {
-        val insertIndex = (currentIndex + 2) % marbles.length
-        val (init, tail) = marbles.splitAt(insertIndex)
-        val newMarbles: Vector[Int] = (init :+ marble) ++ tail
-        helper(newMarbles, insertIndex, marble + 1, nextPlayer, scores)
+        val newMarbles = marbles.next.next.inserted(marble)
+        helper(newMarbles, marble + 1, nextPlayer, scores)
       }
     }
 
-    helper(Vector(0), 0, 1, 1, Map.empty.withDefaultValue(0)).values.max
+    helper(MarbleCircle(Nil, 0, Nil), 1, 1, Map.empty.withDefaultValue(0)).values.max
   }
 
-  def highscore(input: String): Int = {
+  def highscore(input: String, lastMarbleMult: Int = 1): Long = {
     val (playerCount, lastMarble) = parseInput(input)
-    highscore(playerCount, lastMarble)
+    highscore(playerCount, lastMarble * lastMarbleMult)
   }
 
   private val inputRegex = """(\d+) players; last marble is worth (\d+) points""".r
@@ -41,5 +70,6 @@ object Day9 {
 
   def main(args: Array[String]): Unit = {
     println(highscore(input))
+    println(highscore(input, lastMarbleMult = 100))
   }
 }
