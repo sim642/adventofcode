@@ -5,26 +5,26 @@ object Day9 {
   /**
     * Zipper-like immutable circular buffer.
     */
-  case class MarbleCircle(init: List[Int], current: Int, tail: List[Int]) {
-    def next: MarbleCircle = tail match {
-      case hd :: tl => MarbleCircle(current :: init, hd, tl)
+  case class CircularZipper[A](init: List[A], current: A, tail: List[A]) {
+    def next: CircularZipper[A] = tail match {
+      case hd :: tl => CircularZipper(current :: init, hd, tl)
       case Nil =>
         init.reverse match {
-          case hd :: it => MarbleCircle(List(current), hd, it)
+          case hd :: it => CircularZipper(List(current), hd, it)
           case Nil => this
         }
     }
 
-    def prev: MarbleCircle = init match {
-      case hd :: it => MarbleCircle(it, hd, current :: tail)
+    def prev: CircularZipper[A] = init match {
+      case hd :: it => CircularZipper(it, hd, current :: tail)
       case Nil =>
         tail.reverse match {
-          case hd :: tl => MarbleCircle(tl, hd, List(current))
+          case hd :: tl => CircularZipper(tl, hd, List(current))
           case Nil => this
         }
     }
 
-    def rotate(n: Int): MarbleCircle = {
+    def rotate(n: Int): CircularZipper[A] = {
       if (n == 0)
         this
       else if (n > 0)
@@ -33,18 +33,22 @@ object Day9 {
         prev.rotate(n + 1)
     }
 
-    def inserted(elem: Int): MarbleCircle = MarbleCircle(init, elem, current :: tail)
+    def inserted(elem: A): CircularZipper[A] = CircularZipper(init, elem, current :: tail)
 
-    def removed: (Int, MarbleCircle) = tail match {
-      case hd :: tl => (current, MarbleCircle(init, hd, tl))
+    def removed: (A, CircularZipper[A]) = tail match {
+      case hd :: tl => (current, CircularZipper(init, hd, tl))
       case Nil =>
         val hd :: it = init
-        (current, MarbleCircle(it, hd, tail))
+        (current, CircularZipper(it, hd, tail))
     }
   }
 
+  object CircularZipper {
+    def apply[A](elem: A): CircularZipper[A] = CircularZipper(Nil, elem, Nil)
+  }
+
   def highscore(playerCount: Int, lastMarble: Int): Long = {
-    def helper(marbles: MarbleCircle, marble: Int, player: Int, scores: Map[Int, Long]): Map[Int, Long] = {
+    def helper(marbles: CircularZipper[Int], marble: Int, player: Int, scores: Map[Int, Long]): Map[Int, Long] = {
       val nextPlayer = ((player - 1) + 1) % playerCount + 1
 
       if (marble > lastMarble)
@@ -60,7 +64,7 @@ object Day9 {
       }
     }
 
-    helper(MarbleCircle(Nil, 0, Nil), 1, 1, Map.empty.withDefaultValue(0)).values.max
+    helper(CircularZipper(0), 1, 1, Map.empty.withDefaultValue(0)).values.max
   }
 
   def highscore(input: String, lastMarbleMult: Int = 1): Long = {
