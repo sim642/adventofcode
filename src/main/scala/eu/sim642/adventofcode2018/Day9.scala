@@ -24,13 +24,22 @@ object Day9 {
         }
     }
 
+    def rotate(n: Int): MarbleCircle = {
+      if (n == 0)
+        this
+      else if (n > 0)
+        next.rotate(n - 1)
+      else
+        prev.rotate(n + 1)
+    }
+
     def inserted(elem: Int): MarbleCircle = MarbleCircle(init, elem, current :: tail)
 
-    def removed: MarbleCircle = tail match {
-      case hd :: tl => MarbleCircle(init, hd, tl)
+    def removed: (Int, MarbleCircle) = tail match {
+      case hd :: tl => (current, MarbleCircle(init, hd, tl))
       case Nil =>
         val hd :: it = init
-        MarbleCircle(it, hd, tail)
+        (current, MarbleCircle(it, hd, tail))
     }
   }
 
@@ -41,13 +50,12 @@ object Day9 {
       if (marble > lastMarble)
         scores
       else if (marble % 23 == 0) {
-        val beforeRemoved = marbles.prev.prev.prev.prev.prev.prev.prev
-        val newMarbles = beforeRemoved.removed
-        val newScores = scores.updated(player, scores(player) + marble + beforeRemoved.current)
+        val (removed, newMarbles) = marbles.rotate(-7).removed
+        val newScores = scores.updated(player, scores(player) + marble + removed)
         helper(newMarbles, marble + 1, nextPlayer, newScores)
       }
       else {
-        val newMarbles = marbles.next.next.inserted(marble)
+        val newMarbles = marbles.rotate(2).inserted(marble)
         helper(newMarbles, marble + 1, nextPlayer, scores)
       }
     }
