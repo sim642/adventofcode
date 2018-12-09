@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.AdventOfCodeSuite
 import eu.sim642.adventofcode2017.Day1._
 import org.scalatest.FunSuite
 
-class Day1Test extends FunSuite {
+class Day1Test extends FunSuite with AdventOfCodeSuite {
 
   test("Part 1 examples") {
     assert(Part1.captcha("1122") == 3)

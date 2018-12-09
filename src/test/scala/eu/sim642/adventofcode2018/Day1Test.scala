@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2018
 
 import Day1._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 
-class Day1Test extends FunSuite {
+class Day1Test extends FunSuite with AdventOfCodeSuite {
 
   test("Part 1 examples") {
     assert(resultingFreq(Seq(+1, -2, +3, +1)) == 3)

@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2017
 
 import Day8._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
 
-class Day8Test extends FunSuite with PropertyChecks {
+class Day8Test extends FunSuite with PropertyChecks with AdventOfCodeSuite {
 
   val exampleInstructionsStr = """b inc 5 if a > 1
                           |a inc 1 if b < 5

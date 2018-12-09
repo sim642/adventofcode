@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2017
 
 import Day13._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
 
-class Day13Test extends FunSuite with PropertyChecks {
+class Day13Test extends FunSuite with PropertyChecks with AdventOfCodeSuite {
 
   val exampleRanges = Map(0 -> 3, 1 -> 2, 4 -> 4, 6 -> 4)
 

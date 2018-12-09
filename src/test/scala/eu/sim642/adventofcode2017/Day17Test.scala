@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2017
 
 import Day17._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
 
-class Day17Test extends FunSuite with PropertyChecks {
+class Day17Test extends FunSuite with PropertyChecks with AdventOfCodeSuite {
 
   test("Part 1 example states") {
     import Part1._

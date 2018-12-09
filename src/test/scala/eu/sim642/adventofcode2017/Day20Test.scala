@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import Day20._
+import eu.sim642.AdventOfCodeSuite
 import eu.sim642.adventofcode2017.Day20Test._
 import org.scalatest.{FunSuite, Suites}
 
@@ -8,7 +9,7 @@ class Day20Test extends Suites(
   new BaseTest,
   new SimulateSolutionTest,
   new QuadraticSolutionTest
-)
+) with AdventOfCodeSuite
 
 object Day20Test {
 

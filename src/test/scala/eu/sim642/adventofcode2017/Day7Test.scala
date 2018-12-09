@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2017
 
 import Day7._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 
-class Day7Test extends FunSuite {
+class Day7Test extends FunSuite with AdventOfCodeSuite {
 
   test("parseProgram") {
     assert(parseProgram("fwft (72)") == Program("fwft", 72, Seq()))

@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.AdventOfCodeSuite
 import eu.sim642.adventofcode2017.Day6._
 import eu.sim642.adventofcode2017.Day6Test._
 import org.scalatest.prop.PropertyChecks
@@ -9,7 +10,7 @@ class Day6Test extends Suites(
   new BaseTest,
   new NaiveSolutionTest,
   new FloydSolutionTest,
-)
+) with AdventOfCodeSuite
 
 object Day6Test {
 

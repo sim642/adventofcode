@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2018
 
 import org.scalatest.FunSuite
 import Day2._
+import eu.sim642.AdventOfCodeSuite
 
-class Day2Test extends FunSuite {
+class Day2Test extends FunSuite with AdventOfCodeSuite {
 
   test("Part 1 examples") {
     assert(checksum(Seq(

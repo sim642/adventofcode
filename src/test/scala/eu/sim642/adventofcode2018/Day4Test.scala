@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2018
 
 import org.scalatest.FunSuite
 import Day4._
+import eu.sim642.AdventOfCodeSuite
 
-class Day4Test extends FunSuite {
+class Day4Test extends FunSuite with AdventOfCodeSuite {
 
   val exampleInput =
     """[1518-11-01 00:00] Guard #10 begins shift

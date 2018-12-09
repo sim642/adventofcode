@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2017
 
 import Day15._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
 
-class Day15Test extends FunSuite with PropertyChecks {
+class Day15Test extends FunSuite with PropertyChecks with AdventOfCodeSuite {
 
   test("Part 1 example generators") {
     val genA = Part1.generatorA(65)

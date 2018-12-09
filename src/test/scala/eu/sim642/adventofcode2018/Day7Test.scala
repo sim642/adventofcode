@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2018
 
 import org.scalatest.FunSuite
 import Day7._
+import eu.sim642.AdventOfCodeSuite
 
-class Day7Test extends FunSuite {
+class Day7Test extends FunSuite with AdventOfCodeSuite {
 
   val exampleInput =
     """Step C must be finished before step A can begin.

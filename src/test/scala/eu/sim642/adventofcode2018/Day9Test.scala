@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2018
 
 import org.scalatest.FunSuite
 import Day9._
+import eu.sim642.AdventOfCodeSuite
 
-class Day9Test extends FunSuite {
+class Day9Test extends FunSuite with AdventOfCodeSuite {
 
   test("Part 1 examples") {
     assert(highscore(9, 25) == 32)

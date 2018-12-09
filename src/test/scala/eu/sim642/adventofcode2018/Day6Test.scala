@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2018
 
 import org.scalatest.FunSuite
 import Day6._
+import eu.sim642.AdventOfCodeSuite
 
-class Day6Test extends FunSuite {
+class Day6Test extends FunSuite with AdventOfCodeSuite {
 
   val exampleInput =
     """1, 1

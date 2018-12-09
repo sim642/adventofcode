@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2017
 
 import Day25._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
 
-class Day25Test extends FunSuite with PropertyChecks {
+class Day25Test extends FunSuite with PropertyChecks with AdventOfCodeSuite {
 
   lazy val exampleInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day25example.txt")).mkString.trim
 

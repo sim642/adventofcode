@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2018
 
 import org.scalatest.FunSuite
 import Day5._
+import eu.sim642.AdventOfCodeSuite
 
-class Day5Test extends FunSuite {
+class Day5Test extends FunSuite with AdventOfCodeSuite {
 
   test("Part 1 examples") {
     assert(reactPolymer("aA") == "")

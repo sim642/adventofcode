@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2017
 
 import Day11._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
 
-class Day11Test extends FunSuite with PropertyChecks {
+class Day11Test extends FunSuite with PropertyChecks with AdventOfCodeSuite {
 
   test("Part 1 examples") {
     val inputSteps = Table(

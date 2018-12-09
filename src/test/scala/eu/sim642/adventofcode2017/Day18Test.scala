@@ -1,12 +1,13 @@
 package eu.sim642.adventofcode2017
 
 import Day18._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
 
 import scala.collection.immutable.Queue
 
-class Day18Test extends FunSuite with PropertyChecks {
+class Day18Test extends FunSuite with PropertyChecks with AdventOfCodeSuite {
 
   val exampleInput1 = """set a 1
                        |add a 2

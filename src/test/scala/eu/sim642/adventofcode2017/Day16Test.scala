@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2017
 
 import Day16._
+import eu.sim642.AdventOfCodeSuite
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
 
-class Day16Test extends FunSuite with PropertyChecks {
+class Day16Test extends FunSuite with PropertyChecks with AdventOfCodeSuite {
 
   test("parseMove") {
     assert(parseMove("s3") == Spin(3))
