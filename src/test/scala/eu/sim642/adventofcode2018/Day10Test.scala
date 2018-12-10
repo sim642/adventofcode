@@ -39,10 +39,14 @@ class Day10Test extends FunSuite {
       |position=<-3,  6> velocity=< 2, -1>""".stripMargin
 
   test("Part 2 examples") {
-    assert(messageSecond(parsePoints(exampleInput)) == 3)
+    val (minPoints, minSecond) = minimizePointsArea(parsePoints(exampleInput))
+    assert(minSecond == 3)
+    printPoints(minPoints)
   }
 
   test("Part 2 input answer") {
-    assert(messageSecond(parsePoints(input)) == 10659)
+    val (minPoints, minSecond) = minimizePointsArea(parsePoints(input))
+    assert(minSecond == 10659)
+    printPoints(minPoints)
   }
 }
