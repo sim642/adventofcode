@@ -16,15 +16,33 @@ object Day10 {
     area
   }
 
-  def minimizePointsArea(points: Seq[Point]): (Seq[Point], Int) = {
-    val steps = Iterator.iterate(points)(_.map(_.step))
+  def boundingAreaPoints(points: Seq[Point]): Long = boundingArea(points.map(_.position))
 
-    val (minPoints, minSecond) = steps.zipWithIndex.take(15000).minBy({ case (points, second) =>
-      val positions = points.map(_.position)
-      boundingArea(positions)
+  implicit class StreamUnfoldOps(stream: Stream.type) {
+    // https://github.com/tpolecat/examples/blob/ab444af9101b9049d6bd7ebf13ae583bc77ac60a/src/main/scala/eg/Unfold.scala
+    def unfold[A, B](a: A)(f: A => Option[(A, B)]): Stream[B] =
+      f(a).map{ case (a, b) => b #:: unfold(a)(f)}.getOrElse(Stream.empty)
+
+    def unfold0[A](a: A)(f: A => Option[A]): Stream[A] =
+      unfold(a)(a => f(a).map(a => (a, a)))
+  }
+
+  def minimizePointsArea(points: Seq[Point]): (Seq[Point], Int) = {
+    val steps = Stream.unfold0((points, boundingAreaPoints(points)))({ case (points, area) =>
+      val newPoints = points.map(_.step)
+      val newArea = boundingAreaPoints(newPoints)
+
+      if (newArea < area)
+        Some((newPoints, newArea))
+      else
+        None
+    }).map(_._1).toIterator // iterator is much faster because it doesn't keep old states in memory
+
+    val (minPoints, minSecond) = steps.zipWithIndex.minBy({ case (points, second) =>
+      boundingAreaPoints(points)
     })
 
-    (minPoints, minSecond)
+    (minPoints, 1 + minSecond) // unfold doesn't add initial, account for it here
   }
 
   def printPoints(points: Seq[Point]): Unit = {
