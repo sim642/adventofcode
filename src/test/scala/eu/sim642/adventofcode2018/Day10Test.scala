@@ -38,11 +38,11 @@ class Day10Test extends FunSuite {
       |position=<14,  7> velocity=<-2,  0>
       |position=<-3,  6> velocity=< 2, -1>""".stripMargin
 
-  test("Part 1 examples") {
+  test("Part 2 examples") {
     assert(messageSecond(parsePoints(exampleInput)) == 3)
   }
 
-  test("Part 1 input answer") {
+  test("Part 2 input answer") {
     assert(messageSecond(parsePoints(input)) == 10659)
   }
 }
