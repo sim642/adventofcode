@@ -62,18 +62,29 @@ object Day10 {
     def stepBoundingArea(points: Seq[Point], t: Int): Long = boundingAreaPoints(points.map(_.step(t)))
 
     override def minimizePointsArea(points: Seq[Point]): (Seq[Point], Int) = {
+      def slope(t: Int): Long = stepBoundingArea(points, t + 1) - stepBoundingArea(points, t)
+
       def search(min: Int, max: Int): Int = {
         if (min == max)
           return min
 
         val mid = (min + max) / 2
-        (stepBoundingArea(points, mid), stepBoundingArea(points, mid + 1)) match {
-          case (m, m1) if m < m1 => search(min, mid)
-          case (m, m1) if m > m1 => search(mid + 1, max)
-        }
+        if (slope(mid) > 0)
+          search(min, mid)
+        else
+          search(mid + 1, max)
       }
 
-      val minSecond = search(0, 15000)
+      def searchBounds(max: Int = 1): (Int, Int) = {
+        val max2 = 2 * max
+        if (slope(max2) > 0)
+          (max, max2)
+        else
+          searchBounds(max2)
+      }
+
+      val (min, max) = searchBounds()
+      val minSecond = search(min, max)
       (points.map(_.step(minSecond)), minSecond)
     }
   }
