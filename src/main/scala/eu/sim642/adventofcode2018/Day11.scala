@@ -19,11 +19,7 @@ object Day11 {
 
   class NaiveSumGrid(f: Pos => Int) extends SumGrid {
     override def sumRect(topLeft: Pos, bottomRight: Pos): Int = {
-      (for {
-        y <- topLeft.y to bottomRight.y
-        x <- topLeft.x to bottomRight.x
-        pos = Pos(x, y)
-      } yield f(pos)).sum
+      Day6.iterateRect(topLeft, bottomRight).map(f).sum
     }
   }
 
@@ -39,17 +35,17 @@ object Day11 {
     }
 
     override def sumRect(topLeft: Pos, bottomRight: Pos): Int = {
-      partialSums(bottomRight) - partialSums(Pos(topLeft.x - 1, bottomRight.y)) - partialSums(Pos(bottomRight.x, topLeft.y - 1)) + partialSums(Pos(topLeft.x - 1, topLeft.y - 1))
+      val bottomLeft1 = Pos(topLeft.x - 1, bottomRight.y)
+      val topRight1 = Pos(bottomRight.x, topLeft.y - 1)
+      val topLeft1 = Pos(topLeft.x - 1, topLeft.y - 1)
+      partialSums(bottomRight) - partialSums(bottomLeft1) - partialSums(topRight1) + partialSums(topLeft1)
     }
   }
 
   def largestPowerLevelSquare(serialNumber: Int): Pos = {
     val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Pos(1, 1), Pos(300, 300))
 
-    (for {
-      y <- (1 until (300 - 2)).toIterator
-      x <- (1 until (300 - 2)).toIterator
-    } yield Pos(x, y)).maxBy(p => sumGrid.sumRect(p, p + Pos(2, 2)))
+    Day6.iterateRect(Pos(1, 1), Pos(300 - 3, 300 - 3)).maxBy(p => sumGrid.sumRect(p, p + Pos(2, 2)))
   }
 
   def largestPowerLevelSquareString(serialNumber: Int): String = {
@@ -62,9 +58,8 @@ object Day11 {
 
     (for {
       size <- (1 to 300).toIterator
-      y <- (1 until (300 - (size - 1))).toIterator
-      x <- (1 until (300 - (size - 1))).toIterator
-    } yield (Pos(x, y), size)).maxBy(p => sumGrid.sumRect(p._1, p._1 + Pos(p._2 - 1, p._2 - 1)))
+      pos <- Day6.iterateRect(Pos(1, 1), Pos(300 - size, 300 - size))
+    } yield (pos, size)).maxBy({ case (p, s) => sumGrid.sumRect(p, p + Pos(s - 1, s - 1)) })
   }
 
   def largestPowerLevelSquareString2(serialNumber: Int): String = {
