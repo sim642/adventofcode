@@ -24,14 +24,14 @@ class Day12Test extends FunSuite {
       |####. => #""".stripMargin
 
   test("Part 1 examples") {
-    assert(sumPlants(exampleInput) == 325)
+    assert(sumPlantsSimulate(exampleInput) == 325)
   }
 
   test("Part 1 input answer") {
-    assert(sumPlants(input) == 3472)
+    assert(sumPlantsSimulate(input) == 3472)
   }
 
   test("Part 2 input answer") {
-    assert(sumPlants2(input) == 2600000000919L)
+    assert(sumPlantsCycle(input) == 2600000000919L)
   }
 }
