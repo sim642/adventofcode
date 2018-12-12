@@ -1,18 +1,22 @@
 package eu.sim642.adventofcode2018
 
 import Day2.HeadIterator
+import eu.sim642.adventofcode2017.Day6.FloydSolution
+
+import scala.collection.mutable
 
 object Day12 {
 
-  def simulateGeneration(notes: Map[String, Char])(generation: String): String = {
-    ("...." + generation + "....").sliding(5).map(notes).mkString("")
+  def simulateGeneration(notes: Map[String, Char])(generation: String, startIndex: Int): (String, Int) = {
+    //(("...." + generation + "....").sliding(5).map(notes).mkString(""), startIndex + 2)
+    val newGeneration = ("...." + generation + "....").sliding(5).map(notes).mkString("")
+    val firstPlantIndex = newGeneration.indexOf("#")
+    val lastPlantIndex = newGeneration.lastIndexOf("#")
+    (newGeneration.slice(firstPlantIndex, lastPlantIndex + 1), startIndex + 2 - firstPlantIndex)
   }
 
   def sumPlants(initial: String, notes: Map[String, Char]): Int = {
-    val last = Iterator.iterate(initial)(simulateGeneration(notes)).drop(20).head
-    println(last)
-    val startIndex = 20 * 2
-    println(last.drop(startIndex))
+    val (last, startIndex) = Iterator.iterate((initial, 0))(p => simulateGeneration(notes)(p._1, p._2)).drop(20).head
     last.zipWithIndex.map({
       case ('.', _) => 0
       case ('#', i) => i - startIndex
@@ -22,6 +26,44 @@ object Day12 {
   def sumPlants(input: String): Int = {
     val (initial, notes) = parseInput(input)
     sumPlants(initial, notes)
+  }
+
+  def sumPlants2(initial: String, notes: Map[String, Char]): Long = {
+    val prev: mutable.Map[String, (Int, Int)] = mutable.Map.empty
+
+    val it = Iterator.iterate((initial, 0))(p => simulateGeneration(notes)(p._1, p._2))
+    var g = 0
+    while (true) {
+      val (gen, i) = it.next()
+      println(s"$g\t$i\t$gen")
+
+      prev.put(gen, (i, g)) match {
+        case None =>
+        case Some((prevI, prevG)) =>
+          val iShift = i - prevI
+          // 50000000000
+          require(g - prevG == 1)
+          val cycles = 50000000000L - prevG
+          val finalI = prevI + cycles * iShift
+
+          return gen.zipWithIndex.map({
+            case ('.', _) => 0
+            case ('#', i) => i - finalI
+          }).sum
+      }
+
+      g += 1
+    }
+    /*val (mu, lambda) = FloydSolution.floyd[(String, Int)]((initial, 0), p => simulateGeneration(notes)(p._1, p._2))
+    println(mu)
+    println(lambda)*/
+
+    ???
+  }
+
+  def sumPlants2(input: String): Long = {
+    val (initial, notes) = parseInput(input)
+    sumPlants2(initial, notes)
   }
 
   private val initialStateRegex = """initial state: ([.#]+)""".r
@@ -43,6 +85,7 @@ object Day12 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(sumPlants(input))
+    //println(sumPlants(input))
+    println(sumPlants2(input))
   }
 }

@@ -30,4 +30,8 @@ class Day12Test extends FunSuite {
   test("Part 1 input answer") {
     assert(sumPlants(input) == 3472)
   }
+
+  test("Part 2 input answer") {
+    assert(sumPlants2(input) == 2600000000919L)
+  }
 }
