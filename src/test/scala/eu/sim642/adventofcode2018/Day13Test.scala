@@ -43,4 +43,8 @@ class Day13Test extends FunSuite {
   test("Part 2 examples") {
     assert(lastCartPos(exampleInput3) == "6,4")
   }
+
+  test("Part 2 input answer") {
+    assert(lastCartPos(input) == "59,64")
+  }
 }
