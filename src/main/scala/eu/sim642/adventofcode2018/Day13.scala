@@ -39,6 +39,17 @@ object Day13 {
     pos2.diff(pos2.distinct).head
   }
 
+  def lastCartPos(grid: Grid[Char], carts: Seq[Cart]): Pos = {
+    def removeCollisions(carts: Seq[Cart]): Seq[Cart] = {
+      val poss = carts.map(_.pos)
+      val collisionPoss = poss.diff(poss.distinct)
+      carts.filterNot(cart => collisionPoss.contains(cart.pos))
+    }
+
+    val it = Iterator.iterate(carts)(carts => removeCollisions(tickCarts(grid, carts)))
+    it.find(carts => carts.size == 1).get.head.pos
+  }
+
   def parseGrid(input: String): Grid[Char] = input.lines.map(_.toVector).toVector
 
   def parseCart(cell: Char, pos: Pos): Option[Cart] = {
@@ -72,9 +83,18 @@ object Day13 {
     s"${collisionPos.x},${collisionPos.y}"
   }
 
+  def lastCartPos(input: String): String = {
+    val (grid, carts) = parseInput(input)
+    val collisionPos = lastCartPos(grid, carts)
+    s"${collisionPos.x},${collisionPos.y}"
+  }
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.stripLineEnd
 
   def main(args: Array[String]): Unit = {
     println(firstCollisionPos(input))
+    println(lastCartPos(input))
+
+    // 88,50
   }
 }

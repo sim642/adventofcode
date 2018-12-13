@@ -22,6 +22,15 @@ class Day13Test extends FunSuite {
       !\-+-/  \-+--/
       !  \------/   """.stripMargin('!')
 
+  val exampleInput3 =
+    """/>-<\
+      !|   |
+      !| /<+-\
+      !| | | v
+      !\>+</ |
+      !  |   ^
+      !  \<->/""".stripMargin('!')
+
   test("Part 1 examples") {
     assert(firstCollisionPos(exampleInput1) == "0,3")
     assert(firstCollisionPos(exampleInput2) == "7,3")
@@ -29,5 +38,9 @@ class Day13Test extends FunSuite {
 
   test("Part 1 input answer") {
     assert(firstCollisionPos(input) == "48,20")
+  }
+
+  test("Part 2 examples") {
+    assert(lastCartPos(exampleInput3) == "6,4")
   }
 }
