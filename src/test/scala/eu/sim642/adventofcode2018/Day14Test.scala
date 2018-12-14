@@ -15,4 +15,15 @@ class Day14Test extends FunSuite {
   test("Part 1 input answer") {
     assert(tenScores(input) == "5482326119")
   }
+
+  test("Part 2 examples") {
+    assert(recipesToLeft("51589") == 9)
+    assert(recipesToLeft("01245") == 5)
+    assert(recipesToLeft("92510") == 18)
+    assert(recipesToLeft("59414") == 2018)
+  }
+
+  test("Part 2 input answer") {
+    assert(recipesToLeft(input) == 20368140)
+  }
 }

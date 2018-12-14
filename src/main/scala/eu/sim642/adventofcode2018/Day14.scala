@@ -28,10 +28,24 @@ object Day14 {
     it.find(_.scores.length >= after + 10).get.scores.slice(after, after + 10).mkString("")
   }
 
+  def recipesToLeft(scores: String): Int = {
+    val scoreSeq = scores.map(_.asDigit)
+    val it = Iterator.iterate(RecipeState.initial)(_.next)
+    var prevStateLength = 0 // TODO: don't use this state
+    it.find({ state =>
+      val i = state.scores.indexOfSlice(scoreSeq, prevStateLength - scoreSeq.length)
+      prevStateLength = state.scores.length
+      i >= 0
+    }).get.scores.indexOfSlice(scoreSeq)
+  }
+
+  def recipesToLeft(scores: Int): Int = recipesToLeft(scores.toString)
+
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day14.txt")).mkString.trim
   val input = 846021
 
   def main(args: Array[String]): Unit = {
     println(tenScores(input))
+    println(recipesToLeft(input))
   }
 }
