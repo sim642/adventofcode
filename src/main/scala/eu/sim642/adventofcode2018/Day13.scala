@@ -15,7 +15,6 @@ object Day13 {
   val leftDirections = Seq(Pos(1, 0), Pos(0, -1), Pos(-1, 0), Pos(0, 1))
 
   def tickCarts(grid: Grid[Char], carts: Seq[Cart]): Seq[Cart] = {
-    //println(carts)
     carts.map(_.tick).map({ case cart@Cart(pos, direction, intersections) =>
       grid(pos) match {
         case '+' =>
@@ -42,8 +41,6 @@ object Day13 {
   }
 
   def tickCarts2(grid: Grid[Char], carts: Seq[Cart]): Seq[Cart] = {
-    println(carts)
-
     def helper(init: List[Cart], tail: List[Cart]): List[Cart] = tail match {
       case Nil => init
       case cart0 :: tl =>
