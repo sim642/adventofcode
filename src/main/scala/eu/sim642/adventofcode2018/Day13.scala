@@ -1,36 +1,38 @@
 package eu.sim642.adventofcode2018
 
+import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcode2017.Day14.PosGrid
-
-import scala.collection.mutable
 
 object Day13 {
 
-  case class Cart(pos: Pos, direction: Pos, intersections: Int = 0) {
-    def tick: Cart = copy(pos = pos + direction)
+  implicit class DirectionPos(pos: Pos) {
+    def left: Pos = Pos(pos.y, -pos.x)
+    def right: Pos = Pos(-pos.y, pos.x)
   }
 
-  val leftDirections = Seq(Pos(1, 0), Pos(0, -1), Pos(-1, 0), Pos(0, 1))
+  case class Cart(pos: Pos, direction: Pos, intersections: Int = 0) {
+    private def tickMove: Cart = copy(pos = pos + direction)
+
+    private def tickTurn(grid: Grid[Char]): Cart = {
+      (direction, grid(pos)) match {
+        case (_, '+') =>
+          copy(direction = intersections % 3 match {
+            case 0 => direction.left // left
+            case 1 => direction // straight
+            case 2 => direction.right // right
+          }, intersections = intersections + 1)
+        case (Pos(_, 0), '/') | (Pos(0, _), '\\') => copy(direction = direction.left)
+        case (Pos(0, _), '/') | (Pos(_, 0), '\\') => copy(direction = direction.right)
+        case _ => this
+      }
+    }
+
+    def tick(grid: Grid[Char]): Cart = tickMove.tickTurn(grid)
+  }
 
   def tickCarts(grid: Grid[Char], carts: Seq[Cart]): Seq[Cart] = {
-    carts.map(_.tick).map({ case cart@Cart(pos, direction, intersections) =>
-      grid(pos) match {
-        case '+' =>
-          val direction2 = intersections % 3 match {
-            case 0 => leftDirections((leftDirections.indexOf(direction) + 1) % 4) // left
-            case 1 => direction // straight
-            case 2 => leftDirections((leftDirections.indexOf(direction) + 3) % 4)// right
-          }
-          cart.copy(direction = direction2, intersections = intersections + 1)
-        case '/' if direction.x == 0 => cart.copy(direction = Pos(-direction.y, 0))
-        case '\\' if direction.x == 0 => cart.copy(direction = Pos(direction.y, 0))
-        case '/' if direction.y == 0 => cart.copy(direction = Pos(0, -direction.x))
-        case '\\' if direction.y == 0 => cart.copy(direction = Pos(0, direction.x))
-        case _ => cart
-      }
-    })
+    carts.map(_.tick(grid))
   }
 
   def firstCollisionPos(grid: Grid[Char], carts: Seq[Cart]): Pos = {
@@ -40,32 +42,17 @@ object Day13 {
     pos2.diff(pos2.distinct).head
   }
 
-  def tickCarts2(grid: Grid[Char], carts: Seq[Cart]): Seq[Cart] = {
+  def tickCartsCollide(grid: Grid[Char], carts: Seq[Cart]): Seq[Cart] = {
     def helper(init: List[Cart], tail: List[Cart]): List[Cart] = tail match {
       case Nil => init
-      case cart0 :: tl =>
-        val cart@Cart(pos, direction, intersections) = cart0.tick
-        val init2 = init.filterNot(_.pos == pos)
-        val tl2 = tl.filterNot(_.pos == pos)
+      case cart :: tl =>
+        val newCart = cart.tick(grid)
+        val init2 = init.filterNot(_.pos == newCart.pos)
+        val tl2 = tl.filterNot(_.pos == newCart.pos)
         if (init2.size < init.size || tl2.size < tl.size)
           helper(init2, tl2)
-        else {
-          val cart2 = grid(pos) match {
-            case '+' =>
-              val direction2 = intersections % 3 match {
-                case 0 => leftDirections((leftDirections.indexOf(direction) + 1) % 4) // left
-                case 1 => direction // straight
-                case 2 => leftDirections((leftDirections.indexOf(direction) + 3) % 4)// right
-              }
-              cart.copy(direction = direction2, intersections = intersections + 1)
-            case '/' if direction.x == 0 => cart.copy(direction = Pos(-direction.y, 0))
-            case '\\' if direction.x == 0 => cart.copy(direction = Pos(direction.y, 0))
-            case '/' if direction.y == 0 => cart.copy(direction = Pos(0, -direction.x))
-            case '\\' if direction.y == 0 => cart.copy(direction = Pos(0, direction.x))
-            case _ => cart
-          }
-          helper(cart2 :: init, tl)
-        }
+        else
+          helper(newCart :: init, tl)
       }
 
     val sortedCarts = carts.sortWith((c1, c2) => c1.pos.y < c2.pos.y || (c1.pos.y == c2.pos.y && c1.pos.x < c2.pos.x))
@@ -73,8 +60,8 @@ object Day13 {
   }
 
   def lastCartPos(grid: Grid[Char], carts: Seq[Cart]): Pos = {
-    val it = Iterator.iterate(carts)(tickCarts2(grid, _))
-    it.find(carts => carts.size == 1).get.head.pos
+    val it = Iterator.iterate(carts)(tickCartsCollide(grid, _))
+    it.find(_.size == 1).get.head.pos
   }
 
   def parseGrid(input: String): Grid[Char] = input.lines.map(_.toVector).toVector
