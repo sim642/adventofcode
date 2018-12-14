@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2018
 
+import eu.sim642.adventofcode2018.Day2.HeadIterator
+
 object Day14 {
 
   case class RecipeState(scores: Vector[Int], index1: Int, index2: Int) {
@@ -32,11 +34,14 @@ object Day14 {
     val scoreSeq = scores.map(_.asDigit)
     val it = Iterator.iterate(RecipeState.initial)(_.next)
     var prevStateLength = 0 // TODO: don't use this state
-    it.find({ state =>
+    it.flatMap({ state =>
       val i = state.scores.indexOfSlice(scoreSeq, prevStateLength - scoreSeq.length)
       prevStateLength = state.scores.length
-      i >= 0
-    }).get.scores.indexOfSlice(scoreSeq)
+      if (i >= 0)
+        Some(i)
+      else
+        None
+    }).head
   }
 
   def recipesToLeft(scores: Int): Int = recipesToLeft(scores.toString)
