@@ -19,7 +19,7 @@ object Day15 {
     override def target: UnitType = Elf
   }
 
-  case class CombatUnit(unitType: UnitType, pos: Pos, hp: Int = 200)
+  case class CombatUnit(unitType: UnitType, pos: Pos, hp: Int = 200, attackPower: Int = 3)
 
   def readingOrder(pos1: Pos, pos2: Pos): Boolean = pos1.y < pos2.y || (pos1.y == pos2.y && pos1.x < pos2.x)
   def readingOrder(unit1: CombatUnit, unit2: CombatUnit): Boolean = readingOrder(unit1.pos, unit2.pos)
@@ -81,7 +81,7 @@ object Day15 {
     neighborDists.filter(_._2 == minDist).keys.min(posReadingOrdering)
   }
 
-  def combatOutcome(grid: Grid[Char], units: List[CombatUnit]): Int = {
+  def simulateCombat(grid: Grid[Char], units: List[CombatUnit]): (Int, List[CombatUnit]) = {
 
     var done: Boolean = false
 
@@ -113,7 +113,7 @@ object Day15 {
 
           if (attackUnits.nonEmpty) {
             val attackUnit = attackUnits.minBy(u => (u.hp, u.pos))(Ordering.Tuple2(Ordering.Int, posReadingOrdering))
-            val attackUnit2 = attackUnit.copy(hp = attackUnit.hp - 3)
+            val attackUnit2 = attackUnit.copy(hp = attackUnit.hp - unit2.attackPower)
             val attackUnit3 = if (attackUnit2.hp > 0) Some(attackUnit2) else None
 
             val init2 = init.flatMap(u => if (u == attackUnit) attackUnit3 else Some(u))
@@ -129,12 +129,15 @@ object Day15 {
     }
 
     val roundIt = Iterator.iterate(units)(round)
-    val ((_, finalUnits), finalI) = roundIt.zipTail.zipWithIndex.find({ case ((prevUnits, units), i) =>
-      //units.count(_.unitType == Goblin) == 0 || units.count(_.unitType == Elf) == 0
-      //units.isEmpty
-      //prevUnits == units
+    val (finalUnits, finalI) = roundIt.zipWithIndex.find({ case (units, i) =>
       done
     }).get
+
+    (finalI - 1, finalUnits)
+  }
+
+  def combatOutcome(grid: Grid[Char], units: List[CombatUnit]): Int = {
+    val (finalI, finalUnits) = simulateCombat(grid, units)
     val hpSum = finalUnits.map(_.hp).sum
     println(finalUnits)
     println(hpSum)
@@ -142,9 +145,34 @@ object Day15 {
     finalI * hpSum
   }
 
+  def combatOutcomeElfWin(grid: Grid[Char], units: List[CombatUnit]): Int = {
+    for (elfAttackPower <- Iterator.from(4)) {
+      println(elfAttackPower)
+      val newUnits = units.map({
+        case unit@CombatUnit(Elf, _, _, _) => unit.copy(attackPower = elfAttackPower)
+        case unit => unit
+      })
+
+      val (finalI, finalUnits) = simulateCombat(grid, newUnits)
+      if (finalUnits.count(_.unitType == Elf) == newUnits.count(_.unitType == Elf)) {
+        val hpSum = finalUnits.map(_.hp).sum
+        println(finalUnits)
+        println(hpSum)
+        println(finalI)
+        return finalI * hpSum
+      }
+    }
+    ???
+  }
+
   def combatOutcome(input: String): Int = {
     val (grid, units) = parseInput(input)
     combatOutcome(grid, units)
+  }
+
+  def combatOutcomeElfWin(input: String): Int = {
+    val (grid, units) = parseInput(input)
+    combatOutcomeElfWin(grid, units)
   }
 
 
@@ -178,5 +206,6 @@ object Day15 {
 
   def main(args: Array[String]): Unit = {
     println(combatOutcome(input))
+    println(combatOutcomeElfWin(input))
   }
 }

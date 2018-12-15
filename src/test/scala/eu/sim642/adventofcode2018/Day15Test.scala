@@ -154,4 +154,17 @@ class Day15Test extends FunSuite {
   test("Part 1 input answer") {
     assert(combatOutcome(input) == 197025)
   }
+
+  test("Part 2 examples") {
+    assert(combatOutcomeElfWin(exampleInput1) == 4988)
+    // wrong numbering in part 2 description
+    assert(combatOutcomeElfWin(exampleInput3) == 31284)
+    assert(combatOutcomeElfWin(exampleInput4) == 3478)
+    assert(combatOutcomeElfWin(exampleInput5) == 6474)
+    assert(combatOutcomeElfWin(exampleInput6) == 1140)
+  }
+
+  test("Part 2 input answer") {
+    assert(combatOutcomeElfWin(input) == 44423)
+  }
 }
