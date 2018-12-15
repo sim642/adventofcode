@@ -36,7 +36,7 @@ class Day15Test extends FunSuite {
       Pos(3, 1) -> 2,
       Pos(2, 2) -> 2,
       Pos(1, 3) -> 2,
-      Pos(3, 3) -> 4
+      //Pos(3, 3) -> 4 // BFS ends early now
     ))
 
     val nearest = getNearest(reachable)

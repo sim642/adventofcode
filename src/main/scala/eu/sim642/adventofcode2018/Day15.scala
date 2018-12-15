@@ -44,7 +44,7 @@ object Day15 {
     } yield pos
   }
 
-  def bfs(startPos: Pos)(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
+  def bfs(startPos: Pos, endPos: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
 
     def helper(visited: Map[Pos, Int], toVisit: Map[Pos, Int]): Map[Pos, Int] = {
       val neighbors = for {
@@ -55,7 +55,7 @@ object Day15 {
       } yield newPos -> (dist + 1)
       val newVisited = visited ++ toVisit
       val newToVisit = neighbors -- visited.keys
-      if (newToVisit.isEmpty)
+      if (newToVisit.isEmpty || (toVisit.keySet intersect endPos).nonEmpty)
         newVisited
       else
         helper(newVisited, newToVisit)
@@ -65,7 +65,7 @@ object Day15 {
   }
 
   def getReachable(unit: CombatUnit, inRange: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
-    bfs(unit.pos).filterKeys(inRange)
+    bfs(unit.pos, inRange).filterKeys(inRange)
   }
 
   def getNearest(reachable: Map[Pos, Int]): Set[Pos] = {
@@ -76,8 +76,8 @@ object Day15 {
   def getChosen(nearest: Set[Pos]): Pos = nearest.min
 
   def getStep(chosen: Pos, unit: CombatUnit)(implicit grid: Grid[Char], units: List[CombatUnit]): Pos = {
-    val bfsMap = bfs(chosen)
     val unitNeighbors = Pos.axisOffsets.map(unit.pos + _).toSet
+    val bfsMap = bfs(chosen, unitNeighbors)
     val neighborDists = bfsMap.filterKeys(unitNeighbors)
     val minDist = neighborDists.values.min
     neighborDists.filter(_._2 == minDist).keys.min
