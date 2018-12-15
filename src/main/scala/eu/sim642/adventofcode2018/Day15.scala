@@ -21,11 +21,11 @@ object Day15 {
 
   case class CombatUnit(unitType: UnitType, pos: Pos, hp: Int = 200, attackPower: Int = 3)
 
-  def readingOrder(pos1: Pos, pos2: Pos): Boolean = pos1.y < pos2.y || (pos1.y == pos2.y && pos1.x < pos2.x)
-  def readingOrder(unit1: CombatUnit, unit2: CombatUnit): Boolean = readingOrder(unit1.pos, unit2.pos)
+  implicit val posReadingOrdering: Ordering[Pos] = Ordering.fromLessThan({ (pos1, pos2) =>
+    pos1.y < pos2.y || (pos1.y == pos2.y && pos1.x < pos2.x)
+  })
 
-  val posReadingOrdering: Ordering[Pos] = Ordering.fromLessThan(readingOrder)
-  val unitReadingOrdering: Ordering[CombatUnit] = posReadingOrdering.on(_.pos)
+  implicit val combatUnitReadingOrdering: Ordering[CombatUnit] = Ordering.by(_.pos)
 
   def getTargets(unit: CombatUnit)(implicit units: List[CombatUnit]): Set[CombatUnit] = units.filter(_.unitType == unit.unitType.target).toSet
 
@@ -71,14 +71,14 @@ object Day15 {
     reachable.filter(_._2 == minDist).keySet
   }
 
-  def getChosen(nearest: Set[Pos]): Pos = nearest.min(posReadingOrdering)
+  def getChosen(nearest: Set[Pos]): Pos = nearest.min
 
   def getStep(chosen: Pos, unit: CombatUnit)(implicit grid: Grid[Char], units: List[CombatUnit]): Pos = {
     val bfsMap = bfs(chosen)
     val unitNeighbors = Pos.axisOffsets.map(unit.pos + _).toSet
     val neighborDists = bfsMap.filterKeys(unitNeighbors)
     val minDist = neighborDists.values.min
-    neighborDists.filter(_._2 == minDist).keys.min(posReadingOrdering)
+    neighborDists.filter(_._2 == minDist).keys.min
   }
 
   def simulateCombat(grid: Grid[Char], units: List[CombatUnit]): (Int, List[CombatUnit]) = {
@@ -112,7 +112,7 @@ object Day15 {
           val attackUnits = getTargets(unit2).filter(u => unitNeighbors.contains(u.pos))
 
           if (attackUnits.nonEmpty) {
-            val attackUnit = attackUnits.minBy(u => (u.hp, u.pos))(Ordering.Tuple2(Ordering.Int, posReadingOrdering))
+            val attackUnit = attackUnits.minBy(u => (u.hp, u.pos))
             val attackUnit2 = attackUnit.copy(hp = attackUnit.hp - unit2.attackPower)
             val attackUnit3 = if (attackUnit2.hp > 0) Some(attackUnit2) else None
 
@@ -125,7 +125,7 @@ object Day15 {
           }
       }
 
-      turn(Nil, units.sorted(unitReadingOrdering))
+      turn(Nil, units.sorted)
     }
 
     val roundIt = Iterator.iterate(units)(round)
