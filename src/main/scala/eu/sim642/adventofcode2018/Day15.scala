@@ -5,6 +5,8 @@ import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2018.Day2.HeadIterator
 
+import scala.util.Try
+
 object Day15 {
 
   sealed trait UnitType {
@@ -81,7 +83,9 @@ object Day15 {
     neighborDists.filter(_._2 == minDist).keys.min
   }
 
-  def simulateCombat(grid: Grid[Char], units: List[CombatUnit]): (Int, List[CombatUnit]) = {
+  class ElfDeathException extends RuntimeException
+
+  def simulateCombat(grid: Grid[Char], units: List[CombatUnit], elfDeath: Boolean = false): (Int, List[CombatUnit]) = {
 
     def round(units: List[CombatUnit]): (List[CombatUnit], Boolean) = {
 
@@ -112,6 +116,8 @@ object Day15 {
             val attackUnit = attackUnits.minBy(u => (u.hp, u.pos))
             val attackUnit2 = attackUnit.copy(hp = attackUnit.hp - unit2.attackPower)
             val attackUnit3 = if (attackUnit2.hp > 0) Some(attackUnit2) else None
+            if (elfDeath && attackUnit3.isEmpty && attackUnit2.unitType == Elf)
+              throw new ElfDeathException
 
             val init2 = init.flatMap(u => if (u == attackUnit) attackUnit3 else Some(u))
             val tl2 = tl.flatMap(u => if (u == attackUnit) attackUnit3 else Some(u))
@@ -146,13 +152,10 @@ object Day15 {
         case unit => unit
       })
 
-      val (fullRounds, finalUnits) = simulateCombat(grid, newUnits)
-      if (finalUnits.count(_.unitType == Elf) == newUnits.count(_.unitType == Elf)) {
+      Try(simulateCombat(grid, newUnits, elfDeath = true)).toOption.map({ case (fullRounds, finalUnits) =>
         val hpSum = finalUnits.map(_.hp).sum
-        Some(fullRounds * hpSum)
-      }
-      else
-        None
+        fullRounds * hpSum
+      })
     }
 
     val attackPowers = (4 to 200).groupBy(e => math.ceil(200.0 / e).toInt).mapValues(_.min).values.toStream.sorted // 20 and 21 both require 10 hits to kill goblin, no point in trying both
