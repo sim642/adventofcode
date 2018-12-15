@@ -83,18 +83,15 @@ object Day15 {
 
   def simulateCombat(grid: Grid[Char], units: List[CombatUnit]): (Int, List[CombatUnit]) = {
 
-    var done: Boolean = false
+    def round(units: List[CombatUnit]): (List[CombatUnit], Boolean) = {
 
-    def round(units: List[CombatUnit]): List[CombatUnit] = {
-
-      def turn(init: List[CombatUnit], tail: List[CombatUnit]): List[CombatUnit] = tail match {
-        case Nil => init
+      def turn(init: List[CombatUnit], tail: List[CombatUnit], done: Boolean): (List[CombatUnit], Boolean) = tail match {
+        case Nil => (init, done)
         case unit :: tl =>
           implicit val otherUnits: List[CombatUnit] = init ++ tl
           implicit val implicitGrid: Grid[Char] = grid
           val targets = getTargets(unit)
-          if (targets.isEmpty)
-            done = true
+          val done2 = done || targets.isEmpty
           val inRange = getInRange(targets)
 
           var unit2 = unit
@@ -118,20 +115,18 @@ object Day15 {
 
             val init2 = init.flatMap(u => if (u == attackUnit) attackUnit3 else Some(u))
             val tl2 = tl.flatMap(u => if (u == attackUnit) attackUnit3 else Some(u))
-            turn(unit2 :: init2, tl2)
+            turn(unit2 :: init2, tl2, done2)
           }
           else {
-            turn(unit2 :: init, tl)
+            turn(unit2 :: init, tl, done2)
           }
       }
 
-      turn(Nil, units.sorted)
+      turn(Nil, units.sorted, done = false)
     }
 
-    val roundIt = Iterator.iterate(units)(round)
-    val (finalUnits, finalI) = roundIt.zipWithIndex.find({ case (units, i) =>
-      done
-    }).get
+    val roundIt = Iterator.iterate((units, false))({ case (units, _) => round(units) })
+    val ((finalUnits, _), finalI) = roundIt.zipWithIndex.find({ case ((_, done), _) => done }).get
 
     (finalI - 1, finalUnits)
   }
