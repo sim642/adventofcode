@@ -160,7 +160,8 @@ object Day15 {
         None
     }
 
-    Iterator.from(4).flatMap(withElfAttackPower).head
+    val attackPowers = (4 to 200).groupBy(e => math.ceil(200.0 / e).toInt).mapValues(_.min).values.toStream.sorted // 20 and 21 both require 10 hits to kill goblin, no point in trying both
+    attackPowers.flatMap(withElfAttackPower).head // Stream makes flatMapping lazy
   }
 
   def combatOutcome(input: String): Int = {
