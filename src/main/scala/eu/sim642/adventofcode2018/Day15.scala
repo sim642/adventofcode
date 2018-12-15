@@ -3,7 +3,7 @@ package eu.sim642.adventofcode2018
 import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcode2017.Day3.Pos
-import Day14.ZipTailIterator
+import eu.sim642.adventofcode2018.Day2.HeadIterator
 
 object Day15 {
 
@@ -137,32 +137,30 @@ object Day15 {
   }
 
   def combatOutcome(grid: Grid[Char], units: List[CombatUnit]): Int = {
-    val (finalI, finalUnits) = simulateCombat(grid, units)
+    val (fullRounds, finalUnits) = simulateCombat(grid, units)
     val hpSum = finalUnits.map(_.hp).sum
-    println(finalUnits)
-    println(hpSum)
-    println(finalI)
-    finalI * hpSum
+    fullRounds * hpSum
   }
 
   def combatOutcomeElfWin(grid: Grid[Char], units: List[CombatUnit]): Int = {
-    for (elfAttackPower <- Iterator.from(4)) {
-      println(elfAttackPower)
+    def withElfAttackPower(elfAttackPower: Int): Option[Int] = {
+      println(s"Elf attack power: $elfAttackPower")
+
       val newUnits = units.map({
         case unit@CombatUnit(Elf, _, _, _) => unit.copy(attackPower = elfAttackPower)
         case unit => unit
       })
 
-      val (finalI, finalUnits) = simulateCombat(grid, newUnits)
+      val (fullRounds, finalUnits) = simulateCombat(grid, newUnits)
       if (finalUnits.count(_.unitType == Elf) == newUnits.count(_.unitType == Elf)) {
         val hpSum = finalUnits.map(_.hp).sum
-        println(finalUnits)
-        println(hpSum)
-        println(finalI)
-        return finalI * hpSum
+        Some(fullRounds * hpSum)
       }
+      else
+        None
     }
-    ???
+
+    Iterator.from(4).flatMap(withElfAttackPower).head
   }
 
   def combatOutcome(input: String): Int = {
