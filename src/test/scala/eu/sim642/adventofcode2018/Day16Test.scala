@@ -17,4 +17,8 @@ class Day16Test extends FunSuite {
   test("Part 1 input answer") {
     assert(count3Samples(input) == 567)
   }
+
+  test("Part 2 input answer") {
+    assert(runProgram(input) == 610)
+  }
 }
