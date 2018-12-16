@@ -36,14 +36,15 @@ object Day16 {
 
   val opcodes = Set("addr", "addi", "mulr", "muli", "banr", "bani", "borr", "bori", "setr", "seti", "gtir", "gtri", "gtrr", "eqir", "eqri", "eqrr")
 
-  case class InputInstruction(opcode: Int, a: Int, b: Int, c: Int)
+  case class InputInstruction(opcode: Int, a: Int, b: Int, c: Int) {
+    def toInstruction(opcode: String): Instruction = Instruction(opcode, a, b, c)
+  }
 
   case class Sample(before: Registers, instruction: InputInstruction, after: Registers)
 
   def sampleOpcodes(sample: Sample): Set[String] = {
     opcodes.filter({ opcode =>
-      val InputInstruction(_, a, b, c) = sample.instruction
-      val instruction = Instruction(opcode, a, b, c)
+      val instruction = sample.instruction.toInstruction(opcode)
       instruction(sample.before) == sample.after
     })
   }
@@ -86,22 +87,25 @@ object Day16 {
   }
 
   def fitSamples(samples: Seq[Sample]): Map[Int, String] = {
-    val opcodeMap = samples.foldLeft(Map.empty[Int, Set[String]].withDefaultValue(opcodes))({ (opcodeMap, sample) =>
-      val ops = sampleOpcodes(sample)
-      val ops2 = opcodeMap(sample.instruction.opcode) intersect ops
-      val map2 = opcodeMap.updated(sample.instruction.opcode, ops2)
-      if (ops2.size == 1)
-        map2.mapValues(o => if (o == ops2) o else o - ops2.head).withDefaultValue(opcodes)
+    val initialOpcodeMap = (0 to 15).map(_ -> opcodes).toMap // not using withDefaultValue because mapValues doesn't preserve it
+    val finalOpcodeMap = samples.foldLeft(initialOpcodeMap)({ (opcodeMap, sample) =>
+      val opcode = sample.instruction.opcode
+      val opcodes = opcodeMap(opcode) intersect sampleOpcodes(sample)
+      val newOpcodeMap = opcodeMap.updated(opcode, opcodes)
+
+      if (opcodes.size == 1) // unit
+        newOpcodeMap.mapValues(o => if (o == opcodes) o else o -- opcodes) // unit propagate
       else
-        map2
+        newOpcodeMap
     })
-    println(opcodeMap)
-    opcodeMap.mapValues(_.head)
+    assert(finalOpcodeMap.values.forall(_.size == 1))
+    finalOpcodeMap.mapValues(_.head)
   }
 
   def runProgram(program: Seq[InputInstruction], opcodeMap: Map[Int, String]): Int = {
-    program.foldLeft(Seq(0, 0, 0, 0))({ case (registers, InputInstruction(opcode, a, b, c)) =>
-      val instruction = Instruction(opcodeMap(opcode), a, b, c)
+    program.foldLeft(Seq(0, 0, 0, 0))({ case (registers, inputInstruction) =>
+      val opcode = opcodeMap(inputInstruction.opcode)
+      val instruction = inputInstruction.toInstruction(opcode)
       instruction(registers)
     })(0)
   }
@@ -118,7 +122,5 @@ object Day16 {
   def main(args: Array[String]): Unit = {
     println(count3Samples(input))
     println(runProgram(input))
-
-    // 2
   }
 }
