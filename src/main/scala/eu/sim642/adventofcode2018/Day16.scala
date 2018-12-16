@@ -36,11 +36,14 @@ object Day16 {
 
   val opcodes = Set("addr", "addi", "mulr", "muli", "banr", "bani", "borr", "bori", "setr", "seti", "gtir", "gtri", "gtrr", "eqir", "eqri", "eqrr")
 
-  case class Sample(before: Registers, opcode: Int, a: Int, b: Int, c: Int, after: Registers)
+  case class InputInstruction(opcode: Int, a: Int, b: Int, c: Int)
+
+  case class Sample(before: Registers, instruction: InputInstruction, after: Registers)
 
   def sampleOpcodes(sample: Sample): Set[String] = {
     opcodes.filter({ opcode =>
-      val instruction = Instruction(opcode, sample.a, sample.b, sample.c)
+      val InputInstruction(_, a, b, c) = sample.instruction
+      val instruction = Instruction(opcode, a, b, c)
       instruction(sample.before) == sample.after
     })
   }
@@ -58,16 +61,14 @@ object Day16 {
     case sampleRegex(before0, before1, before2, before3, opcode, a, b, c, after0, after1, after2, after3) => 
       Sample(
         Seq(before0, before1, before2, before3).map(_.toInt),
-        opcode.toInt, a.toInt, b.toInt, c.toInt,
+        InputInstruction(opcode.toInt, a.toInt, b.toInt, c.toInt),
         Seq(after0, after1, after2, after3).map(_.toInt)
       )
   }
 
-  type InputInstruction = (Int, Int, Int, Int)
-
   def parseInputInstruction(s: String): InputInstruction = {
     val Seq(opcode, a, b, c) = s.split(" ").toSeq.map(_.toInt)
-    (opcode, a, b, c)
+    InputInstruction(opcode, a, b, c)
   }
 
   def parseInput(input: String): (Seq[Sample], Seq[InputInstruction]) = {
@@ -87,8 +88,8 @@ object Day16 {
   def fitSamples(samples: Seq[Sample]): Map[Int, String] = {
     val opcodeMap = samples.foldLeft(Map.empty[Int, Set[String]].withDefaultValue(opcodes))({ (opcodeMap, sample) =>
       val ops = sampleOpcodes(sample)
-      val ops2 = opcodeMap(sample.opcode) intersect ops
-      val map2 = opcodeMap.updated(sample.opcode, ops2)
+      val ops2 = opcodeMap(sample.instruction.opcode) intersect ops
+      val map2 = opcodeMap.updated(sample.instruction.opcode, ops2)
       if (ops2.size == 1)
         map2.mapValues(o => if (o == ops2) o else o - ops2.head).withDefaultValue(opcodes)
       else
@@ -99,7 +100,7 @@ object Day16 {
   }
 
   def runProgram(program: Seq[InputInstruction], opcodeMap: Map[Int, String]): Int = {
-    program.foldLeft(Seq(0, 0, 0, 0))({ case (registers, (opcode, a, b, c)) =>
+    program.foldLeft(Seq(0, 0, 0, 0))({ case (registers, InputInstruction(opcode, a, b, c)) =>
       val instruction = Instruction(opcodeMap(opcode), a, b, c)
       instruction(registers)
     })(0)
@@ -108,7 +109,6 @@ object Day16 {
   def runProgram(input: String): Int = {
     val (samples, program) = parseInput(input)
     val opcodeMap = fitSamples(samples)
-    println(opcodeMap)
     runProgram(program, opcodeMap)
   }
 
