@@ -15,20 +15,20 @@ object Day17 {
   case object Flowing extends WaterTile {
     override def toString: String = "|"
   }
-  case object Stabilizing extends WaterTile {
+  case object Settling extends WaterTile {
     override def toString: String = "/"
   }
-  case object Stable extends WaterTile {
+  case object Settled extends WaterTile {
     override def toString: String = "~"
   }
 
   type Tiles = Map[Pos, Tile]
 
 
-  def stabilize(tiles: Tiles, pos: Pos): Tiles = {
+  def settle(tiles: Tiles, pos: Pos): Tiles = {
     tiles(pos) match {
-      case Stabilizing =>
-        stabilize(stabilize(tiles + (pos -> Stable), pos + Pos(-1, 0)), pos + Pos(1, 0))
+      case Settling =>
+        settle(settle(tiles + (pos -> Settled), pos + Pos(-1, 0)), pos + Pos(1, 0))
       case _ => tiles
     }
   }
@@ -41,22 +41,22 @@ object Day17 {
       tiles
     else {
       tiles(pos) match {
-        case Clay | Flowing | Stable | Stabilizing => tiles
+        case Clay | Flowing | Settled | Settling => tiles
         case Sand =>
           val downPos = pos + Pos(0, 1)
           val downTiles = flood(tiles + (pos -> Flowing), maxY, downPos, pos)
           downTiles(downPos) match {
-            case Flowing | Stabilizing => downTiles
-            case Clay | Stable =>
+            case Flowing | Settling => downTiles
+            case Clay | Settled =>
               val leftPos = pos + Pos(-1, 0)
               val leftTiles = flood(downTiles, maxY, leftPos, pos)
               val rightPos = pos + Pos(1, 0)
               val rightTiles = flood(leftTiles, maxY, rightPos, pos)
               (rightTiles(leftPos), rightTiles(rightPos)) match {
-                case (Clay | Stable | Stabilizing, _) | (_, Clay | Stable | Stabilizing) if prevPos == leftPos || prevPos == rightPos =>
-                  rightTiles + (pos -> Stabilizing)
-                case (Clay | Stable | Stabilizing, Clay | Stable | Stabilizing) =>
-                  stabilize(stabilize(rightTiles, leftPos), rightPos) + (pos -> Stable)
+                case (Clay | Settled | Settling, _) | (_, Clay | Settled | Settling) if prevPos == leftPos || prevPos == rightPos =>
+                  rightTiles + (pos -> Settling)
+                case (Clay | Settled | Settling, Clay | Settled | Settling) =>
+                  settle(settle(rightTiles, leftPos), rightPos) + (pos -> Settled)
                 case _ => rightTiles
               }
             case Sand => downTiles
@@ -72,11 +72,11 @@ object Day17 {
     flooded.count({ case (pos, tile) => pos.y >= min.y && tile.isInstanceOf[WaterTile]})
   }
 
-  def stableTiles(tiles: Tiles): Int = {
+  def settledTiles(tiles: Tiles): Int = {
     val (min, max) = Day6.boundingRect(tiles.keys.toSeq)
     val flooded = flood(tiles, max.y, Pos(500, 0), Pos(500, -1))
     //printTiles(flooded)
-    flooded.count({ case (pos, tile) => pos.y >= min.y && tile == Stable})
+    flooded.count({ case (pos, tile) => pos.y >= min.y && tile == Settled})
   }
 
 
@@ -105,7 +105,7 @@ object Day17 {
 
   def main(args: Array[String]): Unit = {
     println(floodedTiles(parseInput(input)))
-    println(stableTiles(parseInput(input)))
+    println(settledTiles(parseInput(input)))
 
     // 40454 - too high
   }

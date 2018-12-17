@@ -19,7 +19,7 @@ class Day17Test extends FunSuite {
     assert(floodedTiles(parseInput(exampleInput)) == 57)
   }
 
-  test("Stabilizing water is not stable") {
+  test("Settling water is not settled") {
     /*
     ...||+||..
     ...|###|..
@@ -28,12 +28,12 @@ class Day17Test extends FunSuite {
     |#~~~~~~~#
     |#########
     */
-    val stabilizingInput =
+    val settlingInput =
       """y=1, x=499..501
         |y=5, x=496..504
         |x=496, y=4..5
         |x=504, y=3..5""".stripMargin
-    assert(floodedTiles(parseInput(stabilizingInput)) == 22)
+    assert(floodedTiles(parseInput(settlingInput)) == 22)
   }
 
   test("Part 1 input answer") {
@@ -41,10 +41,10 @@ class Day17Test extends FunSuite {
   }
 
   test("Part 2 examples") {
-    assert(stableTiles(parseInput(exampleInput)) == 29)
+    assert(settledTiles(parseInput(exampleInput)) == 29)
   }
 
   test("Part 2 input answer") {
-    assert(stableTiles(parseInput(input)) == 23811)
+    assert(settledTiles(parseInput(input)) == 23811)
   }
 }
