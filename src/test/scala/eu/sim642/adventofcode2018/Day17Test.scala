@@ -39,4 +39,12 @@ class Day17Test extends FunSuite {
   test("Part 1 input answer") {
     assert(floodedTiles(parseInput(input)) == 29063)
   }
+
+  test("Part 2 examples") {
+    assert(stableTiles(parseInput(exampleInput)) == 29)
+  }
+
+  test("Part 2 input answer") {
+    assert(stableTiles(parseInput(input)) == 23811)
+  }
 }

@@ -57,8 +57,15 @@ object Day17 {
   def floodedTiles(tiles: Tiles): Int = {
     val (min, max) = Day6.boundingRect(tiles.keys.toSeq)
     val flooded = flood(tiles, max.y, Pos(500, 0), Pos(500, -1))
-    printTiles(flooded)
+    //printTiles(flooded)
     flooded.count({ case (pos, tile) => pos.y >= min.y && (tile == Flowing || tile == Stabilizing || tile == Stable)})
+  }
+
+  def stableTiles(tiles: Tiles): Int = {
+    val (min, max) = Day6.boundingRect(tiles.keys.toSeq)
+    val flooded = flood(tiles, max.y, Pos(500, 0), Pos(500, -1))
+    //printTiles(flooded)
+    flooded.count({ case (pos, tile) => pos.y >= min.y && tile == Stable})
   }
 
 
@@ -94,6 +101,7 @@ object Day17 {
 
   def main(args: Array[String]): Unit = {
     println(floodedTiles(parseInput(input)))
+    println(stableTiles(parseInput(input)))
 
     // 40454 - too high
   }
