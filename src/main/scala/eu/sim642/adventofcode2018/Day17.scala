@@ -5,11 +5,22 @@ import eu.sim642.adventofcode2017.Day3.Pos
 object Day17 {
 
   sealed trait Tile
-  case object Sand extends Tile
-  case object Clay extends Tile
-  case object Flowing extends Tile
-  case object Stabilizing extends Tile
-  case object Stable extends Tile
+  case object Sand extends Tile {
+    override def toString: String = "."
+  }
+  case object Clay extends Tile {
+    override def toString: String = "#"
+  }
+  trait WaterTile extends Tile
+  case object Flowing extends WaterTile {
+    override def toString: String = "|"
+  }
+  case object Stabilizing extends WaterTile {
+    override def toString: String = "/"
+  }
+  case object Stable extends WaterTile {
+    override def toString: String = "~"
+  }
 
   type Tiles = Map[Pos, Tile]
 
@@ -58,7 +69,7 @@ object Day17 {
     val (min, max) = Day6.boundingRect(tiles.keys.toSeq)
     val flooded = flood(tiles, max.y, Pos(500, 0), Pos(500, -1))
     //printTiles(flooded)
-    flooded.count({ case (pos, tile) => pos.y >= min.y && (tile == Flowing || tile == Stabilizing || tile == Stable)})
+    flooded.count({ case (pos, tile) => pos.y >= min.y && tile.isInstanceOf[WaterTile]})
   }
 
   def stableTiles(tiles: Tiles): Int = {
@@ -84,15 +95,8 @@ object Day17 {
   def printTiles(tiles: Tiles): Unit = {
     val (min, max) = Day6.boundingRect(tiles.keys.toSeq)
     for (y <- min.y to max.y) {
-      for (x <- min.x to max.x) {
-        print(tiles(Pos(x, y)) match {
-          case Sand => '.'
-          case Clay => '#'
-          case Flowing => '|'
-          case Stabilizing => '/'
-          case Stable => '~'
-        })
-      }
+      for (x <- min.x to max.x)
+        print(tiles(Pos(x, y)))
       println()
     }
   }

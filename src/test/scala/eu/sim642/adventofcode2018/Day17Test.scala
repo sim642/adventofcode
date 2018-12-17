@@ -19,21 +19,21 @@ class Day17Test extends FunSuite {
     assert(floodedTiles(parseInput(exampleInput)) == 57)
   }
 
-  test("Split incoming off-by-one") {
+  test("Stabilizing water is not stable") {
     /*
     ...||+||..
     ...|###|..
     ...|...|..
-    |||||||||#
+    ||||/////#
     |#~~~~~~~#
     |#########
     */
-    val input =
+    val stabilizingInput =
       """y=1, x=499..501
         |y=5, x=496..504
         |x=496, y=4..5
         |x=504, y=3..5""".stripMargin
-    assert(floodedTiles(parseInput(input)) == 22)
+    assert(floodedTiles(parseInput(stabilizingInput)) == 22)
   }
 
   test("Part 1 input answer") {
