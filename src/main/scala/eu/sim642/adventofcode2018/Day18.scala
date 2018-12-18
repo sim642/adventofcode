@@ -35,7 +35,7 @@ object Day18 {
 
     paddedGrid.slidingGrid(3).map(_.map(stepTile).toVector).toVector*/
 
-    for ((row, y) <- grid.zipWithIndex)
+    (for ((row, y) <- grid.zipWithIndex.par)
       yield for ((cell, x) <- row.zipWithIndex)
         yield {
           val pos = Pos(x, y)
@@ -49,7 +49,7 @@ object Day18 {
             case '#' => '.'
             case c => c
           }
-        }
+        }).seq
   }
 
   def resourceValue(grid: Grid[Char]): Int = {
