@@ -5,6 +5,8 @@ import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2018.Day2.HeadIterator
 import eu.sim642.adventofcode2017.Day21.GridOps
 import eu.sim642.adventofcode2017.Day6.FloydSolution
+import eu.sim642.adventofcode2017.Day14.PosGrid
+import eu.sim642.adventofcode2017.Day19.PosGrid2
 
 object Day18 {
 
@@ -17,7 +19,7 @@ object Day18 {
   }
 
   def step(grid: Grid[Char]): Grid[Char] = {
-    val paddingRow = Vector.fill(grid(0).size + 2)('.')
+    /*val paddingRow = Vector.fill(grid(0).size + 2)('.')
     val paddedGrid: Grid[Char] = paddingRow +: grid.map('.' +: _ :+ '.') :+ paddingRow
 
     def stepTile(grid: Grid[Char]): Char = {
@@ -31,13 +33,29 @@ object Day18 {
       }
     }
 
-    paddedGrid.slidingGrid(3).map(_.map(stepTile).toVector).toVector
+    paddedGrid.slidingGrid(3).map(_.map(stepTile).toVector).toVector*/
+
+    for ((row, y) <- grid.zipWithIndex)
+      yield for ((cell, x) <- row.zipWithIndex)
+        yield {
+          val pos = Pos(x, y)
+          val neighbors = Pos.allOffsets.map(pos + _).filter(grid.containsPos).map(grid(_))
+          val trees = neighbors.count(_ == '|')
+          val lumberyards = neighbors.count(_ == '#')
+          cell match {
+            case '.' if trees >= 3 => '|'
+            case '|' if lumberyards >= 3 => '#'
+            case '#' if trees >= 1 && lumberyards >= 1 => '#'
+            case '#' => '.'
+            case c => c
+          }
+        }
   }
 
   def resourceValue(grid: Grid[Char]): Int = {
-    val wooded = grid.countGrid(_ == '|')
+    val trees = grid.countGrid(_ == '|')
     val lumberyards = grid.countGrid(_ == '#')
-    wooded * lumberyards
+    trees * lumberyards
   }
 
   def resourceValueIterate(grid: Grid[Char], after: Int = 10): Int = {
