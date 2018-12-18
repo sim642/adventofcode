@@ -34,33 +34,22 @@ object Day18 {
     paddedGrid.slidingGrid(3).map(_.map(stepTile).toVector).toVector
   }
 
-  def resourceValue(grid: Grid[Char], after: Int = 10): Int = {
-    val it = Iterator.iterate(grid)(step)
-    val finalGrid = it.drop(after).head
-    val wooded = finalGrid.countGrid(_ == '|')
-    val lumberyards = finalGrid.countGrid(_ == '#')
+  def resourceValue(grid: Grid[Char]): Int = {
+    val wooded = grid.countGrid(_ == '|')
+    val lumberyards = grid.countGrid(_ == '#')
     wooded * lumberyards
   }
 
-  def resourceValue2(grid: Grid[Char], after: Int = 1000000000): Int = {
+  def resourceValueIterate(grid: Grid[Char], after: Int = 10): Int = {
+    val it = Iterator.iterate(grid)(step)
+    val finalGrid = it.drop(after).head
+    resourceValue(finalGrid)
+  }
 
+  def resourceValueCycle(grid: Grid[Char], after: Int = 1000000000): Int = {
     val (mu, lambda) = FloydSolution.floyd(grid, step)
-    println(mu)
-    println(lambda)
-
-    val finalAfter = (after - mu) % lambda
-    println(finalAfter)
-    resourceValue(grid, mu + finalAfter)
-    /*val it = Iterator.iterate(grid)(step)
-    for ((grid, i) <- it.zipWithIndex) {
-      println(i)
-      //printGrid(grid)
-      val wooded = grid.countGrid(_ == '|')
-      val lumberyards = grid.countGrid(_ == '#')
-      println(s"$wooded $lumberyards ${wooded * lumberyards}")
-      println()
-    }
-    ???*/
+    val afterMu = (after - mu) % lambda
+    resourceValueIterate(grid, mu + afterMu)
   }
 
   def printGrid(grid: Grid[Char]): Unit = {
@@ -77,10 +66,7 @@ object Day18 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    //println(resourceValue(parseInput(input), after = 1000)) // 169106
-    //println(resourceValue2(parseInput(input), after = 1000)) // 169106
-    println(resourceValue2(parseInput(input)))
-
-    // 653184 - too high
+    println(resourceValueIterate(parseInput(input)))
+    println(resourceValueCycle(parseInput(input)))
   }
 }

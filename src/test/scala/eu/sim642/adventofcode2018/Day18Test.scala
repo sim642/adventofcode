@@ -18,14 +18,14 @@ class Day18Test extends FunSuite {
       |...#.|..|.""".stripMargin
 
   test("Part 1 examples") {
-    assert(resourceValue(parseInput(exampleInput)) == 1147)
+    assert(resourceValueIterate(parseInput(exampleInput)) == 1147)
   }
 
   test("Part 1 input answer") {
-    assert(resourceValue(parseInput(input)) == 653184)
+    assert(resourceValueIterate(parseInput(input)) == 653184)
   }
 
   test("Part 2 input answer") {
-    assert(resourceValue2(parseInput(input)) == 169106)
+    assert(resourceValueCycle(parseInput(input)) == 169106)
   }
 }
