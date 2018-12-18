@@ -4,6 +4,7 @@ import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2018.Day2.HeadIterator
 import eu.sim642.adventofcode2017.Day21.GridOps
+import eu.sim642.adventofcode2017.Day6.FloydSolution
 
 object Day18 {
 
@@ -35,10 +36,39 @@ object Day18 {
 
   def resourceValue(grid: Grid[Char], after: Int = 10): Int = {
     val it = Iterator.iterate(grid)(step)
-    val finalGrid = it.drop(10).head
+    val finalGrid = it.drop(after).head
     val wooded = finalGrid.countGrid(_ == '|')
     val lumberyards = finalGrid.countGrid(_ == '#')
     wooded * lumberyards
+  }
+
+  def resourceValue2(grid: Grid[Char], after: Int = 1000000000): Int = {
+
+    val (mu, lambda) = FloydSolution.floyd(grid, step)
+    println(mu)
+    println(lambda)
+
+    val finalAfter = (after - mu) % lambda
+    println(finalAfter)
+    resourceValue(grid, mu + finalAfter)
+    /*val it = Iterator.iterate(grid)(step)
+    for ((grid, i) <- it.zipWithIndex) {
+      println(i)
+      //printGrid(grid)
+      val wooded = grid.countGrid(_ == '|')
+      val lumberyards = grid.countGrid(_ == '#')
+      println(s"$wooded $lumberyards ${wooded * lumberyards}")
+      println()
+    }
+    ???*/
+  }
+
+  def printGrid(grid: Grid[Char]): Unit = {
+    for (row <- grid) {
+      for (cell <- row)
+        print(cell)
+      println()
+    }
   }
 
 
@@ -47,6 +77,10 @@ object Day18 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(resourceValue(parseInput(input)))
+    //println(resourceValue(parseInput(input), after = 1000)) // 169106
+    //println(resourceValue2(parseInput(input), after = 1000)) // 169106
+    println(resourceValue2(parseInput(input)))
+
+    // 653184 - too high
   }
 }

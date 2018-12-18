@@ -24,4 +24,8 @@ class Day18Test extends FunSuite {
   test("Part 1 input answer") {
     assert(resourceValue(parseInput(input)) == 653184)
   }
+
+  test("Part 2 input answer") {
+    assert(resourceValue2(parseInput(input)) == 169106)
+  }
 }
