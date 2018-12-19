@@ -39,30 +39,15 @@ object Day19 {
     (ipRegister, program)
   }
 
-  def runProgram(input: String, register0: Int): Int = {
+  def runProgram(input: String, register0: Int = 0): Int = {
     val (ipRegister, program) = parseInput(input)
     runProgram(program, ipRegister, register0)
   }
 
-  def reverseEngineered(): Int = {
-    var r3 = 973
-    var r0 = 0
-    var r2 = 1
-    do {
-      var r1 = 1
-      do {
-        if (r2 * r1 == r3)
-          r0 += r2
-        r1 += 1
-      } while (r1 <= r3)
-      r2 += 1
-    } while (r2 <= r3)
-    r0
-  }
-
-  def reverseEngineered2(): Int = {
-    val N = 10551373
-    //val N = 973
+  /**
+    * Reverse engineered logic
+    */
+  def sumDivisors(N: Int): Int = {
     var sum = 0
     var r1 = 1
     do {
@@ -76,12 +61,13 @@ object Day19 {
 
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
+  // Reverse engineered values
+  val inputN1 = 973
+  val inputN2 = 10551373
 
   def main(args: Array[String]): Unit = {
-    //println(runProgram(input, 0))
-    //println(runProgram(input, 1))
-    //println(reverseEngineered())
-    println(reverseEngineered2()) // 12768192
+    println(runProgram(input))
+    println(sumDivisors(inputN2))
 
     // 40435200 - too high
   }

@@ -16,10 +16,18 @@ class Day19Test extends FunSuite {
       |seti 9 0 5""".stripMargin
 
   test("Part 1 examples") {
-    assert(runProgram(exampleInput, 0) == 6)
+    assert(runProgram(exampleInput) == 6)
   }
 
   test("Part 1 input answer") {
-    assert(runProgram(input, 0) == 1120)
+    assert(runProgram(input) == 1120)
+  }
+
+  test("Part 2 examples for part 1") {
+    assert(sumDivisors(inputN1) == 1120)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumDivisors(inputN2) == 12768192)
   }
 }
