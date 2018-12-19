@@ -5,13 +5,14 @@ import eu.sim642.adventofcode2018.Day16.Registers
 
 object Day19 {
 
-  def runProgram(program: Vector[Instruction], ipRegister: Int): Int = {
-    var registers = Seq.fill(6)(0)
+  def runProgram(program: Vector[Instruction], ipRegister: Int, register0: Int): Int = {
+    var registers = Seq.fill(6)(0).updated(0, register0)
     var ip = 0
     while (program.indices.contains(ip)) {
       val beforeRegisters = registers.updated(ipRegister, ip)
       val instruction = program(ip)
       val afterRegisters = instruction(beforeRegisters)
+      //println(s"$beforeRegisters $instruction $afterRegisters")
       ip = afterRegisters(ipRegister)
       registers = afterRegisters
       ip += 1
@@ -38,15 +39,50 @@ object Day19 {
     (ipRegister, program)
   }
 
-  def runProgram(input: String): Int = {
+  def runProgram(input: String, register0: Int): Int = {
     val (ipRegister, program) = parseInput(input)
-    runProgram(program, ipRegister)
+    runProgram(program, ipRegister, register0)
+  }
+
+  def reverseEngineered(): Int = {
+    var r3 = 973
+    var r0 = 0
+    var r2 = 1
+    do {
+      var r1 = 1
+      do {
+        if (r2 * r1 == r3)
+          r0 += r2
+        r1 += 1
+      } while (r1 <= r3)
+      r2 += 1
+    } while (r2 <= r3)
+    r0
+  }
+
+  def reverseEngineered2(): Int = {
+    val N = 10551373
+    //val N = 973
+    var sum = 0
+    var r1 = 1
+    do {
+      val r2 = N / r1
+      if (r2 * r1 == N)
+        sum += r2
+      r1 += 1
+    } while (r1 <= N)
+    sum
   }
 
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(runProgram(input))
+    //println(runProgram(input, 0))
+    //println(runProgram(input, 1))
+    //println(reverseEngineered())
+    println(reverseEngineered2()) // 12768192
+
+    // 40435200 - too high
   }
 }
