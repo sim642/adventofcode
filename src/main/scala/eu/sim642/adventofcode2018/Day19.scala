@@ -1,7 +1,8 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcode2018.Day16.Instruction
-import eu.sim642.adventofcode2018.Day16.Registers
+import scala.math.Integral.Implicits._
+
 
 object Day19 {
 
@@ -48,15 +49,14 @@ object Day19 {
     * Reverse engineered logic
     */
   def sumDivisors(N: Int): Int = {
-    var sum = 0
-    var r1 = 1
-    do {
-      val r2 = N / r1
-      if (r2 * r1 == N)
-        sum += r2
-      r1 += 1
-    } while (r1 <= N)
-    sum
+    //(1 to N).iterator.filter(N % _ == 0).sum
+
+    (1 to math.sqrt(N).ceil.toInt).iterator.flatMap({n =>
+      N /% n match {
+        case (q, 0) => Iterator(n, q)
+        case _ => Iterator.empty
+      }
+    }).sum
   }
 
 
