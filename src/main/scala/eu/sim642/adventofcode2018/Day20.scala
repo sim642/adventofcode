@@ -41,6 +41,44 @@ object Day20 extends RegexParsers {
       pos :: movePositions(tl, newPos)
   }
 
+  type Doors = mutable.Map[Pos, Set[Pos]]
+
+  def allDoors(doors: Doors, regexNode: RegexNode, poss: Set[Pos] = Set(originPos)): Set[Pos] = regexNode match {
+    case StringNode(s) =>
+      val posMoves = poss.map(movePositions(s.toList, _))
+
+      for {
+        moves <- posMoves
+        (p1, p2) <- moves.zip(moves.tail)
+      } {
+        doors(p1) += p2
+        doors(p2) += p1
+      }
+
+      posMoves.map(_.last)
+
+      // not sure if this is any faster
+      /*s.foldLeft(poss)({ (acc, c) =>
+        val offset = moveOffsets(c)
+        for {
+          pos <- acc
+          newPos = pos + offset
+        } yield {
+          doors(pos) += newPos
+          doors(newPos) += pos
+          newPos
+        }
+      })*/
+
+    case ChoiceNode(choices) =>
+      choices.flatMap(allDoors(doors, _, poss)).toSet
+
+    case ConcatNode(concats) =>
+      concats.foldLeft(poss)({ (acc, node) =>
+        allDoors(doors, node, acc)
+      })
+  }
+
   def bfs(doors: Map[Pos, Set[Pos]], startPos: Pos = originPos): Map[Pos, Int] = {
 
     def helper(visited: Map[Pos, Int], toVisit: Map[Pos, Int]): Map[Pos, Int] = {
@@ -63,15 +101,16 @@ object Day20 extends RegexParsers {
   def roomDistances(input: String): Map[Pos, Int] = {
     val regex = parseInput(input)
 
-    val doors: mutable.Map[Pos, Set[Pos]] = mutable.Map.empty.withDefaultValue(Set.empty)
-    for {
+    val doors: Doors = mutable.Map.empty.withDefaultValue(Set.empty)
+    /*for {
       moveString <- allStrings(regex)
       moves = movePositions(moveString.toList)
       (p1, p2) <- moves.zip(moves.tail)
     } {
       doors(p1) += p2
       doors(p2) += p1
-    }
+    }*/
+    allDoors(doors, regex)
 
     bfs(doors.toMap)
   }
