@@ -75,6 +75,25 @@ object Day20 extends RegexParsers {
     distances.values.max
   }
 
+  def farRooms(input: String, threshold: Int = 1000): Int = {
+    val regex = parseInput(input)
+
+    val doors: mutable.Map[Pos, Set[Pos]] = mutable.Map.empty.withDefaultValue(Set.empty)
+    for {
+      moveString <- allStrings(regex)
+      moves = movePositions(moveString.toList)
+      (p1, p2) <- moves.zip(moves.tail)
+    } {
+      doors(p1) += p2
+      doors(p2) += p1
+    }
+
+    //println(doors)
+    val distances = bfs(doors.toMap)
+    //println(distances)
+    distances.values.count(_ >= threshold)
+  }
+
   def parseInput(input: String): RegexNode = {
 
     def inputRegexNode: Parser[RegexNode] = "^" ~> concatNode <~ "$"
@@ -99,5 +118,6 @@ object Day20 extends RegexParsers {
 
   def main(args: Array[String]): Unit = {
     println(furthestRoom(input))
+    println(farRooms(input))
   }
 }

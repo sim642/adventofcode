@@ -32,4 +32,13 @@ class Day20Test extends FunSuite {
   test("Part 1 input answer") {
     assert(furthestRoom(input) == 3633)
   }
+
+  test("Part 2 crafted examples") {
+    assert(farRooms(exampleInput1, 2) == 2)
+    assert(farRooms(exampleInput3, 5) == 11)
+  }
+
+  test("Part 2 input answer") {
+    assert(farRooms(input) == 8756)
+  }
 }
