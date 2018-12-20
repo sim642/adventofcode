@@ -24,6 +24,9 @@ object Day20 extends RegexParsers {
     })
   }
 
+
+  private val originPos = Pos(0, 0) // arbitrary origin position
+
   private val moveOffsets = Map(
     'N' -> Pos(0, -1),
     'E' -> Pos(1, 0),
@@ -31,14 +34,14 @@ object Day20 extends RegexParsers {
     'W' -> Pos(-1, 0),
   )
 
-  def movePositions(moves: List[Char], pos: Pos = Pos(0, 0)): List[Pos] = moves match {
+  def movePositions(moves: List[Char], pos: Pos = originPos): List[Pos] = moves match {
     case Nil => List(pos)
     case move :: tl =>
       val newPos = pos + moveOffsets(move)
       pos :: movePositions(tl, newPos)
   }
 
-  def bfs(doors: Map[Pos, Set[Pos]], startPos: Pos = Pos(0, 0)): Map[Pos, Int] = {
+  def bfs(doors: Map[Pos, Set[Pos]], startPos: Pos = originPos): Map[Pos, Int] = {
 
     def helper(visited: Map[Pos, Int], toVisit: Map[Pos, Int]): Map[Pos, Int] = {
       val neighbors = for {
@@ -56,7 +59,7 @@ object Day20 extends RegexParsers {
     helper(Map.empty, Map(startPos -> 0))
   }
 
-  def furthestRoom(input: String): Int = {
+  def roomDistances(input: String): Map[Pos, Int] = {
     val regex = parseInput(input)
 
     val doors: mutable.Map[Pos, Set[Pos]] = mutable.Map.empty.withDefaultValue(Set.empty)
@@ -69,29 +72,15 @@ object Day20 extends RegexParsers {
       doors(p2) += p1
     }
 
-    //println(doors)
-    val distances = bfs(doors.toMap)
-    //println(distances)
-    distances.values.max
+    bfs(doors.toMap)
+  }
+
+  def furthestRoom(input: String): Int = {
+    roomDistances(input).values.max
   }
 
   def farRooms(input: String, threshold: Int = 1000): Int = {
-    val regex = parseInput(input)
-
-    val doors: mutable.Map[Pos, Set[Pos]] = mutable.Map.empty.withDefaultValue(Set.empty)
-    for {
-      moveString <- allStrings(regex)
-      moves = movePositions(moveString.toList)
-      (p1, p2) <- moves.zip(moves.tail)
-    } {
-      doors(p1) += p2
-      doors(p2) += p1
-    }
-
-    //println(doors)
-    val distances = bfs(doors.toMap)
-    //println(distances)
-    distances.values.count(_ >= threshold)
+    roomDistances(input).values.count(_ >= threshold)
   }
 
   def parseInput(input: String): RegexNode = {
@@ -100,17 +89,16 @@ object Day20 extends RegexParsers {
 
     def concatNode: Parser[ConcatNode] = rep1(regexNode) ^^ ConcatNode
 
+    def emptyNode: Parser[StringNode] = "" ^^^ StringNode("")
+
     def regexNode: Parser[RegexNode] = (
       "[NESW]+".r ^^ StringNode
-    | "(" ~> repsep(concatNode | "" ^^^ StringNode(""), "|") <~ ")" ^^ ChoiceNode
+    | "(" ~> repsep(concatNode | emptyNode, "|") <~ ")" ^^ ChoiceNode
     )
 
     parseAll(inputRegexNode, input) match {
       case Success(result, next) => result
-      case NoSuccess(msg, next) =>
-        println(msg)
-        println(next)
-        ???
+      case NoSuccess(msg, next) => throw new RuntimeException(s"Regex parsing error: $msg ($next)")
     }
   }
 
