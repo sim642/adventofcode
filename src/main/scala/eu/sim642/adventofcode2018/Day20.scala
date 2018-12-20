@@ -49,7 +49,8 @@ object Day20 extends RegexParsers {
         newPos <- doors(pos)
       } yield newPos -> (dist + 1)
       val newVisited = visited ++ toVisit
-      val newToVisit = neighbors -- visited.keys
+      //val newToVisit = neighbors -- visited.keys
+      val newToVisit = neighbors.filterKeys(!visited.contains(_)) // more efficient than -- because visited is large
       if (newToVisit.isEmpty)
         newVisited
       else
