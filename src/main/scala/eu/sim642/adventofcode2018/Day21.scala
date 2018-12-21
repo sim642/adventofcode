@@ -1,12 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day6.FloydSolution
-import eu.sim642.adventofcode2018.Day16.{Instruction, Registers}
+import eu.sim642.adventofcode2018.Day16.Instruction
 
 import scala.collection.mutable
-import scala.math.Integral.Implicits._
-
-import util.control.Breaks._
+import scala.util.control.Breaks._
 
 object Day21 {
 
@@ -61,62 +58,73 @@ object Day21 {
     true
   }
 
-  def reverseEngineered(): Seq[Int] = {
-    var r2s: mutable.LinkedHashSet[Int] = mutable.LinkedHashSet.empty // keeps order but allows fast contains
+  trait Solution {
+    def r2Seq(input: String): Seq[Int]
 
-    var r0 = 0
-    var r1 = 0
-    var r2 = 0
-    var r3 = 0
-    var r4 = 0
-    var r5 = 0
-
-    r2 = 0
-    do {
-      r5 = r2 | 65536
-      r2 = 2238642
-      breakable {
-        do {
-          r3 = r5 & 255
-          r2 += r3
-          r2 &= 16777215
-          r2 *= 65899
-          r2 &= 16777215
-
-          /*if (256 <= r5) {
-          // divide r5 by 256, i.e. right shift by 8
-          r3 = 0
-          do {
-            r1 = r3 + 1
-            r1 *= 256
-            if (r1 <= r5)
-              r3 += 1
-          } while (r1 <= r5)
-          r5 = r3
-        }*/
-          if (256 <= r5) {
-            r5 /= 256
-          }
-          else
-            break()
-        } while (true)
-      }
-
-      //println(r2)
-      if (!r2s.add(r2))
-        return r2s.toSeq
-    } while (r2 != r0)
-    ???
+    def firstHaltr0(input: String): Int = r2Seq(input).head
+    def lastHaltr0(input: String): Int = r2Seq(input).last
   }
 
+  object ReverseEngineeredSolution extends Solution {
+    override def r2Seq(input: String): Seq[Int] = {
+      // ignores input...
+
+      var r2s: mutable.LinkedHashSet[Int] = mutable.LinkedHashSet.empty // keeps order but allows fast contains
+
+      var r0 = 0
+      var r1 = 0
+      var r2 = 0
+      var r3 = 0
+      var r4 = 0
+      var r5 = 0
+
+      r2 = 0
+      do {
+        r5 = r2 | 65536
+        r2 = 2238642
+        breakable {
+          do {
+            r3 = r5 & 255
+            r2 += r3
+            r2 &= 16777215
+            r2 *= 65899
+            r2 &= 16777215
+
+            /*if (256 <= r5) {
+            // divide r5 by 256, i.e. right shift by 8
+            r3 = 0
+            do {
+              r1 = r3 + 1
+              r1 *= 256
+              if (r1 <= r5)
+                r3 += 1
+            } while (r1 <= r5)
+            r5 = r3
+          }*/
+            if (256 <= r5) {
+              r5 /= 256
+            }
+            else
+              break()
+          } while (true)
+        }
+
+        //println(r2)
+        if (!r2s.add(r2))
+          return r2s.toSeq
+      } while (r2 != r0)
+      ???
+    }
+  }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     //runProgram(input, 0)
     //detectLoop(input, 0)
-    println(reverseEngineered().head)
-    println(reverseEngineered().last)
+    import ReverseEngineeredSolution._
+    println(firstHaltr0(input))
+    println(lastHaltr0(input))
 
     // 6401 - too low
     // 3198114 - too low
