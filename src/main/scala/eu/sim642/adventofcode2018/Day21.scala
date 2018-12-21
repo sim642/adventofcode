@@ -62,7 +62,7 @@ object Day21 {
   }
 
   def reverseEngineered(): Seq[Int] = {
-    var r2s: mutable.Map[Int, Int] = mutable.Map.empty
+    var r2s: mutable.LinkedHashSet[Int] = mutable.LinkedHashSet.empty // keeps order but allows fast contains
 
     var r0 = 0
     var r1 = 0
@@ -72,7 +72,6 @@ object Day21 {
     var r5 = 0
 
     r2 = 0
-    var iteration = 0
     do {
       r5 = r2 | 65536
       r2 = 2238642
@@ -104,14 +103,8 @@ object Day21 {
       }
 
       //println(r2)
-
-      iteration += 1
-      r2s.put(r2, iteration) match {
-        case Some(prevr2Iteration) =>
-          r2s.put(r2, prevr2Iteration) // "undo" put
-          return r2s.toSeq.sortBy(_._2).map(_._1)
-        case None =>
-      }
+      if (!r2s.add(r2))
+        return r2s.toSeq
     } while (r2 != r0)
     ???
   }
