@@ -25,7 +25,7 @@
           } while (r1 <= r5)
 26:       r5 = r3
         }
-      } while (256 <= r5)
+      } while (256 <= r5) // must check undivided r5 instead...
 
     } while (r2 != r0)
 

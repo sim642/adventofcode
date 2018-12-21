@@ -6,6 +6,7 @@ import eu.sim642.adventofcode2018.Day16.{Instruction, Registers}
 import scala.collection.mutable
 import scala.math.Integral.Implicits._
 
+import util.control.Breaks._
 
 object Day21 {
 
@@ -43,6 +44,7 @@ object Day21 {
       if (ip == 28) {
         val r2 = beforeRegisters(2)
         println(r2)
+        return false
         if (!prevr2.add(r2)) {
           println(s"duplicate $r2")
           return false
@@ -51,7 +53,7 @@ object Day21 {
 
       val instruction = program(ip)
       val afterRegisters = instruction(beforeRegisters)
-      //println(s"$beforeRegisters $instruction $afterRegisters")
+      println(s"$beforeRegisters $instruction $afterRegisters")
       ip = afterRegisters(ipRegister)
       registers = afterRegisters
       ip += 1
@@ -73,13 +75,15 @@ object Day21 {
     do {
       r5 = r2 | 65536
       r2 = 2238642
-      do {
-        r2 += r5 & 255
-        r2 &= 16777215
-        r2 *= 65899
-        r2 &= 16777215
+      breakable {
+        do {
+          r3 = r5 & 255
+          r2 += r3
+          r2 &= 16777215
+          r2 *= 65899
+          r2 &= 16777215
 
-        /*if (256 <= r5) {
+          /*if (256 <= r5) {
           // divide r5 by 256, i.e. right shift by 8
           r3 = 0
           do {
@@ -90,8 +94,13 @@ object Day21 {
           } while (r1 <= r5)
           r5 = r3
         }*/
-        r5 >>= 8
-      } while (256 <= r5)
+          if (256 <= r5) {
+            r5 /= 256
+          }
+          else
+            break()
+        } while (true)
+      }
 
       i += 1
 
