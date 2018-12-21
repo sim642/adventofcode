@@ -1,68 +1,65 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2018.Day16.Instruction
-
 import scala.collection.mutable
 import scala.util.control.Breaks._
 
 object Day21 {
-
-  def runProgram(program: Vector[Instruction], ipRegister: Int, register0: Int): Int = {
-    var registers = Seq.fill(6)(0).updated(0, register0)
-    var ip = 0
-    while (program.indices.contains(ip)) {
-      val beforeRegisters = registers.updated(ipRegister, ip)
-      val instruction = program(ip)
-      val afterRegisters = instruction(beforeRegisters)
-      println(s"$beforeRegisters $instruction $afterRegisters")
-      ip = afterRegisters(ipRegister)
-      registers = afterRegisters
-      ip += 1
-    }
-    registers(0)
-  }
-
-
-
-  def runProgram(input: String, register0: Int = 0): Int = {
-    val (ipRegister, program) = Day19.parseInput(input)
-    runProgram(program, ipRegister, register0)
-  }
-
-  def detectLoop(input: String, register0: Int = 0): Boolean = {
-    val (ipRegister, program) = Day19.parseInput(input)
-
-    val prevr2: mutable.Set[Int] = mutable.Set.empty
-
-    var registers = Seq.fill(6)(0).updated(0, register0)
-    var ip = 0
-    while (program.indices.contains(ip)) {
-      val beforeRegisters = registers.updated(ipRegister, ip)
-      if (ip == 28) {
-        val r2 = beforeRegisters(2)
-        println(r2)
-        return false
-        if (!prevr2.add(r2)) {
-          println(s"duplicate $r2")
-          return false
-        }
-      }
-
-      val instruction = program(ip)
-      val afterRegisters = instruction(beforeRegisters)
-      println(s"$beforeRegisters $instruction $afterRegisters")
-      ip = afterRegisters(ipRegister)
-      registers = afterRegisters
-      ip += 1
-    }
-    true
-  }
 
   trait Solution {
     def r2Seq(input: String): Seq[Int]
 
     def firstHaltr0(input: String): Int = r2Seq(input).head
     def lastHaltr0(input: String): Int = r2Seq(input).last
+  }
+
+  object SimulateSolution extends Solution {
+    override def r2Seq(input: String): Seq[Int] = {
+      val (ipRegister, program) = Day19.parseInput(input)
+
+      var r2s: mutable.LinkedHashSet[Int] = mutable.LinkedHashSet.empty // keeps order but allows fast contains
+
+      var registers = Seq.fill(6)(0)
+      var ip = 0
+      while (program.indices.contains(ip)) {
+        val beforeRegisters = registers.updated(ipRegister, ip)
+        if (ip == 28) {
+          val r2 = beforeRegisters(2)
+          if (!r2s.add(r2))
+            return r2s.toSeq
+        }
+
+        val instruction = program(ip)
+        val afterRegisters = instruction(beforeRegisters)
+        //println(s"$beforeRegisters $instruction $afterRegisters")
+        ip = afterRegisters(ipRegister)
+        registers = afterRegisters
+        ip += 1
+      }
+      ???
+    }
+
+    override def firstHaltr0(input: String): Int = {
+      // TODO: avoid duplication
+      val (ipRegister, program) = Day19.parseInput(input)
+
+      var registers = Seq.fill(6)(0)
+      var ip = 0
+      while (program.indices.contains(ip)) {
+        val beforeRegisters = registers.updated(ipRegister, ip)
+        if (ip == 28) {
+          val r2 = beforeRegisters(2)
+          return r2 // return immediately on first r2
+        }
+
+        val instruction = program(ip)
+        val afterRegisters = instruction(beforeRegisters)
+        //println(s"$beforeRegisters $instruction $afterRegisters")
+        ip = afterRegisters(ipRegister)
+        registers = afterRegisters
+        ip += 1
+      }
+      ???
+    }
   }
 
   object ReverseEngineeredSolution extends Solution {
@@ -120,8 +117,6 @@ object Day21 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    //runProgram(input, 0)
-    //detectLoop(input, 0)
     import ReverseEngineeredSolution._
     println(firstHaltr0(input))
     println(lastHaltr0(input))
