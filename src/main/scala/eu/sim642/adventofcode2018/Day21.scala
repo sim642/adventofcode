@@ -61,9 +61,10 @@ object Day21 {
     true
   }
 
-  def reverseEngineered(r0: Int): Unit = {
+  def reverseEngineered(): Seq[Int] = {
     var r2s: mutable.Map[Int, Int] = mutable.Map.empty
 
+    var r0 = 0
     var r1 = 0
     var r2 = 0
     var r3 = 0
@@ -71,7 +72,7 @@ object Day21 {
     var r5 = 0
 
     r2 = 0
-    var i = 0
+    var iteration = 0
     do {
       r5 = r2 | 65536
       r2 = 2238642
@@ -102,19 +103,17 @@ object Day21 {
         } while (true)
       }
 
-      i += 1
+      //println(r2)
 
-      r2s.put(r2, i) match {
-        case Some(prevr2i) =>
-          println(r2s)
-
-          println(r2s.toSeq.sortBy(_._2))
-          println(s"$r2 $i $prevr2i")
-          return
+      iteration += 1
+      r2s.put(r2, iteration) match {
+        case Some(prevr2Iteration) =>
+          r2s.put(r2, prevr2Iteration) // "undo" put
+          return r2s.toSeq.sortBy(_._2).map(_._1)
         case None =>
       }
-      println(r2)
     } while (r2 != r0)
+    ???
   }
 
 
@@ -123,7 +122,8 @@ object Day21 {
   def main(args: Array[String]): Unit = {
     //runProgram(input, 0)
     //detectLoop(input, 0)
-    reverseEngineered(0)
+    println(reverseEngineered().head)
+    println(reverseEngineered().last)
 
     // 6401 - too low
     // 3198114 - too low
