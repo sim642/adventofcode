@@ -43,8 +43,10 @@ object Day21 {
       if (ip == 28) {
         val r2 = beforeRegisters(2)
         println(r2)
-        if (!prevr2.add(r2))
-          ???
+        if (!prevr2.add(r2)) {
+          println(s"duplicate $r2")
+          return false
+        }
       }
 
       val instruction = program(ip)
@@ -88,7 +90,7 @@ object Day21 {
           } while (r1 <= r5)
           r5 = r3
         }*/
-        r5 /= 256
+        r5 >>= 8
       } while (256 <= r5)
 
       i += 1
@@ -102,6 +104,7 @@ object Day21 {
           return
         case None =>
       }
+      println(r2)
     } while (r2 != r0)
   }
 
@@ -110,11 +113,12 @@ object Day21 {
 
   def main(args: Array[String]): Unit = {
     //runProgram(input, 0)
-    detectLoop(input, 0)
-    //reverseEngineered(0)
+    //detectLoop(input, 0)
+    reverseEngineered(0)
 
     // 6401 - too low
     // 3198114 - too low
-    // part 1 - 13970209
+    // part 1 - 13970209, first r2
+    // part 2 - 6267260, last r2 before duplicate
   }
 }
