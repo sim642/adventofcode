@@ -26,7 +26,7 @@ object Day21Test {
   }
 
   class SimulatedSolutionTest extends SolutionTest(SimulateSolution) {
-    override protected val testPart2: Boolean = false
+    override protected val testPart2: Boolean = false // takes ~8 minutes
   }
 
   class ReverseEngineeredSolutionTest extends SolutionTest(ReverseEngineeredSolution)
