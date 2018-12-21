@@ -9,23 +9,20 @@ import scala.util.control.Breaks._
 
 object Day21 {
 
+  implicit class UnloopIterator[A](iterable: Iterator[A]) {
+    def unloop: Iterator[A] = {
+      val prevValues: mutable.Set[A] = mutable.Set.empty
+      iterable.takeWhile(value => prevValues.add(value)) // nasty side-effecting takeWhile
+    }
+  }
+
   trait Solution {
     def iterater2(input: String): Iterator[Int]
 
-    def r2Seq(input: String): Seq[Int] = {
-      val (ipRegister, program) = Day19.parseInput(input)
+    def iterate2Unlooped(input: String): Iterator[Int] = iterater2(input).unloop
 
-      var r2s: mutable.LinkedHashSet[Int] = mutable.LinkedHashSet.empty // keeps order but allows fast contains
-
-      for (r2 <- iterater2(input)) {
-        if (!r2s.add(r2))
-          return r2s.toSeq
-      }
-      ???
-    }
-
-    def firstHaltr0(input: String): Int = iterater2(input).head
-    def lastHaltr0(input: String): Int = r2Seq(input).last
+    def firstHaltr0(input: String): Int = iterate2Unlooped(input).head
+    def lastHaltr0(input: String): Int = iterate2Unlooped(input).last
   }
 
   object SimulateSolution extends Solution {
