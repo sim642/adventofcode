@@ -7,6 +7,7 @@ import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.PosGrid2
 
 import scala.collection.mutable
+import scala.util.control.Breaks._
 
 object Day22 {
 
@@ -85,27 +86,32 @@ object Day22 {
 
     val targetPosTool = (target, Torch)
 
-    while (toVisit.nonEmpty) {
-      val (dist, posTool@(pos, tool)) = toVisit.dequeue()
-      if (!visited.contains(posTool)) {
-        visited += posTool
-        distance(posTool) = dist
+    breakable {
+      while (toVisit.nonEmpty) {
+        val (dist, posTool@(pos, tool)) = toVisit.dequeue()
+        if (!visited.contains(posTool)) {
+          visited += posTool
+          distance(posTool) = dist
 
-        def goNeighbor(newPosTool: PosTool, distDelta: Int): Unit = {
-          val newDist = dist + distDelta
-          toVisit.enqueue((newDist, newPosTool))
+          if (posTool == targetPosTool)
+            break()
+
+          def goNeighbor(newPosTool: PosTool, distDelta: Int): Unit = {
+            val newDist = dist + distDelta
+            toVisit.enqueue((newDist, newPosTool))
+          }
+
+          for {
+            offset <- Pos.axisOffsets
+            newPos = pos + offset
+            if caveType.containsPos(newPos)
+            if caveType(newPos).allowedTools.contains(tool)
+          } goNeighbor((newPos, tool), 1)
+
+          for {
+            newTool <- caveType(pos).allowedTools - tool
+          } goNeighbor((pos, newTool), 7)
         }
-
-        for {
-          offset <- Pos.axisOffsets
-          newPos = pos + offset
-          if caveType.containsPos(newPos)
-          if caveType(newPos).allowedTools.contains(tool)
-        } goNeighbor((newPos, tool), 1)
-
-        for {
-          newTool <- caveType(pos).allowedTools - tool
-        } goNeighbor((pos, newTool), 7)
       }
     }
 
