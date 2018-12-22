@@ -21,4 +21,12 @@ class Day22Test extends FunSuite {
   test("Part 1 input answer") {
     assert(totalRiskLevel(input) == 11359)
   }
+
+  test("Part 2 examples") {
+    assert(fastestToTarget(exampleInput) == 45)
+  }
+
+  test("Part 2 input answer") {
+    assert(fastestToTarget(input) == 976)
+  }
 }
