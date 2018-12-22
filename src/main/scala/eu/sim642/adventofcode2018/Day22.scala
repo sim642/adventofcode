@@ -76,12 +76,10 @@ object Day22 {
 
     type PosTool = (Pos, Tool)
 
-    val visited: mutable.Set[PosTool] = mutable.Set.empty
-    val distance: mutable.Map[PosTool, Int] = mutable.Map.empty
+    val visitedDistance: mutable.Map[PosTool, Int] = mutable.Map.empty
     val toVisit: mutable.PriorityQueue[(Int, PosTool)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
 
     val startPosTool = (Pos(0, 0), Torch)
-    distance(startPosTool) = 0
     toVisit.enqueue((0, startPosTool))
 
     val targetPosTool = (target, Torch)
@@ -89,9 +87,8 @@ object Day22 {
     breakable {
       while (toVisit.nonEmpty) {
         val (dist, posTool@(pos, tool)) = toVisit.dequeue()
-        if (!visited.contains(posTool)) {
-          visited += posTool
-          distance(posTool) = dist
+        if (!visitedDistance.contains(posTool)) {
+          visitedDistance(posTool) = dist
 
           if (posTool == targetPosTool)
             break()
@@ -115,7 +112,7 @@ object Day22 {
       }
     }
 
-    distance(targetPosTool)
+    visitedDistance(targetPosTool)
   }
 
   def fastestToTarget(input: String): Int = {
