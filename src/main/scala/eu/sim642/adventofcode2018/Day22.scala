@@ -77,16 +77,25 @@ object Day22 {
     type PosTool = (Pos, Tool)
 
     val visitedDistance: mutable.Map[PosTool, Int] = mutable.Map.empty
-    val toVisit: mutable.PriorityQueue[(Int, PosTool)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
+    val toVisit: mutable.PriorityQueue[(Int, Int, PosTool)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
 
     val startPosTool = (Pos(0, 0), Torch)
-    toVisit.enqueue((0, startPosTool))
-
     val targetPosTool = (target, Torch)
+
+    def heuristic(posTool: PosTool): Int = {
+      (posTool._1 manhattanDistance targetPosTool._1) +
+        (if (posTool._2 != targetPosTool._2) 7 else 0)
+    }
+
+    def enqueueHeuristically(posTool: PosTool, dist: Int): Unit = {
+      toVisit.enqueue((dist + heuristic(posTool), dist, posTool))
+    }
+
+    enqueueHeuristically(startPosTool, 0)
 
     breakable {
       while (toVisit.nonEmpty) {
-        val (dist, posTool@(pos, tool)) = toVisit.dequeue()
+        val (_, dist, posTool@(pos, tool)) = toVisit.dequeue()
         if (!visitedDistance.contains(posTool)) {
           visitedDistance(posTool) = dist
 
@@ -95,7 +104,7 @@ object Day22 {
 
           def goNeighbor(newPosTool: PosTool, distDelta: Int): Unit = {
             val newDist = dist + distDelta
-            toVisit.enqueue((newDist, newPosTool))
+            enqueueHeuristically(newPosTool, newDist)
           }
 
           for {
