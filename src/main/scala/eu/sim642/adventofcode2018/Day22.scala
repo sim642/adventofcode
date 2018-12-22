@@ -72,7 +72,7 @@ object Day22 {
   }
 
   def fastestToTarget(depth: Int, target: Pos): Int = {
-    val caveType = calculateCaveType(depth, target, Pos(target.x * 5, target.y * 5))
+    val caveType = calculateCaveType(depth, target, Pos(target.x * 3, target.y * 3))
 
     type PosTool = (Pos, Tool)
 
@@ -103,8 +103,10 @@ object Day22 {
             break()
 
           def goNeighbor(newPosTool: PosTool, distDelta: Int): Unit = {
-            val newDist = dist + distDelta
-            enqueueHeuristically(newPosTool, newDist)
+            if (!visitedDistance.contains(newPosTool)) { // avoids some unnecessary queue dupication but not all
+              val newDist = dist + distDelta
+              enqueueHeuristically(newPosTool, newDist)
+            }
           }
 
           for {
@@ -120,6 +122,9 @@ object Day22 {
         }
       }
     }
+
+    //println(visitedDistance.size)
+    //println(toVisit.size)
 
     visitedDistance(targetPosTool)
   }
