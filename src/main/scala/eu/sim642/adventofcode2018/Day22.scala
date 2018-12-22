@@ -82,9 +82,12 @@ object Day22 {
     val startPosTool = (Pos(0, 0), Torch)
     val targetPosTool = (target, Torch)
 
+    val moveDistance = 1
+    val toolDistance = 7
+
     def heuristic(posTool: PosTool): Int = {
-      (posTool._1 manhattanDistance targetPosTool._1) +
-        (if (posTool._2 != targetPosTool._2) 7 else 0)
+      (posTool._1 manhattanDistance targetPosTool._1) * moveDistance +
+        (if (posTool._2 != targetPosTool._2) toolDistance else 0)
     }
 
     def enqueueHeuristically(posTool: PosTool, dist: Int): Unit = {
@@ -114,11 +117,11 @@ object Day22 {
             newPos = pos + offset
             if caveType.containsPos(newPos)
             if caveType(newPos).allowedTools.contains(tool)
-          } goNeighbor((newPos, tool), 1)
+          } goNeighbor((newPos, tool), moveDistance)
 
           for {
             newTool <- caveType(pos).allowedTools - tool
-          } goNeighbor((pos, newTool), 7)
+          } goNeighbor((pos, newTool), toolDistance)
         }
       }
     }
