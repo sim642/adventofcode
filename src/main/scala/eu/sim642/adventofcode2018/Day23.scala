@@ -33,7 +33,13 @@ object Day23 {
 
 
   def getInitialOctahedron(nanobots: Seq[Nanobot]): Nanobot = {
-    Iterator.iterate(1)(_ * 3).map(Nanobot(Pos3(0, 0, 0), _)).find(octahedron => nanobots.forall(octahedron.contains)).get
+    //val initPos = Pos3(0, 0, 0)
+    val poss = nanobots.map(_.pos)
+    val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
+    val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
+    val initZ = (poss.map(_.z).min + poss.map(_.z).max) / 2
+    val initPos = Pos3(initX, initY, initZ)
+    Iterator.iterate(1)(_ * 3).map(Nanobot(initPos, _)).find(octahedron => nanobots.forall(octahedron.contains)).get
   }
 
   def getBounds(nanobots: Seq[Nanobot], octahedron: Nanobot): (Int, Int) = {
