@@ -31,112 +31,117 @@ object Day23 {
     nanobots.count(nanobot => largestRadius.contains(nanobot.pos))
   }
 
-
-  def getInitialOctahedron(nanobots: Seq[Nanobot]): Nanobot = {
-    //val initPos = Pos3(0, 0, 0)
-    val poss = nanobots.map(_.pos)
-    val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
-    val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
-    val initZ = (poss.map(_.z).min + poss.map(_.z).max) / 2
-    val initPos = Pos3(initX, initY, initZ)
-    Iterator.iterate(1)(_ * 3).map(Nanobot(initPos, _)).find(octahedron => nanobots.forall(octahedron.contains)).get
+  trait Part2Solution {
+    def closestMostNanobots(nanobots: Seq[Nanobot]): Int
   }
 
-  def getBounds(nanobots: Seq[Nanobot], octahedron: Nanobot): (Int, Int) = {
-    val lower = nanobots.count(_.contains(octahedron))
-    val upper = nanobots.count(_.overlaps(octahedron))
-    (upper, lower)
+  object CliquePart2Solution extends Part2Solution {
+    def maximumClique(neighbors: Map[Nanobot, Set[Nanobot]]): Set[Nanobot] = {
+      var best: Set[Nanobot] = Set.empty
+
+      def bronKerbosh(r: Set[Nanobot], p: Set[Nanobot], x: Set[Nanobot]): Unit = {
+        if (p.isEmpty && x.isEmpty) {
+          //println(r)
+          if (r.size > best.size)
+            best = r
+        }
+        else {
+          //val u = p.headOption.getOrElse(x.head)
+          val u = (p ++ x).maxBy(neighbors(_).size) // pivot on highest degree
+          var p2 = p
+          var x2 = x
+          for (v <- p -- neighbors(u)) {
+            bronKerbosh(r + v, p2 intersect neighbors(v), x2 intersect neighbors(v))
+            p2 -= v
+            x2 += v
+          }
+        }
+      }
+
+      bronKerbosh(Set.empty, neighbors.keySet, Set.empty)
+      best
+    }
+
+    def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+      val neighbors: Map[Nanobot, Set[Nanobot]] = nanobots.map(nanobot1 => nanobot1 -> nanobots.filter(nanobot2 => nanobot2 != nanobot1 && nanobot1.overlaps(nanobot2)).toSet).toMap
+
+      val maximumOverlap = maximumClique(neighbors)
+      //println(maximumOverlap)
+      maximumOverlap.map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
+    }
   }
 
-  def getSplits(octahedron: Nanobot): Set[Nanobot] = {
-    val Nanobot(pos, radius) = octahedron
-    val r2 = (1.0 / 3 * radius).ceil.toInt
-    Set(
-      Pos3(-r2, 0, 0),
-      Pos3(r2, 0, 0),
-      Pos3(0, -r2, 0),
-      Pos3(0, r2, 0),
-      Pos3(0, 0, -r2),
-      Pos3(0, 0, r2),
-      Pos3(0, 0, 0),
-    ).map(offset => Nanobot(pos + offset, (2.0 / 3 * radius).floor.toInt))
-  }
+  object SplittingPart2Solution extends Part2Solution {
+    def getInitialOctahedron(nanobots: Seq[Nanobot]): Nanobot = {
+      //val initPos = Pos3(0, 0, 0)
+      val poss = nanobots.map(_.pos)
+      val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
+      val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
+      val initZ = (poss.map(_.z).min + poss.map(_.z).max) / 2
+      val initPos = Pos3(initX, initY, initZ)
+      Iterator.iterate(1)(_ * 3).map(Nanobot(initPos, _)).find(octahedron => nanobots.forall(octahedron.contains)).get
+    }
 
-  def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-    val queue: mutable.PriorityQueue[((Int, Int), Nanobot)] = mutable.PriorityQueue.empty(Ordering.by(_._1))
-    val done: mutable.Set[Nanobot] = mutable.Set.empty
+    def getBounds(nanobots: Seq[Nanobot], octahedron: Nanobot): (Int, Int) = {
+      val lower = nanobots.count(_.contains(octahedron))
+      val upper = nanobots.count(_.overlaps(octahedron))
+      (upper, lower)
+    }
 
-    val initialOctahedron = getInitialOctahedron(nanobots)
-    //println(initialOctahedron)
-    //println(getBounds(nanobots, initialOctahedron))
-    queue.enqueue((getBounds(nanobots, initialOctahedron), initialOctahedron))
+    def getSplits(octahedron: Nanobot): Set[Nanobot] = {
+      val Nanobot(pos, radius) = octahedron
+      val r2 = (1.0 / 3 * radius).ceil.toInt
+      Set(
+        Pos3(-r2, 0, 0),
+        Pos3(r2, 0, 0),
+        Pos3(0, -r2, 0),
+        Pos3(0, r2, 0),
+        Pos3(0, 0, -r2),
+        Pos3(0, 0, r2),
+        Pos3(0, 0, 0),
+      ).map(offset => Nanobot(pos + offset, (2.0 / 3 * radius).floor.toInt))
+    }
 
-    breakable {
-      while (queue.nonEmpty) {
-        val (_, octahedron) = queue.dequeue()
-        val bounds@(upper, lower) = getBounds(nanobots, octahedron)
+    def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+      val queue: mutable.PriorityQueue[((Int, Int), Nanobot)] = mutable.PriorityQueue.empty(Ordering.by(_._1))
+      val done: mutable.Set[Nanobot] = mutable.Set.empty
 
-        if (!done.contains(octahedron)) {
-          done += octahedron
+      val initialOctahedron = getInitialOctahedron(nanobots)
+      //println(initialOctahedron)
+      //println(getBounds(nanobots, initialOctahedron))
+      queue.enqueue((getBounds(nanobots, initialOctahedron), initialOctahedron))
 
-          //println(s"$octahedron $bounds")
+      breakable {
+        while (queue.nonEmpty) {
+          val (_, octahedron) = queue.dequeue()
+          val bounds@(upper, lower) = getBounds(nanobots, octahedron)
 
-          if (lower == upper) {
-            println("DONE")
-            println(s"$octahedron $bounds")
-            return (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius
-            break()
+          if (!done.contains(octahedron)) {
+            done += octahedron
+
             //println(s"$octahedron $bounds")
-          }
 
-          for (splitOctahedron <- getSplits(octahedron)) {
-            val splitBounds = getBounds(nanobots, splitOctahedron)
-            /*if (lower == 1)
-              println(s"  $splitOctahedron $splitBounds")*/
-            queue.enqueue((splitBounds, splitOctahedron))
+            if (lower == upper) {
+              println("DONE")
+              println(s"$octahedron $bounds")
+              return (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius
+              break()
+              //println(s"$octahedron $bounds")
+            }
+
+            for (splitOctahedron <- getSplits(octahedron)) {
+              val splitBounds = getBounds(nanobots, splitOctahedron)
+              /*if (lower == 1)
+                println(s"  $splitOctahedron $splitBounds")*/
+              queue.enqueue((splitBounds, splitOctahedron))
+            }
           }
         }
       }
+
+      ???
     }
-
-    ???
   }
-
-
-  def maximumClique(neighbors: Map[Nanobot, Set[Nanobot]]): Set[Nanobot] = {
-    var best: Set[Nanobot] = Set.empty
-
-    def bronKerbosh(r: Set[Nanobot], p: Set[Nanobot], x: Set[Nanobot]): Unit = {
-      if (p.isEmpty && x.isEmpty) {
-        //println(r)
-        if (r.size > best.size)
-          best = r
-      }
-      else {
-        //val u = p.headOption.getOrElse(x.head)
-        val u = (p ++ x).maxBy(neighbors(_).size) // pivot on highest degree
-        var p2 = p
-        var x2 = x
-        for (v <- p -- neighbors(u)) {
-          bronKerbosh(r + v, p2 intersect neighbors(v), x2 intersect neighbors(v))
-          p2 -= v
-          x2 += v
-        }
-      }
-    }
-
-    bronKerbosh(Set.empty, neighbors.keySet, Set.empty)
-    best
-  }
-
-
-  /*def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-    val neighbors: Map[Nanobot, Set[Nanobot]] = nanobots.map(nanobot1 => nanobot1 -> nanobots.filter(nanobot2 => nanobot2 != nanobot1 && nanobot1.overlaps(nanobot2)).toSet).toMap
-
-    val maximumOverlap = maximumClique(neighbors)
-    //println(maximumOverlap)
-    maximumOverlap.map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
-  }*/
 
 
   private val nanobotRegex = """pos=<(-?\d+),(-?\d+),(-?\d+)>, r=(\d+)""".r
@@ -150,6 +155,7 @@ object Day23 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import CliquePart2Solution._
     println(nanobotsInLargestRadius(parseInput(input)))
     println(closestMostNanobots(parseInput(input)))
 
