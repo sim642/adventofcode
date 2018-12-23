@@ -1,9 +1,15 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Suites}
 import Day10._
+import eu.sim642.adventofcode2018.Day10Test._
 
-class Day10Test extends FunSuite {
+class Day10Test extends Suites(
+  new NaiveSolutionTest,
+  new BinarySearchSolutionTest
+)
+
+object Day10Test {
 
   private val exampleInput =
     """position=< 9,  1> velocity=< 0,  2>
@@ -38,15 +44,23 @@ class Day10Test extends FunSuite {
       |position=<14,  7> velocity=<-2,  0>
       |position=<-3,  6> velocity=< 2, -1>""".stripMargin
 
-  test("Part 2 examples") {
-    val (minPoints, minSecond) = minimizePointsArea(parsePoints(exampleInput))
-    assert(minSecond == 3)
-    printPoints(minPoints)
+  sealed abstract class SolutionTest(solution: Solution) extends FunSuite {
+    test("Part 2 examples") {
+      val (minPoints, minSecond) = solution.minimizePointsArea(parsePoints(exampleInput))
+      assert(minSecond == 3)
+      printPoints(minPoints)
+    }
+
+    test("Part 2 input answer") {
+      val (minPoints, minSecond) = solution.minimizePointsArea(parsePoints(input))
+      assert(minSecond == 10659)
+      printPoints(minPoints)
+    }
   }
 
-  test("Part 2 input answer") {
-    val (minPoints, minSecond) = minimizePointsArea(parsePoints(input))
-    assert(minSecond == 10659)
-    printPoints(minPoints)
-  }
+  class NaiveSolutionTest extends SolutionTest(NaiveSolution)
+
+  class BinarySearchSolutionTest extends SolutionTest(BinarySearchSolution)
 }
+
+
