@@ -44,12 +44,28 @@ object Day23Test {
         |pos=<50,50,50>, r=200
         |pos=<10,10,10>, r=5""".stripMargin
 
+    lazy val dataforceInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23dataforce.txt")).mkString.trim
+    lazy val dataforceFriendInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23dataforcefriend.txt")).mkString.trim
+    lazy val lamperiInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23lamperi.txt")).mkString.trim
+
     test("Part 2 examples") {
       assert(part2Solution.closestMostNanobots(parseInput(exampleInput2)) == 36)
     }
 
     test("Part 2 input answer") {
       assert(part2Solution.closestMostNanobots(parseInput(input)) == 83779034)
+    }
+
+    test("Part 2 Dataforce") {
+      assert(part2Solution.closestMostNanobots(parseInput(dataforceInput)) == 119011326)
+    }
+
+    test("Part 2 Dataforce friend") {
+      assert(part2Solution.closestMostNanobots(parseInput(dataforceFriendInput)) == 88894457)
+    }
+
+    test("Part 2 Lamperi") {
+      assert(part2Solution.closestMostNanobots(parseInput(lamperiInput)) == 107272899) // unconfirmed answer
     }
   }
 
