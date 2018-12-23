@@ -106,39 +106,29 @@ object Day23 {
       val queue: mutable.PriorityQueue[((Int, Int), Nanobot)] = mutable.PriorityQueue.empty(Ordering.by(_._1))
       val done: mutable.Set[Nanobot] = mutable.Set.empty
 
+      def enqueue(octahedron: Nanobot): Unit = {
+        queue.enqueue((getBounds(nanobots, octahedron), octahedron))
+      }
+
       val initialOctahedron = getInitialOctahedron(nanobots)
-      //println(initialOctahedron)
-      //println(getBounds(nanobots, initialOctahedron))
-      queue.enqueue((getBounds(nanobots, initialOctahedron), initialOctahedron))
+      enqueue(initialOctahedron)
 
       breakable {
         while (queue.nonEmpty) {
           val (_, octahedron) = queue.dequeue()
-          val bounds@(upper, lower) = getBounds(nanobots, octahedron)
-
           if (!done.contains(octahedron)) {
             done += octahedron
 
-            //println(s"$octahedron $bounds")
-
+            val (upper, lower) = getBounds(nanobots, octahedron)
             if (lower == upper) {
-              println("DONE")
-              println(s"$octahedron $bounds")
               return (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius
-              break()
-              //println(s"$octahedron $bounds")
             }
 
-            for (splitOctahedron <- getSplits(octahedron)) {
-              val splitBounds = getBounds(nanobots, splitOctahedron)
-              /*if (lower == 1)
-                println(s"  $splitOctahedron $splitBounds")*/
-              queue.enqueue((splitBounds, splitOctahedron))
-            }
+            for (splitOctahedron <- getSplits(octahedron))
+              enqueue(splitOctahedron)
           }
         }
       }
-
       ???
     }
   }
