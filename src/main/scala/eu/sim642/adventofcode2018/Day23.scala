@@ -14,10 +14,9 @@ object Day23 {
   }
 
 
-  def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-    val neighbors: Map[Nanobot, Set[Nanobot]] = nanobots.map(nanobot1 => nanobot1 -> nanobots.filter(nanobot2 => nanobot2 != nanobot1 && nanobot1.overlaps(nanobot2)).toSet).toMap
-
+  def maximumClique(neighbors: Map[Nanobot, Set[Nanobot]]): Set[Nanobot] = {
     var best: Set[Nanobot] = Set.empty
+
     def bronKerbosh(r: Set[Nanobot], p: Set[Nanobot], x: Set[Nanobot]): Unit = {
       if (p.isEmpty && x.isEmpty) {
         //println(r)
@@ -37,9 +36,17 @@ object Day23 {
       }
     }
 
-    bronKerbosh(Set.empty, nanobots.toSet, Set.empty)
-    //println(best)
-    best.map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
+    bronKerbosh(Set.empty, neighbors.keySet, Set.empty)
+    best
+  }
+
+
+  def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+    val neighbors: Map[Nanobot, Set[Nanobot]] = nanobots.map(nanobot1 => nanobot1 -> nanobots.filter(nanobot2 => nanobot2 != nanobot1 && nanobot1.overlaps(nanobot2)).toSet).toMap
+
+    val maximumOverlap = maximumClique(neighbors)
+    //println(maximumOverlap)
+    maximumOverlap.map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
   }
 
 
