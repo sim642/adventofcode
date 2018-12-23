@@ -25,7 +25,8 @@ object Day23 {
           best = r
       }
       else {
-        val u = p.headOption.getOrElse(x.head)
+        //val u = p.headOption.getOrElse(x.head)
+        val u = (p ++ x).maxBy(neighbors(_).size) // pivot on highest degree
         var p2 = p
         var x2 = x
         for (v <- p -- neighbors(u)) {
