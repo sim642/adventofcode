@@ -90,16 +90,24 @@ object Day23 {
 
     def getSplits(octahedron: Nanobot): Set[Nanobot] = {
       val Nanobot(pos, radius) = octahedron
-      val r2 = (1.0 / 3 * radius).ceil.toInt
-      Set(
-        Pos3(-r2, 0, 0),
-        Pos3(r2, 0, 0),
-        Pos3(0, -r2, 0),
-        Pos3(0, r2, 0),
-        Pos3(0, 0, -r2),
-        Pos3(0, 0, r2),
-        Pos3(0, 0, 0),
-      ).map(offset => Nanobot(pos + offset, (2.0 / 3 * radius).floor.toInt))
+      val offset = (1.0 / 3 * radius).ceil.toInt
+      val newRadius = radius - offset
+      val axisOffsets = Set(
+        Pos3(-offset, 0, 0),
+        Pos3(offset, 0, 0),
+        Pos3(0, -offset, 0),
+        Pos3(0, offset, 0),
+        Pos3(0, 0, -offset),
+        Pos3(0, 0, offset),
+      )
+      val offsets = {
+        if (radius == 1)
+          // must include when going from radius 1 to radius 0, not to forget about center voxel
+          axisOffsets + Pos3(0, 0, 0)
+        else
+          axisOffsets
+      }
+      offsets.map(offset => Nanobot(pos + offset, newRadius))
     }
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
