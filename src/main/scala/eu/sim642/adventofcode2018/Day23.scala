@@ -4,11 +4,41 @@ import eu.sim642.adventofcode2017.Day20.Pos3
 
 object Day23 {
 
-  case class Nanobot(pos: Pos3, radius: Int)
+  case class Nanobot(pos: Pos3, radius: Int) {
+    def overlaps(that: Nanobot): Boolean = (this.pos manhattanDistance that.pos) <= this.radius + that.radius
+  }
 
   def nanobotsInLargestRadius(nanobots: Seq[Nanobot]): Int = {
     val largestRadius = nanobots.maxBy(_.radius)
     nanobots.count(nanobot => (nanobot.pos manhattanDistance largestRadius.pos) <= largestRadius.radius)
+  }
+
+
+  def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+    val neighbors: Map[Nanobot, Set[Nanobot]] = nanobots.map(nanobot1 => nanobot1 -> nanobots.filter(nanobot2 => nanobot2 != nanobot1 && nanobot1.overlaps(nanobot2)).toSet).toMap
+
+    var best: Set[Nanobot] = Set.empty
+    def bronKerbosh(r: Set[Nanobot], p: Set[Nanobot], x: Set[Nanobot]): Unit = {
+      if (p.isEmpty && x.isEmpty) {
+        //println(r)
+        if (r.size > best.size)
+          best = r
+      }
+      else {
+        val u = p.headOption.getOrElse(x.head)
+        var p2 = p
+        var x2 = x
+        for (v <- p -- neighbors(u)) {
+          bronKerbosh(r + v, p2 intersect neighbors(v), x2 intersect neighbors(v))
+          p2 -= v
+          x2 += v
+        }
+      }
+    }
+
+    bronKerbosh(Set.empty, nanobots.toSet, Set.empty)
+    //println(best)
+    best.map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
   }
 
 
@@ -24,5 +54,8 @@ object Day23 {
 
   def main(args: Array[String]): Unit = {
     println(nanobotsInLargestRadius(parseInput(input)))
+    println(closestMostNanobots(parseInput(input)))
+
+    // 90702904 - too high
   }
 }
