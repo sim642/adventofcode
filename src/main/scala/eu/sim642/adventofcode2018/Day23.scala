@@ -120,14 +120,14 @@ object Day23 {
     }
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-      val queue: mutable.PriorityQueue[(Nanobot, (Int, Int))] =
-        mutable.PriorityQueue.empty(Ordering.by({ case (nanobot, (lower, upper)) =>
-          (upper, lower)
+      val queue: mutable.PriorityQueue[(Nanobot, (Int, Int), Int)] =
+        mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
+          (upper, lower, -originDist)
         }))
       val done: mutable.Set[Nanobot] = mutable.Set.empty
 
       def enqueue(octahedron: Nanobot): Unit = {
-        queue.enqueue((octahedron, getBounds(nanobots, octahedron)))
+        queue.enqueue((octahedron, getBounds(nanobots, octahedron), (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius))
       }
 
       val initialOctahedron = getInitialOctahedron(nanobots)
@@ -135,14 +135,12 @@ object Day23 {
 
       breakable {
         while (queue.nonEmpty) {
-          val (octahedron, _) = queue.dequeue()
+          val (octahedron, (lower, upper), originDist) = queue.dequeue()
           if (!done.contains(octahedron)) {
             done += octahedron
 
-            val (upper, lower) = getBounds(nanobots, octahedron)
-            if (lower == upper) {
-              return (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius
-            }
+            if (lower == upper)
+              return originDist
 
             for (splitOctahedron <- getSplits(octahedron))
               enqueue(splitOctahedron)
