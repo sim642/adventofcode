@@ -31,4 +31,13 @@ class Day24Test extends FunSuite {
   test("Part 1 input answer") {
     assert(combat(parseInput(input)) == 19295)
   }
+
+  test("Part 2 examples") {
+    assert(boostedCombat(parseInput(exampleInput), 1570) == Some(ImmuneSystem, 51))
+    assert(smallestBoostedCombat(parseInput(exampleInput)) == 51)
+  }
+
+  test("Part 2 input answer") {
+    assert(smallestBoostedCombat(parseInput(input)) == 12084)
+  }
 }

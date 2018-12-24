@@ -25,7 +25,7 @@ object Day24 {
         effectivePower
     }
 
-    override def toString: String = s"$groupType $i"
+    //override def toString: String = s"$groupType $i"
   }
 
   def targetSelectionPhase(groups: Seq[Group]): Map[Group, Group] = {
@@ -55,11 +55,11 @@ object Day24 {
       case Nil => groups.toSeq
       case attackingGroup :: tl =>
         val defendingGroup = targets(attackingGroup)
-        print(s"$attackingGroup attacks $defendingGroup")
+        //print(s"$attackingGroup attacks $defendingGroup")
         if (groups.contains(defendingGroup)) { // is needed?
           val damage = attackingGroup.damageTo(defendingGroup)
           val killedUnits = damage / defendingGroup.unitHp
-          println(s" killing $killedUnits")
+          //println(s" killing $killedUnits")
           val newDefendingGroup = defendingGroup.copy(units = defendingGroup.units - killedUnits)
 
           if (newDefendingGroup.units > 0) {
@@ -81,7 +81,7 @@ object Day24 {
           }
         }
         else {
-          println()
+          //println()
           helper(tl, targets, groups)
         }
     }
@@ -93,17 +93,59 @@ object Day24 {
   def combat(initialGroups: Seq[Group]): Int = {
     var groups = initialGroups
     while (groups.exists(_.groupType == ImmuneSystem) && groups.exists(_.groupType == Infection)) {
-      for (group <- groups)
-        println(s"$group has ${group.units} units")
+      //for (group <- groups)
+      //  println(s"$group has ${group.units} units")
 
       val targets = targetSelectionPhase(groups)
       //for ((a, d) <- targets)
       //  println(s"$a targets $d")
 
       groups = attackingPhase(groups, targets)
-      println()
+      //println()
     }
     groups.map(_.units).sum
+  }
+
+  def boostGroups(initialGroups: Seq[Group], boost: Int): Seq[Group] = {
+    initialGroups.map({ group =>
+      group.groupType match {
+        case ImmuneSystem => group.copy(attackDamage = group.attackDamage + boost)
+        case Infection => group
+      }
+    })
+  }
+
+  def boostedCombat(initialGroups: Seq[Group], boost: Int): Option[(GroupType, Int)] = {
+    var groups = boostGroups(initialGroups, boost)
+    while (groups.exists(_.groupType == ImmuneSystem) && groups.exists(_.groupType == Infection)) {
+      //for (group <- groups)
+      //  println(s"$group has ${group.units} units")
+
+      val targets = targetSelectionPhase(groups)
+      //for ((a, d) <- targets)
+      //  println(s"$a targets $d")
+
+      val newGroups = attackingPhase(groups, targets)
+      if (newGroups == groups) {
+        // infinitely stuck
+        return None
+      }
+      groups = newGroups
+      //println()
+    }
+    Some(groups.head.groupType, groups.map(_.units).sum)
+  }
+
+  def smallestBoostedCombat(initialGroups: Seq[Group]): Int = {
+    for (boost <- Iterator.from(0)) {
+      //println(s"Boost: $boost")
+      boostedCombat(initialGroups, boost) match {
+        case Some((ImmuneSystem, immuneUnits)) =>
+          return immuneUnits
+        case _ =>
+      }
+    }
+    ???
   }
 
   // TODO: combinator parsing...
@@ -137,6 +179,7 @@ object Day24 {
 
   def main(args: Array[String]): Unit = {
     println(combat(parseInput(input)))
+    println(smallestBoostedCombat(parseInput(input)))
 
     // 19293 - too low
   }
