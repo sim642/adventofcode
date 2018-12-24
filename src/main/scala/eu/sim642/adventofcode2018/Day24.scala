@@ -138,30 +138,39 @@ object Day24 {
     ???
   }
 
-  // TODO: combinator parsing...
-  private val groupWeakImmuneRegex = """(\d+) units each with (\d+) hit points \(weak to ([\w, ]+); immune to ([\w, ]+)\) with an attack that does (\d+) (\w+) damage at initiative (\d+)""".r
-  private val groupImmuneWeakRegex = """(\d+) units each with (\d+) hit points \(immune to ([\w, ]+); weak to ([\w, ]+)\) with an attack that does (\d+) (\w+) damage at initiative (\d+)""".r
-  private val groupWeakRegex = """(\d+) units each with (\d+) hit points \(weak to ([\w, ]+)\) with an attack that does (\d+) (\w+) damage at initiative (\d+)""".r
-  private val groupImmuneRegex = """(\d+) units each with (\d+) hit points \(immune to ([\w, ]+)\) with an attack that does (\d+) (\w+) damage at initiative (\d+)""".r
-  private val groupRegex = """(\d+) units each with (\d+) hit points with an attack that does (\d+) (\w+) damage at initiative (\d+)""".r
+
+  private val weakImmuneRegex = """(weak|immune) to ([\w, ]+)""".r
+
+  def parseWeakImmune(s: String): (Set[String], Set[String]) = {
+    var weaknesses = Set.empty[String]
+    var immunities = Set.empty[String]
+    if (s != null) {
+      val parts = s.replaceAll("""^\(""", "").replaceAll("""\) $""", "").split("; ")
+      for (part <- parts) {
+        part match {
+          case weakImmuneRegex("weak", types) =>
+            weaknesses = types.split(", ").toSet
+          case weakImmuneRegex("immune", types) =>
+            immunities = types.split(", ").toSet
+        }
+      }
+    }
+    (weaknesses, immunities)
+  }
+
+  private val groupRegex = """(\d+) units each with (\d+) hit points (\([^\)]+\) )?with an attack that does (\d+) (\w+) damage at initiative (\d+)""".r
 
   def parseGroup(s: String, i: Int, groupType: GroupType): Group = s match {
-    case groupWeakImmuneRegex(units, unitHp, weaknesses, immunities, attackDamage, attackType, initiative) =>
-      Group(i, groupType, units.toInt, unitHp.toInt, attackDamage.toInt, attackType, initiative.toInt, weaknesses.split(", ").toSet, immunities.split(", ").toSet)
-    case groupImmuneWeakRegex(units, unitHp, immunities, weaknesses, attackDamage, attackType, initiative) =>
-      Group(i, groupType, units.toInt, unitHp.toInt, attackDamage.toInt, attackType, initiative.toInt, weaknesses.split(", ").toSet, immunities.split(", ").toSet)
-    case groupWeakRegex(units, unitHp, weaknesses, attackDamage, attackType, initiative) =>
-      Group(i, groupType, units.toInt, unitHp.toInt, attackDamage.toInt, attackType, initiative.toInt, weaknesses.split(", ").toSet, Set.empty)
-    case groupImmuneRegex(units, unitHp, immunities, attackDamage, attackType, initiative) =>
-      Group(i, groupType, units.toInt, unitHp.toInt, attackDamage.toInt, attackType, initiative.toInt, Set.empty, immunities.split(", ").toSet)
-    case groupRegex(units, unitHp, attackDamage, attackType, initiative) =>
-      Group(i, groupType, units.toInt, unitHp.toInt, attackDamage.toInt, attackType, initiative.toInt, Set.empty, Set.empty)
+    case groupRegex(units, unitHp, weakImmune, attackDamage, attackType, initiative) =>
+      val (weaknesses, immunities) = parseWeakImmune(weakImmune)
+      Group(i, groupType, units.toInt, unitHp.toInt, attackDamage.toInt, attackType, initiative.toInt, weaknesses, immunities)
   }
 
   def parseInput(input: String): Seq[Group] = {
     val Seq("Immune System:" +: immuneLines, "Infection:" +: infectionLines) = input.split("""\n\n""").map(_.lines.toList).toList
 
-    immuneLines.zipWithIndex.map(p => parseGroup(p._1, p._2 + 1, ImmuneSystem)) ++ infectionLines.zipWithIndex.map(p => parseGroup(p._1, p._2 + 1, Infection))
+    immuneLines.zipWithIndex.map({ case (line, i) => parseGroup(line, i + 1, ImmuneSystem) }) ++
+      infectionLines.zipWithIndex.map({case (line, i) => parseGroup(line, i + 1, Infection) })
   }
 
 
