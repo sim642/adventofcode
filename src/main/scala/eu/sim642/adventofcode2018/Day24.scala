@@ -90,33 +90,8 @@ object Day24 {
     helper(attackingGroups.toList, targets, groups.toSet)
   }
 
-  def combat(initialGroups: Seq[Group]): Int = {
+  def combat(initialGroups: Seq[Group]): Option[(GroupType, Int)] = {
     var groups = initialGroups
-    while (groups.exists(_.groupType == ImmuneSystem) && groups.exists(_.groupType == Infection)) {
-      //for (group <- groups)
-      //  println(s"$group has ${group.units} units")
-
-      val targets = targetSelectionPhase(groups)
-      //for ((a, d) <- targets)
-      //  println(s"$a targets $d")
-
-      groups = attackingPhase(groups, targets)
-      //println()
-    }
-    groups.map(_.units).sum
-  }
-
-  def boostGroups(initialGroups: Seq[Group], boost: Int): Seq[Group] = {
-    initialGroups.map({ group =>
-      group.groupType match {
-        case ImmuneSystem => group.copy(attackDamage = group.attackDamage + boost)
-        case Infection => group
-      }
-    })
-  }
-
-  def boostedCombat(initialGroups: Seq[Group], boost: Int): Option[(GroupType, Int)] = {
-    var groups = boostGroups(initialGroups, boost)
     while (groups.exists(_.groupType == ImmuneSystem) && groups.exists(_.groupType == Infection)) {
       //for (group <- groups)
       //  println(s"$group has ${group.units} units")
@@ -136,10 +111,25 @@ object Day24 {
     Some(groups.head.groupType, groups.map(_.units).sum)
   }
 
+  def combatToWin(initialGroups: Seq[Group]): Int = {
+    combat(initialGroups) match {
+      case Some((_, units)) => units
+    }
+  }
+
+  def boostGroups(initialGroups: Seq[Group], boost: Int): Seq[Group] = {
+    initialGroups.map({ group =>
+      group.groupType match {
+        case ImmuneSystem => group.copy(attackDamage = group.attackDamage + boost)
+        case Infection => group
+      }
+    })
+  }
+
   def smallestBoostedCombat(initialGroups: Seq[Group]): Int = {
     for (boost <- Iterator.from(0)) {
       //println(s"Boost: $boost")
-      boostedCombat(initialGroups, boost) match {
+      combat(boostGroups(initialGroups, boost)) match {
         case Some((ImmuneSystem, immuneUnits)) =>
           return immuneUnits
         case _ =>
@@ -178,7 +168,7 @@ object Day24 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(combat(parseInput(input)))
+    println(combatToWin(parseInput(input)))
     println(smallestBoostedCombat(parseInput(input)))
 
     // 19293 - too low
