@@ -85,7 +85,7 @@ object Day23 {
     def getBounds(nanobots: Seq[Nanobot], octahedron: Nanobot): (Int, Int) = {
       val lower = nanobots.count(_.contains(octahedron))
       val upper = nanobots.count(_.overlaps(octahedron))
-      (upper, lower)
+      (lower, upper)
     }
 
     def getSplits(octahedron: Nanobot): Set[Nanobot] = {
@@ -120,11 +120,14 @@ object Day23 {
     }
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-      val queue: mutable.PriorityQueue[((Int, Int), Nanobot)] = mutable.PriorityQueue.empty(Ordering.by(_._1))
+      val queue: mutable.PriorityQueue[(Nanobot, (Int, Int))] =
+        mutable.PriorityQueue.empty(Ordering.by({ case (nanobot, (lower, upper)) =>
+          (upper, lower)
+        }))
       val done: mutable.Set[Nanobot] = mutable.Set.empty
 
       def enqueue(octahedron: Nanobot): Unit = {
-        queue.enqueue((getBounds(nanobots, octahedron), octahedron))
+        queue.enqueue((octahedron, getBounds(nanobots, octahedron)))
       }
 
       val initialOctahedron = getInitialOctahedron(nanobots)
@@ -132,7 +135,7 @@ object Day23 {
 
       breakable {
         while (queue.nonEmpty) {
-          val (_, octahedron) = queue.dequeue()
+          val (octahedron, _) = queue.dequeue()
           if (!done.contains(octahedron)) {
             done += octahedron
 
