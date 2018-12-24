@@ -79,7 +79,8 @@ object Day23 {
       val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
       val initZ = (poss.map(_.z).min + poss.map(_.z).max) / 2
       val initPos = Pos3(initX, initY, initZ)
-      Iterator.iterate(1)(_ * 3).map(Nanobot(initPos, _)).find(octahedron => nanobots.forall(octahedron.contains)).get
+      val radius = nanobots.map(nanobot => (initPos manhattanDistance nanobot.pos) + nanobot.radius).max
+      Nanobot(initPos, radius)
     }
 
     def getBounds(nanobots: Seq[Nanobot], octahedron: Nanobot): (Int, Int) = {
