@@ -124,6 +124,7 @@ object Day23 {
       val queue: mutable.PriorityQueue[(Nanobot, (Int, Int), Int)] =
         mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
           (upper, lower, -originDist)
+          //(upper, -octahedron.radius, -originDist) // much faster but possibly incorrect?
         }))
       val done: mutable.Set[Nanobot] = mutable.Set.empty
 
