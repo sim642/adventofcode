@@ -90,7 +90,16 @@ object Day23 {
 
     def getSplits(octahedron: Nanobot): Set[Nanobot] = {
       val Nanobot(pos, radius) = octahedron
-      val offset = (1.0 / 3 * radius).ceil.toInt
+      val offset = {
+        // rounding corrections by VikeStep
+        // Nanobot(Pos3(30, 30, 30), 55) splits should still contains Pos3(12, 12, 12)
+        if (radius >= 3)
+          (1.0 / 3 * radius).floor.toInt
+        else if (radius > 0)
+          1
+        else
+          0
+      }
       val newRadius = radius - offset
       val axisOffsets = Set(
         Pos3(-offset, 0, 0),
