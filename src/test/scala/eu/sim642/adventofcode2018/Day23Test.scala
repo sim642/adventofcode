@@ -50,6 +50,7 @@ object Day23Test {
     lazy val dataforceFriendInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23dataforcefriend.txt")).mkString.trim
     lazy val lamperiInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23lamperi.txt")).mkString.trim
     lazy val vikestepInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23vikestep.txt")).mkString.trim
+    lazy val magneInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23magne.txt")).mkString.trim
 
     test("Part 2 examples") {
       assert(part2Solution.closestMostNanobots(parseInput(exampleInput2)) == 36)
@@ -143,6 +144,10 @@ object Day23Test {
 
     test("Part 2 VikeStep") {
       assert(part2Solution.closestMostNanobots(parseInput(vikestepInput)) == 93750870)
+    }
+
+    test("Part 2 Magne") {
+      assert(part2Solution.closestMostNanobots(parseInput(magneInput)) == 71484642)
     }
   }
 
