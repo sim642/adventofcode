@@ -52,6 +52,7 @@ object Day23Test {
     lazy val lamperiInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23lamperi.txt")).mkString.trim
     lazy val vikestepInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23vikestep.txt")).mkString.trim
     lazy val magneInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23magne.txt")).mkString.trim
+    lazy val ipavInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23ipav.txt")).mkString.trim
 
     test("Part 2 examples") {
       assert(part2Solution.closestMostNanobots(parseInput(exampleInput2)) == 36)
@@ -149,6 +150,10 @@ object Day23Test {
 
     test("Part 2 Magne") {
       assert(part2Solution.closestMostNanobots(parseInput(magneInput)) == 71484642)
+    }
+
+    test("Part 2 /u/ipav") {
+      assert(part2Solution.closestMostNanobots(parseInput(ipavInput)) == 89915526) // unconfirmed answer
     }
   }
 
