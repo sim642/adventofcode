@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcode2017.Day20.Pos3
+import eu.sim642.adventofcode2018.Day25.Pos4
 
 import scala.collection.mutable
 import scala.util.control.Breaks._
@@ -62,12 +63,13 @@ object Day23 {
       best
     }
 
-    def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+    def maximumOverlap(nanobots: Seq[Nanobot]): Set[Nanobot] = {
       val neighbors: Map[Nanobot, Set[Nanobot]] = nanobots.map(nanobot1 => nanobot1 -> nanobots.filter(nanobot2 => nanobot2 != nanobot1 && nanobot1.overlaps(nanobot2)).toSet).toMap
+      maximumClique(neighbors)
+    }
 
-      val maximumOverlap = maximumClique(neighbors)
-      //println(maximumOverlap)
-      maximumOverlap.map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
+    def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+      maximumOverlap(nanobots).map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
     }
   }
 
@@ -150,6 +152,83 @@ object Day23 {
         }
       }
       ???
+    }
+  }
+
+  object Clique4Part2Solution extends Part2Solution {
+
+    implicit class Pos4Ops(pos4: Pos4) {
+      def +(that: Pos4): Pos4 = Pos4(pos4.x + that.x, pos4.y + that.y, pos4.z + that.z, pos4.w + that.w)
+    }
+
+    implicit class ExactDivideInt(n: Int) {
+      def /!(d: Int): Option[Int] = if (n % d == 0) Some(n / d) else None
+    }
+
+    case class Box4(min: Pos4, max: Pos4) {
+      def intersect(that: Box4): Option[Box4] = {
+        val Box4(min2, max2) = that
+        val minX = min.x max min2.x
+        val maxX = max.x min max2.x
+        val minY = min.y max min2.y
+        val maxY = max.y min max2.y
+        val minZ = min.z max min2.z
+        val maxZ = max.z min max2.z
+        val minW = min.w max min2.w
+        val maxW = max.w min max2.w
+        if (minX <= maxX && minY <= maxY && minZ <= maxZ && minW <= maxW)
+          Some(Box4(Pos4(minX, minY, minZ, minW), Pos4(maxX, maxY, maxZ, maxW)))
+        else
+          None
+      }
+    }
+
+    def nanobot2box4(nanobot: Nanobot): Box4 = {
+      val Nanobot(Pos3(x, y, z), r) = nanobot
+      val x_ = x + y + z
+      val y_ = x + y - z
+      val z_ = x - y - z
+      val w_ = x - y + z
+      val center = Pos4(x_, y_, z_, w_)
+      Box4(center + Pos4(-r, -r, -r, -r), center + Pos4(r, r, r, r))
+    }
+
+    def pos42pos3(pos4: Pos4): Option[Pos3] = {
+      val Pos4(x_, y_, z_, w_) = pos4
+      for {
+        x <- (x_ + z_) /! 2
+        y <- (y_ - z_) /! 2
+        z <- (x_ - y_) /! 2
+        if x - y + z == w_
+      } yield Pos3(x, y, z)
+    }
+
+    def box4iterate(box4: Box4): Iterator[Pos4] = {
+      val Box4(Pos4(x1, y1, z1, w1), Pos4(x2, y2, z2, w2)) = box4
+      for {
+        x <- (x1 to x2).toIterator
+        y <- (y1 to y2).toIterator
+        z <- (z1 to z2).toIterator
+        w <- (w1 to w2).toIterator
+      } yield Pos4(x, y, z, w)
+    }
+
+    override def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+      val overlapping = CliquePart2Solution.maximumOverlap(nanobots)
+      val intersection = overlapping.map(nanobot => Option(nanobot2box4(nanobot))).reduce({ (left, right) =>
+        for {
+          l <- left
+          r <- right
+          i <- l intersect r
+        } yield i
+      }).get
+      //println(intersection)
+
+      val pos4s = box4iterate(intersection).toSeq
+      //println(pos4s.size)
+      val pos3s = pos4s.flatMap(pos42pos3)
+      //println(pos3s.size)
+      pos3s.map(p => p manhattanDistance Pos3(0, 0, 0)).min
     }
   }
 
