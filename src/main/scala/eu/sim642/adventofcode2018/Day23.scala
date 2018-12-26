@@ -12,15 +12,15 @@ object Day23 {
 
     def contains(cPos: Pos3): Boolean = (pos manhattanDistance cPos) <= radius
 
-    def corners: Set[Pos3] = {
-      Set(
+    def corners: Seq[Pos3] = {
+      Seq(
         Pos3(-radius, 0, 0),
         Pos3(radius, 0, 0),
         Pos3(0, -radius, 0),
         Pos3(0, radius, 0),
         Pos3(0, 0, -radius),
         Pos3(0, 0, radius),
-      ).map(pos + _)
+      ).view.map(pos + _)
     }
 
     def contains(that: Nanobot): Boolean = that.corners.forall(contains)
