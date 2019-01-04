@@ -155,6 +155,152 @@ object Day23 {
     }
   }
 
+  object Splitting2Part2Solution extends Part2Solution {
+
+    private def clamp(min: Int, max: Int)(value: Int): Int = {
+      if (value < min)
+        min
+      else if (value > max)
+        max
+      else value
+    }
+
+    case class Box3(min: Pos3, max: Pos3) {
+      def contains(pos: Pos3): Boolean = {
+        min.x <= pos.x && pos.x <= max.x &&
+          min.y <= pos.y && pos.y <= max.y &&
+          min.z <= pos.z && pos.z <= max.z
+      }
+
+      def contains(octahedron: Nanobot): Boolean = octahedron.corners.forall(contains)
+
+      def closestTo(pos: Pos3): Pos3 = {
+        Pos3(
+          clamp(min.x, max.x)(pos.x),
+          clamp(min.y, max.y)(pos.y),
+          clamp(min.z, max.z)(pos.z),
+        )
+      }
+    }
+
+    implicit class NanobotBox3(nanobot: Nanobot) {
+      def contains(box: Box3): Boolean = nanobot.contains(box.min) && nanobot.contains(box.max) // TODO: sufficient to only check two corners?
+
+      def overlaps(box: Box3): Boolean = nanobot.contains(box.closestTo(nanobot.pos))
+    }
+
+    def getInitialBox(nanobots: Seq[Nanobot]): Box3 = {
+      //val initPos = Pos3(0, 0, 0)
+      val poss = nanobots.map(_.pos)
+      val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
+      val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
+      val initZ = (poss.map(_.z).min + poss.map(_.z).max) / 2
+      val initPos = Pos3(initX, initY, initZ)
+      Iterator.iterate(1)(_ * 2).map({ radius =>
+        Box3(initPos + Pos3(-radius, -radius, -radius), initPos + Pos3(radius, radius, radius))
+      }).find(box => nanobots.forall(box.contains)).get
+    }
+
+    def getBounds(nanobots: Seq[Nanobot], box: Box3): (Int, Int) = {
+      val lower = nanobots.count(_.contains(box))
+      val upper = nanobots.count(_.overlaps(box))
+      (lower, upper)
+    }
+
+    def getSplits(box: Box3): Set[Box3] = {
+      val Box3(min, max) = box
+      /*if (min.x == max.x)
+        return Set()*/
+      val mid = Pos3((min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2)
+      Set(
+        Box3(Pos3(min.x, min.y, min.z), Pos3(mid.x, mid.y, mid.z)),
+        Box3(Pos3(mid.x, min.y, min.z), Pos3(max.x, mid.y, mid.z)),
+        Box3(Pos3(min.x, mid.y, min.z), Pos3(mid.x, max.y, mid.z)),
+        Box3(Pos3(min.x, min.y, mid.z), Pos3(mid.x, mid.y, max.z)),
+        Box3(Pos3(mid.x, mid.y, min.z), Pos3(max.x, max.y, mid.z)),
+        Box3(Pos3(min.x, mid.y, mid.z), Pos3(mid.x, max.y, max.z)),
+        Box3(Pos3(mid.x, min.y, mid.z), Pos3(max.x, mid.y, max.z)),
+        Box3(Pos3(mid.x, mid.y, mid.z), Pos3(max.x, max.y, max.z)),
+        /*Box3(Pos3(min.x, min.y, min.z), Pos3(mid.x, mid.y, mid.z)),
+        Box3(Pos3(mid.x + 1, min.y, min.z), Pos3(max.x, mid.y, mid.z)),
+        Box3(Pos3(min.x, mid.y + 1, min.z), Pos3(mid.x, max.y, mid.z)),
+        Box3(Pos3(min.x, min.y, mid.z + 1), Pos3(mid.x, mid.y, max.z)),
+        Box3(Pos3(mid.x + 1, mid.y + 1, min.z), Pos3(max.x, max.y, mid.z)),
+        Box3(Pos3(min.x, mid.y + 1, mid.z + 1), Pos3(mid.x, max.y, max.z)),
+        Box3(Pos3(mid.x + 1, min.y, mid.z + 1), Pos3(max.x, mid.y, max.z)),
+        Box3(Pos3(mid.x + 1, mid.y + 1, mid.z + 1), Pos3(max.x, max.y, max.z)),*/
+      //).filter(box => box.min.x <= box.max.x && box.min.y <= box.max.y && box.min.z <= box.max.z)
+      ) // ensuring(_.forall(box => box.min.x <= box.max.x && box.min.y <= box.max.y && box.min.z <= box.max.z), box)
+    }
+
+    def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+      val queue: mutable.PriorityQueue[(Box3, (Int, Int), Int)] =
+        mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
+          (upper, lower, -originDist)
+          //(upper, -octahedron.radius, -originDist) // much faster but possibly incorrect?
+        }))
+      val done: mutable.Set[Box3] = mutable.Set.empty
+
+      def enqueue(box: Box3): Unit = {
+        queue.enqueue((box, getBounds(nanobots, box), box.closestTo(Pos3(0, 0, 0)) manhattanDistance Pos3(0, 0, 0)))
+      }
+
+      val initialBox = getInitialBox(nanobots)
+      enqueue(initialBox)
+
+      /*breakable {
+        while (queue.nonEmpty) {
+          val (box, (lower, upper), originDist) = queue.dequeue()
+          if (!done.contains(box)) {
+            done += box
+
+            println(s"$box $lower $upper")
+
+            if (lower == upper) {
+              println(s"ret: $box $lower $upper")
+              return originDist
+            }
+
+            for (splitBox <- getSplits(box))
+              enqueue(splitBox)
+          }
+          else
+            println(s"dup: $box")
+        }
+      }
+      ???*/
+
+      var closestBox: Option[(Box3, Int, Int)] = None
+      breakable {
+        while (queue.nonEmpty) {
+          val (box, (lower, upper), originDist) = queue.dequeue()
+          if (!done.contains(box)) {
+            done += box
+
+            if (closestBox.exists(_._2 > upper))
+              break()
+            else if (lower == upper) {
+              println(s"$box $upper $originDist")
+              closestBox match {
+                case None =>
+                  closestBox = Some((box, upper, originDist))
+                  //break()
+                case Some((_, closestUpper, closestOriginDist)) =>
+                  if (originDist < closestOriginDist)
+                    closestBox = Some((box, upper, originDist))
+              }
+            }
+
+            for (splitBox <- getSplits(box))
+              enqueue(splitBox)
+          }
+        }
+      }
+      println(s"ret: $closestBox")
+      closestBox.get._3
+    }
+  }
+
   object Clique4Part2Solution extends Part2Solution {
 
     implicit class Pos4Ops(pos4: Pos4) {

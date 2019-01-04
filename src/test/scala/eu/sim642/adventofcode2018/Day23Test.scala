@@ -3,14 +3,15 @@ package eu.sim642.adventofcode2018
 import org.scalatest.{FunSuite, Suites}
 import Day23._
 import eu.sim642.adventofcode2017.Day20.Pos3
-import eu.sim642.adventofcode2018.Day23Test.{CliquePart2SolutionTest, Clique4Part2SolutionTest, Part1Test, SplittingPart2SolutionTest}
+import eu.sim642.adventofcode2018.Day23Test._
 import org.scalatest.prop.PropertyChecks
 
 class Day23Test extends Suites(
-  new Part1Test,
+  //new Part1Test,
   //new CliquePart2SolutionTest,
-  new SplittingPart2SolutionTest,
-  new Clique4Part2SolutionTest,
+  //new SplittingPart2SolutionTest,
+  new Splitting2Part2SolutionTest,
+  //new Clique4Part2SolutionTest,
 )
 
 object Day23Test {
@@ -84,6 +85,7 @@ object Day23Test {
         )
 
         assert(part2Solution.closestMostNanobots(nanobots) == 2)
+        println("-----")
       }
     }
 
@@ -125,6 +127,7 @@ object Day23Test {
         )
 
         assert(part2Solution.closestMostNanobots(nanobots) == 3)
+        println("-----")
       }
     }
 
@@ -160,6 +163,8 @@ object Day23Test {
   class CliquePart2SolutionTest extends Part2SolutionTest(CliquePart2Solution)
 
   class SplittingPart2SolutionTest extends Part2SolutionTest(SplittingPart2Solution)
+
+  class Splitting2Part2SolutionTest extends Part2SolutionTest(Splitting2Part2Solution)
 
   class Clique4Part2SolutionTest extends Part2SolutionTest(Clique4Part2Solution)
 }
