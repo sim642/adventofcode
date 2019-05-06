@@ -85,7 +85,6 @@ object Day23Test {
         )
 
         assert(part2Solution.closestMostNanobots(nanobots) == 2)
-        println("-----")
       }
     }
 
@@ -127,7 +126,6 @@ object Day23Test {
         )
 
         assert(part2Solution.closestMostNanobots(nanobots) == 3)
-        println("-----")
       }
     }
 

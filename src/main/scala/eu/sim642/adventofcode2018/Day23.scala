@@ -294,14 +294,6 @@ object Day23 {
         return Set()
       val mid = Pos3((min.x + max.x) floorDiv 2, (min.y + max.y) floorDiv 2, (min.z + max.z) floorDiv 2)
       Set(
-        /*Box3(Pos3(min.x, min.y, min.z), Pos3(mid.x, mid.y, mid.z)),
-        Box3(Pos3(mid.x, min.y, min.z), Pos3(max.x, mid.y, mid.z)),
-        Box3(Pos3(min.x, mid.y, min.z), Pos3(mid.x, max.y, mid.z)),
-        Box3(Pos3(min.x, min.y, mid.z), Pos3(mid.x, mid.y, max.z)),
-        Box3(Pos3(mid.x, mid.y, min.z), Pos3(max.x, max.y, mid.z)),
-        Box3(Pos3(min.x, mid.y, mid.z), Pos3(mid.x, max.y, max.z)),
-        Box3(Pos3(mid.x, min.y, mid.z), Pos3(max.x, mid.y, max.z)),
-        Box3(Pos3(mid.x, mid.y, mid.z), Pos3(max.x, max.y, max.z)),*/
         Box3(Pos3(min.x, min.y, min.z), Pos3(mid.x, mid.y, mid.z)),
         Box3(Pos3(mid.x + 1, min.y, min.z), Pos3(max.x, mid.y, mid.z)),
         Box3(Pos3(min.x, mid.y + 1, min.z), Pos3(mid.x, max.y, mid.z)),
@@ -310,7 +302,6 @@ object Day23 {
         Box3(Pos3(min.x, mid.y + 1, mid.z + 1), Pos3(mid.x, max.y, max.z)),
         Box3(Pos3(mid.x + 1, min.y, mid.z + 1), Pos3(max.x, mid.y, max.z)),
         Box3(Pos3(mid.x + 1, mid.y + 1, mid.z + 1), Pos3(max.x, max.y, max.z)),
-      //).filter(box => box.min.x <= box.max.x && box.min.y <= box.max.y && box.min.z <= box.max.z)
       ) ensuring(_.forall(box => box.min.x <= box.max.x && box.min.y <= box.max.y && box.min.z <= box.max.z), box)
     }
 
@@ -329,28 +320,6 @@ object Day23 {
       val initialBox = getInitialBox(nanobots)
       enqueue(initialBox)
 
-      /*breakable {
-        while (queue.nonEmpty) {
-          val (box, (lower, upper), originDist) = queue.dequeue()
-          if (!done.contains(box)) {
-            done += box
-
-            println(s"$box $lower $upper")
-
-            if (lower == upper) {
-              println(s"ret: $box $lower $upper")
-              return originDist
-            }
-
-            for (splitBox <- getSplits(box))
-              enqueue(splitBox)
-          }
-          else
-            println(s"dup: $box")
-        }
-      }
-      ???*/
-
       var closestBox: Option[(Box3, Int, Int)] = None
       breakable {
         while (queue.nonEmpty) {
@@ -361,7 +330,6 @@ object Day23 {
             if (closestBox.exists(_._2 > upper))
               break()
             else if (lower == upper) {
-              //println(s"$box $upper $originDist")
               closestBox match {
                 case None =>
                   closestBox = Some((box, upper, originDist))
@@ -375,11 +343,10 @@ object Day23 {
             for (splitBox <- getSplits(box))
               enqueue(splitBox)
           }
-          else
-            println(s"dup: $box")
+          //else
+          //  println(s"dup: $box")
         }
       }
-      //println(s"ret: $closestBox")
       closestBox.get._3
     }
   }
