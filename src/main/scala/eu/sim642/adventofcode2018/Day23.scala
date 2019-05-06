@@ -150,8 +150,111 @@ object Day23 {
     }
   }
 
-  object OctahedronSplittingPart2Solution extends Part2Solution {
-    def getInitialOctahedron(nanobots: Seq[Nanobot]): Nanobot = {
+  trait SplittingPart2Solution extends Part2Solution {
+    type A
+
+    def getInitial(nanobots: Seq[Nanobot]): A
+
+    def nanobotContains(nanobot: Nanobot, a: A): Boolean
+
+    def nanobotOverlaps(nanobot: Nanobot, a: A): Boolean
+
+    def getBounds(nanobots: Seq[Nanobot], a: A): (Int, Int) = {
+      val lower = nanobots.count(nanobotContains(_, a))
+      val upper = nanobots.count(nanobotOverlaps(_, a))
+      (lower, upper)
+    }
+
+    def getSplits(a: A): Set[A]
+
+    def originDistance(a: A): Int
+  }
+
+  trait GreedySplittingPart2Solution extends SplittingPart2Solution {
+    override def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+      val queue: mutable.PriorityQueue[(A, (Int, Int), Int)] =
+        mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
+          (upper, lower, -originDist)
+          //(upper, -a.radius, -originDist) // much faster but possibly incorrect?
+        }))
+      val done: mutable.Set[A] = mutable.Set.empty
+
+      def enqueue(a: A): Unit = {
+        queue.enqueue((a, getBounds(nanobots, a), originDistance(a)))
+      }
+
+      val initial = getInitial(nanobots)
+      enqueue(initial)
+
+      breakable {
+        while (queue.nonEmpty) {
+          val (a, (lower, upper), originDist) = queue.dequeue()
+          if (!done.contains(a)) {
+            done += a
+
+            if (lower == upper)
+              return originDist
+
+            for (splitOctahedron <- getSplits(a))
+              enqueue(splitOctahedron)
+          }
+        }
+      }
+      ???
+    }
+  }
+
+  trait NonGreedySplittingPart2Solution extends SplittingPart2Solution {
+    override def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
+      val queue: mutable.PriorityQueue[(A, (Int, Int), Int)] =
+        mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
+          (upper, lower, -originDist)
+          //(upper, -a.radius, -originDist) // much faster but possibly incorrect?
+        }))
+      val done: mutable.Set[A] = mutable.Set.empty
+
+      def enqueue(a: A): Unit = {
+        queue.enqueue((a, getBounds(nanobots, a), originDistance(a)))
+      }
+
+      val initial = getInitial(nanobots)
+      enqueue(initial)
+
+      var closest: Option[(A, Int, Int)] = None
+      breakable {
+        while (queue.nonEmpty) {
+          val (a, (lower, upper), originDist) = queue.dequeue()
+          if (!done.contains(a)) {
+            done += a
+
+            if (closest.exists(_._2 > upper))
+              break()
+            else if (lower == upper) {
+              closest match {
+                case None =>
+                  closest = Some((a, upper, originDist))
+                //break()
+                case Some((_, closestUpper, closestOriginDist)) =>
+                  if (originDist < closestOriginDist)
+                    closest = Some((a, upper, originDist))
+              }
+            }
+
+            for (splitBox <- getSplits(a))
+              enqueue(splitBox)
+          }
+          //else
+          //  println(s"dup: $box")
+        }
+      }
+      closest.get._3
+    }
+  }
+
+  object OctahedronSplittingPart2Solution extends GreedySplittingPart2Solution {
+    override type A = Nanobot
+
+    override def getInitial(nanobots: Seq[Nanobot]): Nanobot = {
       //val initPos = Pos3(0, 0, 0)
       val poss = nanobots.map(_.pos)
       val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
@@ -162,13 +265,10 @@ object Day23 {
       Nanobot(initPos, radius)
     }
 
-    def getBounds(nanobots: Seq[Nanobot], octahedron: Nanobot): (Int, Int) = {
-      val lower = nanobots.count(_.contains(octahedron))
-      val upper = nanobots.count(_.overlaps(octahedron))
-      (lower, upper)
-    }
+    override def nanobotContains(nanobot: Nanobot, octahedron: Nanobot): Boolean = nanobot.contains(octahedron)
+    override def nanobotOverlaps(nanobot: Nanobot, octahedron: Nanobot): Boolean = nanobot.overlaps(octahedron)
 
-    def getSplits(octahedron: Nanobot): Set[Nanobot] = {
+    override def getSplits(octahedron: Nanobot): Set[Nanobot] = {
       val Nanobot(pos, radius) = octahedron
       val offset = {
         // rounding corrections by VikeStep
@@ -199,40 +299,10 @@ object Day23 {
       offsets.map(offset => Nanobot(pos + offset, newRadius))
     }
 
-    def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-      val queue: mutable.PriorityQueue[(Nanobot, (Int, Int), Int)] =
-        mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
-          (upper, lower, -originDist)
-          //(upper, -octahedron.radius, -originDist) // much faster but possibly incorrect?
-        }))
-      val done: mutable.Set[Nanobot] = mutable.Set.empty
-
-      def enqueue(octahedron: Nanobot): Unit = {
-        queue.enqueue((octahedron, getBounds(nanobots, octahedron), (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius))
-      }
-
-      val initialOctahedron = getInitialOctahedron(nanobots)
-      enqueue(initialOctahedron)
-
-      breakable {
-        while (queue.nonEmpty) {
-          val (octahedron, (lower, upper), originDist) = queue.dequeue()
-          if (!done.contains(octahedron)) {
-            done += octahedron
-
-            if (lower == upper)
-              return originDist
-
-            for (splitOctahedron <- getSplits(octahedron))
-              enqueue(splitOctahedron)
-          }
-        }
-      }
-      ???
-    }
+    override def originDistance(octahedron: Nanobot): Int = (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius
   }
 
-  object BoxSplittingPart2Solution extends Part2Solution {
+  object BoxSplittingPart2Solution extends NonGreedySplittingPart2Solution {
 
     private def clamp(min: Int, max: Int)(value: Int): Int = {
       if (value < min)
@@ -266,7 +336,9 @@ object Day23 {
       def overlaps(box: Box3): Boolean = nanobot.contains(box.closestTo(nanobot.pos))
     }
 
-    def getInitialBox(nanobots: Seq[Nanobot]): Box3 = {
+    override type A = Box3
+
+    override def getInitial(nanobots: Seq[Nanobot]): Box3 = {
       //val initPos = Pos3(0, 0, 0)
       val poss = nanobots.map(_.pos)
       val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
@@ -278,17 +350,15 @@ object Day23 {
       }).find(box => nanobots.forall(box.contains)).get
     }
 
-    def getBounds(nanobots: Seq[Nanobot], box: Box3): (Int, Int) = {
-      val lower = nanobots.count(_.contains(box))
-      val upper = nanobots.count(_.overlaps(box))
-      (lower, upper)
-    }
+
+    override def nanobotContains(nanobot: Nanobot, box: Box3): Boolean = nanobot.contains(box)
+    override def nanobotOverlaps(nanobot: Nanobot, box: Box3): Boolean = nanobot.overlaps(box)
 
     implicit class FloorDivideInt(n: Int) {
       def floorDiv(d: Int): Int = Math.floorDiv(n, d)
     }
 
-    def getSplits(box: Box3): Set[Box3] = {
+    override def getSplits(box: Box3): Set[Box3] = {
       val Box3(min, max) = box
       if (min.x == max.x)
         return Set()
@@ -305,50 +375,7 @@ object Day23 {
       ) ensuring(_.forall(box => box.min.x <= box.max.x && box.min.y <= box.max.y && box.min.z <= box.max.z), box)
     }
 
-    def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-      val queue: mutable.PriorityQueue[(Box3, (Int, Int), Int)] =
-        mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
-          (upper, lower, -originDist)
-          //(upper, -octahedron.radius, -originDist) // much faster but possibly incorrect?
-        }))
-      val done: mutable.Set[Box3] = mutable.Set.empty
-
-      def enqueue(box: Box3): Unit = {
-        queue.enqueue((box, getBounds(nanobots, box), box.closestTo(Pos3(0, 0, 0)) manhattanDistance Pos3(0, 0, 0)))
-      }
-
-      val initialBox = getInitialBox(nanobots)
-      enqueue(initialBox)
-
-      var closestBox: Option[(Box3, Int, Int)] = None
-      breakable {
-        while (queue.nonEmpty) {
-          val (box, (lower, upper), originDist) = queue.dequeue()
-          if (!done.contains(box)) {
-            done += box
-
-            if (closestBox.exists(_._2 > upper))
-              break()
-            else if (lower == upper) {
-              closestBox match {
-                case None =>
-                  closestBox = Some((box, upper, originDist))
-                  //break()
-                case Some((_, closestUpper, closestOriginDist)) =>
-                  if (originDist < closestOriginDist)
-                    closestBox = Some((box, upper, originDist))
-              }
-            }
-
-            for (splitBox <- getSplits(box))
-              enqueue(splitBox)
-          }
-          //else
-          //  println(s"dup: $box")
-        }
-      }
-      closestBox.get._3
-    }
+    override def originDistance(box: Box3): Int = box.closestTo(Pos3(0, 0, 0)) manhattanDistance Pos3(0, 0, 0)
   }
 
 
