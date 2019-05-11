@@ -29,6 +29,14 @@ class Day20Test extends FunSuite {
     assert(furthestRoom(exampleInput6) == 31)
   }
 
+  test("Part 1 exponential choice") {
+    assert(furthestRoom("^N(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)(NS|)$") == 2)
+  }
+
+  test("Part 1 non-first choice") {
+    assert(furthestRoom("^N(NS|EEWW)(NS|)$") == 3)
+  }
+
   test("Part 1 input answer") {
     assert(furthestRoom(input) == 3633)
   }

@@ -16,10 +16,18 @@ object Day20 extends RegexParsers {
     case StringNode(s) => Iterator(s)
     case ChoiceNode(choices) => choices.flatMap(allStrings).toIterator
     case ConcatNode(concats) => concats.foldLeft(Iterator(""))({ (acc, node) =>
-      val nodeStrings = allStrings(node)
+      // works on actual inputs, but doesn't construct all strings...
+      // nodeStrings iterator gets exhausted after first, other branches ignored
+      /*val nodeStrings = allStrings(node)
       for {
         s1 <- acc
         s2 <- nodeStrings
+      } yield s1 + s2*/
+
+      // correctly constructs all strings, too much for actual inputs
+      for {
+        s1 <- acc
+        s2 <- allStrings(node)
       } yield s1 + s2
     })
   }
