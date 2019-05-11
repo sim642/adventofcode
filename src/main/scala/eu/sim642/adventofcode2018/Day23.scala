@@ -151,23 +151,22 @@ object Day23 {
   }
 
   trait SplittingPart2Solution extends Part2Solution {
-    type A
+    trait ALike {
+      def containedBy(nanobot: Nanobot): Boolean
+      def overlaps(nanobot: Nanobot): Boolean
+      def originDistance: Int
+    }
+    type A <: ALike
 
     def getInitial(nanobots: Seq[Nanobot]): A
 
-    def nanobotContains(nanobot: Nanobot, a: A): Boolean
-
-    def nanobotOverlaps(nanobot: Nanobot, a: A): Boolean
-
     def getBounds(nanobots: Seq[Nanobot], a: A): (Int, Int) = {
-      val lower = nanobots.count(nanobotContains(_, a))
-      val upper = nanobots.count(nanobotOverlaps(_, a))
+      val lower = nanobots.count(a.containedBy)
+      val upper = nanobots.count(a.overlaps)
       (lower, upper)
     }
 
     def getSplits(a: A): Set[A]
-
-    def originDistance(a: A): Int
   }
 
   trait GreedySplittingPart2Solution extends SplittingPart2Solution {
@@ -180,7 +179,7 @@ object Day23 {
       val done: mutable.Set[A] = mutable.Set.empty
 
       def enqueue(a: A): Unit = {
-        queue.enqueue((a, getBounds(nanobots, a), originDistance(a)))
+        queue.enqueue((a, getBounds(nanobots, a), a.originDistance))
       }
 
       val initial = getInitial(nanobots)
@@ -214,7 +213,7 @@ object Day23 {
       val done: mutable.Set[A] = mutable.Set.empty
 
       def enqueue(a: A): Unit = {
-        queue.enqueue((a, getBounds(nanobots, a), originDistance(a)))
+        queue.enqueue((a, getBounds(nanobots, a), a.originDistance))
       }
 
       val initial = getInitial(nanobots)
@@ -252,9 +251,15 @@ object Day23 {
   }
 
   object OctahedronSplittingPart2Solution extends GreedySplittingPart2Solution {
-    override type A = Nanobot
+    case class Octahedron(override val pos: Pos3, override val radius: Int) extends Nanobot(pos, radius) with ALike {
+      override def containedBy(nanobot: Nanobot): Boolean = nanobot.contains(this)
 
-    override def getInitial(nanobots: Seq[Nanobot]): Nanobot = {
+      override def originDistance: Int = (pos manhattanDistance Pos3(0, 0, 0)) - radius
+    }
+
+    override type A = Octahedron
+
+    override def getInitial(nanobots: Seq[Nanobot]): Octahedron = {
       //val initPos = Pos3(0, 0, 0)
       val poss = nanobots.map(_.pos)
       val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
@@ -262,14 +267,14 @@ object Day23 {
       val initZ = (poss.map(_.z).min + poss.map(_.z).max) / 2
       val initPos = Pos3(initX, initY, initZ)
       val radius = nanobots.map(nanobot => (initPos manhattanDistance nanobot.pos) + nanobot.radius).max
-      Nanobot(initPos, radius)
+      Octahedron(initPos, radius)
     }
 
-    override def nanobotContains(nanobot: Nanobot, octahedron: Nanobot): Boolean = nanobot.contains(octahedron)
-    override def nanobotOverlaps(nanobot: Nanobot, octahedron: Nanobot): Boolean = nanobot.overlaps(octahedron)
+    //override def nanobotContains(nanobot: Nanobot, octahedron: Nanobot): Boolean = nanobot.contains(octahedron)
+    //override def nanobotOverlaps(nanobot: Nanobot, octahedron: Nanobot): Boolean = nanobot.overlaps(octahedron)
 
-    override def getSplits(octahedron: Nanobot): Set[Nanobot] = {
-      val Nanobot(pos, radius) = octahedron
+    override def getSplits(octahedron: Octahedron): Set[Octahedron] = {
+      val Octahedron(pos, radius) = octahedron
       val offset = {
         // rounding corrections by VikeStep
         // Nanobot(Pos3(30, 30, 30), 55) splits should still contains Pos3(12, 12, 12)
@@ -296,10 +301,10 @@ object Day23 {
         else
           axisOffsets
       }
-      offsets.map(offset => Nanobot(pos + offset, newRadius))
+      offsets.map(offset => Octahedron(pos + offset, newRadius))
     }
 
-    override def originDistance(octahedron: Nanobot): Int = (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius
+    //override def originDistance(octahedron: Nanobot): Int = (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius
   }
 
   object BoxSplittingPart2Solution extends NonGreedySplittingPart2Solution {
@@ -351,8 +356,8 @@ object Day23 {
     }
 
 
-    override def nanobotContains(nanobot: Nanobot, box: Box3): Boolean = nanobot.contains(box)
-    override def nanobotOverlaps(nanobot: Nanobot, box: Box3): Boolean = nanobot.overlaps(box)
+    //override def nanobotContains(nanobot: Nanobot, box: Box3): Boolean = nanobot.contains(box)
+    //override def nanobotOverlaps(nanobot: Nanobot, box: Box3): Boolean = nanobot.overlaps(box)
 
     implicit class FloorDivideInt(n: Int) {
       def floorDiv(d: Int): Int = Math.floorDiv(n, d)
@@ -375,7 +380,7 @@ object Day23 {
       ) ensuring(_.forall(box => box.min.x <= box.max.x && box.min.y <= box.max.y && box.min.z <= box.max.z), box)
     }
 
-    override def originDistance(box: Box3): Int = box.closestTo(Pos3(0, 0, 0)) manhattanDistance Pos3(0, 0, 0)
+    //override def originDistance(box: Box3): Int = box.closestTo(Pos3(0, 0, 0)) manhattanDistance Pos3(0, 0, 0)
   }
 
 

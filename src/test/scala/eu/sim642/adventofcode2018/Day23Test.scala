@@ -9,7 +9,7 @@ import org.scalatest.prop.PropertyChecks
 class Day23Test extends Suites(
   new Part1Test,
   //new NaiveCliquePart2SolutionTest,
-  new FourDimCliquePart2SolutionTest,
+  //new FourDimCliquePart2SolutionTest,
   new OctahedronSplittingPart2SolutionTest,
   new BoxSplittingPart2SolutionTest,
 )
