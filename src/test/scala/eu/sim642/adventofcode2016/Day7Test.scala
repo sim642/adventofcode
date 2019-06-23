@@ -15,4 +15,15 @@ class Day7Test extends FunSuite {
   test("Part 1 input answer") {
     assert(countSupportsTLS(input) == 115)
   }
+
+  test("Part 2 examples") {
+    assert(supportsSSL("aba[bab]xyz"))
+    assert(!supportsSSL("xyx[xyx]xyx"))
+    assert(supportsSSL("aaa[kek]eke"))
+    assert(supportsSSL("zazbz[bzb]cdb"))
+  }
+
+  test("Part 2 input answer") {
+    assert(countSupportsSSL(input) == 231)
+  }
 }
