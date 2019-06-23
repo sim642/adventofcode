@@ -19,6 +19,10 @@ class Day3Test extends FunSuite {
   }
 
   test("Part 1 input answer") {
-    assert(countPossibleTriangles(input) == 1050)
+    assert(Part1.countPossibleTriangles(input) == 1050)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.countPossibleTriangles(input) == 1921)
   }
 }
