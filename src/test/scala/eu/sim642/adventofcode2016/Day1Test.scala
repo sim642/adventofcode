@@ -18,4 +18,12 @@ class Day1Test extends FunSuite {
   test("Part 1 input answer") {
     assert(shortestDestinationDist(input) == 209)
   }
+
+  test("Part 2 examples") {
+    assert(firstTwiceDist("R8, R4, R4, R8") == 4)
+  }
+
+  test("Part 2 input answer") {
+    assert(firstTwiceDist(input) == 136)
+  }
 }

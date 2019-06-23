@@ -4,6 +4,7 @@ import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2018.Day10.PosScalar
 import eu.sim642.adventofcode2018.Day13.DirectionPos
 
+import scala.collection.mutable
 import scala.util.matching.Regex
 
 object Day1 {
@@ -22,6 +23,15 @@ object Day1 {
       }
       State(pos + instruction.n *: newDir, newDir)
     }
+
+    def applyIntermediate(instruction: Instruction): Iterator[State] = {
+      val newDir = instruction match {
+        case Left(_) => dir.left
+        case Right(_) => dir.right
+      }
+      for (i <- (1 to instruction.n).iterator)
+        yield State(pos + i *: newDir, newDir)
+    }
   }
 
   object State {
@@ -31,6 +41,30 @@ object Day1 {
   def shortestDestinationDist(instructions: Seq[Instruction]): Int = {
     val finalState = instructions.foldLeft(State.initial)(_(_))
     finalState.pos manhattanDistance Pos(0, 0)
+  }
+
+  def firstTwiceDist(instructions: Seq[Instruction]): Int = {
+    //val posIt = instructions.scanLeft(State.initial)(_(_)).map(_.pos)
+
+    /*val stateItBuilder = Iterator.IteratorCanBuildFrom[State].newIterator
+    var acc = State.initial
+    for (instruction <- instructions) {
+      val intermediates = acc.applyIntermediate(instruction)
+      for (i <- intermediates) {
+        stateItBuilder += i
+        acc = i
+      }
+    }
+    val posIt = stateItBuilder.result().map(_.pos)*/
+
+    // TODO: is this really the best way to get scanLeft combined with flatMap?
+    val posIt = instructions.foldLeft((State.initial, Iterator(State.initial)))({ case ((accState, accIterator), instruction) =>
+      (accState(instruction), accIterator ++ accState.applyIntermediate(instruction))
+    })._2.map(_.pos)
+
+    val prevPoss = mutable.Set[Pos]()
+    val firstTwicePos = posIt.find(!prevPoss.add(_)).get // nasty side-effecting find
+    firstTwicePos manhattanDistance Pos(0, 0)
   }
 
   private val instructionRegex: Regex = """([LR])(\d+)""".r
@@ -49,9 +83,12 @@ object Day1 {
 
   def shortestDestinationDist(input: String): Int = shortestDestinationDist(parseInstructions(input))
 
+  def firstTwiceDist(input: String): Int = firstTwiceDist(parseInstructions(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day1.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(shortestDestinationDist(input))
+    println(firstTwiceDist(input))
   }
 }
