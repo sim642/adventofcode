@@ -24,4 +24,12 @@ class Day4Test extends FunSuite {
   test("Part 1 input answer") {
     assert(realSectorIdSum(input) == 409147)
   }
+
+  test("Part 2 examples") {
+    assert(decrypt("qzmt-zixmtkozy-ivhz", 343) == "very encrypted name")
+  }
+
+  test("Part 2 input answer") {
+    assert(northPoleObjectsSectorId(input) == 991)
+  }
 }

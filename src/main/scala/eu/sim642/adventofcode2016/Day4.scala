@@ -14,6 +14,17 @@ object Day4 {
 
   def realSectorIdSum(rooms: Seq[Room]): Int = rooms.filter(isReal).map(_.sectorId).sum
 
+  def decrypt(name: String, sectorId: Int): String = {
+    name.map({
+      case '-' => ' '
+      case c => ('a' + (((c - 'a') + sectorId) % ('z' - 'a' + 1))).toChar
+    }).mkString("")
+  }
+
+  def northPoleObjectsSectorId(rooms: Seq[Room]): Int = {
+    rooms.find(room => decrypt(room.name, room.sectorId) == "northpole object storage").get.sectorId
+  }
+
   private val roomRegex = """([a-z\-]+)-(\d+)\[([a-z]+)\]""".r
 
   def parseRoom(roomStr: String): Room = roomStr match {
@@ -25,9 +36,12 @@ object Day4 {
 
   def realSectorIdSum(input: String): Int = realSectorIdSum(parseRooms(input))
 
+  def northPoleObjectsSectorId(input: String): Int = northPoleObjectsSectorId(parseRooms(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(realSectorIdSum(input))
+    println(northPoleObjectsSectorId(input))
   }
 }
