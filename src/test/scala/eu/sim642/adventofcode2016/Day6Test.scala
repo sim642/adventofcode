@@ -24,10 +24,18 @@ class Day6Test extends FunSuite {
       |enarar""".stripMargin
 
   test("Part 1 examples") {
-    assert(errorCorrect(exampleInput) == "easter")
+    assert(Part1.errorCorrect(exampleInput) == "easter")
   }
 
   test("Part 1 input answer") {
-    assert(errorCorrect(input) == "umcvzsmw")
+    assert(Part1.errorCorrect(input) == "umcvzsmw")
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.errorCorrect(exampleInput) == "advent")
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.errorCorrect(input) == "rwqoacfz")
   }
 }
