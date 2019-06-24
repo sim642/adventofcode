@@ -8,4 +8,8 @@ class Day8Test extends FunSuite {
   test("Part 1 input answer") {
     assert(litPixels(input) == 106)
   }
+
+  test("Part 2 input answer") {
+    render(input) // CFLELOYFCS
+  }
 }

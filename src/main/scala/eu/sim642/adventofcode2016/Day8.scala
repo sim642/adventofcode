@@ -1,5 +1,10 @@
 package eu.sim642.adventofcode2016
 
+import eu.sim642.adventofcode2017.Day19.Grid
+import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcode2017.Day14.PosGrid
+import eu.sim642.adventofcode2018.Day6.iterateRect
+
 object Day8 {
 
   sealed trait Operation
@@ -13,6 +18,46 @@ object Day8 {
       case Rect(a, b) => a * b
       case _ => 0
     }).sum
+  }
+
+  implicit class PosUpdatedGrid[A](grid: Grid[A]) {
+    def updatedGrid(pos: Pos, elem: A): Grid[A] = {
+      grid.updated(pos.y, grid(pos.y).updated(pos.x, elem))
+    }
+  }
+
+  def execute(grid: Grid[Boolean], operation: Operation): Grid[Boolean] = operation match {
+    case Rect(a, b) =>
+      iterateRect(Pos(0, 0), Pos(a - 1, b - 1)).foldLeft(grid)(_.updatedGrid(_, true))
+    case RotateRow(y, by) =>
+      grid(y).indices.map(Pos(_, y)).foldLeft(grid)({ (acc, pos) =>
+        val newPos = Pos((pos.x + by) % grid(y).size, pos.y)
+        acc.updatedGrid(newPos, grid(pos))
+      })
+    case RotateColumn(x, by) =>
+      grid.indices.map(Pos(x, _)).foldLeft(grid)({ (acc, pos) =>
+        val newPos = Pos(pos.x, (pos.y + by) % grid.size)
+        acc.updatedGrid(newPos, grid(pos))
+      })
+  }
+
+  def execute(grid: Grid[Boolean], operations: Seq[Operation]): Grid[Boolean] = {
+    operations.foldLeft(grid)(execute)
+  }
+
+  def printGrid(grid: Grid[Boolean]): Unit = {
+    for (row <- grid) {
+      for (cell <- row) {
+        print(if (cell) '#' else '.')
+      }
+      println()
+    }
+  }
+
+  def render(operations: Seq[Operation]): Unit = {
+    val initialGrid = Vector.fill(6)(Vector.fill(50)(false))
+    val finalGrid = execute(initialGrid, operations)
+    printGrid(finalGrid)
   }
 
   private val rectRegex = """rect (\d+)x(\d+)""".r
@@ -29,9 +74,12 @@ object Day8 {
 
   def litPixels(input: String): Int = litPixels(parseOperations(input))
 
+  def render(input: String): Unit = render(parseOperations(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(litPixels(input))
+    render(input) // CFLELOYFCS
   }
 }
