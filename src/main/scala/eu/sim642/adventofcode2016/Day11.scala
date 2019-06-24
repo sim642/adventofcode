@@ -54,6 +54,17 @@ object Day11 {
 
   def solveSteps(initialState: State): Int = solveSteps(Set.empty, Set(initialState), 0)
 
+  def solveStepsExtra(initialState: State): Int = {
+    val newInitialState = initialState.copy(floorObjects = initialState.floorObjects.updated(0, initialState.floorObjects(0) ++ Set(
+      Generator("elerium"),
+      Microchip("elerium"),
+      Generator("dilithium"),
+      Microchip("dilithium"),
+    )))
+
+    solveSteps(newInitialState)
+  }
+
   private val objectRegex = """(\w+)-compatible microchip|(\w+) generator""".r
 
   def parseInput(input: String): State = {
@@ -73,9 +84,12 @@ object Day11 {
 
   def solveSteps(input: String): Int = solveSteps(parseInput(input))
 
+  def solveStepsExtra(input: String): Int = solveStepsExtra(parseInput(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(solveSteps(input))
+    println(solveStepsExtra(input)) // TODO: optimize a lot
   }
 }

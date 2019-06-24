@@ -33,4 +33,10 @@ class Day11Test extends FunSuite {
   test("Part 1 input answer") {
     assert(solveSteps(input) == 33)
   }
+
+  // needs optimization
+
+  ignore("Part 2 input answer") {
+    assert(solveStepsExtra(input) == 57)
+  }
 }
