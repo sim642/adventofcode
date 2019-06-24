@@ -20,4 +20,12 @@ class Day10Test extends FunSuite {
   test("Part 1 input answer") {
     assert(findComparer(input) == 147)
   }
+
+  test("Part 2 examples") {
+    assert(outputProduct(exampleInput) == 30)
+  }
+
+  test("Part 2 input answer") {
+    assert(outputProduct(input) == 55637)
+  }
 }

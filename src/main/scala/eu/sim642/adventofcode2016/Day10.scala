@@ -14,7 +14,7 @@ object Day10 {
   case class ValueInstruction(bot: Bot, value: Int) extends Instruction
   case class CompareInstruction(bot: Bot, lowTarget: Target, highTarget: Target) extends Instruction
 
-  def findComparer(instructions: Seq[Instruction], compareValues: Set[Int]): Int = {
+  private def execute(instructions: Seq[Instruction]) = {
     // TODO: fix all imperativeness
     val targets = mutable.Map[Target, Set[Int]]().withDefaultValue(Set.empty)
 
@@ -52,8 +52,17 @@ object Day10 {
 
     //println(targets)
     //println(comparisons)
+    (targets, comparisons)
+  }
 
+  def findComparer(instructions: Seq[Instruction], compareValues: Set[Int]): Int = {
+    val comparisons = execute(instructions)._2
     comparisons.find(_._2.contains(compareValues)).get._1.i
+  }
+
+  def outputProduct(instructions: Seq[Instruction]): Int = {
+    val targets = execute(instructions)._1
+    targets(Output(0)).head * targets(Output(1)).head * targets(Output(2)).head
   }
 
   private val valueRegex = """value (\d+) goes to bot (\d+)""".r
@@ -75,9 +84,12 @@ object Day10 {
 
   def findComparer(input: String, compareValues: Set[Int] = Set(61, 17)): Int = findComparer(parseInstructions(input), compareValues)
 
+  def outputProduct(input: String): Int = outputProduct(parseInstructions(input))
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(findComparer(input))
+    println(outputProduct(input))
   }
 }
