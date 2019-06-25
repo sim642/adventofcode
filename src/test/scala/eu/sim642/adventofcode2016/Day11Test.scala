@@ -37,6 +37,6 @@ class Day11Test extends FunSuite {
   // needs optimization
 
   ignore("Part 2 input answer") {
-    assert(solveStepsExtra(input) == 57)
+    assert(solveStepsExtra(input) == 57) // 410 seconds
   }
 }

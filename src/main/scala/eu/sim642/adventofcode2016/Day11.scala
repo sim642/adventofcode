@@ -1,5 +1,8 @@
 package eu.sim642.adventofcode2016
 
+import scala.collection.mutable
+import scala.util.control.Breaks._
+
 object Day11 {
 
   sealed trait Object {
@@ -45,24 +48,63 @@ object Day11 {
     }
   }
 
-  def isFinal(state: State): Boolean = state.floorObjects.view(0, 3).forall(_.isEmpty)
-
-  // bfs adapted from 2018 Day 20
-  def solveSteps(visited: Set[State], toVisit: Set[State], steps: Int): Int = {
-    if (toVisit.exists(isFinal))
-      steps
-    else {
-      val neighbors = for {
-        state <- toVisit.iterator
-        newState <- state.steps
-      } yield newState
-      val newVisited = visited ++ toVisit
-      val newToVisit = neighbors.filter(!visited.contains(_)) // more efficient than -- because visited is large
-      solveSteps(newVisited, newToVisit.toSet, steps + 1)
+  // copied from 2018 Day 22
+  def solveSteps(startState: State): Int = {
+    val targetState = {
+      val allObjects = startState.floorObjects.flatten.toSet
+      State(Vector.fill(4)(Set[Object]()).updated(3, allObjects), 3)
     }
+
+    val visitedDistance: mutable.Map[State, Int] = mutable.Map.empty
+    val toVisit: mutable.PriorityQueue[(Int, Int, State)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
+
+    def heuristic(state: State): Int = {
+      (for {
+        (objects, i) <- state.floorObjects.zipWithIndex
+      } yield {
+        if (objects.size % 2 == 0)
+          2 * (objects.size / 2) * (3 - i)
+        else
+          2 * (objects.size / 2) * (3 - i) + (3 - i)
+      }).sum
+    }
+
+    //println(heuristic(startState))
+    //println(heuristic(targetState))
+
+    def enqueueHeuristically(state: State, dist: Int): Unit = {
+      toVisit.enqueue((dist + heuristic(state), dist, state))
+    }
+
+    enqueueHeuristically(startState, 0)
+
+    breakable {
+      while (toVisit.nonEmpty) {
+        val (_, dist, state) = toVisit.dequeue()
+        if (!visitedDistance.contains(state)) {
+          visitedDistance(state) = dist
+
+          if (state == targetState)
+            break()
+
+          def goNeighbor(newState: State): Unit = {
+            if (!visitedDistance.contains(newState)) { // avoids some unnecessary queue duplication but not all
+              val newDist = dist + 1
+              enqueueHeuristically(newState, newDist)
+            }
+          }
+
+          state.steps.foreach(goNeighbor)
+        }
+      }
+    }
+
+    //println(visitedDistance.size)
+    //println(toVisit.size)
+
+    visitedDistance(targetState)
   }
 
-  def solveSteps(initialState: State): Int = solveSteps(Set.empty, Set(initialState), 0)
 
   def solveStepsExtra(initialState: State): Int = {
     val newInitialState = initialState.copy(floorObjects = initialState.floorObjects.updated(0, initialState.floorObjects(0) ++ Set(
