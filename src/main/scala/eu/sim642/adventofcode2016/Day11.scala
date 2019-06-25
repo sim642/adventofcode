@@ -11,7 +11,7 @@ object Day11 {
 
     def steps: Iterator[State] = {
       def isValid(objects: Set[Object]): Boolean = {
-        val generatorlessMicrochips = objects.filter({
+        val hasGeneratorlessMicrochips = objects.exists({
           case Microchip(element) => !objects.contains(Generator(element))
           case Generator(element) => false
         })
@@ -19,7 +19,7 @@ object Day11 {
           case Microchip(element) => false
           case Generator(element) => true
         })
-        !hasGenerator || generatorlessMicrochips.isEmpty
+        !(hasGenerator && hasGeneratorlessMicrochips)
       }
 
       for {
