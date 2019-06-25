@@ -2,7 +2,9 @@ package eu.sim642.adventofcode2016
 
 object Day11 {
 
-  sealed trait Object
+  sealed trait Object {
+    val element: String
+  }
   case class Microchip(element: String) extends Object
   case class Generator(element: String) extends Object
 
@@ -22,8 +24,16 @@ object Day11 {
         !(hasGenerator && hasGeneratorlessMicrochips)
       }
 
+      val floorDeltas = {
+        if (floorObjects.view(0, elevatorFloor).forall(_.isEmpty))
+          Iterator(1)
+        else
+          Iterator(1, -1)
+      }
+
       for {
-        newElevatorFloor <- Seq(elevatorFloor - 1, elevatorFloor + 1).iterator
+        floorDelta <- floorDeltas
+        newElevatorFloor = elevatorFloor + floorDelta
         if newElevatorFloor >= 0 && newElevatorFloor < 4
         currentObjects = floorObjects(elevatorFloor)
         moveObjects <- currentObjects.subsets(1) ++ currentObjects.subsets(2)
@@ -43,12 +53,12 @@ object Day11 {
       steps
     else {
       val neighbors = for {
-        state <- toVisit
+        state <- toVisit.iterator
         newState <- state.steps
       } yield newState
       val newVisited = visited ++ toVisit
       val newToVisit = neighbors.filter(!visited.contains(_)) // more efficient than -- because visited is large
-      solveSteps(newVisited, newToVisit, steps + 1)
+      solveSteps(newVisited, newToVisit.toSet, steps + 1)
     }
   }
 
