@@ -39,8 +39,8 @@ object Day12 {
       val (startNode, _) = nodeNeighbors.head // take any node
       val group = bfs(nodeNeighbors, startNode) // find its component
       val restNodeNeighbors =
-        nodeNeighbors.filterKeys(!group(_)).mapValues(_.filterNot(group))  // remove component from graph (nodes and edges)
-          .view.force // copy map for efficiency rather than chaining FilteredKeys & MappedValues - https://stackoverflow.com/a/14883167/854540
+        nodeNeighbors.view.filterKeys(!group(_)).mapValues(_.filterNot(group))  // remove component from graph (nodes and edges)
+          .toMap // copy map for efficiency rather than chaining FilteredKeys & MappedValues - https://stackoverflow.com/a/14883167/854540
       bfsGroups(restNodeNeighbors) + group
     }
   }

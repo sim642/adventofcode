@@ -96,7 +96,7 @@ object Day20 extends RegexParsers {
       } yield newPos -> (dist + 1)
       val newVisited = visited ++ toVisit
       //val newToVisit = neighbors -- visited.keys
-      val newToVisit = neighbors.filterKeys(!visited.contains(_)) // more efficient than -- because visited is large
+      val newToVisit = neighbors.view.filterKeys(!visited.contains(_)).toMap // more efficient than -- because visited is large
       if (newToVisit.isEmpty)
         newVisited
       else

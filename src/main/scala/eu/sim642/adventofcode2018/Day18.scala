@@ -35,7 +35,7 @@ object Day18 {
 
     paddedGrid.slidingGrid(3).map(_.map(stepTile).toVector).toVector*/
 
-    (for ((row, y) <- grid.zipWithIndex.par)
+    (for ((row, y) <- grid.zipWithIndex)
       yield for ((cell, x) <- row.zipWithIndex)
         yield {
           val pos = Pos(x, y)

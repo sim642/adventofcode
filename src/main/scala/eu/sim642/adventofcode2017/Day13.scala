@@ -21,7 +21,7 @@ object Day13 {
       range1 - r
   }
 
-  def rangesPositions(ranges: Map[Int, Int], time: Int): Map[Int, Int] = ranges.mapValues(rangePosition(_, time))
+  def rangesPositions(ranges: Map[Int, Int], time: Int): Map[Int, Int] = ranges.view.mapValues(rangePosition(_, time)).toMap
 
   // only needed to check 0
   def rangeCaught(range: Int, time: Int): Boolean = time % (2 * (range - 1)) == 0

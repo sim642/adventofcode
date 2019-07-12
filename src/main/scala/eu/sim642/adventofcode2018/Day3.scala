@@ -33,7 +33,7 @@ object Day3 {
   def nonOverlappingRectangle(rects: Seq[Rectangle]): Int = {
     // TODO: duplication
     val overlaps: mutable.Map[(Int, Int), Rectangle] = mutable.Map.empty
-    val nonOverlaps: mutable.Set[Rectangle] = rects.to[mutable.Set]
+    val nonOverlaps: mutable.Set[Rectangle] = rects.to(mutable.Set)
 
     for {
       rect@Rectangle(_, left, top, width, height) <- rects.toSet

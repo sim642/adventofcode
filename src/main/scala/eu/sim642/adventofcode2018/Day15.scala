@@ -65,7 +65,7 @@ object Day15 {
   }
 
   def getReachable(unit: CombatUnit, inRange: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
-    bfs(unit.pos, inRange).filterKeys(inRange)
+    bfs(unit.pos, inRange).view.filterKeys(inRange).toMap
   }
 
   def getNearest(reachable: Map[Pos, Int]): Set[Pos] = {
@@ -78,7 +78,7 @@ object Day15 {
   def getStep(chosen: Pos, unit: CombatUnit)(implicit grid: Grid[Char], units: List[CombatUnit]): Pos = {
     val unitNeighbors = Pos.axisOffsets.map(unit.pos + _).toSet
     val bfsMap = bfs(chosen, unitNeighbors)
-    val neighborDists = bfsMap.filterKeys(unitNeighbors)
+    val neighborDists = bfsMap.view.filterKeys(unitNeighbors).toMap
     val minDist = neighborDists.values.min
     neighborDists.filter(_._2 == minDist).keys.min
   }

@@ -3,12 +3,12 @@ package eu.sim642.adventofcode2018
 import scala.language.implicitConversions
 
 object Day2 {
-  def letterCounts(id: String): Map[Char, Int] = id.groupBy(c => c).mapValues(_.length)
+  def letterCounts(id: String): Map[Char, Int] = id.toSeq.groupBy(c => c).view.mapValues(_.length).toMap
 
   implicit def bool2Int(b: Boolean): Int = if (b) 1 else 0
 
   def checksum(ids: Seq[String]): Int = {
-    val (cnt2, cnt3) = ids.foldLeft((0, 0)) { case ((cnt2, cnt3), id) =>
+    val (cnt2, cnt3) = ids.foldLeft[(Int, Int)]((0, 0)) { case ((cnt2, cnt3), id) =>
       val idCounts = letterCounts(id).values.toSet
       (cnt2 + idCounts.contains(2), cnt3 + idCounts.contains(3))
     }

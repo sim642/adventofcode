@@ -94,12 +94,12 @@ object Day16 {
       val newOpcodeMap = opcodeMap.updated(opcode, opcodes)
 
       if (opcodes.size == 1) // unit
-        newOpcodeMap.mapValues(o => if (o == opcodes) o else o -- opcodes) // unit propagate
+        newOpcodeMap.view.mapValues(o => if (o == opcodes) o else o -- opcodes).toMap // unit propagate
       else
         newOpcodeMap
     })
     assert(finalOpcodeMap.values.forall(_.size == 1))
-    finalOpcodeMap.mapValues(_.head)
+    finalOpcodeMap.view.mapValues(_.head).toMap
   }
 
   def runProgram(program: Seq[InputInstruction], opcodeMap: Map[Int, String]): Int = {

@@ -83,7 +83,7 @@ object Day20 {
       }
 
       def solveInt(a: Double, b: Double, c: Double): Solution[Int] = solve(a, b, c) match {
-        case Solutions(sols) => Solutions(sols.filter(_.isWhole()).map(_.toInt))
+        case Solutions(sols) => Solutions(sols.filter(_.isWhole).map(_.toInt))
         case AnySolution => AnySolution
       }
 

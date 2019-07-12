@@ -12,7 +12,7 @@ object Day7 {
       case None => revOrder.reverse.mkString("")
       case Some(haveReqStep) =>
         val step = (reqs.keySet -- haveReqStep).min
-        val restReqs = reqs.filterKeys(_ != step)
+        val restReqs = reqs.view.filterKeys(_ != step).toMap
         topologicalSort(restReqs, step :: revOrder)
     }
   }
@@ -44,8 +44,8 @@ object Day7 {
         case Some(haveReqStep) =>
           val inProgress = works.map(_.step)
           val possibleSteps = reqs.keySet -- haveReqStep -- inProgress
-          val newSteps = possibleSteps.to[SortedSet].take(workerCount - works.size)
-          val newWorks = newSteps.map(Work(_))
+          val newSteps = possibleSteps.to(SortedSet).take(workerCount - works.size)
+          val newWorks = newSteps.unsorted.map(Work(_))
           newWorks
       }
     }
