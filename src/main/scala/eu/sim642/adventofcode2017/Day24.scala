@@ -32,7 +32,7 @@ object Day24 {
   implicit class OldIteratorFlatMap[A](it: Iterator[A]) {
     def oldFlatMap[B](f: A => IterableOnce[B]): Iterator[B] = new AbstractIterator[B] {
       private var cur: Iterator[B] = Iterator.empty
-      private def nextCur() { cur = f(it.next()).iterator }
+      private def nextCur(): Unit = { cur = f(it.next()).iterator }
       def hasNext: Boolean = {
         // Equivalent to cur.hasNext || self.hasNext && { nextCur(); hasNext }
         // but slightly shorter bytecode (better JVM inlining!)
