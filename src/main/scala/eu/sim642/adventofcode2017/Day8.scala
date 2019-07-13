@@ -74,7 +74,7 @@ object Day8 {
   private val defaultAmount = 0
 
   def run(instructions: Instructions): Iterator[Registers] = {
-    instructions.toIterator.scanLeft(Map.empty.withDefaultValue(defaultAmount): Registers) { (registers, instruction) =>
+    instructions.iterator.scanLeft(Map.empty.withDefaultValue(defaultAmount): Registers) { (registers, instruction) =>
       if (evalCondition(instruction.condition, registers(instruction.condition.register)))
         registers.updated(instruction.register, execOperation(instruction.operation, registers(instruction.register)))
       else

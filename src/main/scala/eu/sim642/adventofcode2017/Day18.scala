@@ -148,8 +148,8 @@ object Day18 {
 
       val snds0 = newState0.snds
       val snds1 = newState1.snds
-      newState0 = newState0.copy(snds = Queue.empty, rcvs = newState0.rcvs.enqueue(snds1))
-      newState1 = newState1.copy(snds = Queue.empty, rcvs = newState1.rcvs.enqueue(snds0))
+      newState0 = newState0.copy(snds = Queue.empty, rcvs = newState0.rcvs.enqueueAll(snds1))
+      newState1 = newState1.copy(snds = Queue.empty, rcvs = newState1.rcvs.enqueueAll(snds0))
 
       (newState0, newState1)
     }

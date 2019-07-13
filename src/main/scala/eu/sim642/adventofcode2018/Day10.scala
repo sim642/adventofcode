@@ -47,7 +47,7 @@ object Day10 {
           Some((newPoints, newArea))
         else
           None
-      }).map(_._1).toIterator // iterator is much faster because it doesn't keep old states in memory
+      }).map(_._1).iterator // iterator is much faster because it doesn't keep old states in memory
 
       val (minPoints, minSecond) = steps.zipWithIndex.minBy({ case (points, second) =>
         boundingAreaPoints(points)

@@ -124,10 +124,10 @@ object Day23 {
     def box4iterate(box4: Box4): Iterator[Pos4] = {
       val Box4(Pos4(x1, y1, z1, w1), Pos4(x2, y2, z2, w2)) = box4
       for {
-        x <- (x1 to x2).toIterator
-        y <- (y1 to y2).toIterator
-        z <- (z1 to z2).toIterator
-        w <- (w1 to w2).toIterator
+        x <- (x1 to x2).iterator
+        y <- (y1 to y2).iterator
+        z <- (z1 to z2).iterator
+        w <- (w1 to w2).iterator
       } yield Pos4(x, y, z, w)
     }
 

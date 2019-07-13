@@ -14,8 +14,8 @@ object Day6 {
 
   def iterateRect(min: Pos, max: Pos): Iterator[Pos] = {
     for {
-      x <- (min.x to max.x).toIterator
-      y <- (min.y to max.y).toIterator
+      x <- (min.x to max.x).iterator
+      y <- (min.y to max.y).iterator
     } yield Pos(x, y)
   }
 
@@ -36,8 +36,8 @@ object Day6 {
       coord <- closestCoord(pos)
     } yield pos -> coord).toMap
 
-    val finiteGrid = grid.filterKeys(pos => pos.x != min.x && pos.x != max.x && pos.y != min.y && pos.y != max.y)
-    val finiteCoordSizes = finiteGrid.groupBy(_._2).mapValues(_.size)
+    val finiteGrid = grid.view.filterKeys(pos => pos.x != min.x && pos.x != max.x && pos.y != min.y && pos.y != max.y)
+    val finiteCoordSizes = finiteGrid.groupBy(_._2).view.mapValues(_.size)
     finiteCoordSizes.values.max
   }
 

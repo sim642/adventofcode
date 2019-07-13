@@ -158,7 +158,7 @@ object Day15 {
       })
     }
 
-    val attackPowers = (4 to 200).groupBy(e => math.ceil(200.0 / e).toInt).mapValues(_.min).values.toStream.sorted // 20 and 21 both require 10 hits to kill goblin, no point in trying both
+    val attackPowers = (4 to 200).groupBy(e => math.ceil(200.0 / e).toInt).view.mapValues(_.min).values.toStream.sorted // 20 and 21 both require 10 hits to kill goblin, no point in trying both
     attackPowers.flatMap(withElfAttackPower).head // Stream makes flatMapping lazy
   }
 

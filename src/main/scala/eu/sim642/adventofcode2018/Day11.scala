@@ -57,7 +57,7 @@ object Day11 {
     val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Pos(1, 1), Pos(300, 300))
 
     (for {
-      size <- (1 to 300).toIterator
+      size <- (1 to 300).iterator
       pos <- Day6.iterateRect(Pos(1, 1), Pos(300 - size, 300 - size))
     } yield (pos, size)).maxBy({ case (p, s) => sumGrid.sumRect(p, p + Pos(s - 1, s - 1)) })
   }

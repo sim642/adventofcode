@@ -14,7 +14,7 @@ object Day20 extends RegexParsers {
 
   def allStrings(regexNode: RegexNode): Iterator[String] = regexNode match {
     case StringNode(s) => Iterator(s)
-    case ChoiceNode(choices) => choices.flatMap(allStrings).toIterator
+    case ChoiceNode(choices) => choices.flatMap(allStrings).iterator
     case ConcatNode(concats) => concats.foldLeft(Iterator(""))({ (acc, node) =>
       // works on actual inputs, but doesn't construct all strings...
       // nodeStrings iterator gets exhausted after first, other branches ignored

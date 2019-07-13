@@ -7,7 +7,7 @@ import scala.collection.mutable
 object Day12 {
 
   def simulateGeneration(notes: Map[String, Char])(generation: String, startIndex: Int): (String, Int) = {
-    val newGeneration = ("...." + generation + "....").sliding(5).map(notes).mkString("")
+    val newGeneration = ("...." + generation + "....").toSeq.sliding(5).map(s => notes(s.unwrap)).mkString("")
     val firstPlantIndex = newGeneration.indexOf("#")
     val lastPlantIndex = newGeneration.lastIndexOf("#")
     (newGeneration.slice(firstPlantIndex, lastPlantIndex + 1), startIndex + 2 - firstPlantIndex)
