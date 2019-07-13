@@ -2,9 +2,9 @@ package eu.sim642.adventofcode2017
 
 import Day8._
 import org.scalatest.FunSuite
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day8Test extends FunSuite with PropertyChecks {
+class Day8Test extends FunSuite with ScalaCheckPropertyChecks {
 
   val exampleInstructionsStr = """b inc 5 if a > 1
                           |a inc 1 if b < 5

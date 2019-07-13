@@ -2,9 +2,9 @@ package eu.sim642.adventofcode2017
 
 import Day17._
 import org.scalatest.FunSuite
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day17Test extends FunSuite with PropertyChecks {
+class Day17Test extends FunSuite with ScalaCheckPropertyChecks {
 
   test("Part 1 example states") {
     import Part1._

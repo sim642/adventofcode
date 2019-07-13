@@ -3,9 +3,9 @@ package eu.sim642.adventofcode2017
 import Day3._
 import org.scalacheck.Gen
 import org.scalatest.FunSuite
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day3Test extends FunSuite with PropertyChecks {
+class Day3Test extends FunSuite with ScalaCheckPropertyChecks {
 
   test("squarePos") {
     val coords = Table(

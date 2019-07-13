@@ -2,8 +2,8 @@ package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcode2017.Day6._
 import eu.sim642.adventofcode2017.Day6Test._
-import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSuite, Suites}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class Day6Test extends Suites(
   new BaseTest,
@@ -13,7 +13,7 @@ class Day6Test extends Suites(
 
 object Day6Test {
 
-  class BaseTest extends FunSuite with PropertyChecks {
+  class BaseTest extends FunSuite with ScalaCheckPropertyChecks {
     test("reallocCycle") {
       val nextMemories = Table(
         ("memory", "nextMemory"),
@@ -53,7 +53,7 @@ object Day6Test {
     }
   }
 
-  class NaiveSolutionTest extends SolutionTest(NaiveSolution) with PropertyChecks {
+  class NaiveSolutionTest extends SolutionTest(NaiveSolution) with ScalaCheckPropertyChecks {
     test("Part 1 example states") {
       val memories = Table(
         "memory",

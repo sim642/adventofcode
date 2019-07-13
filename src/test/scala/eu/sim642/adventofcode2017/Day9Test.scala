@@ -2,9 +2,9 @@ package eu.sim642.adventofcode2017
 
 import Day9._
 import org.scalatest.FunSuite
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day9Test extends FunSuite with PropertyChecks {
+class Day9Test extends FunSuite with ScalaCheckPropertyChecks {
 
   test("skipGarbage") {
     val strs = Table(

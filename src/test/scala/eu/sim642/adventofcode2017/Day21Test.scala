@@ -2,9 +2,9 @@ package eu.sim642.adventofcode2017
 
 import Day21._
 import org.scalatest.FunSuite
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day21Test extends FunSuite with PropertyChecks {
+class Day21Test extends FunSuite with ScalaCheckPropertyChecks {
 
   val exampleRules = """../.# => ##./#../...
                        |.#./..#/### => #..#/..../..../#..#""".stripMargin
