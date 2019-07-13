@@ -8,7 +8,7 @@ object Day2 {
   implicit def bool2Int(b: Boolean): Int = if (b) 1 else 0
 
   def checksum(ids: Seq[String]): Int = {
-    val (cnt2, cnt3) = ids.foldLeft[(Int, Int)]((0, 0)) { case ((cnt2, cnt3), id) =>
+    val (cnt2, cnt3) = ids.foldLeft((0, 0)) { case ((cnt2, cnt3), id) =>
       val idCounts = letterCounts(id).values.toSet
       (cnt2 + idCounts.contains(2), cnt3 + idCounts.contains(3))
     }
