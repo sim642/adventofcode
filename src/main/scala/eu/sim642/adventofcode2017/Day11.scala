@@ -34,12 +34,12 @@ object Day11 {
 
   def fewestSteps(moves: Seq[String]): Int = HexPos.zero.move(moves) manhattanDistance HexPos.zero
 
-  def fewestSteps(input: String): Int = fewestSteps(input.split(","))
+  def fewestSteps(input: String): Int = fewestSteps(input.split(",").toSeq)
 
 
   def furthestSteps(moves: Seq[String]): Int = HexPos.zero.moves(moves).map(_ manhattanDistance HexPos.zero).max
 
-  def furthestSteps(input: String): Int = furthestSteps(input.split(","))
+  def furthestSteps(input: String): Int = furthestSteps(input.split(",").toSeq)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
 

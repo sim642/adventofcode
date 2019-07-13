@@ -5,7 +5,7 @@ object Day4 {
   trait Part {
     def isValidPassphrase(words: Seq[String]): Boolean
 
-    def isValidPassphrase(passphrase: String): Boolean = isValidPassphrase(passphrase.split("\\s+"))
+    def isValidPassphrase(passphrase: String): Boolean = isValidPassphrase(passphrase.split("\\s+").toSeq)
 
     def countValidPassphrases(passphrases: Seq[String]): Int = passphrases.count(isValidPassphrase)
   }

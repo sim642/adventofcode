@@ -18,7 +18,7 @@ object Day1 {
 
   object Part1 extends Part {
     override def captcha(digits: Seq[Int]): Int =
-      (digits, digits.cyclicTail).zipped
+      digits.lazyZip(digits.cyclicTail)
         .map((digit, nextDigit) => if (digit == nextDigit) digit else 0)
         .sum
   }
@@ -27,7 +27,7 @@ object Day1 {
     override def captcha(digits: Seq[Int]): Int = {
       require(digits.length % 2 == 0)
 
-      (digits, digits.cyclicDrop(digits.length / 2)).zipped
+      digits.lazyZip(digits.cyclicDrop(digits.length / 2))
         .map((digit, nextDigit) => if (digit == nextDigit) digit else 0)
         .sum
     }
