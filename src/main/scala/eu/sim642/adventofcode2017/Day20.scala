@@ -19,7 +19,7 @@ object Day20 {
       Particle(Pos3(px.toInt, py.toInt, pz.toInt), Pos3(vx.toInt, vy.toInt, vz.toInt), Pos3(ax.toInt, ay.toInt, az.toInt))
   }
 
-  def parseParticles(input: String): Seq[Particle] = input.lines.map(parseParticle).toSeq
+  def parseParticles(input: String): Seq[Particle] = input.linesIterator.map(parseParticle).toSeq
 
 
   trait Solution {

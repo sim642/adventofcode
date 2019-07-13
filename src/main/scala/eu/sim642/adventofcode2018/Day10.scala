@@ -109,7 +109,7 @@ object Day10 {
     case pointRegex(posX, posY, velX, velY) => Point(Pos(posX.toInt, posY.toInt), Pos(velX.toInt, velY.toInt))
   }
 
-  def parsePoints(input: String): Seq[Point] = input.lines.map(parsePoint).toSeq
+  def parsePoints(input: String): Seq[Point] = input.linesIterator.map(parsePoint).toSeq
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 

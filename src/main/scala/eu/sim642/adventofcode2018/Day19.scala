@@ -29,7 +29,7 @@ object Day19 {
   }
 
   def parseInput(input: String): (Int, Vector[Instruction]) = {
-    val lines = input.lines.toVector
+    val lines = input.linesIterator.toVector
 
     val ipRegister = lines.head match {
       case ipRegisterRegex(register) => register.toInt

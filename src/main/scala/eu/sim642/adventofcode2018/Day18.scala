@@ -79,7 +79,7 @@ object Day18 {
   }
 
 
-  def parseInput(input: String): Grid[Char] = input.lines.map(_.toVector).toVector
+  def parseInput(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 

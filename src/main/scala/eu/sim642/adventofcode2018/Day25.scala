@@ -41,7 +41,7 @@ object Day25 {
     Pos4(x, y, z, w)
   }
 
-  def parseInput(input: String): Seq[Pos4] = input.lines.map(parsePoint).toSeq
+  def parseInput(input: String): Seq[Pos4] = input.linesIterator.map(parsePoint).toSeq
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day25.txt")).mkString.trim
 

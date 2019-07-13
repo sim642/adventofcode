@@ -8,7 +8,7 @@ object Day13 {
     case rangeRegex(depth, range) => depth.toInt -> range.toInt
   }
 
-  def parseRanges(input: String): Map[Int, Int] = input.lines.map(parseRange).toMap
+  def parseRanges(input: String): Map[Int, Int] = input.linesIterator.map(parseRange).toMap
 
   // not really needed
   def rangePosition(range: Int, time: Int): Int = {

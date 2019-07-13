@@ -70,7 +70,7 @@ object Day7 {
   }
 
   def parseRequirements(input: String): Requirements = {
-    input.lines.map(parseRequirement).foldLeft(Map.empty[Step, Set[Step]])({
+    input.linesIterator.map(parseRequirement).foldLeft(Map.empty[Step, Set[Step]])({
       case (reqs, (reqStep, step)) =>
         reqs +
           (reqStep -> (reqs.getOrElse(reqStep, Set()) + step)) +

@@ -30,7 +30,7 @@ class Day2Test extends FunSuite {
         |fguij
         |axcye
         |wvxyz
-      """.stripMargin.lines.toSeq) == "fgij")
+      """.stripMargin.linesIterator.toSeq) == "fgij")
   }
 
   test("Part 2 input answer") {

@@ -41,7 +41,7 @@ object Day19 {
     Iterator.iterate(PathState(grid, Pos(startX, 0), Pos(0, 1)))(_.next).takeWhile(_.hasNext)
   }
 
-  def parseGrid(input: String): Grid[Char] = input.lines.map(_.toVector).toVector
+  def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
   def pathLetters(grid: Grid[Char]): String = pathIterator(grid).map(_.char).filter(_.isLetter).mkString
 

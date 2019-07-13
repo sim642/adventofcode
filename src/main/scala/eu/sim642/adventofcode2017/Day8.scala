@@ -43,7 +43,7 @@ object Day8 {
 
   type Instructions = List[Instruction]
 
-  def parseInstructions(instructionsStr: String): Instructions = instructionsStr.lines.map(parseInstruction).toList
+  def parseInstructions(instructionsStr: String): Instructions = instructionsStr.linesIterator.map(parseInstruction).toList
 
   type Registers = Map[Register, Int]
 

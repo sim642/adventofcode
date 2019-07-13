@@ -64,7 +64,7 @@ object Day13 {
     it.find(_.size == 1).get.head.pos
   }
 
-  def parseGrid(input: String): Grid[Char] = input.lines.map(_.toVector).toVector
+  def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
   def parseCart(cell: Char, pos: Pos): Option[Cart] = {
     val direction: Option[Pos] = cell match {

@@ -358,7 +358,7 @@ object Day23 {
     case nanobotRegex(x, y, z, r) => Nanobot(Pos3(x.toInt, y.toInt, z.toInt), r.toInt)
   }
 
-  def parseInput(input: String): Seq[Nanobot] = input.lines.map(parseNanobot).toSeq
+  def parseInput(input: String): Seq[Nanobot] = input.linesIterator.map(parseNanobot).toSeq
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
 

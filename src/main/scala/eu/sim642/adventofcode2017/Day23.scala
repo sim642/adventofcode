@@ -68,7 +68,7 @@ object Day23 {
       }
     }
 
-    def parseInstructions(str: String): Instructions = str.lines.map(parseInstruction).toVector
+    def parseInstructions(str: String): Instructions = str.linesIterator.map(parseInstruction).toVector
 
     def execSmallStep(state: AsmState): AsmState = {
       val AsmState(instructions, pc, registers) = state
@@ -107,8 +107,8 @@ object Day23 {
 
     def patch(input: String, regex: Regex, replacement: String): String = {
       regex.replaceAllIn(input, { m =>
-        val matchOps = m.matched.lines.size
-        val replacementOps = replacement.lines.size
+        val matchOps = m.matched.linesIterator.size
+        val replacementOps = replacement.linesIterator.size
         replacement + Iterator.fill(matchOps - replacementOps)("\nnop").mkString
       })
     }

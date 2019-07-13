@@ -74,7 +74,7 @@ object Day16 {
 
   def parseInput(input: String): (Seq[Sample], Seq[InputInstruction]) = {
     val (samples, program) = input.splitAt(input.indexOf("\n\n\n\n"))
-    (samples.split("""\n\n""").map(parseSample), program.trim.lines.map(parseInputInstruction).toSeq)
+    (samples.split("""\n\n""").map(parseSample), program.trim.linesIterator.map(parseInputInstruction).toSeq)
   }
 
   def count3Samples(samples: Seq[Sample]): Int = {

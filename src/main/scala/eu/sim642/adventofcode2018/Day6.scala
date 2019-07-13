@@ -54,7 +54,7 @@ object Day6 {
     case coordRegex(x, y) => Pos(x.toInt, y.toInt)
   }
 
-  def parseCoords(input: String): Seq[Pos] = input.lines.map(parseCoord).toSeq
+  def parseCoords(input: String): Seq[Pos] = input.linesIterator.map(parseCoord).toSeq
 
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim

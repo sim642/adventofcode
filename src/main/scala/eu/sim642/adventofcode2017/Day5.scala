@@ -35,7 +35,7 @@ object Day5 {
     }
 
     def exitSteps(offsetsStr: String): Int = {
-      val offsets = offsetsStr.lines.map(_.toInt).toIndexedSeq // IndexedSeq is much faster because we index a lot
+      val offsets = offsetsStr.linesIterator.map(_.toInt).toIndexedSeq // IndexedSeq is much faster because we index a lot
       exitSteps(offsets)
     }
   }

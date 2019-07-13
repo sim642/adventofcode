@@ -26,7 +26,7 @@ object Day4 {
     })
   }
 
-  def parseRecords(input: String): List[Record] = input.lines.map(parseRecord).toList.sortBy(_.timestamp)
+  def parseRecords(input: String): List[Record] = input.linesIterator.map(parseRecord).toList.sortBy(_.timestamp)
 
   case class Shift(guard: Int, sleep: Set[Int])
 

@@ -24,7 +24,7 @@ object Day22 {
     protected def nextState(state: InfectionState): InfectionState
 
     def parseMap(input: String): Map[Pos, Status] = {
-      val grid = input.lines.map(_.map(_ == '#').toVector).toVector
+      val grid = input.linesIterator.map(_.map(_ == '#').toVector).toVector
       val (h, w) = (grid.size, grid(0).size)
 
       (for {

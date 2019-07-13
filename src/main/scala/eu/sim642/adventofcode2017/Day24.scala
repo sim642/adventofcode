@@ -20,7 +20,7 @@ object Day24 {
 
   type Components = Set[Component]
 
-  def parseComponents(input: String): Components = input.lines.map(parseComponent).toSet
+  def parseComponents(input: String): Components = input.linesIterator.map(parseComponent).toSet
 
   type Bridge = Seq[Component]
 

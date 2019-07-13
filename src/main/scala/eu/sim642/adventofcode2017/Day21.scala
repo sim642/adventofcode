@@ -49,7 +49,7 @@ object Day21 {
     case ruleRegex(from, to) => parsePattern(from) -> parsePattern(to)
   }
 
-  def parseRules(input: String): Map[Pattern, Pattern] = input.lines.map(parseRule).toMap
+  def parseRules(input: String): Map[Pattern, Pattern] = input.linesIterator.map(parseRule).toMap
 
 
   val initialPattern = parsePattern(

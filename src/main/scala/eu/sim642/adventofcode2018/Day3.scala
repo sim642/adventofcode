@@ -12,7 +12,7 @@ object Day3 {
     case rectangleRegex(id, left, top, width, height) => Rectangle(id.toInt, left.toInt, top.toInt, width.toInt, height.toInt)
   }
 
-  def parseRectangles(input: String): Seq[Rectangle] = input.lines.map(parseRectangle).toSeq
+  def parseRectangles(input: String): Seq[Rectangle] = input.linesIterator.map(parseRectangle).toSeq
 
   def overlappingFabric(rects: Seq[Rectangle]): Int = {
     // TODO: nasty mutable

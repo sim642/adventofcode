@@ -89,7 +89,7 @@ object Day17 {
   }
 
   def parseInput(input: String): Tiles = {
-    input.lines.map(parseLine).reduce(_ ++ _).withDefaultValue(Sand)
+    input.linesIterator.map(parseLine).reduce(_ ++ _).withDefaultValue(Sand)
   }
 
   def printTiles(tiles: Tiles): Unit = {

@@ -13,7 +13,7 @@ object Day7 {
   }
 
   def parsePrograms(programsStr: String): Map[String, Program] = {
-    programsStr.lines.map(_.trim).map(line => {
+    programsStr.linesIterator.map(_.trim).map(line => {
       val program = parseProgram(line)
       program.name -> program
     }).toMap

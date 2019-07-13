@@ -29,7 +29,7 @@ object Day2 {
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
-  lazy val inputLines: Seq[String] = input.lines.toSeq
+  lazy val inputLines: Seq[String] = input.linesIterator.toSeq
 
   def main(args: Array[String]): Unit = {
     println(checksum(inputLines))

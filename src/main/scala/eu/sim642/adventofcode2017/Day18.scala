@@ -60,7 +60,7 @@ object Day18 {
     }
   }
 
-  def parseInstructions(str: String): Instructions = str.lines.map(parseInstruction).toVector
+  def parseInstructions(str: String): Instructions = str.linesIterator.map(parseInstruction).toVector
 
   trait Part {
     def execSmallStep(state: AsmState): AsmState = {
