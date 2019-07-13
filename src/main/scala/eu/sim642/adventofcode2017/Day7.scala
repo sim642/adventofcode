@@ -77,7 +77,7 @@ object Day7 {
     }
 
     val bottom = programs(bottomProgram(programs))
-    helper(bottom).left.get
+    helper(bottom).swap.getOrElse(???) // should never be Right
   }
 
   def correctBalanceWeight(programsStr: String): Int = {
