@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import scala.collection.AbstractIterator
+
 object Day24 {
 
   case class Component(a: Int, b: Int) {
@@ -26,15 +28,35 @@ object Day24 {
     def strength: Int = bridge.map(_.strength).sum
   }
 
+  // Scala 2.13 regression workaround: https://github.com/scala/bug/issues/11630
+  implicit class OldIteratorFlatMap[A](it: Iterator[A]) {
+    def oldFlatMap[B](f: A => IterableOnce[B]): Iterator[B] = new AbstractIterator[B] {
+      private var cur: Iterator[B] = Iterator.empty
+      private def nextCur() { cur = f(it.next()).iterator }
+      def hasNext: Boolean = {
+        // Equivalent to cur.hasNext || self.hasNext && { nextCur(); hasNext }
+        // but slightly shorter bytecode (better JVM inlining!)
+        while (!cur.hasNext) {
+          if (!it.hasNext) return false
+          nextCur()
+        }
+        true
+      }
+      def next(): B = (if (hasNext) cur else Iterator.empty).next()
+    }
+  }
+
   def validBridges(components: Components): Iterator[Bridge] = {
 
     def helper(components: Components, port: Int): Iterator[Bridge] = {
       val portComponents = components.filter(_.contains(port))
-      for {
-        component <- portComponents.toIterator
-        newPort = component.other(port)
-        bridge <- Iterator.single(Nil) ++ helper(components - component, newPort)
-      } yield component +: bridge
+      portComponents.iterator
+        .oldFlatMap { component =>
+          val newPort = component.other(port)
+
+          (Iterator.single(Nil) ++ helper(components - component, newPort))
+            .map(bridge => component +: bridge)
+        }
     }
 
     helper(components, 0)
@@ -47,11 +69,13 @@ object Day24 {
       if (portComponents.isEmpty)
         Iterator.single(Nil)
       else
-        for {
-          component <- portComponents.toIterator
-          newPort = component.other(port)
-          bridge <- helper(components - component, newPort)
-        } yield component +: bridge
+        portComponents.iterator
+          .oldFlatMap { component =>
+            val newPort = component.other(port)
+
+            helper(components - component, newPort)
+              .map(bridge => component +: bridge)
+          }
     }
 
     helper(components, 0)
@@ -65,7 +89,7 @@ object Day24 {
   def validLongestBridges(components: Components): Iterator[Bridge] = {
     val bridges = validLongBridges(components).toSet
     val maxLength = bridges.map(_.length).max
-    bridges.filter(_.length == maxLength).toIterator
+    bridges.filter(_.length == maxLength).iterator
   }
 
   def longestBridgeStrength(components: Components): Int = validLongestBridges(components).map(_.strength).max
