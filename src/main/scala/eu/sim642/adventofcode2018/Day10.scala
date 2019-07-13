@@ -29,17 +29,15 @@ object Day10 {
 
   object NaiveSolution extends Solution {
 
-    implicit class StreamUnfoldOps(stream: Stream.type) {
+    implicit class LazyListUnfoldOps(stream: LazyList.type) {
       // https://github.com/tpolecat/examples/blob/ab444af9101b9049d6bd7ebf13ae583bc77ac60a/src/main/scala/eg/Unfold.scala
-      def unfold[A, B](a: A)(f: A => Option[(A, B)]): Stream[B] =
-        f(a).map { case (a, b) => b #:: unfold(a)(f) }.getOrElse(Stream.empty)
-
-      def unfold0[A](a: A)(f: A => Option[A]): Stream[A] =
-        unfold(a)(a => f(a).map(a => (a, a)))
+      // converted to Scala 2.13 LazyList, unfold now standard (but with return arguments swapped)
+      def unfold0[A](a: A)(f: A => Option[A]): LazyList[A] =
+        LazyList.unfold(a)(a => f(a).map(a => (a, a)))
     }
 
     override def minimizePointsArea(points: Seq[Point]): (Seq[Point], Int) = {
-      val steps = Stream.unfold0((points, boundingAreaPoints(points)))({ case (points, area) =>
+      val steps = LazyList.unfold0((points, boundingAreaPoints(points)))({ case (points, area) =>
         val newPoints = points.map(_.step)
         val newArea = boundingAreaPoints(newPoints)
 

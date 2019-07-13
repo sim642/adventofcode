@@ -37,7 +37,7 @@ object Day13 {
 
   def tripSeverity(input: String): Int = tripSeverity(parseRanges(input))
 
-  def uncaughtDelay(ranges: Map[Int, Int]): Int = Stream.from(0).find(delay => rangesCaught(ranges, delay).isEmpty).get
+  def uncaughtDelay(ranges: Map[Int, Int]): Int = LazyList.from(0).find(delay => rangesCaught(ranges, delay).isEmpty).get // TODO: use Iterator instead?
 
   def uncaughtDelay(input: String): Int = uncaughtDelay(parseRanges(input))
 
