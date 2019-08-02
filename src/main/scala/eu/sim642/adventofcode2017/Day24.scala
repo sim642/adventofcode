@@ -29,7 +29,8 @@ object Day24 {
   }
 
   // Scala 2.13 regression workaround: https://github.com/scala/bug/issues/11630
-  implicit class OldIteratorFlatMap[A](it: Iterator[A]) {
+  implicit class IteratorFlatMap[A](it: Iterator[A]) {
+    // copied from Scala 2.12
     def oldFlatMap[B](f: A => IterableOnce[B]): Iterator[B] = new AbstractIterator[B] {
       private var cur: Iterator[B] = Iterator.empty
       private def nextCur(): Unit = { cur = f(it.next()).iterator }
@@ -44,6 +45,43 @@ object Day24 {
       }
       def next(): B = (if (hasNext) cur else Iterator.empty).next()
     }
+
+    // copied from https://github.com/scala/scala/pull/8220
+    // TODO: remove in Scala 2.13.1
+    def newFlatMap[B](f: A => IterableOnce[B]): Iterator[B] = new AbstractIterator[B] {
+      private[this] var cur: Iterator[B] = Iterator.empty
+      /** Trillium logic boolean: -1 = unknown, 0 = false, 1 = true */
+      private[this] var _hasNext: Int = -1
+
+      private[this] def nextCur(): Unit = {
+        cur = null
+        cur = f(it.next()).iterator
+        _hasNext = -1
+      }
+
+      def hasNext: Boolean = {
+        if (_hasNext == -1) {
+          while (!cur.hasNext) {
+            if (!it.hasNext) {
+              _hasNext = 0
+              // since we know we are exhausted, we can release cur for gc, and as well replace with
+              // static Iterator.empty which will support efficient subsequent `hasNext`/`next` calls
+              cur = Iterator.empty
+              return false
+            }
+            nextCur()
+          }
+          _hasNext = 1
+          true
+        } else _hasNext == 1
+      }
+      def next(): B = {
+        if (hasNext) {
+          _hasNext = -1
+        }
+        cur.next()
+      }
+    }
   }
 
   def validBridges(components: Components): Iterator[Bridge] = {
@@ -51,7 +89,7 @@ object Day24 {
     def helper(components: Components, port: Int): Iterator[Bridge] = {
       val portComponents = components.filter(_.contains(port))
       portComponents.iterator
-        .oldFlatMap { component =>
+        .newFlatMap { component =>
           val newPort = component.other(port)
 
           (Iterator.single(Nil) ++ helper(components - component, newPort))
@@ -70,7 +108,7 @@ object Day24 {
         Iterator.single(Nil)
       else
         portComponents.iterator
-          .oldFlatMap { component =>
+          .newFlatMap { component =>
             val newPort = component.other(port)
 
             helper(components - component, newPort)
