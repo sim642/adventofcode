@@ -52,11 +52,25 @@ object Day12 {
     }
   }
 
-  def iterateExec(instructions: Instructions): Iterator[State] = {
-    Iterator.iterate(State(instructions))(execInstruction).takeWhile(!_.terminated)
+  def iterateExec(initialState: State): Iterator[State] = {
+    Iterator.iterate(initialState)(execInstruction).takeWhile(!_.terminated)
   }
 
-  def execRegisterA(instructions: Instructions): Integer = iterateExec(instructions).last.registers('a')
+  trait Part {
+    protected def initialRegisters: Registers
+
+    def execRegisterA(instructions: Instructions): Integer = iterateExec(State(instructions, registers = initialRegisters)).last.registers('a')
+
+    def execRegisterA(input: String): Integer = execRegisterA(parseInstructions(input))
+  }
+
+  object Part1 extends Part {
+    override protected def initialRegisters: Registers = Map.empty.withDefaultValue(0)
+  }
+
+  object Part2 extends Part {
+    override protected def initialRegisters: Registers = Map('c' -> 1).withDefaultValue(0)
+  }
 
   private val instructionRegex = """([a-z]+) ([a-z]|-?\d+)(?: ([a-z]|-?\d+))?""".r
 
@@ -79,11 +93,10 @@ object Day12 {
 
   def parseInstructions(input: String): Instructions = input.lines.map(parseInstruction).toVector
 
-  def execRegisterA(input: String): Integer = execRegisterA(parseInstructions(input))
-
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(execRegisterA(input))
+    println(Part1.execRegisterA(input))
+    println(Part2.execRegisterA(input)) // didn't require reverse engineering
   }
 }
