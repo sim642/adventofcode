@@ -15,6 +15,12 @@ trait UnitNeighbors[A] { this: GraphSearch[A] =>
   override def neighbors(node: A): TraversableOnce[(A, Int)] = unitNeighbors(node).map(_ -> 1)
 }
 
+trait TargetNode[A] { this: GraphSearch[A] =>
+  val targetNode: A
+
+  override def isTargetNode(node: A): Boolean = node == targetNode
+}
+
 trait Heuristic[A] { this: GraphSearch[A] =>
   def heuristic(node: A): Int
 }

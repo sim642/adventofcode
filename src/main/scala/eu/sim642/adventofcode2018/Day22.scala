@@ -5,7 +5,7 @@ import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2017.Day21.GridOps
 import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.PosGrid2
-import eu.sim642.adventofcodelib.{GraphSearch, Heuristic}
+import eu.sim642.adventofcodelib.{GraphSearch, Heuristic, TargetNode}
 
 import scala.collection.mutable
 
@@ -76,12 +76,10 @@ object Day22 {
 
     type PosTool = (Pos, Tool)
 
-    val targetPosTool = (target, Torch)
-
     val moveDistance = 1
     val toolDistance = 7
 
-    val graphSearch = new GraphSearch[PosTool] with Heuristic[PosTool] {
+    val graphSearch = new GraphSearch[PosTool] with TargetNode[PosTool] with Heuristic[PosTool] {
       override def startNodes: TraversableOnce[PosTool] = Seq((Pos(0, 0), Torch))
 
       override def neighbors(posTool: PosTool): TraversableOnce[(PosTool, Int)] = {
@@ -101,11 +99,11 @@ object Day22 {
         moveNeighbors ++ toolNeighbors
       }
 
-      override def isTargetNode(posTool: PosTool): Boolean = posTool == targetPosTool
+      override val targetNode: PosTool = (target, Torch)
 
       override def heuristic(posTool: PosTool): Int = {
-        (posTool._1 manhattanDistance targetPosTool._1) * moveDistance +
-          (if (posTool._2 != targetPosTool._2) toolDistance else 0)
+        (posTool._1 manhattanDistance targetNode._1) * moveDistance +
+          (if (posTool._2 != targetNode._2) toolDistance else 0)
       }
     }
 

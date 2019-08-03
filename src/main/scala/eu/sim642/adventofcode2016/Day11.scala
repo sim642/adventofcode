@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcodelib.{GraphSearch, Heuristic, UnitNeighbors}
+import eu.sim642.adventofcodelib.{GraphSearch, Heuristic, TargetNode, UnitNeighbors}
 
 object Day11 {
 
@@ -48,17 +48,15 @@ object Day11 {
   }
 
   def solveSteps(startState: State): Int = {
-    val targetState = {
-      val allObjects = startState.floorObjects.flatten.toSet
-      State(Vector.fill(4)(Set[Object]()).updated(3, allObjects), 3)
-    }
-
-    val graphSearch = new GraphSearch[State] with UnitNeighbors[State] with Heuristic[State] {
+    val graphSearch = new GraphSearch[State] with UnitNeighbors[State] with TargetNode[State] with Heuristic[State] {
       override def startNodes: TraversableOnce[State] = Seq(startState)
 
-      override def isTargetNode(state: State): Boolean = state == targetState
-
       override def unitNeighbors(state: State): TraversableOnce[State] = state.steps
+
+      override val targetNode: State = {
+        val allObjects = startState.floorObjects.flatten.toSet
+        State(Vector.fill(4)(Set[Object]()).updated(3, allObjects), 3)
+      }
 
       override def heuristic(state: State): Int = {
         (for {

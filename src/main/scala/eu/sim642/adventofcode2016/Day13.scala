@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2016
 
 import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcodelib.{GraphSearch, Heuristic, UnitNeighbors}
+import eu.sim642.adventofcodelib.{GraphSearch, Heuristic, TargetNode, UnitNeighbors}
 
 object Day13 {
 
@@ -21,14 +21,14 @@ object Day13 {
   }
 
   def fewestSteps(favorite: Int, targetPos: Pos = Pos(31, 39)): Int = {
-    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with Heuristic[Pos] {
+    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] with Heuristic[Pos] {
       override def startNodes: TraversableOnce[Pos] = Seq(Pos(1, 1))
-
-      override def isTargetNode(pos: Pos): Boolean = pos == targetPos
 
       override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = getNeighbors(pos, favorite)
 
-      override def heuristic(pos: Pos): Int = pos manhattanDistance targetPos
+      override val targetNode: Pos = targetPos
+
+      override def heuristic(pos: Pos): Int = pos manhattanDistance targetNode
     }
 
     GraphSearch.aStar(graphSearch).target.get._2
