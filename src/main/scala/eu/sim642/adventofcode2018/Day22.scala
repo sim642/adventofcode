@@ -5,9 +5,9 @@ import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2017.Day21.GridOps
 import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.PosGrid2
+import eu.sim642.adventofcodelib.{GraphSearch, Heuristic}
 
 import scala.collection.mutable
-import scala.util.control.Breaks._
 
 object Day22 {
 
@@ -76,60 +76,40 @@ object Day22 {
 
     type PosTool = (Pos, Tool)
 
-    val visitedDistance: mutable.Map[PosTool, Int] = mutable.Map.empty
-    val toVisit: mutable.PriorityQueue[(Int, Int, PosTool)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
-
-    val startPosTool = (Pos(0, 0), Torch)
     val targetPosTool = (target, Torch)
 
     val moveDistance = 1
     val toolDistance = 7
 
-    def heuristic(posTool: PosTool): Int = {
-      (posTool._1 manhattanDistance targetPosTool._1) * moveDistance +
-        (if (posTool._2 != targetPosTool._2) toolDistance else 0)
-    }
+    val graphSearch = new GraphSearch[PosTool] with Heuristic[PosTool] {
+      override def startNodes: TraversableOnce[PosTool] = Seq((Pos(0, 0), Torch))
 
-    def enqueueHeuristically(posTool: PosTool, dist: Int): Unit = {
-      toVisit.enqueue((dist + heuristic(posTool), dist, posTool))
-    }
+      override def neighbors(posTool: PosTool): TraversableOnce[(PosTool, Int)] = {
+        val (pos, tool) = posTool
 
-    enqueueHeuristically(startPosTool, 0)
+        val moveNeighbors = for {
+          offset <- Pos.axisOffsets
+          newPos = pos + offset
+          if caveType.containsPos(newPos)
+          if caveType(newPos).allowedTools.contains(tool)
+        } yield (newPos, tool) -> moveDistance
 
-    breakable {
-      while (toVisit.nonEmpty) {
-        val (_, dist, posTool@(pos, tool)) = toVisit.dequeue()
-        if (!visitedDistance.contains(posTool)) {
-          visitedDistance(posTool) = dist
+        val toolNeighbors = for {
+          newTool <- caveType(pos).allowedTools - tool
+        } yield (pos, newTool) -> toolDistance
 
-          if (posTool == targetPosTool)
-            break()
+        moveNeighbors ++ toolNeighbors
+      }
 
-          def goNeighbor(newPosTool: PosTool, distDelta: Int): Unit = {
-            if (!visitedDistance.contains(newPosTool)) { // avoids some unnecessary queue dupication but not all
-              val newDist = dist + distDelta
-              enqueueHeuristically(newPosTool, newDist)
-            }
-          }
+      override def isTargetNode(posTool: PosTool): Boolean = posTool == targetPosTool
 
-          for {
-            offset <- Pos.axisOffsets
-            newPos = pos + offset
-            if caveType.containsPos(newPos)
-            if caveType(newPos).allowedTools.contains(tool)
-          } goNeighbor((newPos, tool), moveDistance)
-
-          for {
-            newTool <- caveType(pos).allowedTools - tool
-          } goNeighbor((pos, newTool), toolDistance)
-        }
+      override def heuristic(posTool: PosTool): Int = {
+        (posTool._1 manhattanDistance targetPosTool._1) * moveDistance +
+          (if (posTool._2 != targetPosTool._2) toolDistance else 0)
       }
     }
 
-    //println(visitedDistance.size)
-    //println(toVisit.size)
-
-    visitedDistance(targetPosTool)
+    GraphSearch.aStar(graphSearch).target.get._2
   }
 
   def fastestToTarget(input: String): Int = {
