@@ -20,4 +20,8 @@ class Day13Test extends FunSuite {
   test("Part 1 input answer") {
     assert(fewestSteps(input) == 86)
   }
+
+  test("Part 2 input answer") {
+    assert(reachableLocations(input) == 127)
+  }
 }

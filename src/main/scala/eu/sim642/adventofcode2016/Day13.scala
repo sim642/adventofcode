@@ -13,7 +13,16 @@ object Day13 {
     Integer.bitCount(value) % 2 == 0
   }
 
-  // copied from 2018 Day 22
+  def getNeighbors(pos: Pos, favorite: Int): Seq[Pos] = {
+    for {
+      offset <- Pos.axisOffsets
+      newPos = pos + offset
+      if newPos.x >= 0 && newPos.y >= 0
+      if isOpen(newPos, favorite)
+    } yield newPos
+  }
+
+  // copied from 2018 Day 22, A*
   def fewestSteps(favorite: Int, targetPos: Pos = Pos(31, 39)): Int = {
     val visitedDistance: mutable.Map[Pos, Int] = mutable.Map.empty
     val toVisit: mutable.PriorityQueue[(Int, Int, Pos)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
@@ -44,12 +53,7 @@ object Day13 {
             }
           }
 
-          for {
-            offset <- Pos.axisOffsets
-            newPos = pos + offset
-            if newPos.x >= 0 && newPos.y >= 0
-            if isOpen(newPos, favorite)
-          } goNeighbor(newPos)
+          getNeighbors(pos, favorite).foreach(goNeighbor)
         }
       }
     }
@@ -57,10 +61,27 @@ object Day13 {
     visitedDistance(targetPos)
   }
 
+  // bfs
+  def reachableLocations(favorite: Int, maxDist: Int = 50): Int = {
+
+    def helper(visited: Set[Pos], toVisit: Set[Pos], dist: Int): Set[Pos] = {
+      val neighbors = toVisit.flatMap(getNeighbors(_, favorite))
+      val newVisited = visited ++ toVisit
+      val newToVisit = neighbors -- visited
+      if (newToVisit.isEmpty || dist == maxDist)
+        newVisited
+      else
+        helper(newVisited, newToVisit, dist + 1)
+    }
+
+    helper(Set.empty, Set(Pos(1, 1)), 0).size
+  }
+
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
   val input = 1364
 
   def main(args: Array[String]): Unit = {
     println(fewestSteps(input))
+    println(reachableLocations(input))
   }
 }
