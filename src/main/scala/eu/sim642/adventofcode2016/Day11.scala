@@ -49,7 +49,7 @@ object Day11 {
 
   def solveSteps(startState: State): Int = {
     val graphSearch = new GraphSearch[State] with UnitNeighbors[State] with TargetNode[State] with Heuristic[State] {
-      override def startNodes: TraversableOnce[State] = Seq(startState)
+      override val startNode: State = startState
 
       override def unitNeighbors(state: State): TraversableOnce[State] = state.steps
 

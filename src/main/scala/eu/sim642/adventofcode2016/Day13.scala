@@ -22,7 +22,7 @@ object Day13 {
 
   def fewestSteps(favorite: Int, targetPos: Pos = Pos(31, 39)): Int = {
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] with Heuristic[Pos] {
-      override def startNodes: TraversableOnce[Pos] = Seq(Pos(1, 1))
+      override val startNode: Pos = Pos(1, 1)
 
       override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = getNeighbors(pos, favorite)
 

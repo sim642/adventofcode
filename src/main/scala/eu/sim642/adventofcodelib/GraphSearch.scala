@@ -4,7 +4,7 @@ import scala.collection.mutable
 import scala.util.control.Breaks._
 
 trait GraphSearch[A] {
-  def startNodes: TraversableOnce[A]
+  val startNode: A
   def neighbors(node: A): TraversableOnce[(A, Int)]
   def isTargetNode(node: A): Boolean
 }
@@ -44,7 +44,7 @@ object GraphSearch {
       toVisit.enqueue((dist + graphSearch.heuristic(node), dist, node))
     }
 
-    graphSearch.startNodes.foreach(enqueueHeuristically(_, 0))
+    enqueueHeuristically(graphSearch.startNode, 0)
 
     breakable {
       while (toVisit.nonEmpty) {
