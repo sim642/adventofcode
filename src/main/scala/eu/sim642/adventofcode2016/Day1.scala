@@ -3,8 +3,8 @@ package eu.sim642.adventofcode2016
 import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2018.Day10.PosScalar
 import eu.sim642.adventofcode2018.Day13.DirectionPos
+import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
-import scala.collection.mutable
 import scala.util.matching.Regex
 
 object Day1 {
@@ -62,8 +62,7 @@ object Day1 {
       (accState(instruction), accIterator ++ accState.applyIntermediate(instruction))
     })._2.map(_.pos)
 
-    val prevPoss = mutable.Set[Pos]()
-    val firstTwicePos = posIt.find(!prevPoss.add(_)).get // nasty side-effecting find
+    val firstTwicePos = NaiveCycleFinder.find(posIt).cycleHead
     firstTwicePos manhattanDistance Pos(0, 0)
   }
 

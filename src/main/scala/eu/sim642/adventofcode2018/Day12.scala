@@ -35,6 +35,7 @@ object Day12 {
   }
 
   def sumPlantsCycle(initial: String, notes: Map[String, Char], generations: Long = 50000000000L): Long = {
+    // TODO: replace with CycleFinder
     val prev: mutable.Map[String, (Int, Int)] = mutable.Map.empty
 
     val it = iterateGenerations(initial, notes)
