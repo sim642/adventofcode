@@ -5,7 +5,7 @@ import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2017.Day21.GridOps
 import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.PosGrid2
-import eu.sim642.adventofcodelib.{GraphSearch, Heuristic, TargetNode}
+import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic, TargetNode}
 
 import scala.collection.mutable
 
@@ -107,7 +107,7 @@ object Day22 {
       }
     }
 
-    GraphSearch.aStar(graphSearch).target.get._2
+    AStar.search(graphSearch).target.get._2
   }
 
   def fastestToTarget(input: String): Int = {

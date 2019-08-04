@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2017
 
-import eu.sim642.adventofcodelib.{FiniteGraph, GraphComponents, GraphSearch, GraphTraversal, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphComponents, GraphTraversal, UnitNeighbors}
 
 object Day12 {
 
@@ -25,20 +25,20 @@ object Day12 {
       override def unitNeighbors(node: Node): TraversableOnce[Node] = nodeNeighbors(node)
     }
 
-    GraphSearch.bfs(graphTraversal).nodes
+    BFS.traverse(graphTraversal).nodes
   }
 
   def groupSize(input: String, startNode: Int = 0): Int = bfs(parseNodes(input), startNode).size
 
   def bfsGroups(nodeNeighbors: NodeNeighbors): Set[NodeComponent] = {
 
-    val finiteGraph = new FiniteGraph[Node] {
+    val graphComponents = new GraphComponents[Node] {
       override def nodes: TraversableOnce[Node] = nodeNeighbors.keySet
 
       override def unitNeighbors(node: Node): TraversableOnce[Node] = nodeNeighbors(node)
     }
 
-    GraphComponents.bfs(finiteGraph)
+    BFS.components(graphComponents)
   }
 
   def groupCount(input: String): Int = bfsGroups(parseNodes(input)).size

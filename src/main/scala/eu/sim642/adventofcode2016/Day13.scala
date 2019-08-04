@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2016
 
 import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcodelib.{GraphSearch, Heuristic, TargetNode, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{AStar, BFS, GraphSearch, Heuristic, TargetNode, UnitNeighbors}
 
 object Day13 {
 
@@ -31,10 +31,9 @@ object Day13 {
       override def heuristic(pos: Pos): Int = pos manhattanDistance targetNode
     }
 
-    GraphSearch.aStar(graphSearch).target.get._2
+    AStar.search(graphSearch).target.get._2
   }
 
-  // bfs
   def reachableLocations(favorite: Int, maxDist: Int = 50): Int = {
 
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
@@ -45,7 +44,7 @@ object Day13 {
       override def isTargetNode(pos: Pos, dist: Int): Boolean = dist == maxDist
     }
 
-    GraphSearch.bfs(graphSearch).nodes.size
+    BFS.search(graphSearch).nodes.size
   }
 
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim

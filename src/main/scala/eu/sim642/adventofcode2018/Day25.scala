@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcodelib.{FiniteGraph, GraphComponents}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphComponents}
 
 object Day25 {
 
@@ -11,13 +11,13 @@ object Day25 {
 
   def bfsGroups(poss: Set[Pos4]): Set[Set[Pos4]] = {
 
-    val finiteGraph = new FiniteGraph[Pos4] {
+    val graphComponents = new GraphComponents[Pos4] {
       override def nodes: TraversableOnce[Pos4] = poss
 
       override def unitNeighbors(pos: Pos4): TraversableOnce[Pos4] = poss.filter(_.manhattanDistance(pos) <= 3)
     }
 
-    GraphComponents.bfs(finiteGraph)
+    BFS.components(graphComponents)
   }
 
   def countConstellations(points: Seq[Pos4]): Int = bfsGroups(points.toSet).size

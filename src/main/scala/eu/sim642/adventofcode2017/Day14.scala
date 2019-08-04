@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import Day3.Pos
-import eu.sim642.adventofcodelib.{FiniteGraph, GraphComponents}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphComponents}
 
 object Day14 {
 
@@ -25,13 +25,13 @@ object Day14 {
 
   def bfsGroups(poss: Set[Pos]): Set[Set[Pos]] = {
 
-    val finiteGraph = new FiniteGraph[Pos] {
+    val graphComponents = new GraphComponents[Pos] {
       override def nodes: TraversableOnce[Pos] = poss
 
       override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = Pos.axisOffsets.map(offset => pos + offset).filter(poss)
     }
 
-    GraphComponents.bfs(finiteGraph)
+    BFS.components(graphComponents)
   }
 
   def regionsCount(key: String): Int = {

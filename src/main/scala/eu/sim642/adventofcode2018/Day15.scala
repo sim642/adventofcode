@@ -4,7 +4,7 @@ import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2018.Day2.HeadIterator
-import eu.sim642.adventofcodelib.{GraphSearch, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, UnitNeighbors}
 
 import scala.util.Try
 
@@ -61,7 +61,7 @@ object Day15 {
       override def isTargetNode(pos: Pos, dist: Int): Boolean = endPos.contains(pos)
     }
 
-    GraphSearch.bfs(graphSearch).distances
+    BFS.search(graphSearch).distances
   }
 
   def getReachable(unit: CombatUnit, inRange: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {

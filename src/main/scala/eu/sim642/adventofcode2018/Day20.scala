@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2018
 
 import scala.util.parsing.combinator._
 import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcodelib.{GraphSearch, GraphTraversal, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, GraphTraversal, UnitNeighbors}
 
 import scala.collection.mutable
 
@@ -96,7 +96,7 @@ object Day20 extends RegexParsers {
       override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = doors(pos)
     }
 
-    GraphSearch.bfs(graphTraversal).distances
+    BFS.traverse(graphTraversal).distances
   }
 
   def roomDistances(input: String): Map[Pos, Int] = {

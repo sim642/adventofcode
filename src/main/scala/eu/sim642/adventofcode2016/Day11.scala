@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcodelib.{GraphSearch, Heuristic, TargetNode, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic, TargetNode, UnitNeighbors}
 
 object Day11 {
 
@@ -70,7 +70,7 @@ object Day11 {
       }
     }
 
-    GraphSearch.aStar(graphSearch).target.get._2
+    AStar.search(graphSearch).target.get._2
   }
 
 
