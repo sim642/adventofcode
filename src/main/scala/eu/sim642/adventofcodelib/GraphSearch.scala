@@ -3,19 +3,17 @@ package eu.sim642.adventofcodelib
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-trait GraphSearch[A] {
+trait GraphTraversal[A] {
   val startNode: A
   def neighbors(node: A): TraversableOnce[(A, Int)]
+}
+
+trait GraphSearch[A] extends GraphTraversal[A] {
   //def isTargetNode(node: A): Boolean
   def isTargetNode(node: A, dist: Int): Boolean // TODO: does dist-based target make sense for A*?
 }
 
-// TODO: inheritance should be other way around?
-trait GraphTraversal[A] extends GraphSearch[A] {
-  override def isTargetNode(node: A, dist: Int): Boolean = false
-}
-
-trait UnitNeighbors[A] { this: GraphSearch[A] =>
+trait UnitNeighbors[A] { this: GraphTraversal[A] =>
   def unitNeighbors(node: A): TraversableOnce[A]
 
   override final def neighbors(node: A): TraversableOnce[(A, Int)] = unitNeighbors(node).map(_ -> 1)
@@ -44,6 +42,31 @@ trait Target[A] {
 
 object GraphSearch {
   // moved from 2018 Day 20
+  def bfs[A](graphSearch: GraphTraversal[A] with UnitNeighbors[A]): Distances[A] = {
+
+    @tailrec
+    def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] = {
+      // TODO: use one dist: Int argument instead of all same toVisit values
+      val neighbors = for {
+        (node, dist) <- toVisit
+        newNode <- graphSearch.unitNeighbors(node)
+      } yield newNode -> (dist + 1)
+      val newVisited = visited ++ toVisit
+      //val newToVisit = neighbors -- visited.keys
+      val newToVisit = neighbors.filterKeys(!visited.contains(_)) // more efficient than -- because visited is large
+      if (newToVisit.isEmpty) {
+        new Distances[A] {
+          override def distances: Map[A, Int] = newVisited
+        }
+      }
+      else
+        helper(newVisited, newToVisit)
+    }
+
+    helper(Map.empty, Map(graphSearch.startNode -> 0))
+  }
+
+  // moved from 2018 Day 20
   def bfs[A](graphSearch: GraphSearch[A] with UnitNeighbors[A]): Distances[A] with Target[A] = {
 
     @tailrec
@@ -54,7 +77,6 @@ object GraphSearch {
         newNode <- graphSearch.unitNeighbors(node)
       } yield newNode -> (dist + 1)
       val newVisited = visited ++ toVisit
-      // TODO: optimized version of BFS for just traversal
       toVisit.find((graphSearch.isTargetNode _).tupled) match {
         case targetNodeDist@Some(_) =>
           new Distances[A] with Target[A] {
