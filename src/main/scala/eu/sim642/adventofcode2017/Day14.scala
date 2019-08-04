@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import Day3.Pos
-import eu.sim642.adventofcodelib.{GraphSearch, GraphTraversal, UnitNeighbors}
+import eu.sim642.adventofcodelib.{FiniteGraph, GraphComponents}
 
 object Day14 {
 
@@ -23,26 +23,15 @@ object Day14 {
     def apply(pos: Pos): A = grid(pos.y)(pos.x)
   }
 
-  def bfs(poss: Set[Pos], startPos: Pos): Set[Pos] = {
+  def bfsGroups(poss: Set[Pos]): Set[Set[Pos]] = {
 
-    val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
-      override val startNode: Pos = startPos
+    val finiteGraph = new FiniteGraph[Pos] {
+      override def nodes: TraversableOnce[Pos] = poss
 
       override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = Pos.axisOffsets.map(offset => pos + offset).filter(poss)
     }
 
-    GraphSearch.bfs(graphTraversal).nodes
-  }
-
-  def bfsGroups(poss: Set[Pos]): Set[Set[Pos]] = {
-    if (poss.isEmpty)
-      Set.empty
-    else {
-      val startPos = poss.head // take any node
-      val group = bfs(poss, startPos) // find its component
-      val restPoss = poss -- group
-      bfsGroups(restPoss) + group
-    }
+    GraphComponents.bfs(finiteGraph)
   }
 
   def regionsCount(key: String): Int = {
