@@ -37,17 +37,15 @@ object Day13 {
   // bfs
   def reachableLocations(favorite: Int, maxDist: Int = 50): Int = {
 
-    def helper(visited: Set[Pos], toVisit: Set[Pos], dist: Int): Set[Pos] = {
-      val neighbors = toVisit.flatMap(getNeighbors(_, favorite))
-      val newVisited = visited ++ toVisit
-      val newToVisit = neighbors -- visited
-      if (newToVisit.isEmpty || dist == maxDist)
-        newVisited
-      else
-        helper(newVisited, newToVisit, dist + 1)
+    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
+      override val startNode: Pos = Pos(1, 1)
+
+      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = getNeighbors(pos, favorite)
+
+      override def isTargetNode(pos: Pos, dist: Int): Boolean = dist == maxDist
     }
 
-    helper(Set.empty, Set(Pos(1, 1)), 0).size
+    GraphSearch.bfs(graphSearch).nodes.size
   }
 
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim

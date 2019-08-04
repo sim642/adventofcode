@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2018
 
+import eu.sim642.adventofcodelib.{GraphSearch, GraphTraversal, UnitNeighbors}
+
 object Day25 {
 
   case class Pos4(x: Int, y: Int, z: Int, w: Int) {
@@ -10,17 +12,13 @@ object Day25 {
   // copied from 2018 Day 14
   def bfs(poss: Set[Pos4], startPos: Pos4): Set[Pos4] = {
 
-    def helper(visited: Set[Pos4], toVisit: Set[Pos4]): Set[Pos4] = {
-      val neighbors = toVisit.flatMap(pos => poss.filter(_.manhattanDistance(pos) <= 3))
-      val newVisited = visited ++ toVisit
-      val newToVisit = neighbors -- visited
-      if (newToVisit.isEmpty)
-        newVisited
-      else
-        helper(newVisited, newToVisit)
+    val graphTraversal = new GraphTraversal[Pos4] with UnitNeighbors[Pos4] {
+      override val startNode: Pos4 = startPos
+
+      override def unitNeighbors(pos: Pos4): TraversableOnce[Pos4] = poss.filter(_.manhattanDistance(pos) <= 3)
     }
 
-    helper(Set.empty, Set(startPos))
+    GraphSearch.bfs(graphTraversal).nodes
   }
 
   def bfsGroups(poss: Set[Pos4]): Set[Set[Pos4]] = {

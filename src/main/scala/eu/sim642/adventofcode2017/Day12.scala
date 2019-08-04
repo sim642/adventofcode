@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.adventofcodelib.{GraphSearch, GraphTraversal, UnitNeighbors}
+
 object Day12 {
 
   type Node = Int
@@ -15,19 +17,15 @@ object Day12 {
 
   def parseNodes(nodesInput: String): NodeNeighbors = nodesInput.lines.map(parseNode).toMap
 
-  def bfs(nodeNeighbors: NodeNeighbors, startNode: Node): NodeComponent = {
+  def bfs(nodeNeighbors: NodeNeighbors, start: Node): NodeComponent = {
 
-    def helper(visited: Set[Node], toVisit: Set[Node]): NodeComponent = {
-      val neighbors = toVisit.flatMap(nodeNeighbors)
-      val newVisited = visited ++ toVisit
-      val newToVisit = neighbors -- visited
-      if (newToVisit.isEmpty)
-        newVisited
-      else
-        helper(newVisited, newToVisit)
+    val graphTraversal = new GraphTraversal[Node] with UnitNeighbors[Node] {
+      override val startNode: Node = start
+
+      override def unitNeighbors(node: Node): TraversableOnce[Node] = nodeNeighbors(node)
     }
 
-    helper(Set.empty, Set(startNode))
+    GraphSearch.bfs(graphTraversal).nodes
   }
 
   def groupSize(input: String, startNode: Int = 0): Int = bfs(parseNodes(input), startNode).size
