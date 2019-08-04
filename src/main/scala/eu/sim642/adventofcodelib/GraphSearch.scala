@@ -1,7 +1,6 @@
 package eu.sim642.adventofcodelib
 
 import scala.collection.mutable
-import scala.util.control.Breaks._
 
 trait GraphSearch[A] {
   val startNode: A
@@ -46,30 +45,28 @@ object GraphSearch {
 
     enqueueHeuristically(graphSearch.startNode, 0)
 
-    breakable {
-      while (toVisit.nonEmpty) {
-        val (_, dist, node) = toVisit.dequeue()
-        if (!visitedDistance.contains(node)) {
-          visitedDistance(node) = dist
+    while (toVisit.nonEmpty) {
+      val (_, dist, node) = toVisit.dequeue()
+      if (!visitedDistance.contains(node)) {
+        visitedDistance(node) = dist
 
-          if (graphSearch.isTargetNode(node)) {
-            return new Distances[A] with Target[A] {
-              override def distances: Map[A, Int] = visitedDistance.toMap // TODO: don't copy entire mutable.Map
+        if (graphSearch.isTargetNode(node)) {
+          return new Distances[A] with Target[A] {
+            override def distances: Map[A, Int] = visitedDistance.toMap // TODO: don't copy entire mutable.Map
 
-              override def target: Option[(A, Int)] = Some(node -> dist)
-            }
+            override def target: Option[(A, Int)] = Some(node -> dist)
           }
-
-
-          def goNeighbor(newNode: A, distDelta: Int): Unit = {
-            if (!visitedDistance.contains(newNode)) { // avoids some unnecessary queue duplication but not all
-              val newDist = dist + distDelta
-              enqueueHeuristically(newNode, newDist)
-            }
-          }
-
-          graphSearch.neighbors(node).foreach((goNeighbor _).tupled) // eta expansion postfix operator _
         }
+
+
+        def goNeighbor(newNode: A, distDelta: Int): Unit = {
+          if (!visitedDistance.contains(newNode)) { // avoids some unnecessary queue duplication but not all
+            val newDist = dist + distDelta
+            enqueueHeuristically(newNode, newDist)
+          }
+        }
+
+        graphSearch.neighbors(node).foreach((goNeighbor _).tupled) // eta expansion postfix operator _
       }
     }
 
