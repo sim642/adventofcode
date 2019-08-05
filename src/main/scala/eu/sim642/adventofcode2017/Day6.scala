@@ -1,8 +1,8 @@
 package eu.sim642.adventofcode2017
 
-import eu.sim642.adventofcodelib.cycle.{FloydCycleFinder, NaiveCycleFinder}
+import eu.sim642.adventofcodelib.cycle.{BrentCycleFinder, FloydCycleFinder, NaiveCycleFinder}
 
-import scala.collection.{AbstractIterator, mutable}
+import scala.collection.AbstractIterator
 
 object Day6 {
 
@@ -60,11 +60,21 @@ object Day6 {
     }
   }
 
+  object BrentSolution extends Solution {
+    override def reallocCycleCount(initialMemory: Memory): Int = {
+      BrentCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
+    }
+
+    override def reallocCycleLoop(initialMemory: Memory): Int = {
+      BrentCycleFinder.find(initialMemory, reallocCycle).cycleLength
+    }
+  }
+
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
   lazy val inputSeq: IndexedSeq[Int] = input.split("\\s+").toIndexedSeq.map(_.toInt)
 
   def main(args: Array[String]): Unit = {
-    import FloydSolution._
+    import BrentSolution._
 
     println(reallocCycleCount(inputSeq))
     println(reallocCycleLoop(inputSeq))

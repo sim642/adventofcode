@@ -9,6 +9,7 @@ class Day6Test extends Suites(
   new BaseTest,
   new NaiveSolutionTest,
   new FloydSolutionTest,
+  new BrentSolutionTest,
 )
 
 object Day6Test {
@@ -72,4 +73,6 @@ object Day6Test {
   }
 
   class FloydSolutionTest extends SolutionTest(FloydSolution)
+
+  class BrentSolutionTest extends SolutionTest(BrentSolution)
 }
