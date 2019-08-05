@@ -15,7 +15,7 @@ object Day16 {
     sb.mkString
   }
 
-  def checksum(data: String): String = {
+  /*def checksum(data: String): String = {
 
     def reduce(it: Iterator[Char]): Iterator[Char] = {
       it.grouped(2).map(s => if (s(0) == s(1)) '1' else '0')
@@ -29,6 +29,15 @@ object Day16 {
     }
 
     helper(data.iterator, data.length).mkString
+  }*/
+
+  def checksum(data: String): String = {
+    // https://old.reddit.com/r/adventofcode/comments/5imh3d/2016_day_16_solutions/db9erfp/
+    val mergeSize = Integer.lowestOneBit(data.length) // largest power of two divisor
+    data.iterator
+      .grouped(mergeSize)
+      .map(s => if (s.count(_ == '1') % 2 == 0) '1' else '0') // checksumming two chars is XNOR
+      .mkString
   }
 
   def fillChecksum(initial: String, length: Int): String = checksum(generateData(initial, length))
