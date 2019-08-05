@@ -1,15 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import java.security.MessageDigest
-
 import scala.collection.mutable
+import Day14.md5
 
 object Day5 {
-
-  // https://stackoverflow.com/a/5992852
-  def md5(s: String): String = {
-    MessageDigest.getInstance("MD5").digest(s.getBytes).map("%02x".format(_)).mkString
-  }
 
   def getPassword(doorId: String, times: Int = 8): String = {
     Iterator.from(0).map(i => md5(doorId + i)).filter(_.startsWith("00000")).map(_(5)).take(times).mkString("")

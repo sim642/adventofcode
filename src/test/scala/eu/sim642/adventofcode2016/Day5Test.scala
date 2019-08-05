@@ -7,11 +7,7 @@ class Day5Test extends FunSuite {
 
   val exampleInput = "abc"
 
-  test("md5") {
-    assert(md5("The quick brown fox jumps over the lazy dog") == "9e107d9d372bb6826bd81d3542a419d6")
-  }
-
-  // ignored because very slow
+  // ignored because very slow (30s total)
 
   ignore("Part 1 examples") {
     assert(getPassword(exampleInput, 3) == "18f")
@@ -26,7 +22,7 @@ class Day5Test extends FunSuite {
     assert(getPassword2(exampleInput) == "05ace8e3")
   }
 
-  ignore("Part 2 examples (slow)") {
+  ignore("Part 2 input answer") {
     assert(getPassword2(input) == "424a0197")
   }
 }
