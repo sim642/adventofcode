@@ -8,6 +8,7 @@ import org.scalatest.{FunSuite, Suites}
 class Day6Test extends Suites(
   new BaseTest,
   new NaiveSolutionTest,
+  new NaiverSolutionTest,
   new FloydSolutionTest,
   new BrentSolutionTest,
 )
@@ -71,6 +72,8 @@ object Day6Test {
       }
     }
   }
+
+  class NaiverSolutionTest extends SolutionTest(NaiverSolution)
 
   class FloydSolutionTest extends SolutionTest(FloydSolution)
 

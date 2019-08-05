@@ -6,7 +6,7 @@ import eu.sim642.adventofcode2018.Day2.HeadIterator
 import eu.sim642.adventofcode2017.Day21.GridOps
 import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.PosGrid2
-import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
+import eu.sim642.adventofcodelib.cycle.NaiverCycleFinder
 
 object Day18 {
 
@@ -65,7 +65,7 @@ object Day18 {
   }
 
   def resourceValueCycle(grid: Grid[Char], after: Int = 1000000000): Int = {
-    resourceValue(NaiveCycleFinder.find(grid, step)(after))
+    resourceValue(NaiverCycleFinder.find(grid, step)(after))
   }
 
   def printGrid(grid: Grid[Char]): Unit = {

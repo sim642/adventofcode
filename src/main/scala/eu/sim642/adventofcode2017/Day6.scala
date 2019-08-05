@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2017
 
-import eu.sim642.adventofcodelib.cycle.{BrentCycleFinder, FloydCycleFinder, NaiveCycleFinder}
+import eu.sim642.adventofcodelib.cycle.{BrentCycleFinder, FloydCycleFinder, NaiveCycleFinder, NaiverCycleFinder}
 
 import scala.collection.AbstractIterator
 
@@ -47,6 +47,16 @@ object Day6 {
 
     override def reallocCycleLoop(initialMemory: Memory): Int = {
       NaiveCycleFinder.find(initialMemory, reallocCycle).cycleLength
+    }
+  }
+
+  object NaiverSolution extends Solution {
+    override def reallocCycleCount(initialMemory: Memory): Int = {
+      NaiverCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
+    }
+
+    override def reallocCycleLoop(initialMemory: Memory): Int = {
+      NaiverCycleFinder.find(initialMemory, reallocCycle).cycleLength
     }
   }
 
