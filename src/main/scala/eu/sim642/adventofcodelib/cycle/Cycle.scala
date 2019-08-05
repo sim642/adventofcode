@@ -19,9 +19,12 @@ case class SimpleCycle[A](stemLength: Int, cycleLength: Int, cycleHead: A) exten
 case class FunctionCycle[A](stemLength: Int, cycleLength: Int, cycleHead: A)
                            (x0: A, f: A => A) extends Cycle[A] with Indexing[A] { // TODO: extract x0, f pair into separate structure?
   def apply(i: Int): A = {
-    // TODO: optimize by starting from cycle head if i >= stemLength
     // TODO: add version of NaiveCycleFinder (or maybe even FloydCycleFinder) which keeps entire sequence for quick lookup here
-    val shortI = stemLength + (i - stemLength) % cycleLength
-    Iterator.iterate(x0)(f).drop(shortI).head
+    if (i >= stemLength) {
+      val shortI = (i - stemLength) % cycleLength
+      Iterator.iterate(cycleHead)(f).drop(shortI).head
+    }
+    else
+      Iterator.iterate(x0)(f).drop(i).head
   }
 }
