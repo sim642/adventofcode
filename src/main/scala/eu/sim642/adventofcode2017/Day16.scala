@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2017
 
-import eu.sim642.adventofcodelib.cycle.BrentCycleFinder
+import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
 object Day16 {
 
@@ -40,7 +40,7 @@ object Day16 {
   /*def applyMovesRepeat(moves: Seq[DanceMove], programs: Vector[Name], repeat: Int): Vector[Name] =
     (0 until repeat).foldLeft(programs)((programs, _) => applyMoves(moves, programs))*/
   def applyMovesRepeat(moves: Seq[DanceMove], programs: Vector[Name], repeat: Int): Vector[Name] = {
-    BrentCycleFinder.find(programs, applyMoves(moves, _: Vector[Name]))(repeat) // TODO: NaiveCycleFinder is faster
+    NaiveCycleFinder.find(programs, applyMoves(moves, _: Vector[Name]))(repeat)
   }
 
   def applyMovesRepeat(movesStr: String, programsStr: String = ('a' to 'p').mkString, repeat: Int = 1000000000): String =
