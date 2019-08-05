@@ -12,6 +12,10 @@ class Day16Test extends FunSuite {
   }
 
   test("Part 1 input answer") {
-    assert(fillChecksum(input) == "10010100110011100")
+    assert(fillChecksum(input, part1Length) == "10010100110011100")
+  }
+
+  test("Part 2 input answer") {
+    assert(fillChecksum(input, part2Length) == "01100100101101100")
   }
 }

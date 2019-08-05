@@ -19,12 +19,16 @@ object Day16 {
       newData
   }
 
-  def fillChecksum(initial: String, length: Int = 272): String = checksum(generateData(initial, length))
+  def fillChecksum(initial: String, length: Int): String = checksum(generateData(initial, length))
 
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
   val input = "00101000101111010"
 
+  val part1Length = 272
+  val part2Length = 35651584
+
   def main(args: Array[String]): Unit = {
-    println(fillChecksum(input))
+    println(fillChecksum(input, part1Length))
+    println(fillChecksum(input, part2Length)) // TODO: optimize without generating entire string
   }
 }
