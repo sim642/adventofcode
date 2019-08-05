@@ -4,8 +4,12 @@ import scala.annotation.tailrec
 
 object Day15 {
 
-  implicit class ModPos(n: Int) {
+  implicit class IntModPos(n: Int) {
     def %+(d: Int): Int = (n % d + d) % d
+  }
+
+  implicit class LongModPos(n: Long) {
+    def %+(d: Long): Long = (n % d + d) % d
   }
 
   case class Disk(i: Int, posCount: Int, initialPos: Int)
@@ -41,15 +45,31 @@ object Day15 {
     val (a2, n2) = an2
     val (m1, m2) = bezoutCoefs(n1, n2)
     val N = n1 * n2
-    val x = a1 * m2 * n2 + a2 * m1 * n1
-    (x %+ N, N)
+    // TODO: remove overflow avoiding hack, generalize to Numeric?
+    val x = a1.toLong * m2 * n2 + a2 * m1 * n1
+    ((x %+ N.toLong).toInt, N)
   }
 
   def crt(ans: Seq[(Int, Int)]): (Int, Int) = ans.reduce(crt2)
 
-  def firstPressTime(disks: Seq[Disk]): Int = {
-    val ans = disks.map({ case Disk(i, posCount, initialPos) => ((-(initialPos + i)) %+ posCount, posCount)})
-    crt(ans)._1
+  trait Part {
+    def firstPressTime(disks: Seq[Disk]): Int
+
+    def firstPressTime(input: String): Int = firstPressTime(parseInput(input))
+  }
+
+  object Part1 extends Part {
+    override def firstPressTime(disks: Seq[Disk]): Int = {
+      val ans = disks.map({ case Disk(i, posCount, initialPos) => ((-(initialPos + i)) %+ posCount, posCount) })
+      crt(ans)._1
+    }
+  }
+
+  object Part2 extends Part {
+    override def firstPressTime(disks: Seq[Disk]): Int = {
+      val extraDisk = Disk(disks.size + 1, 11, 0)
+      Part1.firstPressTime(extraDisk +: disks)
+    }
   }
 
   private val diskRegex = """Disc #(\d+) has (\d+) positions; at time=0, it is at position (\d+).""".r
@@ -60,13 +80,14 @@ object Day15 {
 
   def parseInput(input: String): Seq[Disk] = input.lines.map(parseDisk).toSeq
 
-  def firstPressTime(input: String): Int = firstPressTime(parseInput(input))
-
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(firstPressTime(input))
+    println(Part1.firstPressTime(input))
+    println(Part2.firstPressTime(input))
 
-    // 577731526 - too high
+    // part 1: 577731526 - too high
+    // part 2: 3180542 - too low
+    // part 2: 3302376 - too high
   }
 }
