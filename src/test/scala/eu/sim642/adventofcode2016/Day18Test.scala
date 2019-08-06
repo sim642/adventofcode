@@ -45,10 +45,14 @@ class Day18Test extends FunSuite with PropertyChecks {
   }
 
   test("Part 1 examples") {
-    assert(countSafe(exampleInput2, 10) == 38)
+    assert(Part1.countSafe(exampleInput2, 10) == 38)
   }
 
   test("Part 1 input answer") {
-    assert(countSafe(input) == 1989)
+    assert(Part1.countSafe(input) == 1989)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.countSafe(input) == 19999894)
   }
 }
