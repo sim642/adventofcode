@@ -17,7 +17,7 @@ class Day18Test extends FunSuite with PropertyChecks {
       "^^..^",
     )
 
-    val it = rows(exampleInput)
+    val it = rowStrings(exampleInput)
     forAll (expectedRows) { expectedRow =>
       assert(it.next() == expectedRow)
     }
@@ -38,7 +38,7 @@ class Day18Test extends FunSuite with PropertyChecks {
       "^^.^^^..^^",
     )
 
-    val it = rows(exampleInput2)
+    val it = rowStrings(exampleInput2)
     forAll (expectedRows) { expectedRow =>
       assert(it.next() == expectedRow)
     }
