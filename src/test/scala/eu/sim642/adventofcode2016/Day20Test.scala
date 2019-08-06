@@ -17,4 +17,12 @@ class Day20Test extends FunSuite {
   test("Part 1 input answer") {
     assert(minUnblocked(input) == 4793564)
   }
+
+  test("Part 2 examples") {
+    assert(countUnblocked(exampleInput, Interval(0, 9)) == 2)
+  }
+
+  test("Part 2 input answer") {
+    assert(countUnblocked(input) == 146)
+  }
 }
