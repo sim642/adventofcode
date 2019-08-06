@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2016
 
 import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic, TargetNode, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph._
 
 object Day17 {
 
@@ -29,12 +29,16 @@ object Day17 {
     }
 
     def moves: Seq[VaultPos] = {
-      for {
-        ((move, offset), isOpen) <- moveOffsets.zip(doors)
-        if isOpen
-        newPos = pos + offset
-        if vaultBox.contains(newPos)
-      } yield copy(pos = newPos, path = path + move)
+      if (pos == targetPos) // "paths always end the first time they reach the bottom-right room"
+        Seq.empty
+      else {
+        for {
+          ((move, offset), isOpen) <- moveOffsets.zip(doors)
+          if isOpen
+          newPos = pos + offset
+          if vaultBox.contains(newPos)
+        } yield copy(pos = newPos, path = path + move)
+      }
     }
   }
 
@@ -53,10 +57,24 @@ object Day17 {
     AStar.search(graphSearch).target.get._1.path
   }
 
+  def longestVaultPathLength(passcode: String): Int = {
+
+    val graphTraversal = new GraphTraversal[VaultPos] with UnitNeighbors[VaultPos] {
+      override val startNode: VaultPos = VaultPos(passcode, startPos, "")
+
+      override def unitNeighbors(vaultPos: VaultPos): TraversableOnce[VaultPos] = vaultPos.moves
+    }
+
+    BFS.traverse(graphTraversal).distances
+      .filter(_._1.pos == targetPos)
+      .values.max
+  }
+
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
   val input = "yjjvjgan"
 
   def main(args: Array[String]): Unit = {
     println(shortestVaultPath(input))
+    println(longestVaultPathLength(input))
   }
 }

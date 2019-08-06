@@ -40,4 +40,21 @@ class Day17Test extends FunSuite with PropertyChecks {
   test("Part 1 input answer") {
     assert(shortestVaultPath(input) == "RLDRUDRDDR")
   }
+
+  test("Part 2 examples") {
+    val passcodeLengths = Table(
+      ("passcode", "expectedLength"),
+      ("ihgpwlah", 370),
+      ("kglvqrro", 492),
+      ("ulqzkmiv", 830),
+    )
+
+    forAll (passcodeLengths) { (passcode, expectedLength) =>
+      assert(longestVaultPathLength(passcode) == expectedLength)
+    }
+  }
+
+  test("Part 2 input answer") {
+    assert(longestVaultPathLength(input) == 498)
+  }
 }
