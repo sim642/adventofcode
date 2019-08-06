@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import Day3.Pos
+import eu.sim642.adventofcodelib.graph.{BFS, GraphComponents}
 
 object Day14 {
 
@@ -22,31 +23,15 @@ object Day14 {
     def apply(pos: Pos): A = grid(pos.y)(pos.x)
   }
 
-  // copied from Day 12
-  def bfs(poss: Set[Pos], startPos: Pos): Set[Pos] = {
-
-    def helper(visited: Set[Pos], toVisit: Set[Pos]): Set[Pos] = {
-      val neighbors = toVisit.flatMap(pos => Pos.axisOffsets.map(offset => pos + offset).filter(poss))
-      val newVisited = visited ++ toVisit
-      val newToVisit = neighbors -- visited
-      if (newToVisit.isEmpty)
-        newVisited
-      else
-        helper(newVisited, newToVisit)
-    }
-
-    helper(Set.empty, Set(startPos))
-  }
-
   def bfsGroups(poss: Set[Pos]): Set[Set[Pos]] = {
-    if (poss.isEmpty)
-      Set.empty
-    else {
-      val startPos = poss.head // take any node
-      val group = bfs(poss, startPos) // find its component
-      val restPoss = poss -- group
-      bfsGroups(restPoss) + group
+
+    val graphComponents = new GraphComponents[Pos] {
+      override def nodes: TraversableOnce[Pos] = poss
+
+      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = Pos.axisOffsets.map(offset => pos + offset).filter(poss)
     }
+
+    BFS.components(graphComponents)
   }
 
   def regionsCount(key: String): Int = {

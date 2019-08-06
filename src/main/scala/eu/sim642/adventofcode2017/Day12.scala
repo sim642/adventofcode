@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.adventofcodelib.graph.{BFS, GraphComponents, GraphTraversal, UnitNeighbors}
+
 object Day12 {
 
   type Node = Int
@@ -15,34 +17,28 @@ object Day12 {
 
   def parseNodes(nodesInput: String): NodeNeighbors = nodesInput.lines.map(parseNode).toMap
 
-  def bfs(nodeNeighbors: NodeNeighbors, startNode: Node): NodeComponent = {
+  def bfs(nodeNeighbors: NodeNeighbors, start: Node): NodeComponent = {
 
-    def helper(visited: Set[Node], toVisit: Set[Node]): NodeComponent = {
-      val neighbors = toVisit.flatMap(nodeNeighbors)
-      val newVisited = visited ++ toVisit
-      val newToVisit = neighbors -- visited
-      if (newToVisit.isEmpty)
-        newVisited
-      else
-        helper(newVisited, newToVisit)
+    val graphTraversal = new GraphTraversal[Node] with UnitNeighbors[Node] {
+      override val startNode: Node = start
+
+      override def unitNeighbors(node: Node): TraversableOnce[Node] = nodeNeighbors(node)
     }
 
-    helper(Set.empty, Set(startNode))
+    BFS.traverse(graphTraversal).nodes
   }
 
   def groupSize(input: String, startNode: Int = 0): Int = bfs(parseNodes(input), startNode).size
 
   def bfsGroups(nodeNeighbors: NodeNeighbors): Set[NodeComponent] = {
-    if (nodeNeighbors.isEmpty)
-      Set.empty
-    else {
-      val (startNode, _) = nodeNeighbors.head // take any node
-      val group = bfs(nodeNeighbors, startNode) // find its component
-      val restNodeNeighbors =
-        nodeNeighbors.filterKeys(!group(_)).mapValues(_.filterNot(group))  // remove component from graph (nodes and edges)
-          .view.force // copy map for efficiency rather than chaining FilteredKeys & MappedValues - https://stackoverflow.com/a/14883167/854540
-      bfsGroups(restNodeNeighbors) + group
+
+    val graphComponents = new GraphComponents[Node] {
+      override def nodes: TraversableOnce[Node] = nodeNeighbors.keySet
+
+      override def unitNeighbors(node: Node): TraversableOnce[Node] = nodeNeighbors(node)
     }
+
+    BFS.components(graphComponents)
   }
 
   def groupCount(input: String): Int = bfsGroups(parseNodes(input)).size

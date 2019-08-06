@@ -1,9 +1,7 @@
 package eu.sim642.adventofcode2016
 
 import eu.sim642.adventofcode2017.Day3.Pos
-
-import scala.collection.mutable
-import scala.util.control.Breaks._
+import eu.sim642.adventofcodelib.graph.{AStar, BFS, GraphSearch, Heuristic, TargetNode, UnitNeighbors}
 
 object Day13 {
 
@@ -22,59 +20,31 @@ object Day13 {
     } yield newPos
   }
 
-  // copied from 2018 Day 22, A*
   def fewestSteps(favorite: Int, targetPos: Pos = Pos(31, 39)): Int = {
-    val visitedDistance: mutable.Map[Pos, Int] = mutable.Map.empty
-    val toVisit: mutable.PriorityQueue[(Int, Int, Pos)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
+    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] with Heuristic[Pos] {
+      override val startNode: Pos = Pos(1, 1)
 
-    val startPos = Pos(1, 1)
+      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = getNeighbors(pos, favorite)
 
-    def heuristic(pos: Pos): Int = pos manhattanDistance targetPos
+      override val targetNode: Pos = targetPos
 
-    def enqueueHeuristically(pos: Pos, dist: Int): Unit = {
-      toVisit.enqueue((dist + heuristic(pos), dist, pos))
+      override def heuristic(pos: Pos): Int = pos manhattanDistance targetNode
     }
 
-    enqueueHeuristically(startPos, 0)
-
-    breakable {
-      while (toVisit.nonEmpty) {
-        val (_, dist, pos) = toVisit.dequeue()
-        if (!visitedDistance.contains(pos)) {
-          visitedDistance(pos) = dist
-
-          if (pos == targetPos)
-            break()
-
-          def goNeighbor(newPos: Pos): Unit = {
-            if (!visitedDistance.contains(newPos)) { // avoids some unnecessary queue duplication but not all
-              val newDist = dist + 1
-              enqueueHeuristically(newPos, newDist)
-            }
-          }
-
-          getNeighbors(pos, favorite).foreach(goNeighbor)
-        }
-      }
-    }
-
-    visitedDistance(targetPos)
+    AStar.search(graphSearch).target.get._2
   }
 
-  // bfs
   def reachableLocations(favorite: Int, maxDist: Int = 50): Int = {
 
-    def helper(visited: Set[Pos], toVisit: Set[Pos], dist: Int): Set[Pos] = {
-      val neighbors = toVisit.flatMap(getNeighbors(_, favorite))
-      val newVisited = visited ++ toVisit
-      val newToVisit = neighbors -- visited
-      if (newToVisit.isEmpty || dist == maxDist)
-        newVisited
-      else
-        helper(newVisited, newToVisit, dist + 1)
+    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
+      override val startNode: Pos = Pos(1, 1)
+
+      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = getNeighbors(pos, favorite)
+
+      override def isTargetNode(pos: Pos, dist: Int): Boolean = dist == maxDist
     }
 
-    helper(Set.empty, Set(Pos(1, 1)), 0).size
+    BFS.search(graphSearch).nodes.size
   }
 
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim

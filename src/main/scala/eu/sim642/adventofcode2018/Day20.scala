@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2018
 
 import scala.util.parsing.combinator._
 import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, GraphTraversal, UnitNeighbors}
 
 import scala.collection.mutable
 
@@ -89,21 +90,13 @@ object Day20 extends RegexParsers {
 
   def bfs(doors: Map[Pos, Set[Pos]], startPos: Pos = originPos): Map[Pos, Int] = {
 
-    def helper(visited: Map[Pos, Int], toVisit: Map[Pos, Int]): Map[Pos, Int] = {
-      val neighbors = for {
-        (pos, dist) <- toVisit
-        newPos <- doors(pos)
-      } yield newPos -> (dist + 1)
-      val newVisited = visited ++ toVisit
-      //val newToVisit = neighbors -- visited.keys
-      val newToVisit = neighbors.filterKeys(!visited.contains(_)) // more efficient than -- because visited is large
-      if (newToVisit.isEmpty)
-        newVisited
-      else
-        helper(newVisited, newToVisit)
+    val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
+      override val startNode: Pos = startPos
+
+      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = doors(pos)
     }
 
-    helper(Map.empty, Map(startPos -> 0))
+    BFS.traverse(graphTraversal).distances
   }
 
   def roomDistances(input: String): Map[Pos, Int] = {

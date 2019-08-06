@@ -1,7 +1,6 @@
 package eu.sim642.adventofcode2016
 
-import scala.collection.mutable
-import scala.util.control.Breaks._
+import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic, TargetNode, UnitNeighbors}
 
 object Day11 {
 
@@ -48,61 +47,30 @@ object Day11 {
     }
   }
 
-  // copied from 2018 Day 22
   def solveSteps(startState: State): Int = {
-    val targetState = {
-      val allObjects = startState.floorObjects.flatten.toSet
-      State(Vector.fill(4)(Set[Object]()).updated(3, allObjects), 3)
-    }
+    val graphSearch = new GraphSearch[State] with UnitNeighbors[State] with TargetNode[State] with Heuristic[State] {
+      override val startNode: State = startState
 
-    val visitedDistance: mutable.Map[State, Int] = mutable.Map.empty
-    val toVisit: mutable.PriorityQueue[(Int, Int, State)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
+      override def unitNeighbors(state: State): TraversableOnce[State] = state.steps
 
-    def heuristic(state: State): Int = {
-      (for {
-        (objects, i) <- state.floorObjects.zipWithIndex
-      } yield {
-        if (objects.size % 2 == 0)
-          2 * (objects.size / 2) * (3 - i)
-        else
-          2 * (objects.size / 2) * (3 - i) + (3 - i)
-      }).sum
-    }
+      override val targetNode: State = {
+        val allObjects = startState.floorObjects.flatten.toSet
+        State(Vector.fill(4)(Set[Object]()).updated(3, allObjects), 3)
+      }
 
-    //println(heuristic(startState))
-    //println(heuristic(targetState))
-
-    def enqueueHeuristically(state: State, dist: Int): Unit = {
-      toVisit.enqueue((dist + heuristic(state), dist, state))
-    }
-
-    enqueueHeuristically(startState, 0)
-
-    breakable {
-      while (toVisit.nonEmpty) {
-        val (_, dist, state) = toVisit.dequeue()
-        if (!visitedDistance.contains(state)) {
-          visitedDistance(state) = dist
-
-          if (state == targetState)
-            break()
-
-          def goNeighbor(newState: State): Unit = {
-            if (!visitedDistance.contains(newState)) { // avoids some unnecessary queue duplication but not all
-              val newDist = dist + 1
-              enqueueHeuristically(newState, newDist)
-            }
-          }
-
-          state.steps.foreach(goNeighbor)
-        }
+      override def heuristic(state: State): Int = {
+        (for {
+          (objects, i) <- state.floorObjects.zipWithIndex
+        } yield {
+          if (objects.size % 2 == 0)
+            2 * (objects.size / 2) * (3 - i)
+          else
+            2 * (objects.size / 2) * (3 - i) + (3 - i)
+        }).sum
       }
     }
 
-    //println(visitedDistance.size)
-    //println(toVisit.size)
-
-    visitedDistance(targetState)
+    AStar.search(graphSearch).target.get._2
   }
 
 
