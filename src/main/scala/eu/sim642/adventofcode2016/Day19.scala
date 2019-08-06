@@ -22,7 +22,7 @@ object Day19 {
 
   def lastElf(elfCount: Int): Int = {
 
-    def helper(elfCount: Int, firstElf: Int, gapSize: Int): Int = {
+    /*def helper(elfCount: Int, firstElf: Int, gapSize: Int): Int = {
       if (elfCount == 1)
         firstElf
       else if (elfCount % 2 == 0)
@@ -31,7 +31,10 @@ object Day19 {
         helper(elfCount / 2, firstElf + gapSize * 2, gapSize * 2)
     }
 
-    helper(elfCount, 1, 1)
+    helper(elfCount, 1, 1)*/
+
+    //2 * (elfCount - Integer.highestOneBit(elfCount)) + 1
+    (elfCount ^ Integer.highestOneBit(elfCount)) << 1 | 1
   }
 
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
