@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2018
 
+import scala.annotation.tailrec
+
 object Day9 {
 
   /**
@@ -24,7 +26,8 @@ object Day9 {
         }
     }
 
-    def rotate(n: Int): CircularZipper[A] = {
+    @tailrec
+    final def rotate(n: Int): CircularZipper[A] = {
       if (n == 0)
         this
       else if (n > 0)
@@ -39,8 +42,12 @@ object Day9 {
       case hd :: tl => (current, CircularZipper(init, hd, tl))
       case Nil =>
         val hd :: it = init
-        (current, CircularZipper(it, hd, tail))
+        (current, CircularZipper(it, hd, tail)) // TODO: fix new current coming from different size?
     }
+    /*def removed: (A, CircularZipper[A]) = {
+      val CircularZipper(elem :: init, current, tail) = next
+      (elem, CircularZipper(init, current, tail))
+    }*/
   }
 
   object CircularZipper {
