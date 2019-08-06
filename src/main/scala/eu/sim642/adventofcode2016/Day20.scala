@@ -9,36 +9,26 @@ object Day20 {
 
   private val unsignedIntInterval = Interval(0, 4294967295L)
 
+  def mergeIntervals(intervals: Seq[Interval]): Seq[Interval] = {
+    val sortedIntervals = intervals.sortBy(_.min)
+    sortedIntervals.foldLeft(List.empty[Interval]){
+      case (acc@prev :: tl, cur) if cur.min <= prev.max + 1 =>
+        /*if (cur.max <= prev.max)
+          acc
+        else
+          Interval(prev.min, cur.max) :: tl*/
+        Interval(prev.min, prev.max max cur.max) :: tl
+      case (acc, cur) =>
+        cur :: acc
+    }
+  }
+
   def minUnblocked(intervals: Seq[Interval]): Long = {
-    intervals
-      .map(_.max + 1)
-      .sorted
-      .find(value => intervals.forall(!_.contains(value))).get
+    mergeIntervals(intervals).map(_.max + 1).min
   }
 
   def countUnblocked(intervals: Seq[Interval], validInterval: Interval): Long = {
-
-    def helper(sweep: Long, intervals: Seq[Interval], totalUnblockedSize: Long): Long = {
-      if (sweep >= validInterval.max)
-        totalUnblockedSize
-      else {
-        // like minUnblocked but assumes sortedness
-        val unblockedMin = intervals.iterator
-          .map(_.max + 1)
-          .find(value => intervals.forall(!_.contains(value))).get
-        val intervals2 = intervals.filter(_.min >= unblockedMin)
-        val unblockedMax = {
-          if (intervals2.isEmpty)
-            validInterval.max
-          else
-            intervals2.iterator.map(_.min - 1).min
-        }
-        val unblocked = Interval(unblockedMin, unblockedMax)
-        helper(unblockedMax, intervals2, totalUnblockedSize + unblocked.size)
-      }
-    }
-
-    helper(validInterval.min, intervals.sortBy(_.max), 0)
+    validInterval.size - mergeIntervals(intervals).map(_.size).sum
   }
 
 
