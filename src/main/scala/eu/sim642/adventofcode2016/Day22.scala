@@ -75,43 +75,35 @@ object Day22 {
   def stepsToGoal(nodes: Map[Pos, Disk]): Int = {
     val nodeTypes = nodesToTypes(nodes)
 
-    case class NodesState(nodeTypes: Map[Pos, DiskType], goalDataPos: Pos) {
-      lazy val moves: Seq[(Pos, Pos)] = {
-        (for {
-          (fromPos, fromDiskType) <- nodeTypes.iterator
-          if fromDiskType == Normal
+    case class NodesState(holePos: Pos, goalDataPos: Pos) {
+      lazy val moves: Seq[NodesState] = {
+        for {
           offset <- Pos.axisOffsets
-          toPos = fromPos + offset
-          if nodeTypes.contains(toPos)
-          toDiskType = nodeTypes(toPos)
-          if toDiskType == Empty
-        } yield (fromPos, toPos)).toSeq
+          newHolePos = holePos + offset
+          if nodeTypes.contains(newHolePos)
+          if nodeTypes(newHolePos) != Oversize
+          newGoalDataPos = if (newHolePos == goalDataPos) holePos else goalDataPos
+        } yield NodesState(newHolePos, newGoalDataPos)
       }
     }
 
     val graphSearch = new GraphSearch[NodesState] with UnitNeighbors[NodesState] with Heuristic[NodesState] {
       override val startNode: NodesState = {
-        val goalDataPos = nodes.keys.filter(_.y == 0).maxBy(_.x)
-        NodesState(nodeTypes, goalDataPos)
+        val holePos = nodeTypes.find(_._2 == Empty).get._1
+        val goalDataPos = nodeTypes.keys.filter(_.y == 0).maxBy(_.x)
+        NodesState(holePos, goalDataPos)
       }
 
-      override def unitNeighbors(nodesState: NodesState): TraversableOnce[NodesState] = {
-        val NodesState(nodeTypes, goalDataPos) = nodesState
-        for ((fromPos, toPos) <- nodesState.moves) yield {
-          val newNodeTypes = nodeTypes.updated(fromPos, Empty).updated(toPos, Normal)
-          val newGoalDataPos = if (fromPos == goalDataPos) toPos else goalDataPos
-          NodesState(newNodeTypes, newGoalDataPos)
-        }
-      }
+      override def unitNeighbors(nodesState: NodesState): TraversableOnce[NodesState] = nodesState.moves
 
       override def isTargetNode(nodesState: NodesState, dist: Int): Boolean = {
         nodesState.goalDataPos == originPos
       }
 
       override def heuristic(nodesState: NodesState): Int = {
-        val holeToGoal = nodesState.moves.map(_._1 manhattanDistance nodesState.goalDataPos).min
+        val holeToGoal = nodesState.holePos manhattanDistance nodesState.goalDataPos
         val goalToOrigin = nodesState.goalDataPos manhattanDistance originPos
-        holeToGoal + 5 * goalToOrigin
+        holeToGoal + 5 * goalToOrigin // 5 moves for hole to go around goal
       }
     }
 
