@@ -2,6 +2,16 @@ package eu.sim642.adventofcode2016
 
 object Day21 {
 
+  // similar to 2017 Day 1 CyclicSeq
+  implicit class RotateString(s: String) {
+    def rotate(n: Int): String = {
+      import eu.sim642.adventofcode2016.Day15.IntModPos
+      val realN = n %+ s.length
+      val (init, tail) = s.splitAt(realN)
+      tail + init
+    }
+  }
+
   sealed trait Operation
   case class SwapPosition(x: Int, y: Int) extends Operation
   case class SwapLetter(x: Char, y: Char) extends Operation
@@ -19,30 +29,36 @@ object Day21 {
         case c if c == y => x
         case c => c
       })
-    case RotateSteps(x) if x >= 0 =>
-      s.drop(x) + s.take(x)
-    case RotateSteps(x) if x < 0 =>
-      s.takeRight(-x) + s.dropRight(-x)
+    case RotateSteps(x) =>
+      s.rotate(x)
     case RotateLetter(x) =>
       val i = s.indexOf(x)
-      val rotate = (1 + i + (if (i >= 4) 1 else 0)) % s.length
-      s.takeRight(rotate) + s.dropRight(rotate)
+      val rotate = 1 + i + (if (i >= 4) 1 else 0)
+      s.rotate(-rotate)
     case Reverse(x, y) =>
-      val lo = x min y
-      val hi = (x max y) + 1
+      val (lo, hi) = (x min y, (x max y) + 1)
       s.take(lo) + s.view(lo, hi).reverse.mkString + s.drop(hi)
     case Move(x, y) =>
       val deleted = s.take(x) + s.drop(x + 1)
-      deleted.take(y) + s(x) + deleted.drop(y)
+      val (init, tail) = deleted.splitAt(y)
+      init + s(x) + tail
   }
+
+  // RotateLetter(x) inverse:
+  // x index before: i
+  // x index after: j = (i + 1 + i + (if (i >= 4) 1 else 0)) % length
+  // turns out to be invertible with length 8
+
 
   def applyOperations(s: String, operations: Seq[Operation]): String = {
     operations.foldLeft(s)(applyOperation)
   }
 
-  private val scrambleString = "abcdefgh"
-
   def scramble(operations: Seq[Operation], s: String): String = applyOperations(s, operations)
+
+  def unscramble(operations: Seq[Operation], s: String): String = {
+    s.permutations.find(scramble(operations, _) == s).get
+  }
 
 
   private val swapPositionRegex = """swap position (\d+) with position (\d+)""".r
@@ -64,11 +80,19 @@ object Day21 {
 
   def parseInput(input: String): Seq[Operation] = input.lines.map(parseOperation).toSeq
 
+  private val scrambleString = "abcdefgh"
+  private val unscrambleString = "fbgdceah"
+
   def scramble(input: String, s: String = scrambleString): String = scramble(parseInput(input), s)
+
+  def unscramble(input: String, s: String = unscrambleString): String = unscramble(parseInput(input), s)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    print(scramble(input))
+    println(scramble(input))
+    println(unscramble(input))
+
+    // hgacdbef - not right
   }
 }

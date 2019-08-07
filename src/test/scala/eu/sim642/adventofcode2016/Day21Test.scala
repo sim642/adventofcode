@@ -35,4 +35,8 @@ class Day21Test extends FunSuite {
   test("Part 1 input answer") {
     assert(scramble(input) == "aefgbcdh")
   }
+
+  test("Part 2 input answer") {
+    assert(unscramble(input) == "egcdahbf")
+  }
 }
