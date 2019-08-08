@@ -37,13 +37,13 @@ object Day24 {
   }
 
   def tsp[A](distMatrix: Map[A, Map[A, Int]], start: A): Int = {
-    (distMatrix.keySet - start).toList
+    (distMatrix.keySet - start).toVector
       .permutations
-      .map(start :: _)
       .map({ path =>
-        path.zip(path.tail)
-          .map({ case (from, to) => distMatrix(from)(to) })
-          .sum
+        distMatrix(start)(path.head) +
+          path.zip(path.tail)
+            .map({ case (from, to) => distMatrix(from)(to) })
+            .sum
       }).min
   }
 
