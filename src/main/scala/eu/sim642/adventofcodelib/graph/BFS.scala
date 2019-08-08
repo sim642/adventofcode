@@ -17,7 +17,9 @@ object BFS {
       } yield newNode -> (dist + 1)
       val newVisited = visited ++ toVisit
       //val newToVisit = neighbors -- visited.keys
-      val newToVisit = neighbors.filterKeys(!visited.contains(_)) // more efficient than -- because visited is large
+      val newToVisit = neighbors.filter({ case (node, _) => !visited.contains(node) }) // more efficient than -- because visited is large
+      // filter instead of filterKeys because filterKeys is lazy and recomputes everything...
+      // TODO: undo in Scala 2.13
       if (newToVisit.isEmpty) {
         new Distances[A] {
           override def distances: Map[A, Int] = newVisited
@@ -50,7 +52,9 @@ object BFS {
           }
         case None =>
           //val newToVisit = neighbors -- visited.keys
-          val newToVisit = neighbors.filterKeys(!visited.contains(_)) // more efficient than -- because visited is large
+          val newToVisit = neighbors.filter({ case (node, _) => !visited.contains(node) }) // more efficient than -- because visited is large
+          // filter instead of filterKeys because filterKeys is lazy and recomputes everything...
+          // TODO: undo in Scala 2.13
           if (newToVisit.isEmpty) {
             new Distances[A] with Target[A] {
               override def distances: Map[A, Int] = newVisited
