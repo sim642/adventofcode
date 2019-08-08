@@ -52,13 +52,34 @@ object Day24 {
     tsp(distMatrix, 0)
   }
 
+  def tspReturn[A](distMatrix: Map[A, Map[A, Int]], start: A): Int = {
+    (distMatrix.keySet - start).toVector
+      .permutations
+      .map({ path =>
+        distMatrix(start)(path.head) +
+          path.zip(path.tail)
+            .map({ case (from, to) => distMatrix(from)(to) })
+            .sum +
+          distMatrix(path.last)(start)
+      }).min
+  }
+
+  def shortestRouteReturn(grid: Grid[Char]): Int = {
+    val pois = findPois(grid)
+    val distMatrix = getPoiDistMatrix(grid, pois)
+    tspReturn(distMatrix, 0)
+  }
+
   def parseGrid(input: String): Grid[Char] = input.lines.map(_.toVector).toVector
 
   def shortestRoute(input: String): Int = shortestRoute(parseGrid(input))
+
+  def shortestRouteReturn(input: String): Int = shortestRouteReturn(parseGrid(input))
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(shortestRoute(input))
+    println(shortestRouteReturn(input))
   }
 }
