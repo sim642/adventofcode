@@ -27,11 +27,11 @@ class Day24Test extends FunSuite {
     assert(shortestRoute(exampleInput) == 14)
   }
 
-  ignore("Part 1 input answer") {
+  test("Part 1 input answer") {
     assert(shortestRoute(input) == 470)
   }
 
-  ignore("Part 2 input answer") {
+  test("Part 2 input answer") {
     assert(shortestRouteReturn(input) == 720)
   }
 }

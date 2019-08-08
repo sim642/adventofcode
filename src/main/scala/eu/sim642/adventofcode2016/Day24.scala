@@ -16,7 +16,8 @@ object Day24 {
   }
 
   def getPoiDistMatrix(grid: Grid[Char], pois: Map[Int, Pos]): Map[Int, Map[Int, Int]] = {
-    pois.mapValues({ fromPos =>
+    // transform instead of mapValues because mapValues is lazy and recomputes everything...
+    pois.transform({ (_, fromPos) =>
 
       val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
         override val startNode: Pos = fromPos
@@ -31,7 +32,7 @@ object Day24 {
       }
 
       val distances = BFS.traverse(graphTraversal).distances
-      pois.mapValues(distances)
+      pois.transform((_, toPos) => distances(toPos))
     })
   }
 
