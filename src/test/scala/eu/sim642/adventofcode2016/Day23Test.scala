@@ -1,9 +1,15 @@
 package eu.sim642.adventofcode2016
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Suites}
 import Day23._
+import eu.sim642.adventofcode2016.Day23Test.{ReverseEngineeredSolutionTest, SimulatedSolutionTest}
 
-class Day23Test extends FunSuite {
+class Day23Test extends Suites(
+  new SimulatedSolutionTest,
+  new ReverseEngineeredSolutionTest,
+)
+
+object Day23Test {
 
   val exampleInput =
     """cpy 2 a
@@ -14,17 +20,27 @@ class Day23Test extends FunSuite {
       |dec a
       |dec a""".stripMargin
 
-  test("Part 1 examples") {
-    assert(Part1.execRegisterA(exampleInput) == 3)
+  sealed abstract class SolutionTest(val solution: Solution) extends FunSuite {
+    test("Part 1 input answer") {
+      assert(solution.safeValue(input, part1eggs) == 11893)
+    }
+
+    protected val testPart2: Boolean = true
+
+    if (testPart2) {
+      test("Part 2 input answer") {
+        assert(solution.safeValue(input, part2eggs) == 479008453)
+      }
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(Part1.execRegisterA(input) == 11893)
+  class SimulatedSolutionTest extends SolutionTest(SimulatedSolution) {
+    test("Part 1 examples") {
+      assert(solution.safeValue(exampleInput, part1eggs) == 3)
+    }
+
+    override protected val testPart2: Boolean = false // takes ~5 minutes
   }
 
-  // ignored because very slow (300s)
-
-  ignore("Part 2 input answer") {
-    assert(Part2.execRegisterA(input) == 479008453)
-  }
+  class ReverseEngineeredSolutionTest extends SolutionTest(ReverseEngineeredSolution)
 }

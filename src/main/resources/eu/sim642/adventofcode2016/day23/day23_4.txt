@@ -1,0 +1,26 @@
+b = a
+b--
+do { d = a
+  a = 0
+  do { c = b
+    do { a++
+      c--
+    } while (c != 0)
+    d--
+  } while (d != 0)
+  b--
+  c = b
+  d = c
+  do { d--
+    c++
+  } while (d != 0)
+  // tgl c
+  // c = -16
+} while (c != 2); c = 1
+c = 89
+{ d = 77
+  do { a++
+    d--
+  } while (d != 0)
+  c--
+} while (c != 0)
