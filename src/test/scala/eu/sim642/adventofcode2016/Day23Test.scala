@@ -21,4 +21,10 @@ class Day23Test extends FunSuite {
   test("Part 1 input answer") {
     assert(Part1.execRegisterA(input) == 11893)
   }
+
+  // ignored because very slow (300s)
+
+  ignore("Part 2 input answer") {
+    assert(Part2.execRegisterA(input) == 479008453)
+  }
 }

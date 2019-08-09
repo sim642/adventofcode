@@ -85,9 +85,9 @@ object Day23 {
     override protected def initialRegisters: Registers = Map('a' -> 7).withDefaultValue(0)
   }
 
-  /*object Part2 extends Part {
-    override protected def initialRegisters: Registers = Map('c' -> 1).withDefaultValue(0)
-  }*/
+  object Part2 extends Part {
+    override protected def initialRegisters: Registers = Map('a' -> 12).withDefaultValue(0)
+  }
 
   private val instructionRegex = """([a-z]+) ([a-z]|-?\d+)(?: ([a-z]|-?\d+))?""".r
 
@@ -115,6 +115,6 @@ object Day23 {
 
   def main(args: Array[String]): Unit = {
     println(Part1.execRegisterA(input))
-    //println(Part2.execRegisterA(input)) // didn't require reverse engineering
+    println(Part2.execRegisterA(input)) // didn't require reverse engineering
   }
 }
