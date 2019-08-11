@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2018
 
-import scala.collection.mutable
+import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
 object Day1 {
   def resultingFreq(freqChanges: Seq[Int]): Int = freqChanges.sum
@@ -14,16 +14,7 @@ object Day1 {
 
   def firstTwiceFreq(freqChanges: Seq[Int]): Int = {
     val it = freqChanges.cycle.scanLeft(0)(_ + _)
-    val prevFreqs = mutable.Set[Int]()
-
-    var firstTwice: Option[Int] = None
-    do {
-      val freq = it.next()
-      if (!prevFreqs.add(freq))
-        firstTwice = Some(freq)
-    } while (firstTwice.isEmpty)
-
-    firstTwice.get
+    NaiveCycleFinder.find(it).cycleHead
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day1.txt")).mkString.trim
