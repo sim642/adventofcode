@@ -26,4 +26,25 @@ object NaiveCycleFinder {
       cycleHead = cycle.cycleHead
     )(x0, f)
   }
+
+
+  def findBy[A, B](it: Iterator[A])(m: A => B): CycleBy[A] = {
+    val prevs = mutable.Map[B, (A, Int)]()
+
+    val (x, Some((prevX, prevI)), i) =
+      it.zipWithIndex
+        .map({ case (x, i) => (x, prevs.put(m(x), (x, i)), i) }) // nasty side-effecting
+        .find(_._2.isDefined).get
+
+    SimpleCycleBy(
+      stemLength = prevI,
+      cycleLength = i - prevI,
+      cycleHead = prevX,
+      cycleHeadRepeat = x
+    )
+  }
+
+  def findBy[A, B](x0: A, f: A => A)(m: A => B): CycleBy[A] = {
+    findBy(Iterator.iterate(x0)(f))(m)
+  }
 }
