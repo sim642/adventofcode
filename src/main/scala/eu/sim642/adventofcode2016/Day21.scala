@@ -37,7 +37,7 @@ object Day21 {
       s.rotate(-rotate)
     case Reverse(x, y) =>
       val (lo, hi) = (x min y, (x max y) + 1)
-      s.take(lo) + s.view(lo, hi).reverse.mkString + s.drop(hi)
+      s.take(lo) + s.view.slice(lo, hi).reverse.mkString + s.drop(hi)
     case Move(x, y) =>
       val deleted = s.take(x) + s.drop(x + 1)
       val (init, tail) = deleted.splitAt(y)

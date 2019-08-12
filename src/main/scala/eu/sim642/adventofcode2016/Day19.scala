@@ -76,8 +76,8 @@ object Day19 {
     override def lastElf(elfCount: Int): Int = {
       // https://old.reddit.com/r/adventofcode/comments/5j4lp1/2016_day_19_solutions/dbdj8jh/
       // mutable.Queue because immutable.Queue is too slow
-      val left = (1 to elfCount / 2).to[mutable.Queue]
-      val right = (elfCount / 2 + 1 to elfCount).to[mutable.Queue]
+      val left = (1 to elfCount / 2).to(mutable.Queue)
+      val right = (elfCount / 2 + 1 to elfCount).to(mutable.Queue)
 
       while (left.size + right.size > 1) {
         right.dequeue() // discard because gifts taken

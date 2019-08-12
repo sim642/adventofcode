@@ -50,14 +50,14 @@ object Day22 {
 
   def nodesToTypes(nodes: Map[Pos, Disk]): Map[Pos, DiskType] = {
     val oversizeLimit = nodes(originPos).size
-    nodes.mapValues({ disk =>
+    nodes.view.mapValues({ disk =>
       if (disk.used == 0)
         Empty
       else if (disk.used > oversizeLimit)
         Oversize
       else
         Normal
-    })
+    }).toMap
   }
 
   def printNodeTypes(nodeTypes: Map[Pos, DiskType]): Unit = {
