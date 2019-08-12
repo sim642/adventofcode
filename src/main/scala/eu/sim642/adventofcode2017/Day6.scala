@@ -1,6 +1,8 @@
 package eu.sim642.adventofcode2017
 
-import scala.collection.{AbstractIterator, mutable}
+import eu.sim642.adventofcodelib.cycle.{BrentCycleFinder, FloydCycleFinder, NaiveCycleFinder, NaiverCycleFinder}
+
+import scala.collection.AbstractIterator
 
 object Day6 {
 
@@ -28,6 +30,7 @@ object Day6 {
   }
 
   object NaiveSolution extends Solution {
+    // TODO: unused
     class ReallocIterator(private var memory: Memory) extends AbstractIterator[Memory] {
       override def hasNext: Boolean = true
 
@@ -39,68 +42,41 @@ object Day6 {
     }
 
     override def reallocCycleCount(initialMemory: Memory): Int = {
-      val it = new ReallocIterator(initialMemory)
-      val prevMemories = mutable.Set[Memory]()
-
-      while (prevMemories.add(it.next())) {}
-
-      prevMemories.size
+      NaiveCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
     }
 
     override def reallocCycleLoop(initialMemory: Memory): Int = {
-      val it = new ReallocIterator(initialMemory)
-      val prevMemories = mutable.Map[Memory, Int]()
+      NaiveCycleFinder.find(initialMemory, reallocCycle).cycleLength
+    }
+  }
 
-      var n = 0
-      var prevN: Option[Int] = None
-      do {
-        val memory = it.next()
-        prevN = prevMemories.put(memory, n)
-        n += 1
-      } while (prevN.isEmpty)
+  object NaiverSolution extends Solution {
+    override def reallocCycleCount(initialMemory: Memory): Int = {
+      NaiverCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
+    }
 
-      n - prevN.get - 1
+    override def reallocCycleLoop(initialMemory: Memory): Int = {
+      NaiverCycleFinder.find(initialMemory, reallocCycle).cycleLength
     }
   }
 
   object FloydSolution extends Solution {
-    /**
-      * https://en.wikipedia.org/wiki/Cycle_detection#Floyd's_Tortoise_and_Hare
-      */
-    def floyd[A](x0: A, f: A => A): (Int, Int) = {
-      var tortoise = f(x0)
-      var hare = f(f(x0))
-      while (tortoise != hare) {
-        tortoise = f(tortoise)
-        hare = f(f(hare))
-      }
-
-      var μ = 0
-      tortoise = x0
-      while (tortoise != hare) {
-        tortoise = f(tortoise)
-        hare = f(hare)
-        μ += 1
-      }
-
-      var λ = 1
-      hare = f(tortoise)
-      while (tortoise != hare) {
-        hare = f(hare)
-        λ += 1
-      }
-
-      (μ, λ)
-    }
-
     override def reallocCycleCount(initialMemory: Memory): Int = {
-      val (μ, λ) = floyd(initialMemory, reallocCycle)
-      μ + λ
+      FloydCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
     }
 
     override def reallocCycleLoop(initialMemory: Memory): Int = {
-      val (μ, λ) = floyd(initialMemory, reallocCycle)
-      λ
+      FloydCycleFinder.find(initialMemory, reallocCycle).cycleLength
+    }
+  }
+
+  object BrentSolution extends Solution {
+    override def reallocCycleCount(initialMemory: Memory): Int = {
+      BrentCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
+    }
+
+    override def reallocCycleLoop(initialMemory: Memory): Int = {
+      BrentCycleFinder.find(initialMemory, reallocCycle).cycleLength
     }
   }
 
@@ -108,7 +84,7 @@ object Day6 {
   lazy val inputSeq: IndexedSeq[Int] = input.split("\\s+").toIndexedSeq.map(_.toInt)
 
   def main(args: Array[String]): Unit = {
-    import FloydSolution._
+    import BrentSolution._
 
     println(reallocCycleCount(inputSeq))
     println(reallocCycleLoop(inputSeq))

@@ -1,0 +1,26 @@
+b = a
+b--
+d = a
+a = 0
+c = b
+a++
+c--
+jnz c -2
+d--
+jnz d -5
+b--
+c = b
+d = c
+d--
+c++
+jnz d -2
+tgl c
+c = -16
+jnz 1 c
+c = 89
+jnz 77 d
+a++
+d++
+jnz d -2
+c++
+jnz c -5

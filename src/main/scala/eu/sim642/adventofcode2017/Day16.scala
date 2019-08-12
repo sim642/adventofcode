@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2017
 
-import eu.sim642.adventofcode2017.Day6.FloydSolution.floyd
+import eu.sim642.adventofcodelib.cycle.NaiverCycleFinder
 
 object Day16 {
 
@@ -40,11 +40,7 @@ object Day16 {
   /*def applyMovesRepeat(moves: Seq[DanceMove], programs: Vector[Name], repeat: Int): Vector[Name] =
     (0 until repeat).foldLeft(programs)((programs, _) => applyMoves(moves, programs))*/
   def applyMovesRepeat(moves: Seq[DanceMove], programs: Vector[Name], repeat: Int): Vector[Name] = {
-    val (μ, λ) = floyd(programs, (programs: Vector[Name]) => applyMoves(moves, programs))
-    println(μ, λ)
-
-    val reducedRepeat = (repeat - μ) % λ
-    (0 until reducedRepeat).foldLeft(programs)((programs, _) => applyMoves(moves, programs))
+    NaiverCycleFinder.find(programs, applyMoves(moves, _: Vector[Name]))(repeat)
   }
 
   def applyMovesRepeat(movesStr: String, programsStr: String = ('a' to 'p').mkString, repeat: Int = 1000000000): String =

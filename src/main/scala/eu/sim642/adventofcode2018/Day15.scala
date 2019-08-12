@@ -4,6 +4,7 @@ import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcode2017.Day3.Pos
 import eu.sim642.adventofcode2018.Day2.HeadIterator
+import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, UnitNeighbors}
 
 import scala.util.Try
 
@@ -46,22 +47,21 @@ object Day15 {
 
   def bfs(startPos: Pos, endPos: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
 
-    def helper(visited: Map[Pos, Int], toVisit: Map[Pos, Int]): Map[Pos, Int] = {
-      val neighbors = for {
-        (pos, dist) <- toVisit
-        offset <- Pos.axisOffsets
-        newPos = pos + offset
-        if isFree(newPos)
-      } yield newPos -> (dist + 1)
-      val newVisited = visited ++ toVisit
-      val newToVisit = neighbors -- visited.keys
-      if (newToVisit.isEmpty || (toVisit.keySet intersect endPos).nonEmpty)
-        newVisited
-      else
-        helper(newVisited, newToVisit)
+    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
+      override val startNode: Pos = startPos
+
+      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = {
+        for {
+          offset <- Pos.axisOffsets
+          newPos = pos + offset
+          if isFree(newPos)
+        } yield newPos
+      }
+
+      override def isTargetNode(pos: Pos, dist: Int): Boolean = endPos.contains(pos)
     }
 
-    helper(Map.empty, Map(startPos -> 0))
+    BFS.search(graphSearch).distances
   }
 
   def getReachable(unit: CombatUnit, inRange: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {

@@ -1,8 +1,7 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcode2018.Day2.HeadIterator
-
-import scala.collection.mutable
+import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
 object Day12 {
 
@@ -35,22 +34,19 @@ object Day12 {
   }
 
   def sumPlantsCycle(initial: String, notes: Map[String, Char], generations: Long = 50000000000L): Long = {
-    val prev: mutable.Map[String, (Int, Int)] = mutable.Map.empty
+    val cycle = NaiveCycleFinder.findBy(iterateGenerations(initial, notes))(_._1)
+    //val cycle = BrentCycleFinder.findBy((initial, 0), (simulateGeneration(notes) _).tupled)(_._1)
+    require(cycle.cycleLength == 1) // works here, otherwise need divmod next
 
-    val it = iterateGenerations(initial, notes)
-    for (((generation, startIndex), generationNum) <- it.zipWithIndex) {
-      prev.put(generation, (startIndex, generationNum)) match {
-        case None =>
-        case Some((prevStartIndex, prevGenerationNum)) =>
-          val startShift = startIndex - prevStartIndex
-          require(generationNum - prevGenerationNum == 1) // works here, otherwise need divmod next
-          val cycles = generations - prevGenerationNum
-          val lastStartIndex = prevStartIndex + cycles * startShift
-          return sumPlants(generation, lastStartIndex)
-      }
-    }
+    val prevGenerationNum = cycle.stemLength
+    val generation = cycle.cycleHead._1
+    val prevStartIndex = cycle.cycleHead._2
+    val startIndex = cycle.cycleHeadRepeat._2
 
-    ???
+    val startShift = startIndex - prevStartIndex
+    val cycles = generations - prevGenerationNum
+    val lastStartIndex = prevStartIndex + cycles * startShift
+    sumPlants(generation, lastStartIndex)
   }
 
   def sumPlantsCycle(input: String): Long = {
