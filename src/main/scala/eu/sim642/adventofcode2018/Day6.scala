@@ -37,7 +37,7 @@ object Day6 {
     } yield pos -> coord).toMap
 
     val finiteGrid = grid.view.filterKeys(pos => pos.x != min.x && pos.x != max.x && pos.y != min.y && pos.y != max.y)
-    val finiteCoordSizes = finiteGrid.groupBy(_._2).view.mapValues(_.size)
+    val finiteCoordSizes = finiteGrid.groupMapReduce(_._2)(_ => 1)(_ + _)
     finiteCoordSizes.values.max
   }
 

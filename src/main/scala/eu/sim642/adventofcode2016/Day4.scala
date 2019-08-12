@@ -6,7 +6,7 @@ object Day4 {
 
   def isReal(room: Room): Boolean = {
     val dashlessName = room.name.filter(_ != '-')
-    val histogram = dashlessName.toSeq.groupBy(c => c).view.mapValues(_.length)
+    val histogram = dashlessName.toSeq.groupMapReduce(identity)(_ => 1)(_ + _)
     val mostCommon = histogram.toSeq.sortBy({ case (c, count) => (-count, c)})
     val mostCommon5 = mostCommon.take(5).map(_._1).mkString("")
     mostCommon5 == room.checksum

@@ -10,13 +10,13 @@ object Day6 {
 
   object Part1 extends Part {
     override def errorCorrect(messages: Seq[String]): String = {
-      messages.transpose.map(_.groupBy(c => c).view.mapValues(_.size).maxBy(_._2)._1).mkString("")
+      messages.transpose.map(_.groupMapReduce(identity)(_ => 1)(_ + _).maxBy(_._2)._1).mkString("")
     }
   }
 
   object Part2 extends Part {
     override def errorCorrect(messages: Seq[String]): String = {
-      messages.transpose.map(_.groupBy(c => c).view.mapValues(_.size).minBy(_._2)._1).mkString("")
+      messages.transpose.map(_.groupMapReduce(identity)(_ => 1)(_ + _).minBy(_._2)._1).mkString("")
     }
   }
 

@@ -49,7 +49,7 @@ object Day4 {
 
   object Strategy1 extends Strategy {
     def choose(shifts: List[Shift]): Int = {
-      val guardSleeps = shifts.groupBy(_.guard).view.mapValues(_.map(_.sleep.toSeq).reduce(_ ++ _))
+      val guardSleeps = shifts.groupMapReduce(_.guard)(_.sleep.toSeq)(_ ++ _)
       val (guard, sleeps) = guardSleeps.maxBy(_._2.length)
       val minute = (0 until 60).maxBy(minute => sleeps.count(_ == minute))
       guard * minute
@@ -58,9 +58,9 @@ object Day4 {
 
   object Strategy2 extends Strategy {
     override def choose(shifts: List[Shift]): Int = {
-      val guardSleeps = shifts.groupBy(_.guard).view.mapValues(_.map(_.sleep.toSeq).reduce(_ ++ _))
-      val guardMinuteCount = guardSleeps.mapValues(_.groupBy(minute => minute).view.mapValues(_.length))
-      val minuteMaxGuardCount = (0 until 60).map(minute => minute -> guardMinuteCount.mapValues(_.getOrElse(minute, 0)).maxBy(_._2)).toMap
+      val guardSleeps = shifts.groupMapReduce(_.guard)(_.sleep.toSeq)(_ ++ _)
+      val guardMinuteCount = guardSleeps.view.mapValues(_.groupMapReduce(identity)(_ => 1)(_ + _)).toMap
+      val minuteMaxGuardCount = (0 until 60).map(minute => minute -> guardMinuteCount.view.mapValues(_.getOrElse(minute, 0)).maxBy(_._2)).toMap
       val (minute, (guard, count)) = minuteMaxGuardCount.maxBy(_._2._2)
       minute * guard
     }
