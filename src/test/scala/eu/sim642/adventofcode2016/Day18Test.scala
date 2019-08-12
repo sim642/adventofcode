@@ -2,9 +2,9 @@ package eu.sim642.adventofcode2016
 
 import org.scalatest.FunSuite
 import Day18._
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day18Test extends FunSuite with PropertyChecks {
+class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
 
   val exampleInput = "..^^."
   val exampleInput2 = ".^^.^.^^^^"
