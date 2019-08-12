@@ -82,7 +82,7 @@ object Day22 {
     val graphSearch = new GraphSearch[PosTool] with TargetNode[PosTool] with Heuristic[PosTool] {
       override val startNode: PosTool = (Pos(0, 0), Torch)
 
-      override def neighbors(posTool: PosTool): TraversableOnce[(PosTool, Int)] = {
+      override def neighbors(posTool: PosTool): IterableOnce[(PosTool, Int)] = {
         val (pos, tool) = posTool
 
         val moveNeighbors = for {

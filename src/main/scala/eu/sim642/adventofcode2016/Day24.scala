@@ -22,7 +22,7 @@ object Day24 {
       val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
         override val startNode: Pos = fromPos
 
-        override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = {
+        override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
           for {
             offset <- Pos.axisOffsets
             newPos = pos + offset

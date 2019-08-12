@@ -93,7 +93,7 @@ object Day20 extends RegexParsers {
     val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = startPos
 
-      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = doors(pos)
+      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = doors(pos)
     }
 
     BFS.traverse(graphTraversal).distances

@@ -47,7 +47,7 @@ object Day17 {
     val graphSearch = new GraphSearch[VaultPos] with UnitNeighbors[VaultPos] with Heuristic[VaultPos] {
       override val startNode: VaultPos = VaultPos(passcode, startPos, "")
 
-      override def unitNeighbors(vaultPos: VaultPos): TraversableOnce[VaultPos] = vaultPos.moves
+      override def unitNeighbors(vaultPos: VaultPos): IterableOnce[VaultPos] = vaultPos.moves
 
       override def isTargetNode(vaultPos: VaultPos, dist: Int): Boolean = vaultPos.pos == targetPos
 
@@ -62,7 +62,7 @@ object Day17 {
     val graphTraversal = new GraphTraversal[VaultPos] with UnitNeighbors[VaultPos] {
       override val startNode: VaultPos = VaultPos(passcode, startPos, "")
 
-      override def unitNeighbors(vaultPos: VaultPos): TraversableOnce[VaultPos] = vaultPos.moves
+      override def unitNeighbors(vaultPos: VaultPos): IterableOnce[VaultPos] = vaultPos.moves
     }
 
     BFS.traverse(graphTraversal).distances

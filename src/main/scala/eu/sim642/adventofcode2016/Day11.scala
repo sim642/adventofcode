@@ -51,7 +51,7 @@ object Day11 {
     val graphSearch = new GraphSearch[State] with UnitNeighbors[State] with TargetNode[State] with Heuristic[State] {
       override val startNode: State = startState
 
-      override def unitNeighbors(state: State): TraversableOnce[State] = state.steps
+      override def unitNeighbors(state: State): IterableOnce[State] = state.steps
 
       override val targetNode: State = {
         val allObjects = startState.floorObjects.flatten.toSet

@@ -50,7 +50,7 @@ object Day15 {
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = startPos
 
-      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = {
+      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
         for {
           offset <- Pos.axisOffsets
           newPos = pos + offset

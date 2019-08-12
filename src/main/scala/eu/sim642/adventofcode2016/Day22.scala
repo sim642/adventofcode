@@ -94,7 +94,7 @@ object Day22 {
         NodesState(holePos, goalDataPos)
       }
 
-      override def unitNeighbors(nodesState: NodesState): TraversableOnce[NodesState] = nodesState.moves
+      override def unitNeighbors(nodesState: NodesState): IterableOnce[NodesState] = nodesState.moves
 
       override def isTargetNode(nodesState: NodesState, dist: Int): Boolean = {
         nodesState.goalDataPos == originPos

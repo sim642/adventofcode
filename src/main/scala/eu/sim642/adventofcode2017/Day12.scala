@@ -22,7 +22,7 @@ object Day12 {
     val graphTraversal = new GraphTraversal[Node] with UnitNeighbors[Node] {
       override val startNode: Node = start
 
-      override def unitNeighbors(node: Node): TraversableOnce[Node] = nodeNeighbors(node)
+      override def unitNeighbors(node: Node): IterableOnce[Node] = nodeNeighbors(node)
     }
 
     BFS.traverse(graphTraversal).nodes
@@ -33,9 +33,9 @@ object Day12 {
   def bfsGroups(nodeNeighbors: NodeNeighbors): Set[NodeComponent] = {
 
     val graphComponents = new GraphComponents[Node] {
-      override def nodes: TraversableOnce[Node] = nodeNeighbors.keySet
+      override def nodes: IterableOnce[Node] = nodeNeighbors.keySet
 
-      override def unitNeighbors(node: Node): TraversableOnce[Node] = nodeNeighbors(node)
+      override def unitNeighbors(node: Node): IterableOnce[Node] = nodeNeighbors(node)
     }
 
     BFS.components(graphComponents)

@@ -24,7 +24,7 @@ object Day13 {
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] with Heuristic[Pos] {
       override val startNode: Pos = Pos(1, 1)
 
-      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = getNeighbors(pos, favorite)
+      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = getNeighbors(pos, favorite)
 
       override val targetNode: Pos = targetPos
 
@@ -39,7 +39,7 @@ object Day13 {
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = Pos(1, 1)
 
-      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = getNeighbors(pos, favorite)
+      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = getNeighbors(pos, favorite)
 
       override def isTargetNode(pos: Pos, dist: Int): Boolean = dist == maxDist
     }

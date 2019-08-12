@@ -12,9 +12,9 @@ object Day25 {
   def bfsGroups(poss: Set[Pos4]): Set[Set[Pos4]] = {
 
     val graphComponents = new GraphComponents[Pos4] {
-      override def nodes: TraversableOnce[Pos4] = poss
+      override def nodes: IterableOnce[Pos4] = poss
 
-      override def unitNeighbors(pos: Pos4): TraversableOnce[Pos4] = poss.filter(_.manhattanDistance(pos) <= 3)
+      override def unitNeighbors(pos: Pos4): IterableOnce[Pos4] = poss.filter(_.manhattanDistance(pos) <= 3)
     }
 
     BFS.components(graphComponents)

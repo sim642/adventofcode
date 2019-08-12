@@ -78,7 +78,7 @@ object BFS {
       val graphTraversal = new GraphTraversal[A] with UnitNeighbors[A] {
         override val startNode: A = start
 
-        override def unitNeighbors(node: A): TraversableOnce[A] = graphComponents.unitNeighbors(node)
+        override def unitNeighbors(node: A): IterableOnce[A] = graphComponents.unitNeighbors(node)
       }
 
       BFS.traverse(graphTraversal).nodes

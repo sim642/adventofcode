@@ -26,9 +26,9 @@ object Day14 {
   def bfsGroups(poss: Set[Pos]): Set[Set[Pos]] = {
 
     val graphComponents = new GraphComponents[Pos] {
-      override def nodes: TraversableOnce[Pos] = poss
+      override def nodes: IterableOnce[Pos] = poss
 
-      override def unitNeighbors(pos: Pos): TraversableOnce[Pos] = Pos.axisOffsets.map(offset => pos + offset).filter(poss)
+      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = Pos.axisOffsets.map(offset => pos + offset).filter(poss)
     }
 
     BFS.components(graphComponents)
