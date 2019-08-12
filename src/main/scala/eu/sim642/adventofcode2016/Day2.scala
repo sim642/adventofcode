@@ -47,7 +47,7 @@ object Day2 {
       allMoves.scanLeft(initialPos)(moves(_, _)).tail.map(keypad(_).get).mkString("")
     }
 
-    def bathroomCode(input: String): String = bathroomCode(input.lines.toSeq)
+    def bathroomCode(input: String): String = bathroomCode(input.linesIterator.toSeq)
   }
 
   object Part1 extends Part {

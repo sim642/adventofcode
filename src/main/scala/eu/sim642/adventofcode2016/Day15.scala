@@ -78,7 +78,7 @@ object Day15 {
     case diskRegex(i, posCount, initialPos) => Disk(i.toInt, posCount.toInt, initialPos.toInt)
   }
 
-  def parseInput(input: String): Seq[Disk] = input.lines.map(parseDisk).toSeq
+  def parseInput(input: String): Seq[Disk] = input.linesIterator.map(parseDisk).toSeq
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
 

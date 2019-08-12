@@ -117,7 +117,7 @@ object Day22 {
       Pos(x.toInt, y.toInt) -> Disk(used.toInt, avail.toInt)
   }
 
-  def parseNodes(input: String): Map[Pos, Disk] = input.lines.collect(parseNode).toMap
+  def parseNodes(input: String): Map[Pos, Disk] = input.linesIterator.collect(parseNode).toMap
 
   def countViablePairs(input: String): Int = countViablePairs(parseNodes(input))
 

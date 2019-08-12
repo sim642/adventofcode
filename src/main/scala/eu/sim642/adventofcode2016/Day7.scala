@@ -19,7 +19,7 @@ object Day7 {
 
   def countSupportsTLS(addresses: Seq[String]): Int = addresses.count(supportsTLS)
 
-  def countSupportsTLS(input: String): Int = countSupportsTLS(input.lines.toSeq)
+  def countSupportsTLS(input: String): Int = countSupportsTLS(input.linesIterator.toSeq)
 
 
   // https://stackoverflow.com/a/41243911
@@ -35,7 +35,7 @@ object Day7 {
 
   def countSupportsSSL(addresses: Seq[String]): Int = addresses.count(supportsSSL)
 
-  def countSupportsSSL(input: String): Int = countSupportsSSL(input.lines.toSeq)
+  def countSupportsSSL(input: String): Int = countSupportsSSL(input.linesIterator.toSeq)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
 

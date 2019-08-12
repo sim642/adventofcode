@@ -80,7 +80,7 @@ object Day10 {
       CompareInstruction(Bot(boti.toInt), parseTarget(lowTarget, lowi.toInt), parseTarget(highTarget, highi.toInt))
   }
 
-  def parseInstructions(input: String): Seq[Instruction] = input.lines.map(parseInstruction).toSeq
+  def parseInstructions(input: String): Seq[Instruction] = input.linesIterator.map(parseInstruction).toSeq
 
   def findComparer(input: String, compareValues: Set[Int] = Set(61, 17)): Int = findComparer(parseInstructions(input), compareValues)
 

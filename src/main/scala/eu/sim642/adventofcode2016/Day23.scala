@@ -105,7 +105,7 @@ object Day23 {
       }
     }
 
-    def parseInstructions(input: String): Instructions = input.lines.map(parseInstruction).toVector
+    def parseInstructions(input: String): Instructions = input.linesIterator.map(parseInstruction).toVector
 
     override def safeValue(input: String, eggs: Int): Int = safeValue(parseInstructions(input), eggs)
   }

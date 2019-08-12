@@ -70,7 +70,7 @@ object Day8 {
     case rotateColumnRegex(x, by) => RotateColumn(x.toInt, by.toInt)
   }
 
-  def parseOperations(input: String): Seq[Operation] = input.lines.map(parseOperation).toSeq
+  def parseOperations(input: String): Seq[Operation] = input.linesIterator.map(parseOperation).toSeq
 
   def litPixels(input: String): Int = litPixels(parseOperations(input))
 

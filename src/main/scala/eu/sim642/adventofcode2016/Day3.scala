@@ -26,7 +26,7 @@ object Day3 {
     override def countPossibleTriangles(triangles: Seq[(Int, Int, Int)]): Int = Part1.countPossibleTriangles(transposeTriangles(triangles))
   }
 
-  def parseInput(input: String): Seq[(Int, Int, Int)] = input.lines.map({ line =>
+  def parseInput(input: String): Seq[(Int, Int, Int)] = input.linesIterator.map({ line =>
     val parts = line.trim.split(" +").map(_.toInt)
     (parts(0), parts(1), parts(2))
   }).toSeq

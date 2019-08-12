@@ -78,7 +78,7 @@ object Day21 {
     case moveRegex(x, y) => Move(x.toInt, y.toInt)
   }
 
-  def parseInput(input: String): Seq[Operation] = input.lines.map(parseOperation).toSeq
+  def parseInput(input: String): Seq[Operation] = input.linesIterator.map(parseOperation).toSeq
 
   private val scrambleString = "abcdefgh"
   private val unscrambleString = "fbgdceah"

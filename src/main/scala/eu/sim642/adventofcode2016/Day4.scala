@@ -32,7 +32,7 @@ object Day4 {
       Room(name, sectorId.toInt, checksum)
   }
 
-  def parseRooms(input: String): Seq[Room] = input.lines.map(parseRoom).toSeq
+  def parseRooms(input: String): Seq[Room] = input.linesIterator.map(parseRoom).toSeq
 
   def realSectorIdSum(input: String): Int = realSectorIdSum(parseRooms(input))
 

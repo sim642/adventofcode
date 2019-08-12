@@ -5,7 +5,7 @@ object Day6 {
   trait Part {
     def errorCorrect(messages: Seq[String]): String
 
-    def errorCorrect(input: String): String = errorCorrect(input.lines.toSeq)
+    def errorCorrect(input: String): String = errorCorrect(input.linesIterator.toSeq)
   }
 
   object Part1 extends Part {

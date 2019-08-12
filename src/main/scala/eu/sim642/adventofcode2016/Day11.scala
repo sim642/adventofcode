@@ -88,7 +88,7 @@ object Day11 {
   private val objectRegex = """(\w+)-compatible microchip|(\w+) generator""".r
 
   def parseInput(input: String): State = {
-    val floorObjects: Vector[Set[Object]] = input.lines.take(3).map({ line =>
+    val floorObjects: Vector[Set[Object]] = input.linesIterator.take(3).map({ line =>
       objectRegex.findAllMatchIn(line).map({ m =>
         if (m.group(1) != null)
           Microchip(m.group(1))

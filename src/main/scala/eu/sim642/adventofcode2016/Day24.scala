@@ -71,7 +71,7 @@ object Day24 {
     tspReturn(distMatrix, 0)
   }
 
-  def parseGrid(input: String): Grid[Char] = input.lines.map(_.toVector).toVector
+  def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
   def shortestRoute(input: String): Int = shortestRoute(parseGrid(input))
 

@@ -96,7 +96,7 @@ object Day25 {
     }
   }
 
-  def parseInstructions(input: String): Instructions = input.lines.map(parseInstruction).toVector
+  def parseInstructions(input: String): Instructions = input.linesIterator.map(parseInstruction).toVector
 
   def clockSignalRegisterA(input: String): Integer = clockSignalRegisterA(parseInstructions(input))
 

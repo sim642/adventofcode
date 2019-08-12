@@ -37,7 +37,7 @@ object Day20 {
     Interval(splitLongs(0), splitLongs(1))
   }
 
-  def parseInput(input: String): Seq[Interval] = input.lines.map(parseInterval).toSeq
+  def parseInput(input: String): Seq[Interval] = input.linesIterator.map(parseInterval).toSeq
 
   def minUnblocked(input: String): Long = minUnblocked(parseInput(input))
 
