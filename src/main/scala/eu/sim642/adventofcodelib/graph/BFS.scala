@@ -13,7 +13,7 @@ object BFS {
       // TODO: use one dist: Int argument instead of all same toVisit values
       val neighbors = for {
         (node, dist) <- toVisit
-        newNode <- graphTraversal.unitNeighbors(node)
+        newNode <- graphTraversal.unitNeighbors(node).iterator
       } yield newNode -> (dist + 1)
       val newVisited = visited ++ toVisit
       //val newToVisit = neighbors -- visited.keys
@@ -40,7 +40,7 @@ object BFS {
       // TODO: use one dist: Int argument instead of all same toVisit values
       val neighbors = for {
         (node, dist) <- toVisit
-        newNode <- graphSearch.unitNeighbors(node)
+        newNode <- graphSearch.unitNeighbors(node).iterator
       } yield newNode -> (dist + 1)
       val newVisited = visited ++ toVisit
       toVisit.find((graphSearch.isTargetNode _).tupled) match {
@@ -95,6 +95,6 @@ object BFS {
       }
     }
 
-    bfsGroups(graphComponents.nodes.toSet)
+    bfsGroups(graphComponents.nodes.iterator.toSet)
   }
 }

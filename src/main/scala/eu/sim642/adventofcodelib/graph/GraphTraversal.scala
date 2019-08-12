@@ -8,7 +8,7 @@ trait GraphTraversal[A] {
 trait UnitNeighbors[A] { this: GraphTraversal[A] =>
   def unitNeighbors(node: A): IterableOnce[A]
 
-  override final def neighbors(node: A): IterableOnce[(A, Int)] = unitNeighbors(node).map(_ -> 1)
+  override final def neighbors(node: A): IterableOnce[(A, Int)] = unitNeighbors(node).iterator.map(_ -> 1)
 }
 
 
