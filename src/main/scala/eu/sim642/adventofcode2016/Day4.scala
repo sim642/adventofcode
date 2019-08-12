@@ -1,12 +1,14 @@
 package eu.sim642.adventofcode2016
 
+import eu.sim642.adventofcode2018.Day2.GroupCountIterable
+
 object Day4 {
 
   case class Room(name: String, sectorId: Int, checksum: String)
 
   def isReal(room: Room): Boolean = {
     val dashlessName = room.name.filter(_ != '-')
-    val histogram = dashlessName.toSeq.groupMapReduce(identity)(_ => 1)(_ + _)
+    val histogram = dashlessName.toSeq.groupCount(identity)
     val mostCommon = histogram.toSeq.sortBy({ case (c, count) => (-count, c)})
     val mostCommon5 = mostCommon.take(5).map(_._1).mkString("")
     mostCommon5 == room.checksum

@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2016
 
+import eu.sim642.adventofcode2018.Day2.GroupCountIterable
+
 object Day6 {
 
   trait Part {
@@ -10,13 +12,13 @@ object Day6 {
 
   object Part1 extends Part {
     override def errorCorrect(messages: Seq[String]): String = {
-      messages.transpose.map(_.groupMapReduce(identity)(_ => 1)(_ + _).maxBy(_._2)._1).mkString("")
+      messages.transpose.map(_.groupCount(identity).maxBy(_._2)._1).mkString("")
     }
   }
 
   object Part2 extends Part {
     override def errorCorrect(messages: Seq[String]): String = {
-      messages.transpose.map(_.groupMapReduce(identity)(_ => 1)(_ + _).minBy(_._2)._1).mkString("")
+      messages.transpose.map(_.groupCount(identity).minBy(_._2)._1).mkString("")
     }
   }
 

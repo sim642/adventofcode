@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcode2018.Day2.GroupCountIterable
 
 object Day6 {
 
@@ -37,7 +38,7 @@ object Day6 {
     } yield pos -> coord).toMap
 
     val finiteGrid = grid.view.filterKeys(pos => pos.x != min.x && pos.x != max.x && pos.y != min.y && pos.y != max.y)
-    val finiteCoordSizes = finiteGrid.groupMapReduce(_._2)(_ => 1)(_ + _)
+    val finiteCoordSizes = finiteGrid.groupCount(_._2)
     finiteCoordSizes.values.max
   }
 

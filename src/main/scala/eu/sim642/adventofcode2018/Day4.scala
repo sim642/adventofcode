@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2018
 
+import eu.sim642.adventofcode2018.Day2.GroupCountIterable
+
 object Day4 {
 
   sealed trait Event
@@ -59,7 +61,7 @@ object Day4 {
   object Strategy2 extends Strategy {
     override def choose(shifts: List[Shift]): Int = {
       val guardSleeps = shifts.groupMapReduce(_.guard)(_.sleep.toSeq)(_ ++ _)
-      val guardMinuteCount = guardSleeps.view.mapValues(_.groupMapReduce(identity)(_ => 1)(_ + _)).toMap
+      val guardMinuteCount = guardSleeps.view.mapValues(_.groupCount(identity)).toMap
       val minuteMaxGuardCount = (0 until 60).map(minute => minute -> guardMinuteCount.view.mapValues(_.getOrElse(minute, 0)).maxBy(_._2)).toMap
       val (minute, (guard, count)) = minuteMaxGuardCount.maxBy(_._2._2)
       minute * guard

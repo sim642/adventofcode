@@ -3,7 +3,14 @@ package eu.sim642.adventofcode2018
 import scala.language.implicitConversions
 
 object Day2 {
-  def letterCounts(id: String): Map[Char, Int] = id.toSeq.groupMapReduce(identity)(_ => 1)(_ + _)
+
+  implicit class GroupCountIterable[A](i: Iterable[A]) {
+    def groupCount[K](key: A => K): Map[K, Int] = {
+      i.groupMapReduce(key)(_ => 1)(_ + _)
+    }
+  }
+
+  def letterCounts(id: String): Map[Char, Int] = id.toSeq.groupCount(identity)
 
   implicit def bool2Int(b: Boolean): Int = if (b) 1 else 0
 
