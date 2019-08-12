@@ -70,7 +70,7 @@ object Day25 {
     val clockSignal = Seq(0, 1, 0, 1, 0, 1, 0, 1, 0, 1) // reasonably long prefix from description
     Iterator.from(1).find({ a =>
       val initialRegisters = Map('a' -> a).withDefaultValue(0)
-      val outStream = iterateOuts(State(instructions, registers = initialRegisters)).toStream
+      val outStream = iterateOuts(State(instructions, registers = initialRegisters)).to(LazyList)
       //println(s"$a: ${outStream.take(clockSignal.size).toList}")
       outStream.startsWith(clockSignal)
     }).get
