@@ -15,7 +15,7 @@ object Day12 {
       nodeStr.toInt -> neighborsStr.split(", ").toSeq.map(_.toInt)
   }
 
-  def parseNodes(nodesInput: String): NodeNeighbors = nodesInput.lines.map(parseNode).toMap
+  def parseNodes(nodesInput: String): NodeNeighbors = nodesInput.linesIterator.map(parseNode).toMap
 
   def bfs(nodeNeighbors: NodeNeighbors, start: Node): NodeComponent = {
 
