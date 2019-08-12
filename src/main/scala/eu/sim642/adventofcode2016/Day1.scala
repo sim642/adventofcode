@@ -77,7 +77,7 @@ object Day1 {
   }
 
   def parseInstructions(input: String): Seq[Instruction] = {
-    input.split(", ").map(parseInstruction)
+    input.split(", ").toIndexedSeq.map(parseInstruction)
   }
 
   def shortestDestinationDist(input: String): Int = shortestDestinationDist(parseInstructions(input))
