@@ -9,7 +9,7 @@ object Day16 {
       sb.append('0')
       //sb.append(s.reverseMap({ case '0' => '1' case '1' => '0' }))
       //s.reverseIterator.take(length - sb.length).map({ case '0' => '1' case '1' => '0' }).foreach(sb.append)
-      sb.view(0, sb.length - 1).reverseIterator.take(length - sb.length).map({ case '0' => '1' case '1' => '0' }).foreach(sb.append)
+      sb.view.slice(0, sb.length - 1).reverseIterator.take(length - sb.length).map({ case '0' => '1' case '1' => '0' }).foreach(sb.append)
     }
     //sb.substring(0, length)
     sb.mkString

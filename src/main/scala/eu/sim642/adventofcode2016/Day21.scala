@@ -57,7 +57,7 @@ object Day21 {
   def scramble(operations: Seq[Operation], s: String): String = applyOperations(s, operations)
 
   def unscramble(operations: Seq[Operation], s: String): String = {
-    s.permutations.find(scramble(operations, _) == s).get
+    s.toSeq.permutations.map(_.unwrap).find(scramble(operations, _) == s).get
   }
 
 

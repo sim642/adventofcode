@@ -32,7 +32,7 @@ object Day14 {
         .map(i => (i, hash(salt + i)))
         .sliding(1 + 1000)
         .filter({ case (i, hash) +: next1000 =>
-          hash.sliding(3).find(s3 => s3(0) == s3(1) && s3(1) == s3(2)) match {
+          hash.toSeq.sliding(3).find(s3 => s3(0) == s3(1) && s3(1) == s3(2)) match {
             case None =>
               false
             case Some(s3) =>

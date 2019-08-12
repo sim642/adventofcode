@@ -27,7 +27,7 @@ object Day11 {
       }
 
       val floorDeltas = {
-        if (floorObjects.view(0, elevatorFloor).forall(_.isEmpty))
+        if (floorObjects.view.slice(0, elevatorFloor).forall(_.isEmpty))
           Iterator(1)
         else
           Iterator(1, -1)
