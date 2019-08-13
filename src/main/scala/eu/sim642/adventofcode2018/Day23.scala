@@ -75,10 +75,6 @@ object Day23 {
 
   object FourDimCliquePart2Solution extends Part2Solution {
 
-    implicit class Pos4Ops(pos4: Pos4) {
-      def +(that: Pos4): Pos4 = Pos4(pos4.x + that.x, pos4.y + that.y, pos4.z + that.z, pos4.w + that.w)
-    }
-
     implicit class ExactDivideInt(n: Int) {
       def /!(d: Int): Option[Int] = if (n % d == 0) Some(n / d) else None
     }
