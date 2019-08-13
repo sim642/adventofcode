@@ -2,20 +2,11 @@ package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcode2018.Day2.HeadIterator
-import eu.sim642.adventofcode2017.Day21.GridOps
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.cycle.NaiverCycleFinder
 
 object Day18 {
-
-  implicit class GridOps2[A](grid: Grid[A]) {
-    def slidingGrid(size: Int): Iterator[Iterator[Grid[A]]] = {
-      grid.sliding(size).map({ rows =>
-        rows.map(_.sliding(size).toVector).transpose.toIterator
-      })
-    }
-  }
 
   def step(grid: Grid[Char]): Grid[Char] = {
     /*val paddingRow = Vector.fill(grid(0).size + 2)('.')

@@ -23,4 +23,22 @@ object GridImplicits {
       Pos(-1, -1)
     }
   }
+
+  implicit class CollectionGridOps[A](grid: Grid[A]) {
+    def countGrid(p: A => Boolean): Int = grid.map(_.count(p)).sum
+
+    def mapGrid[B](f: A => B): Grid[B] = grid.map(_.map(f))
+
+    def flattenGrid[B](implicit asGrid: A => Grid[B]): Grid[B] =
+      grid.mapGrid(asGrid).map(_.transpose.map(_.flatten)).flatten
+
+    def groupedGrid(groupSize: Int): Grid[Grid[A]] =
+      grid.grouped(groupSize).map(_.map(_.grouped(groupSize).toVector).transpose).toVector
+
+    def slidingGrid(size: Int): Iterator[Iterator[Grid[A]]] = {
+      grid.sliding(size).map({ rows =>
+        rows.map(_.sliding(size).toVector).transpose.toIterator
+      })
+    }
+  }
 }

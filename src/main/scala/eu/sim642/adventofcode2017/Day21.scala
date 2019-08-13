@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 
 object Day21 {
 
@@ -26,16 +27,6 @@ object Day21 {
     def rotations: Set[Grid[A]] = (1 to 3).scanLeft(grid)({ case (acc, _) => acc.rotateCW }).toSet
 
     def symmetries: Set[Grid[A]] = grid.rotations ++ grid.flipV.rotations
-
-    def groupedGrid(groupSize: Int): Grid[Grid[A]] =
-      grid.grouped(groupSize).map(_.map(_.grouped(groupSize).toVector).transpose).toVector
-
-    def mapGrid[B](f: A => B): Grid[B] = grid.map(_.map(f))
-
-    def flattenGrid[B](implicit asGrid: A => Grid[B]): Grid[B] =
-      grid.mapGrid(asGrid).map(_.transpose.map(_.flatten)).flatten
-
-    def countGrid(p: A => Boolean): Int = grid.map(_.count(p)).sum
   }
 
 

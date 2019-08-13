@@ -1,7 +1,6 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcode2017.Day21.GridOps
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic, TargetNode}
