@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2017
 
-import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.pos.Pos
 
 object Day22 {
 

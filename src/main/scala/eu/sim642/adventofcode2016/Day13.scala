@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph.{AStar, BFS, GraphSearch, Heuristic, TargetNode, UnitNeighbors}
 
 object Day13 {

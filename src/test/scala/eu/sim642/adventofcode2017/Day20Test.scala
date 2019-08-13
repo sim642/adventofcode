@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2017
 
 import Day20._
 import eu.sim642.adventofcode2017.Day20Test._
+import eu.sim642.adventofcodelib.pos.Pos3
 import org.scalatest.{FunSuite, Suites}
 
 class Day20Test extends Suites(

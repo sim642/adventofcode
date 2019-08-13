@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2018
 
 import scala.util.parsing.combinator._
-import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, GraphTraversal, UnitNeighbors}
 
 import scala.collection.mutable

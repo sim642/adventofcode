@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day20.Pos3
-import eu.sim642.adventofcode2018.Day25.Pos4
+import eu.sim642.adventofcodelib.pos.Pos3
+import eu.sim642.adventofcodelib.pos.Pos4
 
 import scala.collection.mutable
 import scala.util.control.Breaks._

@@ -1,20 +1,10 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.adventofcodelib.pos.Pos
+
 import scala.collection.{AbstractIterator, mutable}
 
 object Day3 {
-
-  case class Pos(x: Int, y: Int) {
-    def manhattanDistance(other: Pos): Int = (x - other.x).abs + (y - other.y).abs
-
-    def +(other: Pos): Pos = Pos(x + other.x, y + other.y)
-  }
-
-  object Pos {
-    val axisOffsets: Seq[Pos] = Seq(Pos(0, 1), Pos(-1, 0), Pos(1, 0), Pos(0, -1))
-    val diagonalOffsets: Seq[Pos] = Seq(Pos(-1, 1), Pos(1, 1), Pos(-1, -1), Pos(1, -1))
-    val allOffsets: Seq[Pos] = axisOffsets ++ diagonalOffsets
-  }
 
   def squarePos(square: Int): Pos = {
     def nextOddSqrt(n: Int): Int = {

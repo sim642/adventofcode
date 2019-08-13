@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import Day3._
+import eu.sim642.adventofcodelib.pos.Pos
 import org.scalacheck.Gen
 import org.scalatest.FunSuite
 import org.scalatest.prop.PropertyChecks
