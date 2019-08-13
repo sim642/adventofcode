@@ -145,7 +145,7 @@ object Day15 {
 
   def combatOutcomeElfWin(grid: Grid[Char], units: List[CombatUnit]): Int = {
     def withElfAttackPower(elfAttackPower: Int): Option[Int] = {
-      println(s"Elf attack power: $elfAttackPower")
+      //println(s"Elf attack power: $elfAttackPower")
 
       val newUnits = units.map({
         case unit@CombatUnit(Elf, _, _, _) => unit.copy(attackPower = elfAttackPower)
