@@ -35,12 +35,12 @@ object Day1 {
   }
 
   object State {
-    val initial: State = State(Pos(0, 0), Pos(0, 1))
+    val initial: State = State(Pos.zero, Pos(0, 1))
   }
 
   def shortestDestinationDist(instructions: Seq[Instruction]): Int = {
     val finalState = instructions.foldLeft(State.initial)(_(_))
-    finalState.pos manhattanDistance Pos(0, 0)
+    finalState.pos manhattanDistance Pos.zero
   }
 
   def firstTwiceDist(instructions: Seq[Instruction]): Int = {
@@ -63,7 +63,7 @@ object Day1 {
     })._2.map(_.pos)
 
     val firstTwicePos = NaiveCycleFinder.find(posIt).cycleHead
-    firstTwicePos manhattanDistance Pos(0, 0)
+    firstTwicePos manhattanDistance Pos.zero
   }
 
   private val instructionRegex: Regex = """([LR])(\d+)""".r

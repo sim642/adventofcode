@@ -28,7 +28,7 @@ object Day8 {
 
   def execute(grid: Grid[Boolean], operation: Operation): Grid[Boolean] = operation match {
     case Rect(a, b) =>
-      iterateRect(Pos(0, 0), Pos(a - 1, b - 1)).foldLeft(grid)(_.updatedGrid(_, true))
+      iterateRect(Pos.zero, Pos(a - 1, b - 1)).foldLeft(grid)(_.updatedGrid(_, true))
     case RotateRow(y, by) =>
       grid(y).indices.map(Pos(_, y)).foldLeft(grid)({ (acc, pos) =>
         val newPos = Pos((pos.x + by) % grid(y).size, pos.y)

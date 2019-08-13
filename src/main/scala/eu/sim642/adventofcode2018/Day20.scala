@@ -34,7 +34,7 @@ object Day20 extends RegexParsers {
   }
 
 
-  private val originPos = Pos(0, 0) // arbitrary origin position
+  private val originPos = Pos.zero // arbitrary origin position
 
   private val moveOffsets = Map(
     'N' -> Pos(0, -1),

@@ -69,7 +69,7 @@ object Day23 {
     }
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-      maximumOverlap(nanobots).map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
+      maximumOverlap(nanobots).map(n => (n.pos manhattanDistance Pos3.zero) - n.radius).max
     }
   }
 
@@ -146,13 +146,13 @@ object Day23 {
       //println(pos4s.size)
       val pos3s = pos4s.flatMap(pos42pos3)
       //println(pos3s.size)
-      pos3s.map(p => p manhattanDistance Pos3(0, 0, 0)).min
+      pos3s.map(p => p manhattanDistance Pos3.zero).min
     }
   }
 
   object OctahedronSplittingPart2Solution extends Part2Solution {
     def getInitialOctahedron(nanobots: Seq[Nanobot]): Nanobot = {
-      //val initPos = Pos3(0, 0, 0)
+      //val initPos = Pos3.zero
       val poss = nanobots.map(_.pos)
       val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
       val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
@@ -192,7 +192,7 @@ object Day23 {
       val offsets = {
         if (radius == 1)
           // must include when going from radius 1 to radius 0, not to forget about center voxel
-          axisOffsets + Pos3(0, 0, 0)
+          axisOffsets + Pos3.zero
         else
           axisOffsets
       }
@@ -208,7 +208,7 @@ object Day23 {
       val done: mutable.Set[Nanobot] = mutable.Set.empty
 
       def enqueue(octahedron: Nanobot): Unit = {
-        queue.enqueue((octahedron, getBounds(nanobots, octahedron), (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius))
+        queue.enqueue((octahedron, getBounds(nanobots, octahedron), (octahedron.pos manhattanDistance Pos3.zero) - octahedron.radius))
       }
 
       val initialOctahedron = getInitialOctahedron(nanobots)
@@ -267,7 +267,7 @@ object Day23 {
     }
 
     def getInitialBox(nanobots: Seq[Nanobot]): Box3 = {
-      //val initPos = Pos3(0, 0, 0)
+      //val initPos = Pos3.zero
       val poss = nanobots.map(_.pos)
       val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
       val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
@@ -314,7 +314,7 @@ object Day23 {
       val done: mutable.Set[Box3] = mutable.Set.empty
 
       def enqueue(box: Box3): Unit = {
-        queue.enqueue((box, getBounds(nanobots, box), box.closestTo(Pos3(0, 0, 0)) manhattanDistance Pos3(0, 0, 0)))
+        queue.enqueue((box, getBounds(nanobots, box), box.closestTo(Pos3.zero) manhattanDistance Pos3.zero))
       }
 
       val initialBox = getInitialBox(nanobots)

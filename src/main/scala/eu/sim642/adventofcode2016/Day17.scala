@@ -12,7 +12,7 @@ object Day17 {
     }
   }
 
-  private val startPos = Pos(0, 0)
+  private val startPos = Pos.zero
   private val targetPos = Pos(3, 3)
   private val vaultBox = Box(startPos, targetPos)
 

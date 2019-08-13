@@ -15,7 +15,7 @@ object Day3 {
     }
 
     if (square == 1)
-      Pos(0, 0)
+      Pos.zero
     else {
       val boundSize = nextOddSqrt(square)
 
@@ -37,7 +37,7 @@ object Day3 {
   }
 
   def steps(square: Int): Int = {
-    squarePos(square) manhattanDistance Pos(0, 0)
+    squarePos(square) manhattanDistance Pos.zero
   }
 
   /**

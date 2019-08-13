@@ -46,7 +46,7 @@ object Day22 {
     override val gridChar: Char = '#'
   }
 
-  private val originPos = Pos(0, 0)
+  private val originPos = Pos.zero
 
   def nodesToTypes(nodes: Map[Pos, Disk]): Map[Pos, DiskType] = {
     val oversizeLimit = nodes(originPos).size
