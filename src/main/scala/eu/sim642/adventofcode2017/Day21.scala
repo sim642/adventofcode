@@ -1,8 +1,8 @@
 package eu.sim642.adventofcode2017
 
-object Day21 {
+import eu.sim642.adventofcodelib.Grid
 
-  type Grid[A] = Vector[Vector[A]]
+object Day21 {
 
   implicit class GridOps[A](grid: Grid[A]) {
     def rotateCW: Grid[A] = {

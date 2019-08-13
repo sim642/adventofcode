@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcode2017.Day14.PosGrid
 import eu.sim642.adventofcode2018.Day6.iterateRect
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 
 object Day8 {
 
@@ -18,12 +18,6 @@ object Day8 {
       case Rect(a, b) => a * b
       case _ => 0
     }).sum
-  }
-
-  implicit class PosUpdatedGrid[A](grid: Grid[A]) {
-    def updatedGrid(pos: Pos, elem: A): Grid[A] = {
-      grid.updated(pos.y, grid(pos.y).updated(pos.x, elem))
-    }
   }
 
   def execute(grid: Grid[Boolean], operation: Operation): Grid[Boolean] = operation match {

@@ -1,15 +1,10 @@
 package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcodelib.pos.Pos
-import Day14.PosGrid
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 
 object Day19 {
-
-  type Grid[A] = Vector[Vector[A]]
-
-  implicit class PosGrid2[A](grid: Grid[A]) {
-    def containsPos(pos: Pos): Boolean = grid.indices.contains(pos.y) && grid(pos.y).indices.contains(pos.x)
-  }
 
   case class PathState(grid: Grid[Char], pos: Pos, prevOffset: Pos) {
     def char: Char = grid(pos)

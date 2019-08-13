@@ -1,6 +1,8 @@
 package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcodelib.pos.Pos
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.graph.{BFS, GraphComponents}
 
 object Day14 {
@@ -10,17 +12,13 @@ object Day14 {
   def bytes2bits(bytes: Seq[Byte]): Vector[Boolean] =
     bytes.flatMap(byte => (0 until 8).foldLeft(Vector.empty[Boolean])((acc, i) => (((byte >> i) & 1) != 0) +: acc)).toVector
 
-  def hashGrid(key: String): Vector[Vector[Boolean]] = {
+  def hashGrid(key: String): Grid[Boolean] = {
     (0 until 128).map(row => bytes2bits(hashRow(key, row))).toVector
   }
 
   def squaresUsed(key: String): Int = {
     val rows = hashGrid(key)
     rows.map(_.count(x => x)).sum
-  }
-
-  implicit class PosGrid[A](grid: Vector[Vector[A]]) {
-    def apply(pos: Pos): A = grid(pos.y)(pos.x)
   }
 
   def bfsGroups(poss: Set[Pos]): Set[Set[Pos]] = {

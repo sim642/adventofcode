@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
-import eu.sim642.adventofcode2017.Day14.PosGrid
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 
 object Day24 {
 

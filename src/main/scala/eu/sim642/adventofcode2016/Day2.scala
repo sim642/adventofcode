@@ -1,9 +1,8 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcode2017.Day19.Grid
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcode2017.Day14.PosGrid
-import eu.sim642.adventofcode2017.Day19.PosGrid2
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 
 object Day2 {
 
@@ -16,18 +15,6 @@ object Day2 {
       'L' -> Pos(-1, 0),
       'R' -> Pos(1, 0),
     )
-
-  implicit class PosOfGrid[A](grid: Grid[A]) {
-    def posOf(elem: A): Pos = {
-      for {
-        (row, y) <- grid.zipWithIndex
-        (cell, x) <- row.zipWithIndex
-        if cell == elem
-      } return Pos(x, y)
-
-      Pos(-1, -1)
-    }
-  }
 
   trait Part {
     val keypad: Grid[Option[Char]]
