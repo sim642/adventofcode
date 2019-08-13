@@ -1,7 +1,6 @@
 package eu.sim642.adventofcode2016
 
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcode2018.Day10.PosScalar
 import eu.sim642.adventofcode2018.Day13.DirectionPos
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 

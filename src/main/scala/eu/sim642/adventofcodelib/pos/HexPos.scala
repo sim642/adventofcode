@@ -9,6 +9,9 @@ case class HexPos(x: Int, y: Int, z: Int) extends PosOps[HexPos] {
   override def +(that: HexPos): HexPos =
     HexPos(this.x + that.x, this.y + that.y, this.z + that.z)
 
+  override def *:(k: Int): HexPos =
+    HexPos(k * x, k * y, k * z)
+
   override def manhattanDistance(that: HexPos): Int =
     ((this.x - that.x).abs + (this.y - that.y).abs + (this.z - that.z).abs) / 2
 }

@@ -7,10 +7,6 @@ object Day19 {
 
   type Grid[A] = Vector[Vector[A]]
 
-  implicit class Pos2(pos: Pos) {
-    def unary_-(): Pos = Pos(-pos.x, -pos.y)
-  }
-
   implicit class PosGrid2[A](grid: Grid[A]) {
     def containsPos(pos: Pos): Boolean = grid.indices.contains(pos.y) && grid(pos.y).indices.contains(pos.x)
   }

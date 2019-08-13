@@ -4,6 +4,9 @@ case class Pos(x: Int, y: Int) extends PosOps[Pos] {
   override def +(that: Pos): Pos =
     Pos(x + that.x, y + that.y)
 
+  override def *:(k: Int): Pos =
+    Pos(k * x, k * y)
+
   override def manhattanDistance(that: Pos): Int =
     (x - that.x).abs + (y - that.y).abs
 }
