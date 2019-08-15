@@ -149,7 +149,7 @@ object Day20 {
             None
       }).toSeq.sortBy(_._3)
 
-      println(collisions)
+      //println(collisions)
 
       helper(collisions, particles.indices.toSet).size
     }
