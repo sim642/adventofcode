@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2018
 
+import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 
 import scala.collection.mutable
@@ -14,12 +15,13 @@ object Day11 {
   }
 
   trait SumGrid {
+    // TODO: use Box argument
     def sumRect(topLeft: Pos, bottomRight: Pos): Int
   }
 
   class NaiveSumGrid(f: Pos => Int) extends SumGrid {
     override def sumRect(topLeft: Pos, bottomRight: Pos): Int = {
-      Day6.iterateRect(topLeft, bottomRight).map(f).sum
+      Box(topLeft, bottomRight).iterator.map(f).sum
     }
   }
 
@@ -45,7 +47,7 @@ object Day11 {
   def largestPowerLevelSquare(serialNumber: Int): Pos = {
     val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Pos(1, 1), Pos(300, 300))
 
-    Day6.iterateRect(Pos(1, 1), Pos(300 - 3, 300 - 3)).maxBy(p => sumGrid.sumRect(p, p + Pos(2, 2)))
+    Box(Pos(1, 1), Pos(300 - 3, 300 - 3)).iterator.maxBy(p => sumGrid.sumRect(p, p + Pos(2, 2)))
   }
 
   def largestPowerLevelSquareString(serialNumber: Int): String = {
@@ -58,7 +60,7 @@ object Day11 {
 
     (for {
       size <- (1 to 300).toIterator
-      pos <- Day6.iterateRect(Pos(1, 1), Pos(300 - size, 300 - size))
+      pos <- Box(Pos(1, 1), Pos(300 - size, 300 - size)).iterator
     } yield (pos, size)).maxBy({ case (p, s) => sumGrid.sumRect(p, p + Pos(s - 1, s - 1)) })
   }
 

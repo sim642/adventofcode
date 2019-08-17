@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcode2018.Day6.iterateRect
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.box.Box
 
 object Day8 {
 
@@ -22,7 +22,7 @@ object Day8 {
 
   def execute(grid: Grid[Boolean], operation: Operation): Grid[Boolean] = operation match {
     case Rect(a, b) =>
-      iterateRect(Pos.zero, Pos(a - 1, b - 1)).foldLeft(grid)(_.updatedGrid(_, true))
+      Box(Pos.zero, Pos(a - 1, b - 1)).iterator.foldLeft(grid)(_.updatedGrid(_, true))
     case RotateRow(y, by) =>
       grid(y).indices.map(Pos(_, y)).foldLeft(grid)({ (acc, pos) =>
         val newPos = Pos((pos.x + by) % grid(y).size, pos.y)

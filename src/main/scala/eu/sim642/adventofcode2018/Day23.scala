@@ -100,16 +100,6 @@ object Day23 {
       } yield Pos3(x, y, z)
     }
 
-    def box4iterate(box4: Box4): Iterator[Pos4] = {
-      val Box4(Pos4(x1, y1, z1, w1), Pos4(x2, y2, z2, w2)) = box4
-      for {
-        x <- (x1 to x2).toIterator
-        y <- (y1 to y2).toIterator
-        z <- (z1 to z2).toIterator
-        w <- (w1 to w2).toIterator
-      } yield Pos4(x, y, z, w)
-    }
-
     override def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
       val overlapping = NaiveCliquePart2Solution.maximumOverlap(nanobots)
       val intersection = overlapping.map(nanobot => Option(nanobot2box4(nanobot))).reduce({ (left, right) =>
@@ -121,7 +111,7 @@ object Day23 {
       }).get
       //println(intersection)
 
-      val pos4s = box4iterate(intersection).toSeq
+      val pos4s = intersection.iterator.toSeq
       //println(pos4s.size)
       val pos3s = pos4s.flatMap(pos42pos3)
       //println(pos3s.size)
