@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2018
 
+import eu.sim642.adventofcodelib.box.{Box3, Box4}
 import eu.sim642.adventofcodelib.pos.Pos3
 import eu.sim642.adventofcodelib.pos.Pos4
 
@@ -77,24 +78,6 @@ object Day23 {
 
     implicit class ExactDivideInt(n: Int) {
       def /!(d: Int): Option[Int] = if (n % d == 0) Some(n / d) else None
-    }
-
-    case class Box4(min: Pos4, max: Pos4) {
-      def intersect(that: Box4): Option[Box4] = {
-        val Box4(min2, max2) = that
-        val minX = min.x max min2.x
-        val maxX = max.x min max2.x
-        val minY = min.y max min2.y
-        val maxY = max.y min max2.y
-        val minZ = min.z max min2.z
-        val maxZ = max.z min max2.z
-        val minW = min.w max min2.w
-        val maxW = max.w min max2.w
-        if (minX <= maxX && minY <= maxY && minZ <= maxZ && minW <= maxW)
-          Some(Box4(Pos4(minX, minY, minZ, minW), Pos4(maxX, maxY, maxZ, maxW)))
-        else
-          None
-      }
     }
 
     def nanobot2box4(nanobot: Nanobot): Box4 = {
@@ -238,14 +221,10 @@ object Day23 {
       else value
     }
 
-    case class Box3(min: Pos3, max: Pos3) {
-      def contains(pos: Pos3): Boolean = {
-        min.x <= pos.x && pos.x <= max.x &&
-          min.y <= pos.y && pos.y <= max.y &&
-          min.z <= pos.z && pos.z <= max.z
-      }
+    implicit class NanobotBox3(box: Box3) {
+      val Box3(min, max) = box
 
-      def contains(octahedron: Nanobot): Boolean = octahedron.corners.forall(contains)
+      def contains(octahedron: Nanobot): Boolean = octahedron.corners.forall(box.contains)
 
       def closestTo(pos: Pos3): Pos3 = {
         Pos3(
@@ -256,7 +235,7 @@ object Day23 {
       }
     }
 
-    implicit class NanobotBox3(nanobot: Nanobot) {
+    implicit class Box3Nanobot(nanobot: Nanobot) {
       def contains(box: Box3): Boolean = nanobot.contains(box.min) && nanobot.contains(box.max) // TODO: sufficient to only check two corners?
 
       def overlaps(box: Box3): Boolean = nanobot.contains(box.closestTo(nanobot.pos))
@@ -271,7 +250,7 @@ object Day23 {
       val initPos = Pos3(initX, initY, initZ)
       Iterator.iterate(1)(_ * 2).map({ radius =>
         Box3(initPos + Pos3(-radius, -radius, -radius), initPos + Pos3(radius, radius, radius))
-      }).find(box => nanobots.forall(box.contains)).get
+      }).find(box => nanobots.forall(box.contains(_))).get
     }
 
     def getBounds(nanobots: Seq[Nanobot], box: Box3): (Int, Int) = {

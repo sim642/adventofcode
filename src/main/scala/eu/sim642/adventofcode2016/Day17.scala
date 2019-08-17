@@ -1,16 +1,10 @@
 package eu.sim642.adventofcode2016
 
+import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph._
 
 object Day17 {
-
-  case class Box(min: Pos, max: Pos) {
-    def contains(pos: Pos): Boolean = {
-      min.x <= pos.x && pos.x <= max.x &&
-        min.y <= pos.y && pos.y <= max.y
-    }
-  }
 
   private val startPos = Pos.zero
   private val targetPos = Pos(3, 3)
