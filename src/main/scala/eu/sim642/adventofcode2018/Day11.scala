@@ -47,7 +47,7 @@ object Day11 {
   def largestPowerLevelSquare(serialNumber: Int): Pos = {
     val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Pos(1, 1), Pos(300, 300))
 
-    Box(Pos(1, 1), Pos(300 - 3, 300 - 3)).iterator.maxBy(p => sumGrid.sumRect(p, p + Pos(2, 2)))
+    Box(Pos(1, 1), Pos(300 - 3 + 1, 300 - 3 + 1)).iterator.maxBy(p => sumGrid.sumRect(p, p + Pos(2, 2)))
   }
 
   def largestPowerLevelSquareString(serialNumber: Int): String = {
@@ -60,7 +60,7 @@ object Day11 {
 
     (for {
       size <- (1 to 300).toIterator
-      pos <- Box(Pos(1, 1), Pos(300 - size, 300 - size)).iterator
+      pos <- Box(Pos(1, 1), Pos(300 - size + 1, 300 - size + 1)).iterator
     } yield (pos, size)).maxBy({ case (p, s) => sumGrid.sumRect(p, p + Pos(s - 1, s - 1)) })
   }
 
