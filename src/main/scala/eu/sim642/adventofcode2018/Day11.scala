@@ -15,17 +15,17 @@ object Day11 {
   }
 
   trait SumGrid {
-    // TODO: use Box argument
-    def sumRect(topLeft: Pos, bottomRight: Pos): Int
+    def sumBox(box: Box): Int
   }
 
   class NaiveSumGrid(f: Pos => Int) extends SumGrid {
-    override def sumRect(topLeft: Pos, bottomRight: Pos): Int = {
-      Box(topLeft, bottomRight).iterator.map(f).sum
+    override def sumBox(box: Box): Int = {
+      box.iterator.map(f).sum
     }
   }
 
-  class PartialSumGrid(f: Pos => Int, min: Pos, max: Pos) extends SumGrid {
+  class PartialSumGrid(f: Pos => Int, box: Box) extends SumGrid {
+    val Box(min, max) = box
     val partialSums: mutable.Map[Pos, Int] = mutable.Map.empty.withDefaultValue(0)
 
     for (y <- min.y to max.y) {
@@ -36,7 +36,8 @@ object Day11 {
       }
     }
 
-    override def sumRect(topLeft: Pos, bottomRight: Pos): Int = {
+    override def sumBox(box: Box): Int = {
+      val Box(topLeft, bottomRight) = box
       val bottomLeft1 = Pos(topLeft.x - 1, bottomRight.y)
       val topRight1 = Pos(bottomRight.x, topLeft.y - 1)
       val topLeft1 = Pos(topLeft.x - 1, topLeft.y - 1)
@@ -45,9 +46,10 @@ object Day11 {
   }
 
   def largestPowerLevelSquare(serialNumber: Int): Pos = {
-    val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Pos(1, 1), Pos(300, 300))
+    val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Box(Pos(1, 1), Pos(300, 300)))
 
-    Box(Pos(1, 1), Pos(300 - 3 + 1, 300 - 3 + 1)).iterator.maxBy(p => sumGrid.sumRect(p, p + Pos(2, 2)))
+    // TODO: extract BoxOps.sliding
+    Box(Pos(1, 1), Pos(300 - 3 + 1, 300 - 3 + 1)).iterator.maxBy(p => sumGrid.sumBox(Box(p, p + Pos(2, 2))))
   }
 
   def largestPowerLevelSquareString(serialNumber: Int): String = {
@@ -56,12 +58,12 @@ object Day11 {
   }
 
   def largestPowerLevelSquare2(serialNumber: Int): (Pos, Int) = {
-    val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Pos(1, 1), Pos(300, 300))
+    val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Box(Pos(1, 1), Pos(300, 300)))
 
     (for {
       size <- (1 to 300).toIterator
       pos <- Box(Pos(1, 1), Pos(300 - size + 1, 300 - size + 1)).iterator
-    } yield (pos, size)).maxBy({ case (p, s) => sumGrid.sumRect(p, p + Pos(s - 1, s - 1)) })
+    } yield (pos, size)).maxBy({ case (p, s) => sumGrid.sumBox(Box(p, p + Pos(s - 1, s - 1))) })
   }
 
   def largestPowerLevelSquareString2(serialNumber: Int): String = {
