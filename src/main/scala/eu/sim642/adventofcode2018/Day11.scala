@@ -45,11 +45,23 @@ object Day11 {
     }
   }
 
-  def largestPowerLevelSquare(serialNumber: Int): Pos = {
-    val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Box(Pos(1, 1), Pos(300, 300)))
+  private val totalBox = Box(Pos(1, 1), Pos(300, 300))
 
-    // TODO: extract BoxOps.sliding
-    Box(Pos(1, 1), Pos(300 - 3 + 1, 300 - 3 + 1)).iterator.maxBy(p => sumGrid.sumBox(Box(p, p + Pos(2, 2))))
+  def getSumGrid(serialNumber: Int): SumGrid = {
+    new PartialSumGrid(powerLevel(serialNumber), totalBox)
+  }
+
+  implicit class SlidingBox(box: Box) {
+    def sliding(size: Pos): Iterator[Box] = {
+      val sizeOffset = size - Pos(1, 1)
+      val minBox = Box(box.min, box.max - sizeOffset)
+      minBox.iterator.map(min => Box(min, min + sizeOffset))
+    }
+  }
+
+  def largestPowerLevelSquare(serialNumber: Int): Pos = {
+    val sumGrid = getSumGrid(serialNumber)
+    totalBox.sliding(Pos(3, 3)).maxBy(sumGrid.sumBox).min
   }
 
   def largestPowerLevelSquareString(serialNumber: Int): String = {
@@ -58,12 +70,12 @@ object Day11 {
   }
 
   def largestPowerLevelSquare2(serialNumber: Int): (Pos, Int) = {
-    val sumGrid = new PartialSumGrid(powerLevel(serialNumber), Box(Pos(1, 1), Pos(300, 300)))
-
-    (for {
+    val sumGrid = getSumGrid(serialNumber)
+    val maxSumBox = (for {
       size <- (1 to 300).toIterator
-      pos <- Box(Pos(1, 1), Pos(300 - size + 1, 300 - size + 1)).iterator
-    } yield (pos, size)).maxBy({ case (p, s) => sumGrid.sumBox(Box(p, p + Pos(s - 1, s - 1))) })
+      box <- totalBox.sliding(Pos(size, size))
+    } yield box).maxBy(sumGrid.sumBox)
+    (maxSumBox.min, maxSumBox.max.x - maxSumBox.min.x + 1) // recompute size assuming square
   }
 
   def largestPowerLevelSquareString2(serialNumber: Int): String = {
