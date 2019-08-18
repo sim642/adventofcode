@@ -3,6 +3,7 @@ package eu.sim642.adventofcode2018
 import eu.sim642.adventofcodelib.box.{Box3, Box4}
 import eu.sim642.adventofcodelib.pos.Pos3
 import eu.sim642.adventofcodelib.pos.Pos4
+import eu.sim642.adventofcodelib.IntegralImplicits._
 
 import scala.collection.mutable
 import scala.util.control.Breaks._
@@ -75,10 +76,6 @@ object Day23 {
   }
 
   object FourDimCliquePart2Solution extends Part2Solution {
-
-    implicit class ExactDivideInt(n: Int) {
-      def /!(d: Int): Option[Int] = if (n % d == 0) Some(n / d) else None
-    }
 
     def nanobot2box4(nanobot: Nanobot): Box4 = {
       val Nanobot(Pos3(x, y, z), r) = nanobot
@@ -247,10 +244,6 @@ object Day23 {
       val lower = nanobots.count(_.contains(box))
       val upper = nanobots.count(_.overlaps(box))
       (lower, upper)
-    }
-
-    implicit class FloorDivideInt(n: Int) {
-      def floorDiv(d: Int): Int = Math.floorDiv(n, d)
     }
 
     def getSplits(box: Box3): Set[Box3] = {

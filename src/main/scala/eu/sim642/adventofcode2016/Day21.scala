@@ -5,7 +5,7 @@ object Day21 {
   // similar to 2017 Day 1 CyclicSeq
   implicit class RotateString(s: String) {
     def rotate(n: Int): String = {
-      import eu.sim642.adventofcode2016.Day15.IntModPos
+      import eu.sim642.adventofcodelib.IntegralImplicits._
       val realN = n %+ s.length
       val (init, tail) = s.splitAt(realN)
       tail + init
