@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2018.Day2.HeadIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 import scala.collection.AbstractIterator
 

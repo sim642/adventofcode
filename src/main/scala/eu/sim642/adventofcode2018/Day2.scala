@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2018
 
 import scala.language.implicitConversions
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day2 {
   def letterCounts(id: String): Map[Char, Int] = id.groupBy(c => c).mapValues(_.length)
@@ -13,11 +14,6 @@ object Day2 {
       (cnt2 + idCounts.contains(2), cnt3 + idCounts.contains(3))
     }
     cnt2 * cnt3
-  }
-
-  implicit class HeadIterator[A](it: Iterator[A]) {
-    def headOption: Option[A] = if (it.nonEmpty) Some(it.next) else None
-    def head: A = headOption.get
   }
 
   def commonCorrectIds(ids: Seq[String]): String = {

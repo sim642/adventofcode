@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcode2018.Day2.HeadIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.cycle.NaiverCycleFinder
@@ -50,7 +50,7 @@ object Day18 {
 
   def resourceValueIterate(grid: Grid[Char], after: Int = 10): Int = {
     val it = Iterator.iterate(grid)(step)
-    val finalGrid = it.drop(after).head
+    val finalGrid = it(after)
     resourceValue(finalGrid)
   }
 

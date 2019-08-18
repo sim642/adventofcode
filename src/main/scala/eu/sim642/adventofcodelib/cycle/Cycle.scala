@@ -1,6 +1,6 @@
 package eu.sim642.adventofcodelib.cycle
 
-import eu.sim642.adventofcode2018.Day2.HeadIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 trait Cycle[A] {
   val stemLength: Int
@@ -25,10 +25,10 @@ case class FunctionCycle[A](stemLength: Int, cycleLength: Int, cycleHead: A)
   def apply(i: Int): A = {
     if (i >= stemLength) {
       val shortI = (i - stemLength) % cycleLength
-      Iterator.iterate(cycleHead)(f).drop(shortI).head
+      Iterator.iterate(cycleHead)(f)(shortI)
     }
     else
-      Iterator.iterate(x0)(f).drop(i).head
+      Iterator.iterate(x0)(f)(i)
   }
 }
 

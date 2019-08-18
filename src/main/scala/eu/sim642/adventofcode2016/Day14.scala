@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2016
 
 import java.security.MessageDigest
 
-import eu.sim642.adventofcode2018.Day2.HeadIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day14 {
 
@@ -45,7 +45,7 @@ object Day14 {
     }
 
     def key64Index(salt: String): Int = {
-      keys(salt).drop(64 - 1).head._1
+      keys(salt)(64 - 1)._1
     }
   }
 
@@ -55,7 +55,7 @@ object Day14 {
 
   object Part2 extends Part {
     override def hash(s: String): String = {
-      Iterator.iterate(s)(md5).drop(2017).head
+      Iterator.iterate(s)(md5)(2017)
     }
   }
 

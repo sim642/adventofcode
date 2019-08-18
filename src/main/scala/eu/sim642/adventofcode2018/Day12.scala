@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2018.Day2.HeadIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
 object Day12 {
@@ -24,7 +24,7 @@ object Day12 {
   }
 
   def sumPlantsSimulate(initial: String, notes: Map[String, Char]): Long = {
-    val (last, startIndex) = iterateGenerations(initial, notes).drop(20).head
+    val (last, startIndex) = iterateGenerations(initial, notes)(20)
     sumPlants(last, startIndex)
   }
 

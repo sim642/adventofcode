@@ -1,8 +1,7 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcode2018.Day16.{Instruction, Registers}
-import eu.sim642.adventofcode2018.Day2.HeadIterator
-import eu.sim642.adventofcode2017.Day8.LastIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 import scala.collection.mutable
 import scala.util.control.Breaks._
