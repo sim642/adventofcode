@@ -2,14 +2,9 @@ package eu.sim642.adventofcode2018
 
 import scala.language.implicitConversions
 import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.IterableImplicits._
 
 object Day2 {
-
-  implicit class GroupCountIterable[A](i: Iterable[A]) {
-    def groupCount[K](key: A => K): Map[K, Int] = {
-      i.groupMapReduce(key)(_ => 1)(_ + _)
-    }
-  }
 
   def letterCounts(id: String): Map[Char, Int] = id.toSeq.groupCount(identity)
 

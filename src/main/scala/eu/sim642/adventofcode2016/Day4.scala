@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcode2018.Day2.GroupCountIterable
+import eu.sim642.adventofcodelib.IterableImplicits._
 
 object Day4 {
 
