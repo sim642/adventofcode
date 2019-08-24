@@ -2,19 +2,23 @@ package eu.sim642.adventofcodelib.cycle
 
 import scala.collection.mutable
 
+import eu.sim642.adventofcodelib.IteratorImplicits._
+
 object NaiveCycleFinder {
   def find[A](it: Iterator[A]): Cycle[A] = {
     val prevs = mutable.Map[A, Int]()
 
-    val (x, Some(prevI), i) =
-      it.zipWithIndex
-        .map({ case (x, i) => (x, prevs.put(x, i), i) }) // nasty side-effecting
-        .find(_._2.isDefined).get
+    val (Some(lastX), x, Some(prevI), i) =
+      it.zipWithPrev
+        .zipWithIndex
+        .map({ case ((lastX, x), i) => (lastX, x, prevs.put(x, i), i) }) // nasty side-effecting
+        .find(_._3.isDefined).get
 
     SimpleCycle(
       stemLength = prevI,
       cycleLength = i - prevI,
-      cycleHead = x
+      cycleHead = x,
+      cycleLast = lastX
     )
   }
 
@@ -23,7 +27,8 @@ object NaiveCycleFinder {
     FunctionCycle(
       stemLength = cycle.stemLength,
       cycleLength = cycle.cycleLength,
-      cycleHead = cycle.cycleHead
+      cycleHead = cycle.cycleHead,
+      cycleLast = cycle.cycleLast
     )(x0, f)
   }
 
@@ -31,15 +36,17 @@ object NaiveCycleFinder {
   def findBy[A, B](it: Iterator[A])(m: A => B): CycleBy[A] = {
     val prevs = mutable.Map[B, (A, Int)]()
 
-    val (x, Some((prevX, prevI)), i) =
-      it.zipWithIndex
-        .map({ case (x, i) => (x, prevs.put(m(x), (x, i)), i) }) // nasty side-effecting
-        .find(_._2.isDefined).get
+    val (Some(lastX), x, Some((prevX, prevI)), i) =
+      it.zipWithPrev
+        .zipWithIndex
+        .map({ case ((lastX, x), i) => (lastX, x, prevs.put(m(x), (x, i)), i) }) // nasty side-effecting
+        .find(_._3.isDefined).get
 
     SimpleCycleBy(
       stemLength = prevI,
       cycleLength = i - prevI,
       cycleHead = prevX,
+      cycleLast = lastX,
       cycleHeadRepeat = x
     )
   }

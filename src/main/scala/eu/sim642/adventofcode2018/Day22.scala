@@ -1,10 +1,8 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day19.Grid
-import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcode2017.Day21.GridOps
-import eu.sim642.adventofcode2017.Day14.PosGrid
-import eu.sim642.adventofcode2017.Day19.PosGrid2
+import eu.sim642.adventofcodelib.pos.Pos
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic, TargetNode}
 
 import scala.collection.mutable
@@ -80,7 +78,7 @@ object Day22 {
     val toolDistance = 7
 
     val graphSearch = new GraphSearch[PosTool] with TargetNode[PosTool] with Heuristic[PosTool] {
-      override val startNode: PosTool = (Pos(0, 0), Torch)
+      override val startNode: PosTool = (Pos.zero, Torch)
 
       override def neighbors(posTool: PosTool): TraversableOnce[(PosTool, Int)] = {
         val (pos, tool) = posTool

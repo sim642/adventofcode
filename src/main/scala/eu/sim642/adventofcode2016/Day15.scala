@@ -2,15 +2,9 @@ package eu.sim642.adventofcode2016
 
 import scala.annotation.tailrec
 
+import eu.sim642.adventofcodelib.IntegralImplicits._
+
 object Day15 {
-
-  implicit class IntModPos(n: Int) {
-    def %+(d: Int): Int = (n % d + d) % d
-  }
-
-  implicit class LongModPos(n: Long) {
-    def %+(d: Long): Long = (n % d + d) % d
-  }
 
   case class Disk(i: Int, posCount: Int, initialPos: Int)
 

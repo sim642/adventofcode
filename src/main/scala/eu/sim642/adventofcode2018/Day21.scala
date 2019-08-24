@@ -1,28 +1,21 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcode2018.Day16.{Instruction, Registers}
-import eu.sim642.adventofcode2018.Day2.HeadIterator
-import eu.sim642.adventofcode2017.Day8.LastIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
-import scala.collection.mutable
 import scala.util.control.Breaks._
 
 object Day21 {
 
-  implicit class UnloopIterator[A](iterable: Iterator[A]) {
-    def unloop: Iterator[A] = {
-      val prevValues: mutable.Set[A] = mutable.Set.empty
-      iterable.takeWhile(value => prevValues.add(value)) // nasty side-effecting takeWhile
-    }
-  }
-
   trait Solution {
     def iterater2(input: String): Iterator[Int]
 
-    def iterate2Unlooped(input: String): Iterator[Int] = iterater2(input).unloop
+    def firstHaltr0(input: String): Int = iterater2(input).head
 
-    def firstHaltr0(input: String): Int = iterate2Unlooped(input).head
-    def lastHaltr0(input: String): Int = iterate2Unlooped(input).last
+    def lastHaltr0(input: String): Int = {
+      NaiveCycleFinder.find(iterater2(input)).cycleLast
+    }
   }
 
   object SimulateSolution extends Solution {

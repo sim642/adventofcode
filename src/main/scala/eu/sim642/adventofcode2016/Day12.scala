@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcode2017.Day8.LastIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day12 {
 

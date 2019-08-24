@@ -18,13 +18,17 @@ object BrentCycleFinder {
     }
 
     tortoise = x0
+    var prevHare = x0
     hare = x0
-    for (i <- 0 until λ)
+    for (i <- 0 until λ) {
+      prevHare = hare
       hare = f(hare)
+    }
 
     var μ = 0
     while (tortoise != hare) {
       tortoise = f(tortoise)
+      prevHare = hare
       hare = f(hare)
       μ += 1
     }
@@ -33,7 +37,8 @@ object BrentCycleFinder {
     FunctionCycle(
       stemLength = μ,
       cycleLength = λ,
-      cycleHead = tortoise
+      cycleHead = tortoise,
+      cycleLast = prevHare
     )(x0, f)
   }
 
@@ -54,13 +59,17 @@ object BrentCycleFinder {
     }
 
     tortoise = x0
+    var prevHare = x0
     hare = x0
-    for (i <- 0 until λ)
+    for (i <- 0 until λ) {
+      prevHare = hare
       hare = f(hare)
+    }
 
     var μ = 0
     while (m(tortoise) != m(hare)) {
       tortoise = f(tortoise)
+      prevHare = hare
       hare = f(hare)
       μ += 1
     }
@@ -70,6 +79,7 @@ object BrentCycleFinder {
       stemLength = μ,
       cycleLength = λ,
       cycleHead = tortoise,
+      cycleLast = prevHare,
       cycleHeadRepeat = hare
     )
   }

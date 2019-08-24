@@ -1,14 +1,8 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.adventofcodelib.pos.Pos3
+
 object Day20 {
-
-  case class Pos3(x: Int, y: Int, z: Int) {
-    def manhattanDistance(that: Pos3): Int =
-      (x - that.x).abs + (y - that.y).abs + (z - that.z).abs
-
-    def +(that: Pos3): Pos3 =
-      Pos3(x + that.x, y + that.y, z + that.z)
-  }
 
   case class Particle(p: Pos3, v: Pos3, a: Pos3)
 
@@ -45,7 +39,7 @@ object Day20 {
 
     override def staysClosest(particles: Seq[Particle]): Int = {
       val endParticles = (0 until maxIterations).foldLeft(particles.toVector)({ case (acc, _) => acc.map(_.updated) })
-      endParticles.zipWithIndex.minBy({ case (p, i) => p.p manhattanDistance Pos3(0, 0, 0) })._2
+      endParticles.zipWithIndex.minBy({ case (p, i) => p.p manhattanDistance Pos3.zero })._2
     }
 
     override def particlesLeft(particles: Seq[Particle]): Int = {
@@ -124,7 +118,7 @@ object Day20 {
 
     override def staysClosest(particles: Seq[Particle]): Int =
       particles.zipWithIndex.minBy({ case (pos, i) =>
-        (pos.a manhattanDistance Pos3(0, 0, 0), pos.v manhattanDistance Pos3(0, 0, 0), pos.p manhattanDistance Pos3(0, 0, 0)) // is this asymptote even correct?
+        (pos.a manhattanDistance Pos3.zero, pos.v manhattanDistance Pos3.zero, pos.p manhattanDistance Pos3.zero) // is this asymptote even correct?
       })._2
 
     override def particlesLeft(particles: Seq[Particle]): Int = {

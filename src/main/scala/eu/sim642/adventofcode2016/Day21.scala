@@ -1,16 +1,8 @@
 package eu.sim642.adventofcode2016
 
-object Day21 {
+import eu.sim642.adventofcodelib.SeqImplicits._
 
-  // similar to 2017 Day 1 CyclicSeq
-  implicit class RotateString(s: String) {
-    def rotate(n: Int): String = {
-      import eu.sim642.adventofcode2016.Day15.IntModPos
-      val realN = n %+ s.length
-      val (init, tail) = s.splitAt(realN)
-      tail + init
-    }
-  }
+object Day21 {
 
   sealed trait Operation
   case class SwapPosition(x: Int, y: Int) extends Operation
@@ -30,11 +22,11 @@ object Day21 {
         case c => c
       })
     case RotateSteps(x) =>
-      s.rotate(x)
+      s.rotateLeft(x)
     case RotateLetter(x) =>
       val i = s.indexOf(x)
       val rotate = 1 + i + (if (i >= 4) 1 else 0)
-      s.rotate(-rotate)
+      s.rotateRight(rotate)
     case Reverse(x, y) =>
       val (lo, hi) = (x min y, (x max y) + 1)
       s.take(lo) + s.view(lo, hi).reverse.mkString + s.drop(hi)

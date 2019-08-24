@@ -1,5 +1,8 @@
 package eu.sim642.adventofcode2017
 
+import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.TraversableOnceImplicits._
+
 object Day8 {
 
   type Register = String
@@ -61,14 +64,6 @@ object Day8 {
   def execOperation(operation: Operation, registerAmount: Int): Int = operation match {
     case Inc(amount) => registerAmount + amount
     case Dec(amount) => registerAmount - amount
-  }
-
-  implicit class LastIterator[A](iterator: Iterator[A]) {
-    def last: A = iterator.reduce((_, x) => x)
-  }
-
-  implicit class OptionIntIterable(iterable: Iterable[Int]) {
-    def maxOption: Option[Int] = iterable.reduceOption(_ max _)
   }
 
   private val defaultAmount = 0

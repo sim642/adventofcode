@@ -1,8 +1,6 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2018.Day2.HeadIterator
-
-import scala.collection.AbstractIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day14 {
 
@@ -32,32 +30,10 @@ object Day14 {
     it.find(_.scores.length >= after + 10).get.scores.slice(after, after + 10).mkString("")
   }
 
-  implicit class ZipTailIterator[A](it: Iterator[A]) {
-    def zipTail: Iterator[(A, A)] = {
-      if (it.hasNext) {
-        // TODO: can be done with unfold for Iterator?
-        new AbstractIterator[(A, A)] {
-          private var prev: A = it.next()
-
-          override def hasNext: Boolean = it.hasNext
-
-          override def next(): (A, A) = {
-            val cur = it.next()
-            val ret = (prev, cur)
-            prev = cur
-            ret
-          }
-        }
-      }
-      else
-        Iterator.empty
-    }
-  }
-
   def recipesToLeft(scores: String): Int = {
     val scoreSeq = scores.map(_.asDigit)
     val it = Iterator.iterate(RecipeState.initial)(_.next)
-    it.zipTail.flatMap({ case (prevState, state) =>
+    it.zipWithTail.flatMap({ case (prevState, state) =>
       val i = state.scores.indexOfSlice(scoreSeq, prevState.scores.length - scoreSeq.length)
       if (i >= 0)
         Some(i)

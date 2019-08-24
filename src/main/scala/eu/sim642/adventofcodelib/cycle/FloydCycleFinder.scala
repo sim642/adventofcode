@@ -19,8 +19,10 @@ object FloydCycleFinder {
     }
 
     var λ = 1
+    var prevHare = tortoise
     hare = f(tortoise)
     while (tortoise != hare) {
+      prevHare = hare
       hare = f(hare)
       λ += 1
     }
@@ -29,7 +31,8 @@ object FloydCycleFinder {
     FunctionCycle(
       stemLength = μ,
       cycleLength = λ,
-      cycleHead = tortoise
+      cycleHead = tortoise,
+      cycleLast = prevHare
     )(x0, f)
   }
 
@@ -51,8 +54,10 @@ object FloydCycleFinder {
     }
 
     var λ = 1
+    var prevHare = tortoise
     hare = f(tortoise)
     while (m(tortoise) != m(hare)) {
+      prevHare = hare
       hare = f(hare)
       λ += 1
     }
@@ -62,6 +67,7 @@ object FloydCycleFinder {
       stemLength = μ,
       cycleLength = λ,
       cycleHead = tortoise,
+      cycleLast = prevHare,
       cycleHeadRepeat = hare
     )
   }

@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2018
 
 import org.scalatest.{FunSuite, Suites}
 import Day23._
-import eu.sim642.adventofcode2017.Day20.Pos3
+import eu.sim642.adventofcodelib.pos.Pos3
 import eu.sim642.adventofcode2018.Day23Test._
 import org.scalatest.prop.PropertyChecks
 

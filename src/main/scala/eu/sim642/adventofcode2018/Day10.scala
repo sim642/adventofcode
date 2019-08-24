@@ -1,13 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcode2017.Day19.Pos2
+import eu.sim642.adventofcodelib.box.Box
+import eu.sim642.adventofcodelib.pos.Pos
 
 object Day10 {
-
-  implicit class PosScalar(pos: Pos) {
-    def *:(k: Int): Pos = Pos(pos.x * k, pos.y * k)
-  }
 
   case class Point(position: Pos, velocity: Pos) {
     def step: Point = Point(position + velocity, velocity)
@@ -15,8 +11,8 @@ object Day10 {
   }
 
   def boundingArea(positions: Seq[Pos]): Long = {
-    val (min, max) = Day6.boundingRect(positions)
-    val delta = max + (-min)
+    val Box(min, max) = Box.bounding(positions)
+    val delta = max - min
     val area = delta.x.toLong * delta.y.toLong
     area
   }
@@ -91,7 +87,7 @@ object Day10 {
 
   def printPoints(points: Seq[Point]): Unit = {
     val positions = points.map(_.position)
-    val (min, max) = Day6.boundingRect(positions)
+    val Box(min, max) = Box.bounding(positions)
     val positionsSet = positions.toSet
 
     for (y <- min.y to max.y) {

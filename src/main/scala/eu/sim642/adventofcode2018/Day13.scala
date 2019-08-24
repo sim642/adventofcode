@@ -1,8 +1,8 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day14.PosGrid
-import eu.sim642.adventofcode2017.Day19.Grid
-import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.pos.Pos
 
 object Day13 {
 

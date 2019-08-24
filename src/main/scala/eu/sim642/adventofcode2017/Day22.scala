@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2017
 
-import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.pos.Pos
 
 object Day22 {
 
@@ -15,7 +15,7 @@ object Day22 {
     case object Clean extends Status
     case object Infected extends Status
 
-    case class InfectionState(statuses: Map[Pos, Status], pos: Pos = Pos(0, 0), prevOffset: Pos = Pos(0, 1)) {
+    case class InfectionState(statuses: Map[Pos, Status], pos: Pos = Pos.zero, prevOffset: Pos = Pos(0, 1)) {
       def posStatus: Status = statuses(pos)
 
       def next(statuses: Map[Pos, Status], offset: Pos) = InfectionState(statuses, pos + offset, offset)
