@@ -1,7 +1,6 @@
 package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcodelib.IteratorImplicits._
-import eu.sim642.adventofcodelib.TraversableOnceImplicits._
 
 object Day8 {
 

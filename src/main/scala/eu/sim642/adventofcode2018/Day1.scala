@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
-import eu.sim642.adventofcodelib.TraversableImplicits._
+import eu.sim642.adventofcodelib.IterableImplicits._
 
 object Day1 {
   def resultingFreq(freqChanges: Seq[Int]): Int = freqChanges.sum

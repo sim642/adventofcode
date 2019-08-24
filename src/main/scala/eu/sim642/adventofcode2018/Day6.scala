@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.TraversableOnceImplicits._
+import eu.sim642.adventofcodelib.IterableOnceImplicits._
 import eu.sim642.adventofcode2018.Day2.GroupCountIterable // TODO: move to library
 
 object Day6 {
