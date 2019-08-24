@@ -1,7 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day20.Pos3
-import eu.sim642.adventofcode2018.Day25.Pos4
+import eu.sim642.adventofcodelib.box.{Box3, Box4}
+import eu.sim642.adventofcodelib.pos.Pos3
+import eu.sim642.adventofcodelib.pos.Pos4
+import eu.sim642.adventofcodelib.IntegralImplicits._
 
 import scala.collection.mutable
 import scala.util.control.Breaks._
@@ -69,37 +71,11 @@ object Day23 {
     }
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
-      maximumOverlap(nanobots).map(n => (n.pos manhattanDistance Pos3(0, 0, 0)) - n.radius).max
+      maximumOverlap(nanobots).map(n => (n.pos manhattanDistance Pos3.zero) - n.radius).max
     }
   }
 
   object FourDimCliquePart2Solution extends Part2Solution {
-
-    implicit class Pos4Ops(pos4: Pos4) {
-      def +(that: Pos4): Pos4 = Pos4(pos4.x + that.x, pos4.y + that.y, pos4.z + that.z, pos4.w + that.w)
-    }
-
-    implicit class ExactDivideInt(n: Int) {
-      def /!(d: Int): Option[Int] = if (n % d == 0) Some(n / d) else None
-    }
-
-    case class Box4(min: Pos4, max: Pos4) {
-      def intersect(that: Box4): Option[Box4] = {
-        val Box4(min2, max2) = that
-        val minX = min.x max min2.x
-        val maxX = max.x min max2.x
-        val minY = min.y max min2.y
-        val maxY = max.y min max2.y
-        val minZ = min.z max min2.z
-        val maxZ = max.z min max2.z
-        val minW = min.w max min2.w
-        val maxW = max.w min max2.w
-        if (minX <= maxX && minY <= maxY && minZ <= maxZ && minW <= maxW)
-          Some(Box4(Pos4(minX, minY, minZ, minW), Pos4(maxX, maxY, maxZ, maxW)))
-        else
-          None
-      }
-    }
 
     def nanobot2box4(nanobot: Nanobot): Box4 = {
       val Nanobot(Pos3(x, y, z), r) = nanobot
@@ -121,16 +97,6 @@ object Day23 {
       } yield Pos3(x, y, z)
     }
 
-    def box4iterate(box4: Box4): Iterator[Pos4] = {
-      val Box4(Pos4(x1, y1, z1, w1), Pos4(x2, y2, z2, w2)) = box4
-      for {
-        x <- (x1 to x2).iterator
-        y <- (y1 to y2).iterator
-        z <- (z1 to z2).iterator
-        w <- (w1 to w2).iterator
-      } yield Pos4(x, y, z, w)
-    }
-
     override def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
       val overlapping = NaiveCliquePart2Solution.maximumOverlap(nanobots)
       val intersection = overlapping.map(nanobot => Option(nanobot2box4(nanobot))).reduce({ (left, right) =>
@@ -142,17 +108,17 @@ object Day23 {
       }).get
       //println(intersection)
 
-      val pos4s = box4iterate(intersection).toSeq
+      val pos4s = intersection.iterator.toSeq
       //println(pos4s.size)
       val pos3s = pos4s.flatMap(pos42pos3)
       //println(pos3s.size)
-      pos3s.map(p => p manhattanDistance Pos3(0, 0, 0)).min
+      pos3s.map(p => p manhattanDistance Pos3.zero).min
     }
   }
 
   object OctahedronSplittingPart2Solution extends Part2Solution {
     def getInitialOctahedron(nanobots: Seq[Nanobot]): Nanobot = {
-      //val initPos = Pos3(0, 0, 0)
+      //val initPos = Pos3.zero
       val poss = nanobots.map(_.pos)
       val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
       val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
@@ -192,7 +158,7 @@ object Day23 {
       val offsets = {
         if (radius == 1)
           // must include when going from radius 1 to radius 0, not to forget about center voxel
-          axisOffsets + Pos3(0, 0, 0)
+          axisOffsets + Pos3.zero
         else
           axisOffsets
       }
@@ -208,7 +174,7 @@ object Day23 {
       val done: mutable.Set[Nanobot] = mutable.Set.empty
 
       def enqueue(octahedron: Nanobot): Unit = {
-        queue.enqueue((octahedron, getBounds(nanobots, octahedron), (octahedron.pos manhattanDistance Pos3(0, 0, 0)) - octahedron.radius))
+        queue.enqueue((octahedron, getBounds(nanobots, octahedron), (octahedron.pos manhattanDistance Pos3.zero) - octahedron.radius))
       }
 
       val initialOctahedron = getInitialOctahedron(nanobots)
@@ -242,14 +208,10 @@ object Day23 {
       else value
     }
 
-    case class Box3(min: Pos3, max: Pos3) {
-      def contains(pos: Pos3): Boolean = {
-        min.x <= pos.x && pos.x <= max.x &&
-          min.y <= pos.y && pos.y <= max.y &&
-          min.z <= pos.z && pos.z <= max.z
-      }
+    implicit class NanobotBox3(box: Box3) {
+      val Box3(min, max) = box
 
-      def contains(octahedron: Nanobot): Boolean = octahedron.corners.forall(contains)
+      def contains(octahedron: Nanobot): Boolean = octahedron.corners.forall(box.contains)
 
       def closestTo(pos: Pos3): Pos3 = {
         Pos3(
@@ -260,14 +222,14 @@ object Day23 {
       }
     }
 
-    implicit class NanobotBox3(nanobot: Nanobot) {
+    implicit class Box3Nanobot(nanobot: Nanobot) {
       def contains(box: Box3): Boolean = nanobot.contains(box.min) && nanobot.contains(box.max) // TODO: sufficient to only check two corners?
 
       def overlaps(box: Box3): Boolean = nanobot.contains(box.closestTo(nanobot.pos))
     }
 
     def getInitialBox(nanobots: Seq[Nanobot]): Box3 = {
-      //val initPos = Pos3(0, 0, 0)
+      //val initPos = Pos3.zero
       val poss = nanobots.map(_.pos)
       val initX = (poss.map(_.x).min + poss.map(_.x).max) / 2
       val initY = (poss.map(_.y).min + poss.map(_.y).max) / 2
@@ -275,17 +237,13 @@ object Day23 {
       val initPos = Pos3(initX, initY, initZ)
       Iterator.iterate(1)(_ * 2).map({ radius =>
         Box3(initPos + Pos3(-radius, -radius, -radius), initPos + Pos3(radius, radius, radius))
-      }).find(box => nanobots.forall(box.contains)).get
+      }).find(box => nanobots.forall(box.contains(_))).get
     }
 
     def getBounds(nanobots: Seq[Nanobot], box: Box3): (Int, Int) = {
       val lower = nanobots.count(_.contains(box))
       val upper = nanobots.count(_.overlaps(box))
       (lower, upper)
-    }
-
-    implicit class FloorDivideInt(n: Int) {
-      def floorDiv(d: Int): Int = Math.floorDiv(n, d)
     }
 
     def getSplits(box: Box3): Set[Box3] = {
@@ -314,7 +272,7 @@ object Day23 {
       val done: mutable.Set[Box3] = mutable.Set.empty
 
       def enqueue(box: Box3): Unit = {
-        queue.enqueue((box, getBounds(nanobots, box), box.closestTo(Pos3(0, 0, 0)) manhattanDistance Pos3(0, 0, 0)))
+        queue.enqueue((box, getBounds(nanobots, box), box.closestTo(Pos3.zero) manhattanDistance Pos3.zero))
       }
 
       val initialBox = getInitialBox(nanobots)

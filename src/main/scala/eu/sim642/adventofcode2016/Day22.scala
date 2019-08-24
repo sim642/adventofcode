@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2016
 
-import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph.{AStar, BFS, GraphSearch, Heuristic, UnitNeighbors}
 
 object Day22 {
@@ -46,7 +46,7 @@ object Day22 {
     override val gridChar: Char = '#'
   }
 
-  private val originPos = Pos(0, 0)
+  private val originPos = Pos.zero
 
   def nodesToTypes(nodes: Map[Pos, Disk]): Map[Pos, DiskType] = {
     val oversizeLimit = nodes(originPos).size

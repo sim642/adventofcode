@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2018
 
 import org.scalatest.FunSuite
 import Day11._
-import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.pos.Pos
 
 class Day11Test extends FunSuite {
 

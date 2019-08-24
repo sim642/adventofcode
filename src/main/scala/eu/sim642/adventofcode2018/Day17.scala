@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day3.Pos
+import eu.sim642.adventofcodelib.box.Box
+import eu.sim642.adventofcodelib.pos.Pos
 
 object Day17 {
 
@@ -66,14 +67,14 @@ object Day17 {
   }
 
   def floodedTiles(tiles: Tiles): Int = {
-    val (min, max) = Day6.boundingRect(tiles.keys.toSeq)
+    val Box(min, max) = Box.bounding(tiles.keys)
     val flooded = flood(tiles, max.y, Pos(500, 0), Pos(500, -1))
     //printTiles(flooded)
     flooded.count({ case (pos, tile) => pos.y >= min.y && tile.isInstanceOf[WaterTile]})
   }
 
   def settledTiles(tiles: Tiles): Int = {
-    val (min, max) = Day6.boundingRect(tiles.keys.toSeq)
+    val Box(min, max) = Box.bounding(tiles.keys)
     val flooded = flood(tiles, max.y, Pos(500, 0), Pos(500, -1))
     //printTiles(flooded)
     flooded.count({ case (pos, tile) => pos.y >= min.y && tile == Settled})
@@ -93,7 +94,7 @@ object Day17 {
   }
 
   def printTiles(tiles: Tiles): Unit = {
-    val (min, max) = Day6.boundingRect(tiles.keys.toSeq)
+    val Box(min, max) = Box.bounding(tiles.keys)
     for (y <- min.y to max.y) {
       for (x <- min.x to max.x)
         print(tiles(Pos(x, y)))

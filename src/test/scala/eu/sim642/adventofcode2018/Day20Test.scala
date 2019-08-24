@@ -13,12 +13,12 @@ class Day20Test extends FunSuite {
   val exampleInput6 = "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$"
 
   test("parseInput") {
-    println(parseInput(exampleInput1))
-    println(parseInput(exampleInput2))
-    println(parseInput(exampleInput3))
-    println(parseInput(exampleInput4))
-    println(parseInput(exampleInput5))
-    println(parseInput(exampleInput6))
+    parseInput(exampleInput1)
+    parseInput(exampleInput2)
+    parseInput(exampleInput3)
+    parseInput(exampleInput4)
+    parseInput(exampleInput5)
+    parseInput(exampleInput6)
   }
 
   test("Part 1 examples") {

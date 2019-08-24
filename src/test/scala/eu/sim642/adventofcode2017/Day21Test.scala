@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import Day21._
+import eu.sim642.adventofcodelib.GridImplicits._
 import org.scalatest.FunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 

@@ -1,11 +1,12 @@
 package eu.sim642.adventofcodelib.cycle
 
-import eu.sim642.adventofcode2018.Day2.HeadIterator
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 trait Cycle[A] {
   val stemLength: Int
   val cycleLength: Int
   val cycleHead: A
+  val cycleLast: A
 
   def stemCycleLength: Int = stemLength + cycleLength
 }
@@ -18,17 +19,17 @@ trait CycleBy[A] extends Cycle[A] {
   val cycleHeadRepeat: A
 }
 
-case class SimpleCycle[A](stemLength: Int, cycleLength: Int, cycleHead: A) extends Cycle[A]
+case class SimpleCycle[A](stemLength: Int, cycleLength: Int, cycleHead: A, cycleLast: A) extends Cycle[A]
 
-case class FunctionCycle[A](stemLength: Int, cycleLength: Int, cycleHead: A)
+case class FunctionCycle[A](stemLength: Int, cycleLength: Int, cycleHead: A, cycleLast: A)
                            (x0: A, f: A => A) extends Cycle[A] with Indexing[A] { // TODO: extract x0, f pair into separate structure?
   def apply(i: Int): A = {
     if (i >= stemLength) {
       val shortI = (i - stemLength) % cycleLength
-      Iterator.iterate(cycleHead)(f).drop(shortI).head
+      Iterator.iterate(cycleHead)(f)(shortI)
     }
     else
-      Iterator.iterate(x0)(f).drop(i).head
+      Iterator.iterate(x0)(f)(i)
   }
 }
 
@@ -36,6 +37,7 @@ case class VectorCycle[A](stem: Vector[A], cycle: Vector[A]) extends Cycle[A] wi
   override val stemLength: Int = stem.length
   override val cycleLength: Int = cycle.length
   override val cycleHead: A = cycle.head
+  override val cycleLast: A = cycle.last
 
   override def apply(i: Int): A = {
     if (i >= stemLength) {
@@ -47,4 +49,4 @@ case class VectorCycle[A](stem: Vector[A], cycle: Vector[A]) extends Cycle[A] wi
   }
 }
 
-case class SimpleCycleBy[A](stemLength: Int, cycleLength: Int, cycleHead: A, cycleHeadRepeat: A) extends CycleBy[A]
+case class SimpleCycleBy[A](stemLength: Int, cycleLength: Int, cycleHead: A, cycleLast: A, cycleHeadRepeat: A) extends CycleBy[A]

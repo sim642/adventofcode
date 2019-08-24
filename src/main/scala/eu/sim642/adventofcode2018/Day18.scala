@@ -1,22 +1,12 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day19.Grid
-import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcode2018.Day2.HeadIterator
-import eu.sim642.adventofcode2017.Day21.GridOps
-import eu.sim642.adventofcode2017.Day14.PosGrid
-import eu.sim642.adventofcode2017.Day19.PosGrid2
+import eu.sim642.adventofcodelib.pos.Pos
+import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.cycle.NaiverCycleFinder
 
 object Day18 {
-
-  implicit class GridOps2[A](grid: Grid[A]) {
-    def slidingGrid(size: Int): Iterator[Iterator[Grid[A]]] = {
-      grid.sliding(size).map({ rows =>
-        rows.map(_.sliding(size).toVector).transpose.iterator
-      })
-    }
-  }
 
   def step(grid: Grid[Char]): Grid[Char] = {
     /*val paddingRow = Vector.fill(grid(0).size + 2)('.')
@@ -60,7 +50,7 @@ object Day18 {
 
   def resourceValueIterate(grid: Grid[Char], after: Int = 10): Int = {
     val it = Iterator.iterate(grid)(step)
-    val finalGrid = it.drop(after).head
+    val finalGrid = it(after)
     resourceValue(finalGrid)
   }
 

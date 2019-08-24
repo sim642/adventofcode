@@ -1,9 +1,8 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcode2017.Day14.PosGrid
-import eu.sim642.adventofcode2017.Day19.Grid
-import eu.sim642.adventofcode2017.Day3.Pos
-import eu.sim642.adventofcode2018.Day2.HeadIterator
+import eu.sim642.adventofcodelib.pos.Pos
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, UnitNeighbors}
 
 import scala.util.Try
@@ -145,7 +144,7 @@ object Day15 {
 
   def combatOutcomeElfWin(grid: Grid[Char], units: List[CombatUnit]): Int = {
     def withElfAttackPower(elfAttackPower: Int): Option[Int] = {
-      println(s"Elf attack power: $elfAttackPower")
+      //println(s"Elf attack power: $elfAttackPower")
 
       val newUnits = units.map({
         case unit@CombatUnit(Elf, _, _, _) => unit.copy(attackPower = elfAttackPower)

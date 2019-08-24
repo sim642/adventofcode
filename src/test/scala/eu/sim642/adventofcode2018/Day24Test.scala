@@ -20,8 +20,8 @@ class Day24Test extends FunSuite {
   }
 
   test("parseInput") {
-    println(parseInput(exampleInput))
-    println(parseInput(input))
+    parseInput(exampleInput)
+    parseInput(input)
   }
 
   test("Part 1 examples") {
