@@ -37,7 +37,7 @@ object GridImplicits {
 
     def slidingGrid(size: Int): Iterator[Iterator[Grid[A]]] = {
       grid.sliding(size).map({ rows =>
-        rows.map(_.sliding(size).toVector).transpose.toIterator
+        rows.map(_.sliding(size).toVector).transpose.iterator
       })
     }
   }
