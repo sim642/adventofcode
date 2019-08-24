@@ -2,26 +2,37 @@ package eu.sim642.adventofcodelib
 
 import eu.sim642.adventofcodelib.IntegralImplicits._
 
+import scala.collection.BuildFrom
+import scala.collection.generic.IsSeq
+import scala.language.implicitConversions
+
 object SeqImplicits {
 
-  implicit class RotateSeqOps[A](seq: Seq[A]) {
-    def rotateLeft(n: Int): Seq[A] = {
-      val realN = n %+ seq.length
-      val (init, tail) = seq.splitAt(realN)
-      tail ++ init
+  class RotateSeqOps[Repr, S <: IsSeq[Repr]](coll: Repr, seq: S) {
+    def rotateLeft[That](n: Int)(implicit bf: BuildFrom[Repr, seq.A, That]): That = {
+      val seqOps = seq(coll)
+      val realN = n %+ seqOps.length
+      val (init, tail) = seqOps.view.splitAt(realN)
+      bf.fromSpecific(coll)(tail ++ init)
     }
 
-    def rotateRight(n: Int): Seq[A] = rotateLeft(-n)
+    def rotateRight[That](n: Int)(implicit bf: BuildFrom[Repr, seq.A, That]): That =
+      rotateLeft(-n)
   }
 
-  // TODO: in Scala 2.13 remove and use IsSeq or something
-  implicit class RotateStringOps(s: String) {
-    def rotateLeft(n: Int): String = {
-      val realN = n %+ s.length
-      val (init, tail) = s.splitAt(realN)
-      tail + init
+  // alternate more limited view-less implementation by OlegYch|h on freenode#scala
+  /*class RotateOps[Repr, S <: IsSeq[Repr]](coll: Repr, seq: S) {
+    def rotateLeft[That](n: Int)(implicit bf: BuildFrom[Repr, seq.A, That], seqIsRepr: seq.C =:= Repr): That = {
+      val seqOps = seq(coll)
+      val realN = n %+ seqOps.length
+      val (init, tail) = seqOps.splitAt(realN)
+      bf.fromSpecific(coll)(seq(tail) ++ seq(init))
     }
 
-    def rotateRight(n: Int): String = rotateLeft(-n)
-  }
+     def rotateRight[That](n: Int)(implicit bf: BuildFrom[Repr, seq.A, That], seqIsRepr: seq.C =:= Repr): That =
+       rotateLeft(-n)
+  }*/
+
+  implicit def RotateSeqOps[Repr](coll: Repr)(implicit seq: IsSeq[Repr]): RotateSeqOps[Repr, seq.type] =
+    new RotateSeqOps(coll, seq)
 }
