@@ -15,6 +15,18 @@ object Day2 {
 
   def totalWrappingPaperArea(input: String): Int = totalWrappingPaperArea(parseInput(input))
 
+  def ribbonLength(l: Int, w: Int, h: Int): Int = {
+    val sidePerimeters = Seq(l + w, w + h, h + l).map(2 * _)
+    val volume = l * w * h
+    sidePerimeters.min + volume
+  }
+
+  def totalRibbonLength(presents: Seq[Present]): Int = {
+    presents.map((ribbonLength _).tupled).sum
+  }
+
+  def totalRibbonLength(input: String): Int = totalRibbonLength(parseInput(input))
+
   private val presentRegex = """(\d+)x(\d+)x(\d+)""".r
 
   def parsePresent(s: String): Present = s match {
@@ -27,5 +39,6 @@ object Day2 {
 
   def main(args: Array[String]): Unit = {
     println(totalWrappingPaperArea(input))
+    println(totalRibbonLength(input))
   }
 }
