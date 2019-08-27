@@ -40,5 +40,8 @@ object GridImplicits {
         rows.map(_.sliding(size).toVector).transpose.iterator
       })
     }
+
+    def sumGrid(implicit num: Numeric[A]): A =
+      grid.iterator.map(_.sum).sum
   }
 }

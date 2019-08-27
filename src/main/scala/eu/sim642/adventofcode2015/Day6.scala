@@ -30,6 +30,23 @@ object Day6 {
 
   def countLit(input: String): Int = countLit(parseInstructions(input))
 
+  def totalBrightness(instructions: Seq[Instruction]): Int = {
+    // TODO: optimize, possibly using mutable
+    val initialGrid = Vector.fill(1000, 1000)(0)
+    val finalGrid = instructions.foldLeft(initialGrid)({ case (grid, instruction) =>
+      instruction.box.iterator.foldLeft(grid)({ case (grid, pos) =>
+        grid.updatedGrid(pos, instruction.operation match {
+          case TurnOn => grid(pos) + 1
+          case TurnOff => (grid(pos) - 1) max 0
+          case Toggle => grid(pos) + 2
+        })
+      })
+    })
+    finalGrid.sumGrid
+  }
+
+  def totalBrightness(input: String): Int = totalBrightness(parseInstructions(input))
+
 
   private val instructionRegex = """(turn (?:on|off)|toggle) (\d+),(\d+) through (\d+),(\d+)""".r
 
@@ -51,5 +68,6 @@ object Day6 {
 
   def main(args: Array[String]): Unit = {
     println(countLit(input))
+    println(totalBrightness(input))
   }
 }
