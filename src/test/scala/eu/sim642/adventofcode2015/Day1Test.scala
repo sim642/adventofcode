@@ -20,4 +20,13 @@ class Day1Test extends FunSuite {
   test("Part 1 input answer") {
     assert(finalFloor(input) == 232)
   }
+
+  test("Part 2 examples") {
+    assert(basementPosition(")") == 1)
+    assert(basementPosition("()())") == 5)
+  }
+
+  test("Part 2 input answer") {
+    assert(basementPosition(input) == 1783)
+  }
 }
