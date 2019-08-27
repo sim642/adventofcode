@@ -4,8 +4,20 @@ import eu.sim642.adventofcode2016.Day14.md5
 
 object Day4 {
 
-  def findZeroHash(input: String): Int = {
-    Iterator.from(1).find(i => md5(input + i).startsWith("00000")).get
+  trait Part {
+    protected val prefix: String
+
+    def findZeroHash(input: String): Int = {
+      Iterator.from(1).find(i => md5(input + i).startsWith(prefix)).get
+    }
+  }
+
+  object Part1 extends Part {
+    override protected val prefix: String = "00000"
+  }
+
+  object Part2 extends Part {
+    override protected val prefix: String = "000000"
   }
 
 
@@ -13,6 +25,7 @@ object Day4 {
   val input = "ckczppom"
 
   def main(args: Array[String]): Unit = {
-    println(findZeroHash(input))
+    println(Part1.findZeroHash(input))
+    println(Part2.findZeroHash(input))
   }
 }
