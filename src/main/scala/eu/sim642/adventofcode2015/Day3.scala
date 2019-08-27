@@ -15,14 +15,32 @@ object Day3 {
     moves.iterator.scanLeft(Pos.zero)(_ + moveOffsets(_))
   }
 
-  def countAtLeastOne(moves: String): Int = {
-    iteratePoss(moves).toSet.size
+  trait Part {
+    def countAtLeastOne(moves: String): Int
+  }
+
+  object Part1 extends Part {
+    override def countAtLeastOne(moves: String): Int = {
+      iteratePoss(moves).toSet.size
+    }
+  }
+
+  object Part2 extends Part {
+    override def countAtLeastOne(moves: String): Int = {
+      moves.grouped(2).toSeq
+        .transpose
+        .map(_.mkString)
+        .map(iteratePoss(_).toSet)
+        .reduce(_ ++ _)
+        .size
+    }
   }
 
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day3.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countAtLeastOne(input))
+    println(Part1.countAtLeastOne(input))
+    println(Part2.countAtLeastOne(input))
   }
 }
