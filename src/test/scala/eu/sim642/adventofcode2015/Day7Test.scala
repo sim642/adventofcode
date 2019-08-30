@@ -42,6 +42,10 @@ class Day7Test extends FunSuite with ScalaCheckPropertyChecks{
   }
 
   test("Part 1 input answer") {
-    assert(evalA(input) == 16076)
+    assert(Part1.evalA(input) == 16076)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.evalA(input) == 2797)
   }
 }

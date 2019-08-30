@@ -38,7 +38,22 @@ object Day7 extends RegexParsers {
     evalExpr(Wire(ident))
   }
 
-  def evalA(input: String): Value = eval(parseInstructions(input))("a")
+  trait Part {
+    def evalA(input: String): Value
+  }
+
+  object Part1 extends Part {
+    override def evalA(input: String): Value = eval(parseInstructions(input))("a")
+  }
+
+  object Part2 extends Part {
+    override def evalA(input: String): Value = {
+      val instructions = parseInstructions(input)
+      val newB = eval(instructions)("a")
+      val newInstructions = instructions + ("b" -> Const(newB))
+      eval(newInstructions)("a")
+    }
+  }
 
 
   def parseInstruction(s: String): (String, Expr) = {
@@ -74,6 +89,7 @@ object Day7 extends RegexParsers {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(evalA(input))
+    println(Part1.evalA(input))
+    println(Part2.evalA(input))
   }
 }
