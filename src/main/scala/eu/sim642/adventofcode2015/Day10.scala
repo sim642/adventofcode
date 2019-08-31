@@ -18,13 +18,14 @@ object Day10 {
 
   def lookAndSayIterator(s: String): Iterator[String] = Iterator.iterate(s)(lookAndSay)
 
-  def lookAndSayLength(s: String, times: Int = 40): Int = lookAndSayIterator(s)(times).length
+  def lookAndSayLength(s: String, times: Int): Int = lookAndSayIterator(s)(times).length
 
 
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
   val input = "1321131112"
 
   def main(args: Array[String]): Unit = {
-    println(lookAndSayLength(input))
+    println(lookAndSayLength(input, 40))
+    println(lookAndSayLength(input, 50))
   }
 }
