@@ -21,13 +21,15 @@ object Day7 extends RegexParsers {
   case class Rshift(left: SimpleExpr, right: SimpleExpr) extends Expr
 
 
-  def eval(instructions: Map[String, Expr])(ident: String): Value = {
+  def eval(instructions: Map[String, Expr]): String => Value = {
     val cache = mutable.Map.empty[String, Value]
+    def evalIdent(ident: String): Value = {
+      cache.getOrElseUpdate(ident, evalExpr(instructions(ident)))
+    }
 
     def evalExpr(expr: Expr): Value = expr match {
       case Const(value) => value
-      case Wire(ident) =>
-        cache.getOrElseUpdate(ident, evalExpr(instructions(ident)))
+      case Wire(ident) => evalIdent(ident)
       case Not(expr) => ~evalExpr(expr) & valueMask
       case And(left, right) => evalExpr(left) & evalExpr(right)
       case Or(left, right) => evalExpr(left) | evalExpr(right)
@@ -35,20 +37,21 @@ object Day7 extends RegexParsers {
       case Rshift(left, right) => evalExpr(left) >> evalExpr(right)
     }
 
-    evalExpr(Wire(ident))
+    evalIdent
   }
 
   trait Part {
-    def evalA(input: String): Value
+    def evalA(instructions: Map[String, Expr]): Value
+
+    def evalA(input: String): Value = evalA(parseInstructions(input))
   }
 
   object Part1 extends Part {
-    override def evalA(input: String): Value = eval(parseInstructions(input))("a")
+    override def evalA(instructions: Map[String, Expr]): Value = eval(instructions)("a")
   }
 
   object Part2 extends Part {
-    override def evalA(input: String): Value = {
-      val instructions = parseInstructions(input)
+    override def evalA(instructions: Map[String, Expr]): Value = {
       val newB = eval(instructions)("a")
       val newInstructions = instructions + ("b" -> Const(newB))
       eval(newInstructions)("a")
@@ -57,6 +60,7 @@ object Day7 extends RegexParsers {
 
 
   def parseInstruction(s: String): (String, Expr) = {
+    // parser combinators might be a bit overkill for this...
     def ident: Parser[String] = "[a-z]+".r
 
     def simpleExpr: Parser[SimpleExpr] = (
@@ -66,6 +70,7 @@ object Day7 extends RegexParsers {
 
     def expr: Parser[Expr] = (
       "NOT" ~> simpleExpr ^^ Not
+    // TODO: avoid repeating operator in case?
     | simpleExpr ~ "AND" ~ simpleExpr ^^ { case left ~ "AND" ~ right => And(left, right)}
     | simpleExpr ~ "OR" ~ simpleExpr ^^ { case left ~ "OR" ~ right => Or(left, right)}
     | simpleExpr ~ "LSHIFT" ~ simpleExpr ^^ { case left ~ "LSHIFT" ~ right => Lshift(left, right)}
