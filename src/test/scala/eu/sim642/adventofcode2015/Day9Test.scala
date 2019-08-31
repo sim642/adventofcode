@@ -17,4 +17,12 @@ class Day9Test extends FunSuite {
   test("Part 1 input answer") {
     assert(shortestRoute(input) == 207)
   }
+
+  test("Part 2 examples") {
+    assert(longestRoute(exampleInput) == 982)
+  }
+
+  test("Part 2 input answer") {
+    assert(longestRoute(input) == 804)
+  }
 }

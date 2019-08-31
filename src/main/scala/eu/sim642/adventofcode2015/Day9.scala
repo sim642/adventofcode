@@ -2,6 +2,8 @@ package eu.sim642.adventofcode2015
 
 object Day9 {
 
+  // TODO: move TSP implementations to library
+
   // copied & modified from 2016 Day 24
   def tsp[A](distMatrix: Map[A, Map[A, Int]]): Int = {
     distMatrix.keySet.toVector
@@ -14,6 +16,19 @@ object Day9 {
   }
 
   def shortestRoute(input: String): Int = tsp(parseDistMatrix(input))
+
+  // copied & modified from 2016 Day 24
+  def tspLongest[A](distMatrix: Map[A, Map[A, Int]]): Int = {
+    distMatrix.keySet.toVector
+      .permutations
+      .map({ path =>
+        path.zip(path.tail)
+          .map({ case (from, to) => distMatrix(from)(to) })
+          .sum
+      }).max
+  }
+
+  def longestRoute(input: String): Int = tspLongest(parseDistMatrix(input))
 
 
   private val edgeRegex = """(\w+) to (\w+) = (\d+)""".r
@@ -32,5 +47,6 @@ object Day9 {
 
   def main(args: Array[String]): Unit = {
     println(shortestRoute(input))
+    println(longestRoute(input))
   }
 }
