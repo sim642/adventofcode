@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2016
 
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, NaiveTSP, UnitNeighbors}
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
 
@@ -36,39 +36,16 @@ object Day24 {
     })
   }
 
-  def tsp[A](distMatrix: Map[A, Map[A, Int]], start: A): Int = {
-    (distMatrix.keySet - start).toVector
-      .permutations
-      .map({ path =>
-        distMatrix(start)(path.head) +
-          path.zip(path.tail)
-            .map({ case (from, to) => distMatrix(from)(to) })
-            .sum
-      }).min
-  }
-
   def shortestRoute(grid: Grid[Char]): Int = {
     val pois = findPois(grid)
     val distMatrix = getPoiDistMatrix(grid, pois)
-    tsp(distMatrix, 0)
-  }
-
-  def tspReturn[A](distMatrix: Map[A, Map[A, Int]], start: A): Int = {
-    (distMatrix.keySet - start).toVector
-      .permutations
-      .map({ path =>
-        distMatrix(start)(path.head) +
-          path.zip(path.tail)
-            .map({ case (from, to) => distMatrix(from)(to) })
-            .sum +
-          distMatrix(path.last)(start)
-      }).min
+    NaiveTSP.startPathLength(distMatrix, 0)
   }
 
   def shortestRouteReturn(grid: Grid[Char]): Int = {
     val pois = findPois(grid)
     val distMatrix = getPoiDistMatrix(grid, pois)
-    tspReturn(distMatrix, 0)
+    NaiveTSP.cycleLength(distMatrix, 0)
   }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector

@@ -1,34 +1,12 @@
 package eu.sim642.adventofcode2015
 
+import eu.sim642.adventofcodelib.graph.NaiveTSP
+
 object Day9 {
 
-  // TODO: move TSP implementations to library
+  def shortestRoute(input: String): Int = NaiveTSP.pathLength(parseDistMatrix(input))
 
-  // copied & modified from 2016 Day 24
-  def tsp[A](distMatrix: Map[A, Map[A, Int]]): Int = {
-    distMatrix.keySet.toVector
-      .permutations
-      .map({ path =>
-        path.zip(path.tail)
-          .map({ case (from, to) => distMatrix(from)(to) })
-          .sum
-      }).min
-  }
-
-  def shortestRoute(input: String): Int = tsp(parseDistMatrix(input))
-
-  // copied & modified from 2016 Day 24
-  def tspLongest[A](distMatrix: Map[A, Map[A, Int]]): Int = {
-    distMatrix.keySet.toVector
-      .permutations
-      .map({ path =>
-        path.zip(path.tail)
-          .map({ case (from, to) => distMatrix(from)(to) })
-          .sum
-      }).max
-  }
-
-  def longestRoute(input: String): Int = tspLongest(parseDistMatrix(input))
+  def longestRoute(input: String): Int = NaiveTSP.pathLength(parseDistMatrix(input))(Ordering.Int.reverse)
 
 
   private val edgeRegex = """(\w+) to (\w+) = (\d+)""".r
@@ -39,7 +17,9 @@ object Day9 {
 
   def parseDistMatrix(input: String): Map[String, Map[String, Int]] = {
     input.linesIterator.map(parseEdge).foldLeft(Map.empty[String, Map[String, Int]].withDefaultValue(Map.empty[String, Int]))({ case (distMatrix, (from, dist, to)) =>
-      distMatrix + (from -> (distMatrix(from) + (to -> dist))) + (to -> (distMatrix(to) + (from -> dist)))
+      distMatrix +
+        (from -> (distMatrix(from) + (to -> dist))) +
+        (to -> (distMatrix(to) + (from -> dist)))
     })
   }
 
