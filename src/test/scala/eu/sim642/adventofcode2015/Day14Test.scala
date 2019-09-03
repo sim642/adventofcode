@@ -6,9 +6,11 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class Day14Test extends FunSuite with ScalaCheckPropertyChecks {
 
+  val comet = Reindeer(14, 10, 127)
+  val dancer = Reindeer(16, 11, 162)
+  val exampleReindeers = Seq(comet, dancer)
+
   test("Part 1 examples") {
-    val comet = Reindeer(14, 10, 127)
-    val dancer = Reindeer(16, 11, 162)
 
     val timeDists = Table(
       ("time", "cometDist", "dancerDist"),
@@ -24,10 +26,18 @@ class Day14Test extends FunSuite with ScalaCheckPropertyChecks {
     }
 
 
-    assert(winningDistance(Seq(comet, dancer), 1000) == 1120)
+    assert(winningDistance(exampleReindeers, 1000) == 1120)
   }
 
   test("Part 1 input answer") {
     assert(winningDistance(input) == 2696)
+  }
+
+  test("Part 2 examples") {
+    assert(winningPoints(exampleReindeers, 1000) == 689)
+  }
+
+  test("Part 2 input answer") {
+    assert(winningPoints(input) == 1084)
   }
 }
