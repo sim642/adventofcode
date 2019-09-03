@@ -29,10 +29,24 @@ object Day11 {
   }
 
   def req1(s: String): Boolean = {
-    s.toSeq.sliding(3).exists(s => (s(0) + 1 == s(1)) && (s(1) + 1 == s(2)))
+    @tailrec
+    def helper(prev: Char, i: Int, count: Int): Boolean = {
+      if (count == 3)
+        true
+      else if (i == s.length)
+        false
+      else {
+        val cur = s(i)
+        val newCount = if (prev + 1 == cur) count + 1 else 1
+        helper(cur, i + 1, newCount)
+      }
+    }
+
+    helper(s.head, 1, 1)
   }
 
   def req2(s: String): Boolean = {
+    // faster than [^iol]* regex
     !s.contains('i') && !s.contains('o') && !s.contains('l')
   }
 
