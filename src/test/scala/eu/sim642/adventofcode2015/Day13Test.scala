@@ -20,10 +20,14 @@ class Day13Test extends FunSuite {
       |David would gain 41 happiness units by sitting next to Carol.""".stripMargin
 
   test("Part 1 examples") {
-    assert(optimalHappiness(exampleInput) == 330)
+    assert(Part1.optimalHappiness(exampleInput) == 330)
   }
 
   test("Part 1 input answer") {
-    assert(optimalHappiness(input) == 733)
+    assert(Part1.optimalHappiness(input) == 733)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.optimalHappiness(input) == 725)
   }
 }

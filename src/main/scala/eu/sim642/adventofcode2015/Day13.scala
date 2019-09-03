@@ -1,11 +1,28 @@
 package eu.sim642.adventofcode2015
 
 import eu.sim642.adventofcodelib.graph.NaiveTSP
+import eu.sim642.adventofcodelib.graph.NaiveTSP.DistanceMatrix
 
 object Day13 {
 
   // modified from 2015 Day 9
-  def optimalHappiness(input: String): Int = NaiveTSP.cycleLength(parseDistMatrix(input))(Ordering.Int.reverse)
+
+  trait Part {
+    def getDistMatrix(input: String): DistanceMatrix[String]
+
+    def optimalHappiness(input: String): Int = NaiveTSP.cycleLength(getDistMatrix(input))(Ordering.Int.reverse)
+  }
+
+  object Part1 extends Part {
+    override def getDistMatrix(input: String): DistanceMatrix[String] = parseDistMatrix(input)
+  }
+
+  object Part2 extends Part {
+    override def getDistMatrix(input: String): DistanceMatrix[String] = {
+      val distMatrix = parseDistMatrix(input)
+      distMatrix + ("ME" -> distMatrix("ME")) // 0-s are defaults anyway
+    }
+  }
 
 
   private val edgeRegex = """(\w+) would (gain|lose) (\d+) happiness units by sitting next to (\w+)\.""".r
@@ -31,6 +48,7 @@ object Day13 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(optimalHappiness(input))
+    println(Part1.optimalHappiness(input))
+    println(Part2.optimalHappiness(input))
   }
 }
