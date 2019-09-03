@@ -16,4 +16,12 @@ class Day15Test extends FunSuite {
   test("Part 1 input answer") {
     assert(highestScore(input) == 222870)
   }
+
+  test("Part 2 examples") {
+    assert(highestCalorieScore(exampleInput) == 57600000)
+  }
+
+  test("Part 2 input answer") {
+    assert(highestCalorieScore(input) == 117936)
+  }
 }

@@ -22,21 +22,35 @@ object Day15 {
 
     def +(that: Ingredient): Ingredient =
       Ingredient(capacity + that.capacity, durability + that.durability, flavor + that.flavor, texture + that.texture, calories + that.calories)
+
+    def score: Int =
+      (capacity max 0) * (durability max 0) * (flavor max 0) * (texture max 0)
   }
 
-  def highestScore(ingredients: Seq[Ingredient]): Int = {
-    ingredients.repeatCombinations(100)
+  def ingredientCombinations(ingredients: Seq[Ingredient], total: Int): Iterator[Ingredient] = {
+    ingredients.repeatCombinations(total)
       .map({ ingredientCounts =>
         ingredientCounts.map({ case (ingredient, count) => count *: ingredient })
           .reduce(_ + _)
       })
-      .map({ case Ingredient(capacity, durability, flavor, texture, calories) =>
-        (capacity max 0) * (durability max 0) * (flavor max 0) * (texture max 0)
-      })
+  }
+
+  def highestScore(ingredients: Seq[Ingredient]): Int = {
+    ingredientCombinations(ingredients, 100)
+      .map(_.score)
       .max
   }
 
   def highestScore(input: String): Int = highestScore(parseIngredients(input))
+
+  def highestCalorieScore(ingredients: Seq[Ingredient]): Int = {
+    ingredientCombinations(ingredients, 100)
+      .filter(_.calories == 500)
+      .map(_.score)
+      .max
+  }
+
+  def highestCalorieScore(input: String): Int = highestCalorieScore(parseIngredients(input))
 
 
   private val ingredientRegex = """(\w+): capacity (-?\d+), durability (-?\d+), flavor (-?\d+), texture (-?\d+), calories (-?\d+)""".r
@@ -52,5 +66,6 @@ object Day15 {
 
   def main(args: Array[String]): Unit = {
     println(highestScore(input))
+    println(highestCalorieScore(input))
   }
 }
