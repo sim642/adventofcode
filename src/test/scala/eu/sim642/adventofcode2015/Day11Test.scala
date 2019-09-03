@@ -35,4 +35,8 @@ class Day11Test extends FunSuite with ScalaCheckPropertyChecks {
   test("Part 1 input answer") {
     assert(findPassword(input) == "hxbxxyzz")
   }
+
+  test("Part 2 input answer") {
+    assert(findPassword(input, 1) == "hxcaabcc")
+  }
 }

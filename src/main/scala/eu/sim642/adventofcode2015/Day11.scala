@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2015
 
+import eu.sim642.adventofcodelib.IteratorImplicits._
 import scala.annotation.tailrec
 
 object Day11 {
@@ -41,8 +42,8 @@ object Day11 {
     req3Regex.findFirstIn(s).isDefined
   }
 
-  def findPassword(s: String): String = {
-    iterateIncrements(s).find(s => req1(s) && req2(s) && req3(s)).get
+  def findPassword(s: String, i: Int = 0): String = {
+    iterateIncrements(s).filter(s => req1(s) && req2(s) && req3(s))(i)
   }
 
   //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
@@ -50,5 +51,6 @@ object Day11 {
 
   def main(args: Array[String]): Unit = {
     println(findPassword(input))
+    println(findPassword(input, 1))
   }
 }
