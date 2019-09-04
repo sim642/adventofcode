@@ -17,11 +17,29 @@ object Day16 {
     "perfumes" -> 1,
   )
 
-  def findWrappingSue(sues: Seq[Detection]): Int = {
-    sues.indexWhere(_.forall({ case (compound, count) => wrappingDetection(compound) == count })) + 1
+  trait Part {
+    def isMatchingSue(sue: Detection): Boolean
+
+    def findWrappingSue(sues: Seq[Detection]): Int = sues.indexWhere(isMatchingSue) + 1
+
+    def findWrappingSue(input: String): Int = findWrappingSue(parseSues(input))
   }
 
-  def findWrappingSue(input: String): Int = findWrappingSue(parseSues(input))
+  object Part1 extends Part {
+    override def isMatchingSue(sue: Detection): Boolean = {
+      sue.forall({ case (compound, count) => wrappingDetection(compound) == count })
+    }
+  }
+
+  object Part2 extends Part {
+    override def isMatchingSue(sue: Detection): Boolean = {
+      sue.forall({
+        case (compound@("cats" | "trees"), count) => wrappingDetection(compound) < count
+        case (compound@("pomeranians" | "goldfish"), count) => wrappingDetection(compound) > count
+        case (compound, count) => wrappingDetection(compound) == count
+      })
+    }
+  }
 
 
   private val sueRegex = """Sue (\d+): (.*)""".r
@@ -39,6 +57,7 @@ object Day16 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(findWrappingSue(input))
+    println(Part1.findWrappingSue(input))
+    println(Part2.findWrappingSue(input))
   }
 }
