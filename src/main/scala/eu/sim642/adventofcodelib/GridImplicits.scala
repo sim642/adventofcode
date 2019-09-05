@@ -11,7 +11,9 @@ object GridImplicits {
       grid.updated(pos.y, grid(pos.y).updated(pos.x, elem))
     }
 
-    def containsPos(pos: Pos): Boolean = grid.indices.contains(pos.y) && grid(pos.y).indices.contains(pos.x)
+    def containsPos(pos: Pos): Boolean = {
+      0 <= pos.x && 0 <= pos.y && pos.y < grid.size && pos.x < grid(pos.y).size
+    }
 
     def posOf(elem: A): Pos = {
       for {
