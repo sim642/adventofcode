@@ -10,6 +10,13 @@ class Day19Test extends FunSuite {
       |H => OH
       |O => HH""".stripMargin
 
+  val exampleInputReplacements2 =
+    """e => H
+      |e => O
+      |H => HO
+      |H => OH
+      |O => HH""".stripMargin
+
   test("Part 1 examples") {
     val exampleReplacements = parseReplacements(exampleInputReplacements)
     assert(countDistinctSingleReplacements(exampleReplacements, "HOH") == 4)
@@ -18,5 +25,11 @@ class Day19Test extends FunSuite {
 
   test("Part 1 input answer") {
     assert(countDistinctSingleReplacements(input) == 509)
+  }
+
+  test("Part 2 examples") {
+    val exampleReplacements2 = parseReplacements(exampleInputReplacements2)
+    assert(fewestStepsFabricate(exampleReplacements2, "HOH") == 3)
+    assert(fewestStepsFabricate(exampleReplacements2, "HOHOHO") == 6)
   }
 }
