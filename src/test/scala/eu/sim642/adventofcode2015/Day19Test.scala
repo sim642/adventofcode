@@ -32,4 +32,8 @@ class Day19Test extends FunSuite {
     assert(fewestStepsFabricate(exampleReplacements2, "HOH") == 3)
     assert(fewestStepsFabricate(exampleReplacements2, "HOHOHO") == 6)
   }
+
+  test("Part 2 input answer") {
+    assert(fewestStepsFabricate(input) == 195)
+  }
 }
