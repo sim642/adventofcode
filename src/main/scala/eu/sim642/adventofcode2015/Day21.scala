@@ -64,6 +64,24 @@ object Day21 {
     leastWinGold(enemyDamage, enemyArmor, enemyHitpoints)
   }
 
+  // TODO: reduce duplication
+  def mostLoseGold(enemyDamage: Int, enemyArmor: Int, enemyHitpoints: Int): Int = {
+    def wouldIWin(totalItem: Item): Boolean = {
+      turnsToKill(totalItem.damage, enemyArmor, enemyHitpoints) <= turnsToKill(enemyDamage, totalItem.armor, myHitpoints)
+    }
+
+    iterateItemCombinations()
+      .map(_.reduce(_ + _))
+      .filter(!wouldIWin(_))
+      .maxBy(_.cost)
+      .cost
+  }
+
+  def mostLoseGold(input: String): Int = {
+    val (enemyDamage, enemyArmor, enemyHitpoints) = parseEnemy(input)
+    mostLoseGold(enemyDamage, enemyArmor, enemyHitpoints)
+  }
+
 
   private val inputRegex =
     """Hit Points: (\d+)
@@ -78,5 +96,6 @@ object Day21 {
 
   def main(args: Array[String]): Unit = {
     println(leastWinGold(input))
+    println(mostLoseGold(input))
   }
 }
