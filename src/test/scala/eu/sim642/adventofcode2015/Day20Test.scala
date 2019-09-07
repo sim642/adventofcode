@@ -13,4 +13,8 @@ class Day20Test extends FunSuite {
   test("Part 1 input answer") {
     assert(findHouse(input) == 776160)
   }
+
+  test("Part 2 input answer") {
+    assert(findHouseLimit(input) == 786240)
+  }
 }
