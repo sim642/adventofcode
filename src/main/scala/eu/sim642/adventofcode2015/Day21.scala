@@ -40,47 +40,44 @@ object Day21 {
     } yield myWeapons ++ myArmors ++ myRings
   }
 
-  def turnsToKill(myDamage: Int, enemyArmor: Int, enemyHitpoints: Int): Int = {
-    val damageDealt = (myDamage - enemyArmor) max 1
-    (enemyHitpoints.toFloat / damageDealt).ceil.toInt
+  case class Fighter(damage: Int, armor: Int, hitpoints: Int) {
+    def turnsToKill(enemy: Fighter): Int = {
+      val damageDealt = (damage - enemy.armor) max 1
+      (enemy.hitpoints.toFloat / damageDealt).ceil.toInt
+    }
+
+    def wins(enemy: Fighter): Boolean = {
+      turnsToKill(enemy) <= enemy.turnsToKill(this)
+    }
+  }
+
+  object Fighter {
+    def apply(totalItem: Item, hitpoints: Int): Fighter = {
+      Fighter(totalItem.damage, totalItem.armor, hitpoints)
+    }
   }
 
   private val myHitpoints = 100
 
-  def leastWinGold(enemyDamage: Int, enemyArmor: Int, enemyHitpoints: Int): Int = {
-    def wouldIWin(totalItem: Item): Boolean = {
-      turnsToKill(totalItem.damage, enemyArmor, enemyHitpoints) <= turnsToKill(enemyDamage, totalItem.armor, myHitpoints)
-    }
-
+  def leastWinGold(enemy: Fighter): Int = {
     iterateItemCombinations()
       .map(_.reduce(_ + _))
-      .filter(wouldIWin)
+      .filter(Fighter(_, myHitpoints).wins(enemy))
       .minBy(_.cost)
       .cost
   }
 
-  def leastWinGold(input: String): Int = {
-    val (enemyDamage, enemyArmor, enemyHitpoints) = parseEnemy(input)
-    leastWinGold(enemyDamage, enemyArmor, enemyHitpoints)
-  }
+  def leastWinGold(input: String): Int = leastWinGold(parseEnemy(input))
 
-  // TODO: reduce duplication
-  def mostLoseGold(enemyDamage: Int, enemyArmor: Int, enemyHitpoints: Int): Int = {
-    def wouldIWin(totalItem: Item): Boolean = {
-      turnsToKill(totalItem.damage, enemyArmor, enemyHitpoints) <= turnsToKill(enemyDamage, totalItem.armor, myHitpoints)
-    }
-
+  def mostLoseGold(enemy: Fighter): Int = {
     iterateItemCombinations()
       .map(_.reduce(_ + _))
-      .filter(!wouldIWin(_))
+      .filter(!Fighter(_, myHitpoints).wins(enemy))
       .maxBy(_.cost)
       .cost
   }
 
-  def mostLoseGold(input: String): Int = {
-    val (enemyDamage, enemyArmor, enemyHitpoints) = parseEnemy(input)
-    mostLoseGold(enemyDamage, enemyArmor, enemyHitpoints)
-  }
+  def mostLoseGold(input: String): Int = mostLoseGold(parseEnemy(input))
 
 
   private val inputRegex =
@@ -88,8 +85,8 @@ object Day21 {
       |Damage: (\d+)
       |Armor: (\d+)""".stripMargin.r
 
-  def parseEnemy(input: String): (Int, Int, Int) = input match {
-    case inputRegex(hitpoints, damage, armor) => (damage.toInt, armor.toInt, hitpoints.toInt)
+  def parseEnemy(input: String): Fighter = input match {
+    case inputRegex(hitpoints, damage, armor) => Fighter(damage.toInt, armor.toInt, hitpoints.toInt)
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
