@@ -17,8 +17,8 @@ object Day24 {
     }
   }
 
-  def idealFirstQE(weights: List[Int]): Long = {
-    val groupWeight = weights.sum / 3
+  def idealFirstQE(weights: List[Int], groups: Int): Long = {
+    val groupWeight = weights.sum / groups
     iterateSubseqSum(weights, groupWeight)
       .foldLeft((Option.empty[Int], Set.empty[List[Int]]))({ case (acc@(minLength, minSet), seq) =>
         minLength match {
@@ -36,7 +36,7 @@ object Day24 {
       ._2.map(_.map(_.toLong).product).min
   }
 
-  def idealFirstQE(input: String): Long = idealFirstQE(parseWeights(input))
+  def idealFirstQE(input: String, groups: Int): Long = idealFirstQE(parseWeights(input), groups)
 
 
   def parseWeights(input: String): List[Int] = input.linesIterator.map(_.toInt).toList
@@ -44,6 +44,7 @@ object Day24 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(idealFirstQE(input))
+    println(idealFirstQE(input, 3))
+    println(idealFirstQE(input, 4))
   }
 }
