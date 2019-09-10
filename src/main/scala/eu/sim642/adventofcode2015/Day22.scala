@@ -28,8 +28,13 @@ object Day22 {
 
     def turns: Seq[State] = {
       assert(myAlive)
-      if (enemyAlive)
-        effectsApplied.myTurns.flatMap(_.effectsApplied.enemyTurn)
+      if (enemyAlive) {
+        val afterEffects = effectsApplied
+        if (afterEffects.myAlive)
+          afterEffects.myTurns.flatMap(_.effectsApplied.enemyTurn)
+        else
+          Seq.empty
+      }
       else
         Seq.empty
     }
@@ -121,6 +126,15 @@ object Day22 {
     }
   }
 
+  case object Hard extends Effect {
+    override val turns: Int = Int.MaxValue // hack
+    override val manaCost: Int = 0 // unused
+
+    override protected def applyInner(state: State): State = {
+      state.copy(myHitpoints = state.myHitpoints - 1)
+    }
+  }
+
   private val allSpells: Seq[Spell] = Seq(MagicMissle, Drain, Shield, Poison, Recharge)
 
   def leastWinManaUsed(initialState: State): Int = {
@@ -143,6 +157,13 @@ object Day22 {
 
   def leastWinManaUsed(input: String): Int = leastWinManaUsed(parseInitialState(input))
 
+  def leastWinManaUsedHard(initialState: State): Int = {
+    val newInitialState = Hard.cast(initialState).get // manually cast spell, can't fail
+    leastWinManaUsed(newInitialState)
+  }
+
+  def leastWinManaUsedHard(input: String): Int = leastWinManaUsedHard(parseInitialState(input))
+
 
   private val inputRegex =
     """Hit Points: (\d+)
@@ -158,5 +179,6 @@ object Day22 {
 
   def main(args: Array[String]): Unit = {
     println(leastWinManaUsed(input))
+    println(leastWinManaUsedHard(input))
   }
 }

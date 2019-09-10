@@ -17,4 +17,8 @@ class Day22Test extends FunSuite {
   test("Part 1 input answer") {
     assert(leastWinManaUsed(input) == 1269)
   }
+
+  test("Part 2 input answer") {
+    assert(leastWinManaUsedHard(input) == 1309)
+  }
 }
