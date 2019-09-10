@@ -69,6 +69,10 @@ object Day23 {
     override protected def initialRegisters: Registers = Map.empty.withDefaultValue(0)
   }
 
+  object Part2 extends Part {
+    override protected def initialRegisters: Registers = Map('a' -> 1).withDefaultValue(0)
+  }
+
   private val instructionRegex = """([a-z]+) ([a-z]|[+-]\d+)(?:, ([a-z]|[+-]\d+))?""".r
 
   def parseInstruction(str: String): Instruction = str match {
@@ -88,5 +92,6 @@ object Day23 {
 
   def main(args: Array[String]): Unit = {
     println(Part1.execRegisterB(input))
+    println(Part2.execRegisterB(input))
   }
 }
