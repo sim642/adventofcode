@@ -23,7 +23,7 @@ object Day22 {
           .filter(_.myAlive)
       }
       else
-        Some(this)
+        Some(this).filter(_.myAlive)
     }
 
     def turns: Seq[State] = {
