@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2015
 
-import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic}
+import eu.sim642.adventofcodelib.graph.{Dijkstra, GraphSearch}
 
 object Day22 {
 
@@ -138,7 +138,7 @@ object Day22 {
   private val allSpells: Seq[Spell] = Seq(MagicMissle, Drain, Shield, Poison, Recharge)
 
   def leastWinManaUsed(initialState: State): Int = {
-    val graphSearch = new GraphSearch[State] with Heuristic[State] {
+    val graphSearch = new GraphSearch[State] {
       override val startNode: State = initialState
 
       override def neighbors(state: State): IterableOnce[(State, Int)] = {
@@ -148,11 +148,9 @@ object Day22 {
       }
 
       override def isTargetNode(state: State, dist: Int): Boolean = !state.enemyAlive
-
-      override def heuristic(state: State): Int = 0 // TODO: implement Dijkstra
     }
 
-    AStar.search(graphSearch).target.get._2
+    Dijkstra.search(graphSearch).target.get._2
   }
 
   def leastWinManaUsed(input: String): Int = leastWinManaUsed(parseInitialState(input))
