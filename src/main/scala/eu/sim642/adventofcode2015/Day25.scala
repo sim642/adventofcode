@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2015
 
 import eu.sim642.adventofcodelib.pos.Pos
+import eu.sim642.adventofcodelib.IntegralImplicits._
 
 object Day25 {
 
@@ -11,26 +12,13 @@ object Day25 {
     triangleSum + diagonalOffset
   }
 
-  def modPow(a: Long, n: Long, m: Long): Long = {
-    if (n == 0)
-      1
-    else {
-      val half = modPow(a, n / 2, m)
-      val halfSquare = (half * half) % m
-      if (n % 2 == 0)
-        halfSquare
-      else
-        (a * halfSquare) % m
-    }
-  }
-
   private val initialCode = 20151125
-  private val base = 252533
+  private val base = 252533L // Long, so modPow squaring doesn't overflow
   private val modulo = 33554393
 
   def getCode(pos: Pos): Long = {
     val power = posIndex(pos) - 1
-    (initialCode * modPow(base, power, modulo)) % modulo
+    (initialCode * base.modPow(power, modulo)) % modulo
   }
 
   def getCode(input: String): Long = getCode(parseInput(input))
