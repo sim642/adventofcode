@@ -8,10 +8,6 @@ class Day14Test extends FunSuite with ScalaCheckPropertyChecks {
 
   val exampleInput = "abc"
 
-  test("md5") {
-    assert(md5("The quick brown fox jumps over the lazy dog") == "9e107d9d372bb6826bd81d3542a419d6")
-  }
-
   test("Part 1 keys") {
     val keyIndices = Table("i", 39, 92)
 

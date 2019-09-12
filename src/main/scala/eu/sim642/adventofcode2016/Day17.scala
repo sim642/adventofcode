@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2016
 
+import eu.sim642.adventofcodelib.Hash
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph._
@@ -19,7 +20,7 @@ object Day17 {
 
   case class VaultPos(passcode: String, pos: Pos, path: String) {
     private lazy val doors = {
-      Day14.md5(passcode + path).take(4).map(_ >= 'b')
+      Hash.md5(passcode + path).take(4).map(_ >= 'b')
     }
 
     def moves: Seq[VaultPos] = {

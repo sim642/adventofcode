@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2015
 
-import eu.sim642.adventofcode2016.Day14.md5
+import eu.sim642.adventofcodelib.Hash
 
 object Day4 {
 
@@ -8,7 +8,7 @@ object Day4 {
     protected val prefix: String
 
     def findZeroHash(input: String): Int = {
-      Iterator.from(1).find(i => md5(input + i).startsWith(prefix)).get
+      Iterator.from(1).find(i => Hash.md5(input + i).startsWith(prefix)).get
     }
   }
 

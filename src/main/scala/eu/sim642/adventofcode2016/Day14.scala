@@ -1,28 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import java.security.MessageDigest
-
+import eu.sim642.adventofcodelib.Hash
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day14 {
-
-  // https://old.reddit.com/r/adventofcode/comments/5i8pzz/2016_day_14_solutions/dbd7lvz/
-  // https://stackoverflow.com/a/9855338/854540
-  private val HEX_ARRAY = "0123456789abcdef".toCharArray
-  def bytesToHex(bytes: Array[Byte]): String = {
-    val hexChars = new Array[Char](bytes.length * 2)
-    for (j <- bytes.indices) {
-      val v = bytes(j) & 0xFF
-      hexChars(j * 2) = HEX_ARRAY(v >>> 4)
-      hexChars(j * 2 + 1) = HEX_ARRAY(v & 0x0F)
-    }
-    new String(hexChars)
-  }
-
-  // https://stackoverflow.com/a/5992852
-  def md5(s: String): String = {
-    bytesToHex(MessageDigest.getInstance("MD5").digest(s.getBytes))
-  }
 
   trait Part {
     def hash(s: String): String
@@ -50,12 +31,12 @@ object Day14 {
   }
 
   object Part1 extends Part {
-    override def hash(s: String): String = md5(s)
+    override def hash(s: String): String = Hash.md5(s)
   }
 
   object Part2 extends Part {
     override def hash(s: String): String = {
-      Iterator.iterate(s)(md5)(2017)
+      Iterator.iterate(s)(Hash.md5)(2017)
     }
   }
 
