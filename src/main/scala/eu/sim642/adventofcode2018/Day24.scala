@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2018
 
+import eu.sim642.adventofcodelib.IteratorImplicits._
+
 object Day24 {
 
   sealed trait GroupType {
@@ -123,16 +125,10 @@ object Day24 {
   }
 
   def smallestBoostedCombat(initialGroups: Seq[Group]): Int = {
-    // TODO: refactor to not use return
-    for (boost <- Iterator.from(0)) {
-      //println(s"Boost: $boost")
-      combat(boostGroups(initialGroups, boost)) match {
-        case Some((ImmuneSystem, immuneUnits)) =>
-          return immuneUnits
-        case _ =>
-      }
-    }
-    ???
+    (for {
+      boost <- Iterator.from(0)
+      (ImmuneSystem, immuneUnits) <- combat(boostGroups(initialGroups, boost))
+    } yield immuneUnits).head
   }
 
 
