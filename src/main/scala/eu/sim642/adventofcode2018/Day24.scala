@@ -111,11 +111,7 @@ object Day24 {
     Some(groups.head.groupType, groups.map(_.units).sum)
   }
 
-  def combatToWin(initialGroups: Seq[Group]): Int = {
-    combat(initialGroups) match {
-      case Some((_, units)) => units
-    }
-  }
+  def combatToWin(initialGroups: Seq[Group]): Int = combat(initialGroups).get._2
 
   def boostGroups(initialGroups: Seq[Group], boost: Int): Seq[Group] = {
     initialGroups.map({ group =>
@@ -127,6 +123,7 @@ object Day24 {
   }
 
   def smallestBoostedCombat(initialGroups: Seq[Group]): Int = {
+    // TODO: refactor to not use return
     for (boost <- Iterator.from(0)) {
       //println(s"Boost: $boost")
       combat(boostGroups(initialGroups, boost)) match {
