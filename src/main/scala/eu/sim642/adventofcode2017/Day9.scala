@@ -6,6 +6,7 @@ object Day9 {
     case '>' :: xs => xs
     case '!' :: _ :: xs => skipGarbage(xs)
     case _ :: xs => skipGarbage(xs)
+    case Nil => throw new IllegalArgumentException("nonterminated garbage")
   }
 
   def stripGarbage(chars: List[Char]): List[Char] = chars match {
@@ -42,6 +43,7 @@ object Day9 {
     case _ :: xs =>
       val (rest, cnt) = skipGarbageCount(xs)
       (rest, 1 + cnt)
+    case Nil => throw new IllegalArgumentException("nonterminated garbage")
   }
 
   def stripGarbageCount(chars: List[Char]): Int = chars match {

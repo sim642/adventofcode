@@ -36,6 +36,7 @@ object Day8 {
         val (children, seq) = replicateParser(childrenCount, treeParser)(tl)
         val (metadata, seq2) = seq.splitAt(metadataCount)
         (Tree(children, metadata), seq2)
+      case _ => throw new IllegalArgumentException("incomplete tree")
     }
 
     treeParser(seq)._1

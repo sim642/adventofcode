@@ -18,8 +18,9 @@ object Day12 {
 
   def sumPlants(generation: String, startIndex: Long): Long = {
     generation.zipWithIndex.map({
-      case ('.', _) => 0
+      case ('.', _) => 0L
       case ('#', i) => i - startIndex
+      case (_, _) => throw new IllegalArgumentException("illegal generation char")
     }).sum
   }
 
