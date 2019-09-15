@@ -12,7 +12,7 @@ object Day17 {
   case object Clay extends Tile {
     override def toString: String = "#"
   }
-  trait WaterTile extends Tile
+  sealed trait WaterTile extends Tile
   case object Flowing extends WaterTile {
     override def toString: String = "|"
   }
