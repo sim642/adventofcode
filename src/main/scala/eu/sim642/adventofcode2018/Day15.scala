@@ -60,7 +60,7 @@ object Day15 {
       override def isTargetNode(pos: Pos, dist: Int): Boolean = endPos.contains(pos)
     }
 
-    BFS.search(graphSearch).distances
+    BFS.search(graphSearch).distances.toMap // TODO: don't copy entire Map
   }
 
   def getReachable(unit: CombatUnit, inRange: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {

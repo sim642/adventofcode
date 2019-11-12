@@ -96,7 +96,7 @@ object Day20 extends RegexParsers {
       override def unitNeighbors(pos: Pos): IterableOnce[Pos] = doors(pos)
     }
 
-    BFS.traverse(graphTraversal).distances
+    BFS.traverse(graphTraversal).distances.toMap // TODO: don't copy entire Map
   }
 
   def roomDistances(input: String): Map[Pos, Int] = {

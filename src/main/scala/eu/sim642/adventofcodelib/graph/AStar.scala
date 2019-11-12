@@ -21,7 +21,7 @@ object AStar {
 
         if (graphSearch.isTargetNode(node, dist)) {
           return new Distances[A] with Target[A] {
-            override def distances: Map[A, Int] = visitedDistance.toMap // TODO: don't copy entire mutable.Map
+            override def distances: collection.Map[A, Int] = visitedDistance
 
             override def target: Option[(A, Int)] = Some(node -> dist)
           }
@@ -40,7 +40,7 @@ object AStar {
     }
 
     new Distances[A] with Target[A] {
-      override def distances: Map[A, Int] = visitedDistance.toMap // TODO: don't copy entire mutable.Map
+      override def distances: collection.Map[A, Int] = visitedDistance
 
       override def target: Option[(A, Int)] = None
     }

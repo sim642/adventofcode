@@ -13,7 +13,7 @@ trait UnitNeighbors[A] { this: GraphTraversal[A] =>
 
 
 trait Distances[A] {
-  def distances: Map[A, Int]
+  def distances: collection.Map[A, Int]
 
-  def nodes: Set[A] = distances.keySet
+  def nodes: collection.Set[A] = distances.keySet
 }

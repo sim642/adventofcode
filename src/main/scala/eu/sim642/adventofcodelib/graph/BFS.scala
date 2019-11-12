@@ -22,7 +22,7 @@ object BFS {
       // TODO: undo in Scala 2.13
       if (newToVisit.isEmpty) {
         new Distances[A] {
-          override def distances: Map[A, Int] = newVisited
+          override def distances: collection.Map[A, Int] = newVisited
         }
       }
       else
@@ -46,7 +46,7 @@ object BFS {
       toVisit.find((graphSearch.isTargetNode _).tupled) match {
         case targetNodeDist@Some(_) =>
           new Distances[A] with Target[A] {
-            override def distances: Map[A, Int] = newVisited
+            override def distances: collection.Map[A, Int] = newVisited
 
             override def target: Option[(A, Int)] = targetNodeDist
           }
@@ -57,7 +57,7 @@ object BFS {
           // TODO: undo in Scala 2.13
           if (newToVisit.isEmpty) {
             new Distances[A] with Target[A] {
-              override def distances: Map[A, Int] = newVisited
+              override def distances: collection.Map[A, Int] = newVisited
 
               override def target: Option[(A, Int)] = None
             }
@@ -81,7 +81,7 @@ object BFS {
         override def unitNeighbors(node: A): IterableOnce[A] = graphComponents.unitNeighbors(node)
       }
 
-      BFS.traverse(graphTraversal).nodes
+      BFS.traverse(graphTraversal).nodes.toSet // TODO: don't copy entire Set
     }
 
     def bfsGroups(nodes: Set[A]): Set[Set[A]] = {

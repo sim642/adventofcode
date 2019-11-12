@@ -25,7 +25,7 @@ object Day12 {
       override def unitNeighbors(node: Node): IterableOnce[Node] = nodeNeighbors(node)
     }
 
-    BFS.traverse(graphTraversal).nodes
+    BFS.traverse(graphTraversal).nodes.toSet // TODO: don't copy entire Set
   }
 
   def groupSize(input: String, startNode: Int = 0): Int = bfs(parseNodes(input), startNode).size
