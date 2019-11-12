@@ -44,7 +44,7 @@ object Day15 {
     } yield pos
   }
 
-  def bfs(startPos: Pos, endPos: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
+  def bfs(startPos: Pos, endPos: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): collection.Map[Pos, Int] = {
 
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = startPos
@@ -60,10 +60,11 @@ object Day15 {
       override def isTargetNode(pos: Pos, dist: Int): Boolean = endPos.contains(pos)
     }
 
-    BFS.search(graphSearch).distances.toMap // TODO: don't copy entire Map
+    BFS.search(graphSearch).distances
   }
 
   def getReachable(unit: CombatUnit, inRange: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
+    // TODO: extract this pattern, same as in getStep
     bfs(unit.pos, inRange).view.filterKeys(inRange).toMap
   }
 

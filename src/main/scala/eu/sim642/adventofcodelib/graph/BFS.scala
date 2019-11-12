@@ -71,9 +71,9 @@ object BFS {
   }
 
   // moved from 2017 Day 14
-  def components[A](graphComponents: GraphComponents[A]): Set[Set[A]] = {
+  def components[A](graphComponents: GraphComponents[A]): collection.Set[collection.Set[A]] = {
 
-    def bfs(start: A): Set[A] = {
+    def bfs(start: A): collection.Set[A] = {
 
       val graphTraversal = new GraphTraversal[A] with UnitNeighbors[A] {
         override val startNode: A = start
@@ -81,10 +81,10 @@ object BFS {
         override def unitNeighbors(node: A): IterableOnce[A] = graphComponents.unitNeighbors(node)
       }
 
-      BFS.traverse(graphTraversal).nodes.toSet // TODO: don't copy entire Set
+      BFS.traverse(graphTraversal).nodes
     }
 
-    def bfsGroups(nodes: Set[A]): Set[Set[A]] = {
+    def bfsGroups(nodes: Set[A]): Set[collection.Set[A]] = {
       if (nodes.isEmpty)
         Set.empty
       else {

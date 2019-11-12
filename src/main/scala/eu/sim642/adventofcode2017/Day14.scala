@@ -21,7 +21,7 @@ object Day14 {
     rows.map(_.count(x => x)).sum
   }
 
-  def bfsGroups(poss: Set[Pos]): Set[Set[Pos]] = {
+  def bfsGroups(poss: Set[Pos]): collection.Set[collection.Set[Pos]] = {
 
     val graphComponents = new GraphComponents[Pos] {
       override def nodes: IterableOnce[Pos] = poss

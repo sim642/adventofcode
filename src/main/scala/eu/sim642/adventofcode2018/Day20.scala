@@ -88,7 +88,7 @@ object Day20 extends RegexParsers {
       })
   }
 
-  def bfs(doors: Map[Pos, Set[Pos]], startPos: Pos = originPos): Map[Pos, Int] = {
+  def bfs(doors: collection.Map[Pos, Set[Pos]], startPos: Pos = originPos): collection.Map[Pos, Int] = {
 
     val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = startPos
@@ -96,10 +96,10 @@ object Day20 extends RegexParsers {
       override def unitNeighbors(pos: Pos): IterableOnce[Pos] = doors(pos)
     }
 
-    BFS.traverse(graphTraversal).distances.toMap // TODO: don't copy entire Map
+    BFS.traverse(graphTraversal).distances
   }
 
-  def roomDistances(input: String): Map[Pos, Int] = {
+  def roomDistances(input: String): collection.Map[Pos, Int] = {
     val regex = parseInput(input)
 
     val doors: Doors = mutable.Map.empty.withDefaultValue(Set.empty)
@@ -113,7 +113,7 @@ object Day20 extends RegexParsers {
     }*/
     allDoors(doors, regex)
 
-    bfs(doors.toMap)
+    bfs(doors)
   }
 
   def furthestRoom(input: String): Int = {

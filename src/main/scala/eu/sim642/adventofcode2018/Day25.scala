@@ -5,7 +5,7 @@ import eu.sim642.adventofcodelib.pos.Pos4
 
 object Day25 {
 
-  def bfsGroups(poss: Set[Pos4]): Set[Set[Pos4]] = {
+  def bfsGroups(poss: Set[Pos4]): collection.Set[collection.Set[Pos4]] = {
 
     val graphComponents = new GraphComponents[Pos4] {
       override def nodes: IterableOnce[Pos4] = poss

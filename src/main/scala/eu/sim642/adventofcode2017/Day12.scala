@@ -6,7 +6,7 @@ object Day12 {
 
   type Node = Int
   type NodeNeighbors = Map[Node, Seq[Node]]
-  type NodeComponent = Set[Node]
+  type NodeComponent = collection.Set[Node]
 
   private val nodeRegex = """(\d+) <-> (\d+(?:, \d+)*)""".r
 
@@ -25,12 +25,12 @@ object Day12 {
       override def unitNeighbors(node: Node): IterableOnce[Node] = nodeNeighbors(node)
     }
 
-    BFS.traverse(graphTraversal).nodes.toSet // TODO: don't copy entire Set
+    BFS.traverse(graphTraversal).nodes
   }
 
   def groupSize(input: String, startNode: Int = 0): Int = bfs(parseNodes(input), startNode).size
 
-  def bfsGroups(nodeNeighbors: NodeNeighbors): Set[NodeComponent] = {
+  def bfsGroups(nodeNeighbors: NodeNeighbors): collection.Set[NodeComponent] = {
 
     val graphComponents = new GraphComponents[Node] {
       override def nodes: IterableOnce[Node] = nodeNeighbors.keySet
