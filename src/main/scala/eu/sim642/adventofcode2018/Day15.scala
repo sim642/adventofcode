@@ -63,9 +63,12 @@ object Day15 {
     BFS.search(graphSearch).distances
   }
 
+  def bfsEndDistances(startPos: Pos, endPos: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
+    bfs(startPos, endPos).view.filterKeys(endPos).toMap
+  }
+
   def getReachable(unit: CombatUnit, inRange: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
-    // TODO: extract this pattern, same as in getStep
-    bfs(unit.pos, inRange).view.filterKeys(inRange).toMap
+    bfsEndDistances(unit.pos, inRange)
   }
 
   def getNearest(reachable: Map[Pos, Int]): Set[Pos] = {
@@ -77,8 +80,7 @@ object Day15 {
 
   def getStep(chosen: Pos, unit: CombatUnit)(implicit grid: Grid[Char], units: List[CombatUnit]): Pos = {
     val unitNeighbors = Pos.axisOffsets.map(unit.pos + _).toSet
-    val bfsMap = bfs(chosen, unitNeighbors)
-    val neighborDists = bfsMap.view.filterKeys(unitNeighbors).toMap
+    val neighborDists = bfsEndDistances(chosen, unitNeighbors)
     val minDist = neighborDists.values.min
     neighborDists.filter(_._2 == minDist).keys.min
   }
