@@ -89,13 +89,13 @@ object Day11 {
 
   def parseInput(input: String): State = {
     val floorObjects: Vector[Set[Object]] = input.linesIterator.take(3).map({ line =>
-      objectRegex.findAllMatchIn(line).map({ m =>
+      objectRegex.findAllMatchIn(line).map[Object]({ m =>
         if (m.group(1) != null)
           Microchip(m.group(1))
         else if (m.group(2) != null)
           Generator(m.group(2))
         else
-          ???.asInstanceOf[Object] // TODO: why is this needed?
+          throw new IllegalArgumentException("impossible objectRegex match")
       }).toSet
     }).toVector :+ Set()
 

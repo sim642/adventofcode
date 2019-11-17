@@ -11,7 +11,7 @@ object Day8 {
       case Nil => length
       case '\\' :: ('\\' | '"') :: tl => helper(tl, length + 1)
       case '\\' :: 'x' :: _ :: _ :: tl => helper(tl, length + 1)
-      case '\\' :: _ :: tl => ???
+      case '\\' :: _ :: _ => throw new IllegalArgumentException("illegal escape char")
       case _ :: tl => helper(tl, length + 1)
     }
 

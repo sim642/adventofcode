@@ -9,7 +9,7 @@ object Day1 {
       instruction match {
         case '(' => floor + 1
         case ')' => floor - 1
-        case _ => ???
+        case _ => throw new IllegalArgumentException("illegal instruction char")
       }
     })
   }
