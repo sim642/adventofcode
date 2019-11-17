@@ -43,7 +43,7 @@ object Day21 {
   def parseRules(input: String): Map[Pattern, Pattern] = input.linesIterator.map(parseRule).toMap
 
 
-  val initialPattern = parsePattern(
+  private val initialPattern = parsePattern(
     """.#.
       |..#
       |###""".stripMargin, '\n')

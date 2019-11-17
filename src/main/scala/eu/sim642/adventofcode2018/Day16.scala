@@ -34,7 +34,7 @@ object Day16 {
     }
   }
 
-  val opcodes = Set("addr", "addi", "mulr", "muli", "banr", "bani", "borr", "bori", "setr", "seti", "gtir", "gtri", "gtrr", "eqir", "eqri", "eqrr")
+  private val opcodes = Set("addr", "addi", "mulr", "muli", "banr", "bani", "borr", "bori", "setr", "seti", "gtir", "gtri", "gtrr", "eqir", "eqri", "eqrr")
 
   case class InputInstruction(opcode: Int, a: Int, b: Int, c: Int) {
     def toInstruction(opcode: String): Instruction = Instruction(opcode, a, b, c)
