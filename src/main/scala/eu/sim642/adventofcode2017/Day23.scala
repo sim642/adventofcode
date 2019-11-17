@@ -75,19 +75,20 @@ object Day23 {
 
       if (state.terminated)
         state
+      else {
+        state.instruction match {
+          case Set(x, y) => state.copy(registers = registers + (x -> state.get(y)), pc = pc + 1)
+          case Sub(x, y) => state.copy(registers = registers + (x -> (registers(x) - state.get(y))), pc = pc + 1)
+          case Mul(x, y) => state.copy(registers = registers + (x -> (registers(x) * state.get(y))), pc = pc + 1)
+          case Jnz(x, y) =>
+            if (state.get(x) != 0)
+              state.copy(pc = pc + state.get(y).toInt)
+            else
+              state.copy(pc = pc + 1)
 
-      state.instruction match {
-        case Set(x, y) => state.copy(registers = registers + (x -> state.get(y)), pc = pc + 1)
-        case Sub(x, y) => state.copy(registers = registers + (x -> (registers(x) - state.get(y))), pc = pc + 1)
-        case Mul(x, y) => state.copy(registers = registers + (x -> (registers(x) * state.get(y))), pc = pc + 1)
-        case Jnz(x, y) =>
-          if (state.get(x) != 0)
-            state.copy(pc = pc + state.get(y).toInt)
-          else
-            state.copy(pc = pc + 1)
-
-        case IsPrime(x, y) => state.copy(registers = registers + (x -> (if (isPrime(state.get(y))) 1 else 0)), pc = pc + 1)
-        case Nop => state.copy(pc = pc + 1)
+          case IsPrime(x, y) => state.copy(registers = registers + (x -> (if (isPrime(state.get(y))) 1 else 0)), pc = pc + 1)
+          case Nop => state.copy(pc = pc + 1)
+        }
       }
     }
 

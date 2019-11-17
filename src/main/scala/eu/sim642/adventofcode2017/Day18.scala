@@ -68,21 +68,22 @@ object Day18 {
 
       if (state.terminated)
         state
-
-      state.instruction match {
-        case Snd(x) =>
-          state.copy(snds = snds.enqueue(state.get(x)), pc = pc + 1)
-        case Set(x, y) => state.copy(registers = registers + (x -> state.get(y)), pc = pc + 1)
-        case Add(x, y) => state.copy(registers = registers + (x -> (registers(x) + state.get(y))), pc = pc + 1)
-        case Mul(x, y) => state.copy(registers = registers + (x -> (registers(x) * state.get(y))), pc = pc + 1)
-        case Mod(x, y) => state.copy(registers = registers + (x -> (registers(x) % state.get(y))), pc = pc + 1)
-        case Rcv(x) =>
-          execRcvSmallStep(state)
-        case Jgz(x, y) =>
-          if (state.get(x) > 0)
-            state.copy(pc = pc + state.get(y).toInt)
-          else
-            state.copy(pc = pc + 1)
+      else {
+        state.instruction match {
+          case Snd(x) =>
+            state.copy(snds = snds.enqueue(state.get(x)), pc = pc + 1)
+          case Set(x, y) => state.copy(registers = registers + (x -> state.get(y)), pc = pc + 1)
+          case Add(x, y) => state.copy(registers = registers + (x -> (registers(x) + state.get(y))), pc = pc + 1)
+          case Mul(x, y) => state.copy(registers = registers + (x -> (registers(x) * state.get(y))), pc = pc + 1)
+          case Mod(x, y) => state.copy(registers = registers + (x -> (registers(x) % state.get(y))), pc = pc + 1)
+          case Rcv(x) =>
+            execRcvSmallStep(state)
+          case Jgz(x, y) =>
+            if (state.get(x) > 0)
+              state.copy(pc = pc + state.get(y).toInt)
+            else
+              state.copy(pc = pc + 1)
+        }
       }
     }
 
