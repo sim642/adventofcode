@@ -151,7 +151,7 @@ object Day24 {
     (weaknesses, immunities)
   }
 
-  private val groupRegex = """(\d+) units each with (\d+) hit points (\([^\)]+\) )?with an attack that does (\d+) (\w+) damage at initiative (\d+)""".r
+  private val groupRegex = """(\d+) units each with (\d+) hit points (\([^)]+\) )?with an attack that does (\d+) (\w+) damage at initiative (\d+)""".r
 
   def parseGroup(s: String, i: Int, groupType: GroupType): Group = s match {
     case groupRegex(units, unitHp, weakImmune, attackDamage, attackType, initiative) =>
