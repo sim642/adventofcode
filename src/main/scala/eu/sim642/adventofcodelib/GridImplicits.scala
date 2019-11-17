@@ -32,7 +32,7 @@ object GridImplicits {
     def mapGrid[B](f: A => B): Grid[B] = grid.map(_.map(f))
 
     def flattenGrid[B](implicit asGrid: A => Grid[B]): Grid[B] =
-      grid.mapGrid(asGrid).map(_.transpose.map(_.flatten)).flatten
+      grid.mapGrid(asGrid).flatMap(_.transpose.map(_.flatten))
 
     def groupedGrid(groupSize: Int): Grid[Grid[A]] =
       grid.grouped(groupSize).map(_.map(_.grouped(groupSize).toVector).transpose).toVector
