@@ -1,6 +1,6 @@
 # Advent of Code solutions in Scala
 
-[![Scala CI](https://github.com/sim642/adventofcode/workflows/Scala%20CI/badge.svg)](https://github.com/sim642/adventofcode/actions?query=workflow%3A%22Scala+CI%22)
+[![Scala CI](https://github.com/sim642/adventofcode/workflows/Scala%20CI/badge.svg?branch=master)](https://github.com/sim642/adventofcode/actions?query=workflow%3A%22Scala+CI%22)
 
 | Year | Solutions | Inputs | Tests |
 | ---- | --------- | ------ | ----- |
