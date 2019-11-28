@@ -45,7 +45,7 @@ object Day18 {
   }
 
   def parseInput(input: String): Row = {
-    input.zipWithIndex
+    input.view.zipWithIndex
       .filter(_._1 == '^')
       .map(_._2)
       .foldLeft(BigInt(0))((acc, bit) => acc.setBit(bit))

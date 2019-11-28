@@ -79,12 +79,12 @@ object Day13 {
   }
 
   def parseInput(input: String): (Grid[Char], Seq[Cart]) = {
-    val carts: Seq[Cart] = for {
-      (row, y) <- parseGrid(input).zipWithIndex
-      (cell, x) <- row.zipWithIndex
+    val carts: Seq[Cart] = (for {
+      (row, y) <- parseGrid(input).view.zipWithIndex
+      (cell, x) <- row.view.zipWithIndex
       pos = Pos(x, y)
       cart <- parseCart(cell, pos)
-    } yield cart
+    } yield cart).toSeq
 
     val grid = parseGrid(input.replace('>', '-').replace('<', '-').replace('v', '|').replace('^', '|'))
 

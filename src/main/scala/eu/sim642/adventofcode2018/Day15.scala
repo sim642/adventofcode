@@ -189,8 +189,8 @@ object Day15 {
 
   def parseInput(input: String): (Grid[Char], List[CombatUnit]) = {
     val units: List[CombatUnit] = (for {
-      (row, y) <- parseGrid(input).zipWithIndex
-      (cell, x) <- row.zipWithIndex
+      (row, y) <- parseGrid(input).view.zipWithIndex
+      (cell, x) <- row.view.zipWithIndex
       pos = Pos(x, y)
       unit <- parseUnit(cell, pos)
     } yield unit).toList

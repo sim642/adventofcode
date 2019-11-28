@@ -39,7 +39,8 @@ object Day20 {
 
     override def staysClosest(particles: Seq[Particle]): Int = {
       val endParticles = (0 until maxIterations).foldLeft(particles.toVector)({ case (acc, _) => acc.map(_.updated) })
-      endParticles.zipWithIndex.minBy({ case (p, i) => p.p manhattanDistance Pos3.zero })._2
+      // TODO: create indexMinBy
+      endParticles.view.zipWithIndex.minBy({ case (p, i) => p.p manhattanDistance Pos3.zero })._2
     }
 
     override def particlesLeft(particles: Seq[Particle]): Int = {
@@ -117,7 +118,8 @@ object Day20 {
     }
 
     override def staysClosest(particles: Seq[Particle]): Int =
-      particles.zipWithIndex.minBy({ case (pos, i) =>
+      // TODO: create indexMinBy
+      particles.view.zipWithIndex.minBy({ case (pos, i) =>
         (pos.a manhattanDistance Pos3.zero, pos.v manhattanDistance Pos3.zero, pos.p manhattanDistance Pos3.zero) // is this asymptote even correct?
       })._2
 

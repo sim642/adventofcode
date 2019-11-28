@@ -23,6 +23,7 @@ object Day18 {
 
   object Part1 extends Part {
     override def step(grid: Grid[Boolean]): Grid[Boolean] = {
+      // TODO: use view for zipWithIndex?
       for ((row, y) <- grid.zipWithIndex)
         yield for ((cell, x) <- row.zipWithIndex)
           yield {

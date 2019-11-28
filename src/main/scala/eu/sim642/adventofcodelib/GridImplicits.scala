@@ -17,8 +17,8 @@ object GridImplicits {
 
     def posOf(elem: A): Pos = {
       for {
-        (row, y) <- grid.zipWithIndex.iterator
-        (cell, x) <- row.zipWithIndex.iterator
+        (row, y) <- grid.view.zipWithIndex
+        (cell, x) <- row.view.zipWithIndex
         if cell == elem
       } return Pos(x, y)
 

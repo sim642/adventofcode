@@ -60,7 +60,7 @@ object Day11 {
 
       override def heuristic(state: State): Int = {
         (for {
-          (objects, i) <- state.floorObjects.zipWithIndex
+          (objects, i) <- state.floorObjects.view.zipWithIndex
         } yield {
           if (objects.size % 2 == 0)
             2 * (objects.size / 2) * (3 - i)

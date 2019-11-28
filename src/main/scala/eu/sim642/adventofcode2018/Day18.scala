@@ -25,6 +25,7 @@ object Day18 {
 
     paddedGrid.slidingGrid(3).map(_.map(stepTile).toVector).toVector*/
 
+    // TODO: use view for zipWithIndex?
     for ((row, y) <- grid.zipWithIndex)
       yield for ((cell, x) <- row.zipWithIndex)
         yield {

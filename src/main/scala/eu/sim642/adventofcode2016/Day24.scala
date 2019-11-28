@@ -9,8 +9,8 @@ object Day24 {
 
   def findPois(grid: Grid[Char]): Map[Int, Pos] = {
     (for {
-      (row, y) <- grid.zipWithIndex.iterator
-      (cell, x) <- row.zipWithIndex.iterator
+      (row, y) <- grid.view.zipWithIndex
+      (cell, x) <- row.view.zipWithIndex
       if cell.isDigit
     } yield cell.asDigit -> Pos(x, y)).toMap
   }
