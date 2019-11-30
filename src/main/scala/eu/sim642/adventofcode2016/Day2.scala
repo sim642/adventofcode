@@ -53,7 +53,7 @@ object Day2 {
         Vector(     None, Some('2'), Some('3'), Some('4'),      None),
         Vector(Some('5'), Some('6'), Some('7'), Some('8'), Some('9')),
         Vector(     None, Some('A'), Some('B'), Some('C'),      None),
-        Vector(None,           None, Some('D'),      None,      None),
+        Vector(     None,      None, Some('D'),      None,      None),
       )
   }
 
