@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcodelib.pos.Pos3
+import eu.sim642.adventofcodelib.IterableOnceImplicits._
 
 object Day20 {
 
@@ -39,8 +40,7 @@ object Day20 {
 
     override def staysClosest(particles: Seq[Particle]): Int = {
       val endParticles = (0 until maxIterations).foldLeft(particles.toVector)({ case (acc, _) => acc.map(_.updated) })
-      // TODO: create indexMinBy
-      endParticles.view.zipWithIndex.minBy({ case (p, i) => p.p manhattanDistance Pos3.zero })._2
+      endParticles.indexMinBy(_.p manhattanDistance Pos3.zero)
     }
 
     override def particlesLeft(particles: Seq[Particle]): Int = {
@@ -117,11 +117,11 @@ object Day20 {
       ))
     }
 
-    override def staysClosest(particles: Seq[Particle]): Int =
-      // TODO: create indexMinBy
-      particles.view.zipWithIndex.minBy({ case (pos, i) =>
-        (pos.a manhattanDistance Pos3.zero, pos.v manhattanDistance Pos3.zero, pos.p manhattanDistance Pos3.zero) // is this asymptote even correct?
-      })._2
+    override def staysClosest(particles: Seq[Particle]): Int = {
+      particles.indexMinBy({ p =>
+        (p.a manhattanDistance Pos3.zero, p.v manhattanDistance Pos3.zero, p.p manhattanDistance Pos3.zero) // is this asymptote even correct?
+      })
+    }
 
     override def particlesLeft(particles: Seq[Particle]): Int = {
       import Quadratic._

@@ -3,6 +3,8 @@ package eu.sim642.adventofcodelib
 object IterableOnceImplicits {
 
   implicit class OrderingIterableOnceOps[A](coll: IterableOnce[A]) {
+    // TODO: move to IteratorImplicits because in Scala 2.13 IterableOnce min is deprecated
+
     def minStrict(implicit ordering: Ordering[A]): Option[A] = {
       // optional min value, min value duplication flag
       val acc = coll.iterator.foldLeft((Option.empty[A], false))({
@@ -21,6 +23,10 @@ object IterableOnceImplicits {
         case (Some(_), true) => None
         case (minOption, _) => minOption
       }
+    }
+
+    def indexMinBy[B](f: A => B)(implicit cmp: Ordering[B]): Int = {
+      coll.iterator.zipWithIndex.minBy({ case (x, i) => f(x) })._2
     }
   }
 }
