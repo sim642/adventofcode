@@ -35,6 +35,22 @@ object Day6Test {
         assert(reallocCycle(memory) == nextMemory)
       }
     }
+
+    test("Part 1 example states") {
+      val memories = Table(
+        "memory",
+        IndexedSeq(0, 2, 7, 0),
+        IndexedSeq(2, 4, 1, 2),
+        IndexedSeq(3, 1, 2, 3),
+        IndexedSeq(0, 2, 3, 4),
+        IndexedSeq(1, 3, 4, 1),
+        IndexedSeq(2, 4, 1, 2)
+      )
+      val it = Iterator.iterate(memories.head)(reallocCycle)
+      forAll (memories) { memory =>
+        assert(it.next() == memory)
+      }
+    }
   }
 
   sealed abstract class SolutionTest(solution: Solution) extends FunSuite {
@@ -55,23 +71,7 @@ object Day6Test {
     }
   }
 
-  class NaiveSolutionTest extends SolutionTest(NaiveSolution) with ScalaCheckPropertyChecks {
-    test("Part 1 example states") {
-      val memories = Table(
-        "memory",
-        IndexedSeq(0, 2, 7, 0),
-        IndexedSeq(2, 4, 1, 2),
-        IndexedSeq(3, 1, 2, 3),
-        IndexedSeq(0, 2, 3, 4),
-        IndexedSeq(1, 3, 4, 1),
-        IndexedSeq(2, 4, 1, 2)
-      )
-      val it = new NaiveSolution.ReallocIterator(memories.head)
-      forAll (memories) { memory =>
-        assert(it.next() == memory)
-      }
-    }
-  }
+  class NaiveSolutionTest extends SolutionTest(NaiveSolution)
 
   class NaiverSolutionTest extends SolutionTest(NaiverSolution)
 

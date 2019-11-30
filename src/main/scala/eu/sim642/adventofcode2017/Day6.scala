@@ -30,17 +30,6 @@ object Day6 {
   }
 
   object NaiveSolution extends Solution {
-    // TODO: unused
-    class ReallocIterator(private var memory: Memory) extends AbstractIterator[Memory] {
-      override def hasNext: Boolean = true
-
-      override def next(): Memory = {
-        val returnMemory = memory
-        memory = reallocCycle(memory)
-        returnMemory
-      }
-    }
-
     override def reallocCycleCount(initialMemory: Memory): Int = {
       NaiveCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
     }
