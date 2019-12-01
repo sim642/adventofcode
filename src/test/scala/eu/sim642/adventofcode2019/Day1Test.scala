@@ -2,14 +2,22 @@ package eu.sim642.adventofcode2019
 
 import org.scalatest.FunSuite
 import Day1._
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day1Test extends FunSuite {
+class Day1Test extends FunSuite with ScalaCheckPropertyChecks {
 
   test("Part 1 examples") {
-    assert(Part1.requiredFuel(12) == 2)
-    assert(Part1.requiredFuel(14) == 2)
-    assert(Part1.requiredFuel(1969) == 654)
-    assert(Part1.requiredFuel(100756) == 33583)
+    val massExpectedFuels = Table(
+      ("mass", "expectedFuel"),
+      (12, 2),
+      (14, 2),
+      (1969, 654),
+      (100756, 33583),
+    )
+
+    forAll (massExpectedFuels) { (mass, expectedFuel) =>
+      assert(Part1.requiredFuel(mass) == expectedFuel)
+    }
   }
 
   test("Part 1 input answer") {
@@ -17,9 +25,16 @@ class Day1Test extends FunSuite {
   }
 
   test("Part 2 examples") {
-    assert(Part2.requiredFuel(12) == 2)
-    assert(Part2.requiredFuel(1969) == 966)
-    assert(Part2.requiredFuel(100756) == 50346)
+    val massExpectedFuels = Table(
+      ("mass", "expectedFuel"),
+      (12, 2),
+      (1969, 966),
+      (100756, 50346),
+    )
+
+    forAll (massExpectedFuels) { (mass, expectedFuel) =>
+      assert(Part2.requiredFuel(mass) == expectedFuel)
+    }
   }
 
   test("Part 2 input answer") {
