@@ -6,14 +6,14 @@ import eu.sim642.adventofcode2019.Day1Test._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class Day1Test extends Suites(
-  new BaseTest,
+  new Part1Test,
   new RecursivePart2SolutionTest,
   new ClosedFormPart2SolutionTest,
 )
 
 object Day1Test {
 
-  class BaseTest extends FunSuite with ScalaCheckPropertyChecks {
+  class Part1Test extends FunSuite with ScalaCheckPropertyChecks {
 
     test("Part 1 examples") {
       val massExpectedFuels = Table(
