@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcodelib.LazyListImplicits._
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day2 {
 
@@ -38,11 +39,24 @@ object Day2 {
     Program(newCode).execFinal.code(0)
   }
 
+  def findNounVerb(code: Vector[Int], requiredOutput: Int = 19690720): Int = {
+    val (noun, verb) = (for {
+      noun <- (0 to 99).iterator
+      verb <- (0 to 99).iterator
+      newCode = code.updated(1, noun).updated(2, verb)
+      output = Program(newCode).execFinal.code(0)
+      if output == requiredOutput
+    } yield (noun, verb)).head
+
+    100 * noun + verb
+  }
+
   def parseCode(input: String): Vector[Int] = input.split(',').toVector.map(_.toInt)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(execPosition0(parseCode(input)))
+    println(findNounVerb(parseCode(input)))
   }
 }
