@@ -23,7 +23,7 @@ class Day2Test extends FunSuite with ScalaCheckPropertyChecks {
   }
 
   test("Part 1 input answer") {
-    assert(execPosition0(parseCode(input)) == 2782414)
+    assert(execNounVerb(parseCode(input)) == 2782414)
   }
 
   test("Part 2 input answer") {

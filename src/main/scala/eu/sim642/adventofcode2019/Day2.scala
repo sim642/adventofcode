@@ -34,8 +34,8 @@ object Day2 {
     }
   }
 
-  def execPosition0(code: Vector[Int]): Int = {
-    val newCode = code.updated(1, 12).updated(2, 2)
+  def execNounVerb(code: Vector[Int], noun: Int = 12, verb: Int = 2): Int = {
+    val newCode = code.updated(1, noun).updated(2, verb)
     Program(newCode).execFinal.code(0)
   }
 
@@ -43,8 +43,7 @@ object Day2 {
     val (noun, verb) = (for {
       noun <- (0 to 99).iterator
       verb <- (0 to 99).iterator
-      newCode = code.updated(1, noun).updated(2, verb)
-      output = Program(newCode).execFinal.code(0)
+      output = execNounVerb(code, noun, verb)
       if output == requiredOutput
     } yield (noun, verb)).head
 
@@ -56,7 +55,7 @@ object Day2 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(execPosition0(parseCode(input)))
+    println(execNounVerb(parseCode(input)))
     println(findNounVerb(parseCode(input)))
   }
 }
