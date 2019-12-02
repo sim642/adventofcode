@@ -18,15 +18,15 @@ class Day2Test extends FunSuite with ScalaCheckPropertyChecks {
     )
 
     forAll (initialExpectedFinals) { (initial, expectedFinal) =>
-      assert(Program(initial).execFinal.code == expectedFinal)
+      assert(ProgramState(initial).execFinal.memory == expectedFinal)
     }
   }
 
   test("Part 1 input answer") {
-    assert(execNounVerb(parseCode(input)) == 2782414)
+    assert(execNounVerb(parseProgram(input)) == 2782414)
   }
 
   test("Part 2 input answer") {
-    assert(findNounVerb(parseCode(input)) == 9820)
+    assert(findNounVerb(parseProgram(input)) == 9820)
   }
 }
