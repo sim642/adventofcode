@@ -52,4 +52,10 @@ object IteratorImplicits {
       }
     }
   }
+
+  implicit class IteratorUnfoldOps(iterator: Iterator.type) {
+    // copied from LazyListImplicits
+    def unfold0[A](a: A)(f: A => Option[A]): Iterator[A] =
+      Iterator.unfold(a)(a => f(a).map(a => (a, a)))
+  }
 }

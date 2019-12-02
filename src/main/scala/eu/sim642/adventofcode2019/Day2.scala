@@ -1,6 +1,5 @@
 package eu.sim642.adventofcode2019
 
-import eu.sim642.adventofcodelib.LazyListImplicits._
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day2 {
@@ -25,8 +24,8 @@ object Day2 {
       }
     }
 
-    def execAll: LazyList[Program] = {
-      LazyList.unfold0(this)(_.execOne)
+    def execAll: Iterator[Program] = {
+      Iterator.unfold0(this)(_.execOne)
     }
 
     def execFinal: Program = {
