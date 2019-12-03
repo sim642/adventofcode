@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.MapImplicits._
 
 object Day3 {
 
@@ -29,9 +30,7 @@ object Day3 {
     val (path1, path2) = paths
     val map1 = iteratePath(path1).zipWithIndex.groupMapReduce(_._1)(_._2)(_ min _)
     val map2 = iteratePath(path2).zipWithIndex.groupMapReduce(_._1)(_._2)(_ min _)
-    val intersections = map1.view.filterKeys(map2.contains).toMap.transform({ case (position, distance) =>
-      distance + map2(position)
-    }) - Pos.zero
+    val intersections = (map1 intersect map2)(_ + _) - Pos.zero
     intersections.minBy(_._2)._2
   }
 
