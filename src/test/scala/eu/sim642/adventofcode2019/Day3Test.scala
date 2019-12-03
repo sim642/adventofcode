@@ -37,4 +37,14 @@ class Day3Test extends FunSuite {
   test("Part 1 input answer") {
     assert(findCentralIntersectionDistance(parseInput(input)) == 1626)
   }
+
+  test("Part 2 examples") {
+    assert(findClosestIntersectionDistance(parseInput(exampleInput1)) == 30)
+    assert(findClosestIntersectionDistance(parseInput(exampleInput2)) == 610)
+    assert(findClosestIntersectionDistance(parseInput(exampleInput3)) == 410)
+  }
+
+  test("Part 2 input answer") {
+    assert(findClosestIntersectionDistance(parseInput(input)) == 27330)
+  }
 }

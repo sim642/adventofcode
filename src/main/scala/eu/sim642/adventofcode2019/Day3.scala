@@ -24,6 +24,16 @@ object Day3 {
     centralIntersection manhattanDistance Pos.zero
   }
 
+  def findClosestIntersectionDistance(paths: (Path, Path)): Int = {
+    val (path1, path2) = paths
+    val map1 = iteratePath(path1).zipWithIndex.toSeq.groupMapReduce(_._1)(_._2)(_ min _)
+    val map2 = iteratePath(path2).zipWithIndex.toSeq.groupMapReduce(_._1)(_._2)(_ min _)
+    val intersections = map1.view.filterKeys(map2.contains).toMap.transform({ case (position, distance) =>
+      distance + map2(position)
+    }) - Pos.zero
+    intersections.minBy(_._2)._2
+  }
+
 
   private val directionDistanceRegex = """([UDLR])(\d+)""".r
 
@@ -50,5 +60,6 @@ object Day3 {
 
   def main(args: Array[String]): Unit = {
     println(findCentralIntersectionDistance(parseInput(input)))
+    println(findClosestIntersectionDistance(parseInput(input)))
   }
 }
