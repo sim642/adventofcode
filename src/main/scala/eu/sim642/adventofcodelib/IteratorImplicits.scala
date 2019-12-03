@@ -1,6 +1,6 @@
 package eu.sim642.adventofcodelib
 
-import scala.collection.AbstractIterator
+import scala.collection.{AbstractIterator, immutable}
 
 object IteratorImplicits {
 
@@ -50,6 +50,14 @@ object IteratorImplicits {
         prevOption = Some(cur)
         ret
       }
+    }
+  }
+
+  implicit class GroupIteratorOps[A](it: Iterator[A]) {
+    // TODO: Remove if Scala gets groupMapReduce on Iterator
+    // Signature copied from Iterable
+    def groupMapReduce[K, B](key: A => K)(f: A => B)(reduce: (B, B) => B): immutable.Map[K, B] = {
+      it.to(LazyList).groupMapReduce(key)(f)(reduce)
     }
   }
 
