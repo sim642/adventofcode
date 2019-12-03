@@ -22,8 +22,7 @@ object Day3 {
     val set1 = iteratePath(path1).toSet
     val set2 = iteratePath(path2).toSet
     val intersections = (set1 intersect set2) - Pos.zero
-    val centralIntersection = intersections.minBy(_ manhattanDistance Pos.zero)
-    centralIntersection manhattanDistance Pos.zero
+    intersections.map(_ manhattanDistance Pos.zero).min
   }
 
   def findClosestIntersectionDistance(paths: (Path, Path)): Int = {
@@ -31,7 +30,7 @@ object Day3 {
     val map1 = iteratePath(path1).zipWithIndex.groupMapReduce(_._1)(_._2)(_ min _)
     val map2 = iteratePath(path2).zipWithIndex.groupMapReduce(_._1)(_._2)(_ min _)
     val intersections = (map1 intersect map2)(_ + _) - Pos.zero
-    intersections.minBy(_._2)._2
+    intersections.values.min
   }
 
 
