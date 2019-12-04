@@ -2,8 +2,17 @@ package eu.sim642.adventofcode2019
 
 import org.scalatest.FunSuite
 import Day4._
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day4Test extends FunSuite {
+class Day4Test extends FunSuite with ScalaCheckPropertyChecks {
+
+  test("toDigitList") {
+    forAll { number: Int =>
+      whenever (number >= 0) {
+        assert(toDigitList(number) == number.toString.toList.map(_.asDigit))
+      }
+    }
+  }
 
   test("Part 1 examples") {
     assert(Part1.isPassword(111111))

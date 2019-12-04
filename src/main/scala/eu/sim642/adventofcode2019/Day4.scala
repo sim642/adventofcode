@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2019
 
-import scala.collection.immutable.ArraySeq
+import scala.Integral.Implicits._
+import scala.annotation.tailrec
 
 object Day4 {
 
@@ -10,25 +11,55 @@ object Day4 {
     def countPasswords(range: Range.Inclusive): Int = range.count(isPassword)
   }
 
+  // should be faster than number.toString.toList.map(_.asDigit)
+  def toDigitList(number: Int): List[Int] = {
+    @tailrec
+    def helper(number: Int, acc: List[Int]): List[Int] = {
+      val (q, r) = number /% 10
+      val newAcc = r :: acc
+      if (q == 0)
+        newAcc
+      else
+        helper(q, newAcc)
+    }
+
+    helper(number, Nil)
+  }
+
+  def runLengthsReverse[A](list: List[A]): List[Int] = {
+    @tailrec
+    def helper(list: List[A], prev: A, run: Int, acc: List[Int]): List[Int] = list match {
+      case Nil => run :: acc
+      case x :: xs =>
+        if (x == prev)
+          helper(xs, x, run + 1, acc)
+        else
+          helper(xs, x, 1, run :: acc)
+    }
+
+    list match {
+      case Nil => Nil // unnecessary case for this task
+      case x :: xs => helper(xs, x, 1, Nil)
+    }
+  }
+
+  def isSorted(list: List[Int]): Boolean = {
+    (list lazyZip list.tail).forall(_ <= _)
+  }
+
   object Part1 extends Part {
     override def isPassword(number: Int): Boolean = {
-      val digits = number.toString.toList.map(_.asDigit)
-      val deltas = (digits.tail lazyZip digits).map(_ - _)
-      deltas.contains(0) && // two adjacent are the same
-        deltas.forall(_ >= 0) // digits never decrease
+      val digits = toDigitList(number)
+      // seems a bit faster to short-circuit isSorted first
+      isSorted(digits) && runLengthsReverse(digits).exists(_ >= 2)
     }
   }
 
   object Part2 extends Part {
     override def isPassword(number: Int): Boolean = {
-      val digits = number.toString.to(ArraySeq).map(_.asDigit)
-      val deltas = (digits.tail lazyZip digits).map(_ - _)
-      deltas.indices.exists({ i =>
-        deltas(i) == 0 && // two adjacent are the same
-          (i == 0 || deltas(i - 1) != 0) && // not same before
-          (i == deltas.size - 1 || deltas(i + 1) != 0) // not same after
-      }) && // TODO: make less ugly
-        deltas.forall(_ >= 0) // digits never decrease
+      val digits = toDigitList(number)
+      // seems a bit faster to short-circuit isSorted first
+      isSorted(digits) && runLengthsReverse(digits).contains(2)
     }
   }
 
