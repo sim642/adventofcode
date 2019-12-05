@@ -4,7 +4,7 @@ import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day5 {
 
-  // copied from 2019 Day 2
+  // copied & modified from 2019 Day 2
 
   type Memory = Vector[Int]
 
@@ -45,6 +45,24 @@ object Day5 {
           val newValue = readParam(0)
           val newOutputs = newValue #:: outputs
           Some(copy(ip = ip + 2, outputs = newOutputs))
+        case 5 => // jump if true
+          if (readParam(0) != 0)
+            Some(copy(ip = readParam(1)))
+          else
+            Some(copy(ip = ip + 3))
+        case 6 => // jump if false
+          if (readParam(0) == 0)
+            Some(copy(ip = readParam(1)))
+          else
+            Some(copy(ip = ip + 3))
+        case 7 => // less than
+          val newValue = if (readParam(0) < readParam(1)) 1 else 0
+          val newMemory = writeParam(2, newValue)
+          Some(copy(memory = newMemory, ip = ip + 4))
+        case 8 => // equal
+          val newValue = if (readParam(0) == readParam(1)) 1 else 0
+          val newMemory = writeParam(2, newValue)
+          Some(copy(memory = newMemory, ip = ip + 4))
         case 99 => None
         case _ => throw new IllegalArgumentException("Unknown opcode")
       }
@@ -64,8 +82,8 @@ object Day5 {
     finalState.outputs
   }
 
-  def execDiagnostic(program: Memory): Int = {
-    val (diagnostic #:: outputs) = execInputs(program, LazyList(1))
+  def execDiagnostic(program: Memory, systemId: Int): Int = {
+    val (diagnostic #:: outputs) = execInputs(program, LazyList(systemId))
     assert(outputs.forall(_ == 0))
     diagnostic
   }
@@ -75,6 +93,7 @@ object Day5 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(execDiagnostic(parseProgram(input)))
+    println(execDiagnostic(parseProgram(input), 1))
+    println(execDiagnostic(parseProgram(input), 5))
   }
 }
