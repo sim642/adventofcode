@@ -17,14 +17,14 @@ object Day6 {
   }
 
   def countOrbitalTransfers(parentMap: Map[String, String]): Int = {
-    def getParents(obj: String): Seq[String] = {
-      // TODO: unfold0 for Seq etc as well
-      Seq.unfold(obj)(child => parentMap.get(child).map(parent => (parent, parent)))
+    def getParents(obj: String): Set[String] = {
+      // TODO: unfold0 for Seq, Set etc as well
+      Set.unfold(obj)(child => parentMap.get(child).map(parent => (parent, parent)))
     }
 
     val youParents = getParents("YOU")
     val sanParents = getParents("SAN")
-    val commonParents = youParents.intersect(sanParents)
+    val commonParents = youParents intersect sanParents
 
     val youDist = youParents.size - commonParents.size
     val sanDist = sanParents.size - commonParents.size
