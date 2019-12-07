@@ -98,15 +98,24 @@ object Day7 {
 
   object Part2 extends Part {
     override def execPhaseSettingSequence(program: Memory, phaseSettings: Seq[Int]): Int = {
-      val lastIndex = phaseSettings.size - 1
+      // my initial manual knot tying
+      /*assert(phaseSettings.size == 5)
 
-      def inputs(i: Int): LazyList[Int] = i match {
-        case 0 => 0 #:: outputs(lastIndex)
-        case _ => outputs(i - 1)
-      }
-      def outputs(i: Int): LazyList[Int] = ProgramState(program, phaseSettings(i) #:: inputs(i)).outputs
+      def a: LazyList[Int] = ProgramState(program, phaseSettings(0) #:: 0 #:: e).outputs
+      def b: LazyList[Int] = ProgramState(program, phaseSettings(1) #:: a).outputs
+      def c: LazyList[Int] = ProgramState(program, phaseSettings(2) #:: b).outputs
+      def d: LazyList[Int] = ProgramState(program, phaseSettings(3) #:: c).outputs
+      def e: LazyList[Int] = ProgramState(program, phaseSettings(4) #:: d).outputs
 
-      outputs(lastIndex).last
+      e.last*/
+
+      // knot tying generalization of Part 1's foldLeft
+      // inspired by: https://github.com/glguy/advent2019/blob/053a95904b1b48cfdc72d6e8f258f9ea778eee16/execs/Day07.hs
+      def outputs: LazyList[Int] = phaseSettings.foldLeft(0 #:: outputs)({ (inputs, phaseSetting) =>
+        ProgramState(program, phaseSetting #:: inputs).outputs
+      })
+
+      outputs.last
     }
 
     override val phaseSettings: Seq[Int] = 5 to 9
