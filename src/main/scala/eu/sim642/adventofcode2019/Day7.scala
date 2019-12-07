@@ -83,13 +83,9 @@ object Day7 {
   }
 
   object Part1 extends Part {
-    def execPhaseSetting(program: Memory, phaseSetting: Int, input: Int): Int = {
-      ProgramState(program, LazyList(phaseSetting, input)).outputs.head
-    }
-
     override def execPhaseSettingSequence(program: Memory, phaseSettings: Seq[Int]): Int = {
       phaseSettings.foldLeft(0)({ (signal, phaseSetting) =>
-        execPhaseSetting(program, phaseSetting, signal)
+        ProgramState(program, LazyList(phaseSetting, signal)).outputs.head
       })
     }
 
