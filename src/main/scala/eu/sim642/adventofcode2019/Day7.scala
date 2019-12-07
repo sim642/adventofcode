@@ -98,16 +98,15 @@ object Day7 {
 
   object Part2 extends Part {
     override def execPhaseSettingSequence(program: Memory, phaseSettings: Seq[Int]): Int = {
-      // TODO: generalize somehow?
-      assert(phaseSettings.size == 5)
+      val lastIndex = phaseSettings.size - 1
 
-      def a: LazyList[Int] = ProgramState(program, phaseSettings(0) #:: 0 #:: e).outputs
-      def b: LazyList[Int] = ProgramState(program, phaseSettings(1) #:: a).outputs
-      def c: LazyList[Int] = ProgramState(program, phaseSettings(2) #:: b).outputs
-      def d: LazyList[Int] = ProgramState(program, phaseSettings(3) #:: c).outputs
-      def e: LazyList[Int] = ProgramState(program, phaseSettings(4) #:: d).outputs
+      def inputs(i: Int): LazyList[Int] = i match {
+        case 0 => 0 #:: outputs(lastIndex)
+        case _ => outputs(i - 1)
+      }
+      def outputs(i: Int): LazyList[Int] = ProgramState(program, phaseSettings(i) #:: inputs(i)).outputs
 
-      e.last
+      outputs(lastIndex).last
     }
 
     override val phaseSettings: Seq[Int] = 5 to 9
