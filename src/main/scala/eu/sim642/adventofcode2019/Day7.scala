@@ -67,7 +67,7 @@ object Day7 {
     }
 
     def outputs: LazyList[Int] = {
-      LazyList.unfold(this)(_.execOne.map({ case (a, b) => (b, a) })).flatten
+      LazyList.unfold(this)(_.execOne.map(_.swap)).flatten
     }
   }
 
