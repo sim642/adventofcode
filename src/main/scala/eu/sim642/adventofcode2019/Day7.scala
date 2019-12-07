@@ -71,43 +71,52 @@ object Day7 {
     }
   }
 
-  def execPhaseSetting(program: Memory, phaseSetting: Int, input: Int): Int = {
-    ProgramState(program, LazyList(phaseSetting, input)).outputs.head
+  trait Part {
+    def execPhaseSettingSequence(program: Memory, phaseSettings: Seq[Int]): Int
+    val phaseSettings: Seq[Int]
+
+    def findMaxSignal(program: Memory): Int = {
+      phaseSettings.permutations
+        .map(execPhaseSettingSequence(program, _))
+        .max
+    }
   }
 
-  def execPhaseSettingSequence(program: Memory, phaseSettings: Seq[Int]): Int = {
-    phaseSettings.foldLeft(0)({ (signal, phaseSetting) =>
-      execPhaseSetting(program, phaseSetting, signal)
-    })
+  object Part1 extends Part {
+    def execPhaseSetting(program: Memory, phaseSetting: Int, input: Int): Int = {
+      ProgramState(program, LazyList(phaseSetting, input)).outputs.head
+    }
+
+    override def execPhaseSettingSequence(program: Memory, phaseSettings: Seq[Int]): Int = {
+      phaseSettings.foldLeft(0)({ (signal, phaseSetting) =>
+        execPhaseSetting(program, phaseSetting, signal)
+      })
+    }
+
+    override val phaseSettings: Seq[Int] = 0 to 4
   }
 
-  def findMaxSignal(program: Memory): Int = {
-    (0 to 4).permutations
-      .map(execPhaseSettingSequence(program, _))
-      .max
-  }
+  object Part2 extends Part {
+    override def execPhaseSettingSequence(program: Memory, phaseSettings: Seq[Int]): Int = {
+      // TODO: generalize somehow?
+      assert(phaseSettings.size == 5)
 
-  def execPhaseSettingSequence2(program: Memory, phaseSettings: Seq[Int]): Int = {
-    // TODO: generalize somehow?
-    def a: LazyList[Int] = ProgramState(program, phaseSettings(0) #:: 0 #:: e).outputs
-    def b: LazyList[Int] = ProgramState(program, phaseSettings(1) #:: a).outputs
-    def c: LazyList[Int] = ProgramState(program, phaseSettings(2) #:: b).outputs
-    def d: LazyList[Int] = ProgramState(program, phaseSettings(3) #:: c).outputs
-    def e: LazyList[Int] = ProgramState(program, phaseSettings(4) #:: d).outputs
+      def a: LazyList[Int] = ProgramState(program, phaseSettings(0) #:: 0 #:: e).outputs
+      def b: LazyList[Int] = ProgramState(program, phaseSettings(1) #:: a).outputs
+      def c: LazyList[Int] = ProgramState(program, phaseSettings(2) #:: b).outputs
+      def d: LazyList[Int] = ProgramState(program, phaseSettings(3) #:: c).outputs
+      def e: LazyList[Int] = ProgramState(program, phaseSettings(4) #:: d).outputs
 
-    e.last
-  }
+      e.last
+    }
 
-  def findMaxSignal2(program: Memory): Int = {
-    (5 to 9).permutations
-      .map(execPhaseSettingSequence2(program, _))
-      .max
+    override val phaseSettings: Seq[Int] = 5 to 9
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(findMaxSignal(parseProgram(input)))
-    println(findMaxSignal2(parseProgram(input)))
+    println(Part1.findMaxSignal(parseProgram(input)))
+    println(Part2.findMaxSignal(parseProgram(input)))
   }
 }
