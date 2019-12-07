@@ -31,36 +31,36 @@ object Day7 {
         case 1 => // add
           val newValue = readParam(0) + readParam(1)
           val newMemory = writeParam(2, newValue)
-          Some((copy(memory = newMemory, ip = ip + 4)), None)
+          Some((copy(memory = newMemory, ip = ip + 4), None))
         case 2 => // multiply
           val newValue = readParam(0) * readParam(1)
           val newMemory = writeParam(2, newValue)
-          Some((copy(memory = newMemory, ip = ip + 4)), None)
+          Some((copy(memory = newMemory, ip = ip + 4), None))
         case 3 => // input
           val (input #:: newInputs) = inputs
           val newMemory = writeParam(0, input)
-          Some((copy(memory = newMemory, ip = ip + 2, inputs = newInputs)), None)
+          Some((copy(memory = newMemory, ip = ip + 2, inputs = newInputs), None))
         case 4 => // output
           val newValue = readParam(0)
-          Some((copy(ip = ip + 2)), Some(newValue))
+          Some((copy(ip = ip + 2), Some(newValue)))
         case 5 => // jump if true
           if (readParam(0) != 0)
-            Some((copy(ip = readParam(1))), None)
+            Some((copy(ip = readParam(1)), None))
           else
-            Some((copy(ip = ip + 3)), None)
+            Some((copy(ip = ip + 3), None))
         case 6 => // jump if false
           if (readParam(0) == 0)
-            Some((copy(ip = readParam(1))), None)
+            Some((copy(ip = readParam(1)), None))
           else
-            Some((copy(ip = ip + 3)), None)
+            Some((copy(ip = ip + 3), None))
         case 7 => // less than
           val newValue = if (readParam(0) < readParam(1)) 1 else 0
           val newMemory = writeParam(2, newValue)
-          Some((copy(memory = newMemory, ip = ip + 4)), None)
+          Some((copy(memory = newMemory, ip = ip + 4), None))
         case 8 => // equal
           val newValue = if (readParam(0) == readParam(1)) 1 else 0
           val newMemory = writeParam(2, newValue)
-          Some((copy(memory = newMemory, ip = ip + 4)), None)
+          Some((copy(memory = newMemory, ip = ip + 4), None))
         case 99 => None
         case _ => throw new IllegalArgumentException("Unknown opcode")
       }
