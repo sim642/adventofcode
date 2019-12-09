@@ -77,8 +77,8 @@ object Day9 {
     }
   }
 
-  def boostKeyCode(program: Memory): Value = {
-    val outputs = ProgramState(program, LazyList(1)).outputs
+  def runBoost(program: Memory, input: Value): Value = {
+    val outputs = ProgramState(program, LazyList(input)).outputs
     assert(outputs.lengthIs == 1)
     outputs.head
   }
@@ -88,6 +88,7 @@ object Day9 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(boostKeyCode(parseProgram(input)))
+    println(runBoost(parseProgram(input), 1))
+    println(runBoost(parseProgram(input), 2))
   }
 }

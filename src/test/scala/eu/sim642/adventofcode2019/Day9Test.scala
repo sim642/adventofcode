@@ -12,6 +12,10 @@ class Day9Test extends FunSuite {
   }
 
   test("Part 1 input answer") {
-    assert(boostKeyCode(parseProgram(input)) == 2789104029L)
+    assert(runBoost(parseProgram(input), 1) == 2789104029L)
+  }
+
+  test("Part 2 input answer") {
+    assert(runBoost(parseProgram(input), 2) == 32869)
   }
 }
