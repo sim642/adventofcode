@@ -10,8 +10,8 @@ object Day9 {
 
   case class ProgramState(memory: Memory,
                           inputs: LazyList[Value] = LazyList.empty,
-                          ip: Int = 0,
-                          relativeBase: Int = 0) {
+                          ip: Address = 0,
+                          relativeBase: Address = 0) {
 
     def instruction(i: Int): Value = memory(ip + i)
     def opcode: Int = (instruction(0) % 100).toInt
