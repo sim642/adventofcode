@@ -7,39 +7,24 @@ import scala.annotation.tailrec
 
 object Day10 {
 
-  def isBlocked(monitoring: Pos, blocker: Pos, asteroid: Pos): Boolean = {
-    val blockerDelta = blocker - monitoring
-    val blockerGcd = NumberTheory.gcd(blockerDelta.x, blockerDelta.y).abs
-    val blockerMinDelta = Pos(blockerDelta.x / blockerGcd, blockerDelta.y / blockerGcd)
-
-    val asteroidDelta = asteroid - monitoring
-
-    //val crossZ = blockerDelta.x * asteroidDelta.y - blockerDelta.y * asteroidDelta.x
-
-    if (blockerMinDelta.x * asteroidDelta.y == asteroidDelta.x * blockerMinDelta.y) {
-      if (blockerMinDelta.x != 0)
-        asteroidDelta.x / blockerMinDelta.x > 1
-      else
-        asteroidDelta.y / blockerMinDelta.y > 1
-    }
-    else
-      false
-  }
-
   def filterVisible(monitoring: Pos, asteroids: Set[Pos]): Set[Pos] = {
 
     @tailrec
-    def helper(visible: Set[Pos], todo: List[Pos]): Set[Pos] = todo match {
+    def helper(visible: Set[Pos], visibleMinDelta: Set[Pos], todo: List[Pos]): Set[Pos] = todo match {
       case Nil => visible
       case asteroid :: otherAsteroids =>
-        if (visible.forall(!isBlocked(monitoring, _, asteroid)))
-          helper(visible + asteroid, otherAsteroids)
+        val asteroidDelta = asteroid - monitoring
+        val asteroidGcd = NumberTheory.gcd(asteroidDelta.x, asteroidDelta.y).abs
+        val asteroidMinDelta = Pos(asteroidDelta.x / asteroidGcd, asteroidDelta.y / asteroidGcd)
+
+        if (!visibleMinDelta.contains(asteroidMinDelta))
+          helper(visible + asteroid, visibleMinDelta + asteroidMinDelta, otherAsteroids)
         else
-          helper(visible, otherAsteroids)
+          helper(visible, visibleMinDelta, otherAsteroids)
     }
 
     val todo = asteroids.toList.sortBy(monitoring manhattanDistance _)
-    helper(Set.empty, todo)
+    helper(Set.empty, Set.empty, todo)
   }
 
   def bestMonitoringPosCount(asteroids: Set[Pos]): (Pos, Int) = {

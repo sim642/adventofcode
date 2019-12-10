@@ -79,10 +79,6 @@ class Day10Test extends FunSuite with ScalaCheckPropertyChecks {
       |..#.....X...###..
       |..#.#.....#....##""".stripMargin
 
-  test("isBlocked") {
-    assert(isBlocked(Pos(3, 4), Pos(2, 2), Pos(1, 0)))
-  }
-
   test("Part 1 examples") {
     val inputExpectedPosCount = Table(
       ("input", "expectedPos", "expectedCount"),
