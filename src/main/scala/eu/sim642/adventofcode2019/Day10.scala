@@ -26,7 +26,7 @@ object Day10 {
       false
   }
 
-  def countVisible(monitoring: Pos, asteroids: Set[Pos]): Int = {
+  def filterVisible(monitoring: Pos, asteroids: Set[Pos]): Set[Pos] = {
 
     @tailrec
     def helper(visible: Set[Pos], todo: List[Pos]): Set[Pos] = todo match {
@@ -39,17 +39,40 @@ object Day10 {
     }
 
     val todo = asteroids.toList.sortBy(monitoring manhattanDistance _)
-    helper(Set.empty, todo).size
+    helper(Set.empty, todo)
   }
 
   def bestMonitoringPosCount(asteroids: Set[Pos]): (Pos, Int) = {
     (for {
       monitoring <- asteroids.iterator
       otherAsteroids = asteroids - monitoring
-    } yield monitoring -> countVisible(monitoring, otherAsteroids)).maxBy(_._2)
+    } yield monitoring -> filterVisible(monitoring, otherAsteroids).size).maxBy(_._2)
   }
 
   def bestMonitoringCount(asteroids: Set[Pos]): Int = bestMonitoringPosCount(asteroids)._2
+
+  def laserAngle(monitoring: Pos, asteroid: Pos): Double = {
+    val delta = asteroid - monitoring
+    val angle = math.atan2(-delta.y, delta.x)
+    val angle2 = if (angle > math.Pi / 2) angle - 2 * math.Pi else angle
+    math.Pi / 2 - angle2
+  }
+
+  def vaporizeSeq(monitoring: Pos, asteroids: Set[Pos]): Seq[Pos] = {
+    if (asteroids.isEmpty)
+      Seq.empty
+    else {
+      val visible = filterVisible(monitoring, asteroids)
+      val vaporizeRotation = visible.toSeq.sortBy(laserAngle(monitoring, _))
+      vaporizeRotation ++ vaporizeSeq(monitoring, asteroids -- visible)
+    }
+  }
+
+  def vaporizeBet(asteroids: Set[Pos]): Int = {
+    val monitoring = bestMonitoringPosCount(asteroids)._1
+    val pos = vaporizeSeq(monitoring, asteroids - monitoring)(199)
+    100 * pos.x + pos.y
+  }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
@@ -66,5 +89,6 @@ object Day10 {
 
   def main(args: Array[String]): Unit = {
     println(bestMonitoringCount(parseAsteroids(input)))
+    println(vaporizeBet(parseAsteroids(input)))
   }
 }
