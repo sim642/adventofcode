@@ -20,6 +20,8 @@ object NumberTheory {
     helper(0, 1, 1, 0, b, a)
   }
 
+  def gcd(a: Int, b: Int): Int = extendedGcd(a, b)._2
+
   def bezoutCoefs(a: Int, b: Int): (Int, Int) = extendedGcd(a, b)._1
 
   private def crt2(an1: (Int, Int), an2: (Int, Int)): (Int, Int) = {
