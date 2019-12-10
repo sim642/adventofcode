@@ -36,11 +36,26 @@ object Day10 {
 
   def bestMonitoringCount(asteroids: Set[Pos]): Int = bestMonitoringPosCount(asteroids)._2
 
+  private val halfPi = math.Pi / 2
+
   def laserAngle(monitoring: Pos, asteroid: Pos): Double = {
     val delta = asteroid - monitoring
-    val angle = math.atan2(-delta.y, delta.x)
-    val angle2 = if (angle > math.Pi / 2) angle - 2 * math.Pi else angle
-    math.Pi / 2 - angle2
+
+    // naive
+    /*val angle = math.atan2(-delta.y, delta.x) // our y-axis is flipped
+    if (angle > halfPi) // (π/2, π)
+      //4 * halfPi - (angle - halfPi)
+      halfPi - angle + 2 * math.Pi
+    else // [0, π/2] or (-π, 0)
+      halfPi - angle*/
+
+    // mod 2π
+    /*val angle = math.atan2(-delta.y, delta.x) // our y-axis is flipped
+    (halfPi - angle + 2 * math.Pi) % (2 * math.Pi) // TODO: %+ for Double & Float*/
+
+    // atan2 abuse
+    val angle = math.atan2(delta.x, delta.y) // our y-axis is flipped, atan2 axes transposed
+    -angle // y-axis offset by π so no % required
   }
 
   def vaporizeSeq(monitoring: Pos, asteroids: Set[Pos]): Seq[Pos] = {
