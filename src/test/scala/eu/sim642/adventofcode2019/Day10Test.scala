@@ -86,8 +86,11 @@ class Day10Test extends FunSuite with ScalaCheckPropertyChecks {
   test("Part 1 examples") {
     val inputExpectedPosCount = Table(
       ("input", "expectedPos", "expectedCount"),
-      (exampleInput, Pos(3, 4), 8)
-      // TODO: add missing examples...
+      (exampleInput, Pos(3, 4), 8),
+      (exampleInput2, Pos(5, 8), 33),
+      (exampleInput3, Pos(1, 2), 35),
+      (exampleInput4, Pos(6, 3), 41),
+      (exampleInput5, Pos(11, 13), 210),
     )
 
     forAll (inputExpectedPosCount) { (input, expectedPos, expectedCount) =>
