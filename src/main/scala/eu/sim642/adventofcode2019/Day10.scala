@@ -82,7 +82,7 @@ object Day10 {
       (cell, x) <- row.view.zipWithIndex
       if cell == '#'
       pos = Pos(x, y)
-    } yield Pos(x, y)).toSet
+    } yield pos).toSet
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
