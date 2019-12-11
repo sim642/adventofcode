@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcodelib.{Grid, NumberTheory}
 import eu.sim642.adventofcodelib.pos.Pos
+import eu.sim642.adventofcodelib.FractionalImplicits._
 
 import scala.annotation.tailrec
 
@@ -51,7 +52,7 @@ object Day10 {
 
     // mod 2π
     /*val angle = math.atan2(-delta.y, delta.x) // our y-axis is flipped
-    (halfPi - angle + 2 * math.Pi) % (2 * math.Pi) // TODO: %+ for Double & Float*/
+    (halfPi - angle) %+ (2 * math.Pi)*/
 
     // atan2 abuse
     val angle = math.atan2(delta.x, delta.y) // our y-axis is flipped, atan2 axes transposed
