@@ -1,23 +1,36 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Suites}
 import Day9.parseProgram
 import Day11._
+import eu.sim642.adventofcode2019.Day11Test._
 
-class Day11Test extends FunSuite {
+class Day11Test extends Suites(
+  new KnotTyingSolutionTest,
+  new OutputLoopSolutionTest,
+)
 
-  // manually constructed Intcode program which just outputs the example values
-  val exampleInput = "104,1,104,0,104,0,104,0,104,1,104,0,104,1,104,0,104,0,104,1,104,1,104,0,104,1,104,0,99"
+object Day11Test {
 
-  test("Part 1 examples") {
-    assert(countPainted(parseProgram(exampleInput)) == 6)
+  sealed abstract class SolutionTest(solution: Solution) extends FunSuite {
+
+    // manually constructed Intcode program which just outputs the example values
+    val exampleInput = "104,1,104,0,104,0,104,0,104,1,104,0,104,1,104,0,104,0,104,1,104,1,104,0,104,1,104,0,99"
+
+    test("Part 1 examples") {
+      assert(solution.countPainted(parseProgram(exampleInput)) == 6)
+    }
+
+    test("Part 1 input answer") {
+      assert(solution.countPainted(parseProgram(input)) == 1863)
+    }
+
+    test("Part 2 input answer") {
+      solution.renderIdentifier(parseProgram(input)) // BLULZJLZ
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(countPainted(parseProgram(input)) == 1863)
-  }
+  class KnotTyingSolutionTest extends SolutionTest(KnotTyingSolution)
 
-  test("Part 2 input answer") {
-    renderIdentifier(parseProgram(input)) // BLULZJLZ
-  }
+  class OutputLoopSolutionTest extends SolutionTest(OutputLoopSolution)
 }
