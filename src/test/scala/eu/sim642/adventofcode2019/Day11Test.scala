@@ -14,4 +14,14 @@ class Day11Test extends FunSuite {
   test("Part 1 input answer") {
     assert(countPainted(parseProgram(input)) == 1863)
   }
+
+  ignore("Part 2 examples") {
+    // TODO: test something?
+    val program = parseProgram("104,1,104,0,104,0,104,0,104,1,104,0,104,1,104,0,104,0,104,1,104,1,104,0,104,1,104,0,99")
+    renderIdentifier(program)
+  }
+
+  test("Part 2 input answer") {
+    renderIdentifier(parseProgram(input))
+  }
 }
