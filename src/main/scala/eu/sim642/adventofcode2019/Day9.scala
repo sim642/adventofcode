@@ -68,12 +68,18 @@ object Day9 {
           val newRelativeBase = relativeBase + readParam(0)
           Some((copy(ip = ip + 2, relativeBase = newRelativeBase.toInt), None))
         case 99 => None
-        case _ => throw new IllegalArgumentException("Unknown opcode")
+        case _ => throw new IllegalArgumentException(s"Unknown opcode ${opcode}")
       }
     }
 
     def outputs: LazyList[Value] = {
       LazyList.unfold(this)(_.execOne.map(_.swap)).flatten
+    }
+
+    def execs: LazyList[(ProgramState, Option[Value])] = {
+      LazyList.unfold(this)({ state =>
+        state.execOne.map(ret => (ret, ret._1))
+      })
     }
   }
 
