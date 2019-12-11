@@ -9,34 +9,34 @@ import scala.annotation.tailrec
 
 object Day11 {
 
-  case class PaintState(pos: Pos, offset: Pos, paint: Map[Pos, Long])
+  case class PaintState(pos: Pos, offset: Pos, paint: Map[Pos, Long]) {
+    def posPaint: Long = paint(pos)
+  }
 
-  def runPaint(program: Memory, initialPaint: Map[Pos, Long] = Map.empty): PaintState = {
+  def runPaint(program: Memory, initialPaint: Map[Pos, Long]): PaintState = {
     @tailrec
     def helper(programState: ProgramState, paintState: PaintState): PaintState = {
-      val outputStates = programState.copy(inputs = LazyList.continually(paintState.paint(paintState.pos))).execs
-        .filter(_._2.isDefined)
-        .map(p => (p._1, p._2.get))
+      val newProgramState = programState.copy(inputs = LazyList.continually(paintState.posPaint))
 
-      outputStates.take(2) match {
-        case LazyList() =>
+      newProgramState.outputStates.take(2) match {
+        case LazyList() => // halted
           paintState
-        case LazyList((_, out1), (newState, out2)) =>
-          val newPaint = paintState.paint + (paintState.pos -> out1)
-          val newOffset = out2 match {
+        case LazyList((_, outPaint), (newProgramState, outDirection)) =>
+          val newPaint = paintState.paint + (paintState.pos -> outPaint)
+          val newOffset = outDirection match {
             case 0 => paintState.offset.left
             case 1 => paintState.offset.right
           }
           val newPos = paintState.pos + newOffset
-          //println(out1, out2)
-          helper(newState, PaintState(newPos, newOffset, newPaint))
+          val newPaintState = PaintState(newPos, newOffset, newPaint)
+          helper(newProgramState, newPaintState)
       }
     }
 
-    helper(ProgramState(program), PaintState(Pos.zero, Pos(0, 1), initialPaint.withDefaultValue(0)))
+    helper(ProgramState(program), PaintState(Pos.zero, Pos(0, 1), initialPaint))
   }
 
-  def countPainted(program: Memory): Int = runPaint(program).paint.size
+  def countPainted(program: Memory): Int = runPaint(program, Map.empty.withDefaultValue(0L)).paint.size
 
   def printPaint(paint: Map[Pos, Long]): Unit = {
     val Box(min, max) = Box.bounding(paint.keys)
@@ -51,7 +51,7 @@ object Day11 {
   }
 
   def renderIdentifier(program: Memory): Unit = {
-    val paint = runPaint(program, Map(Pos.zero -> 1)).paint
+    val paint = runPaint(program, Map(Pos.zero -> 1L).withDefaultValue(0L)).paint
     printPaint(paint)
   }
 

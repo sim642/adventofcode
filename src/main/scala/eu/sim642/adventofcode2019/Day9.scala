@@ -81,6 +81,13 @@ object Day9 {
         state.execOne.map(ret => (ret, ret._1))
       })
     }
+
+    def outputStates: LazyList[(ProgramState, Value)] = {
+      // TODO: refactor
+      execs
+        .filter(_._2.isDefined)
+        .map(p => (p._1, p._2.get))
+    }
   }
 
   def runBoost(program: Memory, input: Value): Value = {
