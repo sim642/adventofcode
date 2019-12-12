@@ -95,7 +95,6 @@ object Day12 {
     override def simulateCycleSteps(moons: Seq[Moon]): Long = {
       val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons) _
 
-      // TODO: remove implicit assumption using CRT
       val xyzCycleEqs = {
         for {
           fMoons <- xyzMoons
