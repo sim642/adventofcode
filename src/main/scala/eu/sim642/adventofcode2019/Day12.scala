@@ -2,6 +2,8 @@ package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcodelib.pos.Pos3
 import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.NumberTheory
+import eu.sim642.adventofcodelib.cycle.{BrentCycleFinder, NaiveCycleFinder}
 
 object Day12 {
 
@@ -48,6 +50,26 @@ object Day12 {
     totalEnergy(finalMoons)
   }
 
+  def simulateCycleSteps(moons: Seq[Moon]): Long = {
+    //NaiveCycleFinder.find(moons, stepMoons).stemCycleLength
+    //BrentCycleFinder.find(moons, stepMoons).stemCycleLength
+
+    // TODO: separate this to Part2Solutions
+    val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons) _
+    val xCycle = cycleFinder(_.map(moon => (moon.pos.x, moon.vel.x)))
+    val yCycle = cycleFinder(_.map(moon => (moon.pos.y, moon.vel.y)))
+    val zCycle = cycleFinder(_.map(moon => (moon.pos.z, moon.vel.z)))
+
+    // TODO: remove implicit assumption using CRT
+    assert(xCycle.stemLength == 0)
+    assert(yCycle.stemLength == 0)
+    assert(zCycle.stemLength == 0)
+
+    def lcm(a: Long, b: Long): Long = a * b / NumberTheory.gcd(a.toInt, b.toInt) // TODO: no toInt
+
+    lcm(lcm(xCycle.cycleLength, yCycle.cycleLength), zCycle.cycleLength)
+  }
+
 
   private val moonRegex = """<x=(-?\d+),\s*y=(-?\d+),\s*z=(-?\d+)>""".r
 
@@ -62,5 +84,6 @@ object Day12 {
 
   def main(args: Array[String]): Unit = {
     println(simulateTotalEnergy(parseMoons(input)))
+    println(simulateCycleSteps(parseMoons(input)))
   }
 }

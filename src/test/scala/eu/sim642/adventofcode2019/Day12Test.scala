@@ -37,4 +37,13 @@ class Day12Test extends FunSuite {
   test("Part 1 input answer") {
     assert(simulateTotalEnergy(parseMoons(input)) == 13045)
   }
+
+  test("Part 2 examples") {
+    assert(simulateCycleSteps(parseMoons(exampleInput)) == 2772)
+    assert(simulateCycleSteps(parseMoons(exampleInput2)) == 4686774924L)
+  }
+
+  test("Part 2 input answer") {
+    assert(simulateCycleSteps(parseMoons(input)) == 344724687853944L)
+  }
 }
