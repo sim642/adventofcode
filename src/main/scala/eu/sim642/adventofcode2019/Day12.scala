@@ -50,26 +50,36 @@ object Day12 {
     totalEnergy(finalMoons)
   }
 
-  def simulateCycleSteps(moons: Seq[Moon]): Long = {
-    //NaiveCycleFinder.find(moons, stepMoons).stemCycleLength
-    //BrentCycleFinder.find(moons, stepMoons).stemCycleLength
-
-    // TODO: separate this to Part2Solutions
-    val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons) _
-    val xCycle = cycleFinder(_.map(moon => (moon.pos.x, moon.vel.x)))
-    val yCycle = cycleFinder(_.map(moon => (moon.pos.y, moon.vel.y)))
-    val zCycle = cycleFinder(_.map(moon => (moon.pos.z, moon.vel.z)))
-
-    // TODO: remove implicit assumption using CRT
-    assert(xCycle.stemLength == 0)
-    assert(yCycle.stemLength == 0)
-    assert(zCycle.stemLength == 0)
-
-    def lcm(a: Long, b: Long): Long = a * b / NumberTheory.gcd(a.toInt, b.toInt) // TODO: no toInt
-
-    lcm(lcm(xCycle.cycleLength, yCycle.cycleLength), zCycle.cycleLength)
+  trait Part2Solution {
+    def simulateCycleSteps(moons: Seq[Moon]): Long
   }
 
+  object NaivePart2Solution extends Part2Solution {
+    override def simulateCycleSteps(moons: Seq[Moon]): Long = {
+      NaiveCycleFinder.find(moons, stepMoons).stemCycleLength
+      //BrentCycleFinder.find(moons, stepMoons).stemCycleLength
+    }
+  }
+
+  object LcmPart2Solution extends Part2Solution {
+    // TODO: split LCM and CRT solutions
+
+    override def simulateCycleSteps(moons: Seq[Moon]): Long = {
+      val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons) _
+      val xCycle = cycleFinder(_.map(moon => (moon.pos.x, moon.vel.x)))
+      val yCycle = cycleFinder(_.map(moon => (moon.pos.y, moon.vel.y)))
+      val zCycle = cycleFinder(_.map(moon => (moon.pos.z, moon.vel.z)))
+
+      // TODO: remove implicit assumption using CRT
+      assert(xCycle.stemLength == 0)
+      assert(yCycle.stemLength == 0)
+      assert(zCycle.stemLength == 0)
+
+      def lcm(a: Long, b: Long): Long = a * b / NumberTheory.gcd(a.toInt, b.toInt) // TODO: no toInt
+
+      lcm(lcm(xCycle.cycleLength, yCycle.cycleLength), zCycle.cycleLength)
+    }
+  }
 
   private val moonRegex = """<x=(-?\d+),\s*y=(-?\d+),\s*z=(-?\d+)>""".r
 
@@ -83,6 +93,8 @@ object Day12 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import LcmPart2Solution._
+
     println(simulateTotalEnergy(parseMoons(input)))
     println(simulateCycleSteps(parseMoons(input)))
   }
