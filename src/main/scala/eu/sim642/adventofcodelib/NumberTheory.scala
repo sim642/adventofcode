@@ -29,17 +29,18 @@ object NumberTheory {
 
   def lcm[A: Integral](as: Seq[A]): A = as.reduce(lcm(_, _))
 
-  def bezoutCoefs(a: Int, b: Int): (Int, Int) = extendedGcd(a, b)._1
+  def bezoutCoefs[A: Integral](a: A, b: A): (A, A) = extendedGcd(a, b)._1
 
-  private def crt2(an1: (Int, Int), an2: (Int, Int)): (Int, Int) = {
+  private def crt2[A: Integral](an1: (A, A), an2: (A, A)): (A, A) = {
     val (a1, n1) = an1
     val (a2, n2) = an2
     val (m1, m2) = bezoutCoefs(n1, n2)
-    val N = n1 * n2
-    // TODO: remove overflow avoiding hack, generalize to Numeric?
-    val x = a1.toLong * m2 * n2 + a2 * m1 * n1
-    ((x %+ N.toLong).toInt, N)
+    //val N = n1 * n2
+    val N = lcm(n1, n2) // TODO: is this right generalization?
+    // TODO: avoid overflow if possible
+    val x = a1 * m2 * n2 + a2 * m1 * n1
+    (x %+ N, N)
   }
 
-  def crt(ans: Seq[(Int, Int)]): (Int, Int) = ans.reduce(crt2)
+  def crt[A: Integral](ans: Seq[(A, A)]): (A, A) = ans.reduce(crt2(_, _))
 }

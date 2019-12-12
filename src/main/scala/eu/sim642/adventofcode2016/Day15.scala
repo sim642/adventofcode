@@ -23,8 +23,10 @@ object Day15 {
 
   object Part1 extends Part {
     override def firstPressTime(disks: Seq[Disk]): Int = {
-      val ans = disks.map({ case Disk(i, posCount, initialPos) => ((-(initialPos + i)) %+ posCount, posCount) })
-      NumberTheory.crt(ans)._1
+      val ans = disks.map({ case Disk(i, posCount, initialPos) =>
+        (((-(initialPos + i)) %+ posCount).toLong, posCount.toLong)
+      })
+      NumberTheory.crt(ans)._1.toInt
     }
   }
 

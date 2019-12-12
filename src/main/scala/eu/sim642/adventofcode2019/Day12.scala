@@ -96,8 +96,15 @@ object Day12 {
       val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons) _
 
       // TODO: remove implicit assumption using CRT
-      val xyzCycleLengths = xyzMoons.map(cycleFinder(_).ensuring(_.stemLength == 0).cycleLength.toLong)
-      NumberTheory.lcm(xyzCycleLengths)
+      val xyzCycleEqs = {
+        for {
+          fMoons <- xyzMoons
+          cycle = cycleFinder(fMoons)
+        } yield (cycle.stemLength.toLong, cycle.cycleLength.toLong)
+      }
+
+      val (x, n) = NumberTheory.crt(xyzCycleEqs)
+      x + n
     }
   }
 
