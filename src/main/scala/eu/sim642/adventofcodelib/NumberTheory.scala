@@ -1,14 +1,15 @@
 package eu.sim642.adventofcodelib
 
 import scala.annotation.tailrec
+import scala.math.Integral.Implicits._
 import eu.sim642.adventofcodelib.IntegralImplicits._
 
 object NumberTheory {
 
-  def extendedGcd(a: Int, b: Int): ((Int, Int), Int, (Int, Int)) = {
+  def extendedGcd[A](a: A, b: A)(implicit aIntegral: Integral[A]): ((A, A), A, (A, A)) = {
 
     @tailrec
-    def helper(s: Int, oldS: Int, t: Int, oldT: Int, r: Int, oldR: Int): ((Int, Int), Int, (Int, Int)) = {
+    def helper(s: A, oldS: A, t: A, oldT: A, r: A, oldR: A): ((A, A), A, (A, A)) = {
       if (r == 0)
         ((oldS, oldT), oldR, (s, t))
       else {
@@ -17,10 +18,16 @@ object NumberTheory {
       }
     }
 
-    helper(0, 1, 1, 0, b, a)
+    helper(aIntegral.zero, aIntegral.one, aIntegral.one, aIntegral.zero, b, a)
   }
 
-  def gcd(a: Int, b: Int): Int = extendedGcd(a, b)._2
+  def gcd[A: Integral](a: A, b: A): A = extendedGcd(a, b)._2
+
+  def gcd[A: Integral](as: Seq[A]): A = as.reduce(gcd(_, _))
+
+  def lcm[A: Integral](a: A, b: A): A = a / gcd(a, b) * b // divide before multiply to reduce overflow risk
+
+  def lcm[A: Integral](as: Seq[A]): A = as.reduce(lcm(_, _))
 
   def bezoutCoefs(a: Int, b: Int): (Int, Int) = extendedGcd(a, b)._1
 

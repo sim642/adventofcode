@@ -67,6 +67,7 @@ object Day12 {
   def xMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.x, moon.vel.x))
   def yMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.y, moon.vel.y))
   def zMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.z, moon.vel.z))
+  val xyzMoons = Seq(xMoons _, yMoons _, zMoons _)
 
   /**
     * Part 2 solution which finds per-axis cycles with the first state repeating.
@@ -81,14 +82,8 @@ object Day12 {
         iterateMoons.view.map(f).indexOf(f(moons), 1)
       }
 
-      val xCycleLength = cycleLength(xMoons)
-      val yCycleLength = cycleLength(yMoons)
-      val zCycleLength = cycleLength(zMoons)
-
-      def lcm(a: Long, b: Long): Long = a * b / NumberTheory.gcd(a.toInt, b.toInt) // TODO: no toInt
-
-      // TODO: multi-way LCM
-      lcm(lcm(xCycleLength, yCycleLength), zCycleLength)
+      val xyzCycleLengths = xyzMoons.map(cycleLength(_).toLong)
+      NumberTheory.lcm(xyzCycleLengths)
     }
   }
 
@@ -99,18 +94,10 @@ object Day12 {
   object CrtPart2Solution extends Part2Solution {
     override def simulateCycleSteps(moons: Seq[Moon]): Long = {
       val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons) _
-      val xCycle = cycleFinder(xMoons)
-      val yCycle = cycleFinder(yMoons)
-      val zCycle = cycleFinder(zMoons)
 
       // TODO: remove implicit assumption using CRT
-      assert(xCycle.stemLength == 0)
-      assert(yCycle.stemLength == 0)
-      assert(zCycle.stemLength == 0)
-
-      def lcm(a: Long, b: Long): Long = a * b / NumberTheory.gcd(a.toInt, b.toInt) // TODO: no toInt
-
-      lcm(lcm(xCycle.cycleLength, yCycle.cycleLength), zCycle.cycleLength)
+      val xyzCycleLengths = xyzMoons.map(cycleFinder(_).ensuring(_.stemLength == 0).cycleLength.toLong)
+      NumberTheory.lcm(xyzCycleLengths)
     }
   }
 
