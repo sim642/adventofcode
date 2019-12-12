@@ -54,6 +54,9 @@ object Day12 {
     def simulateCycleSteps(moons: Seq[Moon]): Long
   }
 
+  /**
+    * Part 2 solution which naïvely simulates until cycle is found.
+    */
   object NaivePart2Solution extends Part2Solution {
     override def simulateCycleSteps(moons: Seq[Moon]): Long = {
       NaiveCycleFinder.find(moons, stepMoons).stemCycleLength
@@ -61,14 +64,44 @@ object Day12 {
     }
   }
 
-  object LcmPart2Solution extends Part2Solution {
-    // TODO: split LCM and CRT solutions
+  def xMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.x, moon.vel.x))
+  def yMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.y, moon.vel.y))
+  def zMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.z, moon.vel.z))
 
+  /**
+    * Part 2 solution which finds per-axis cycles with the first state repeating.
+    * The first state will be the one to repeat since a step is invertible.
+    * Overall cycle step count is the LCM of the per-axis cycle lengths.
+    */
+  object LcmPart2Solution extends Part2Solution {
+    override def simulateCycleSteps(moons: Seq[Moon]): Long = {
+      val iterateMoons = LazyList.iterate(moons)(stepMoons)
+
+      def cycleLength[A](f: Seq[Moon] => A): Int = {
+        iterateMoons.view.map(f).indexOf(f(moons), 1)
+      }
+
+      val xCycleLength = cycleLength(xMoons)
+      val yCycleLength = cycleLength(yMoons)
+      val zCycleLength = cycleLength(zMoons)
+
+      def lcm(a: Long, b: Long): Long = a * b / NumberTheory.gcd(a.toInt, b.toInt) // TODO: no toInt
+
+      // TODO: multi-way LCM
+      lcm(lcm(xCycleLength, yCycleLength), zCycleLength)
+    }
+  }
+
+  /**
+    * Part 2 solution which finds per-axis cycles in general.
+    * Overall cycle step count is calculated by CRT of the per-axis cycles.
+    */
+  object CrtPart2Solution extends Part2Solution {
     override def simulateCycleSteps(moons: Seq[Moon]): Long = {
       val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons) _
-      val xCycle = cycleFinder(_.map(moon => (moon.pos.x, moon.vel.x)))
-      val yCycle = cycleFinder(_.map(moon => (moon.pos.y, moon.vel.y)))
-      val zCycle = cycleFinder(_.map(moon => (moon.pos.z, moon.vel.z)))
+      val xCycle = cycleFinder(xMoons)
+      val yCycle = cycleFinder(yMoons)
+      val zCycle = cycleFinder(zMoons)
 
       // TODO: remove implicit assumption using CRT
       assert(xCycle.stemLength == 0)
@@ -93,7 +126,7 @@ object Day12 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    import LcmPart2Solution._
+    import CrtPart2Solution._
 
     println(simulateTotalEnergy(parseMoons(input)))
     println(simulateCycleSteps(parseMoons(input)))

@@ -9,6 +9,7 @@ class Day12Test extends Suites(
   new BaseTest,
   new NaivePart2SolutionTest,
   new LcmPart2SolutionTest,
+  new CrtPart2SolutionTest,
 )
 
 object Day12Test {
@@ -73,4 +74,6 @@ object Day12Test {
   }
 
   class LcmPart2SolutionTest extends Part2SolutionTest(LcmPart2Solution)
+
+  class CrtPart2SolutionTest extends Part2SolutionTest(CrtPart2Solution)
 }
