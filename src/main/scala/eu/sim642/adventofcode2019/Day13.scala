@@ -25,49 +25,55 @@ object Day13 {
 
   def countBlocks(program: Memory): Int = runPaint(program).values.count(_ == 2)
 
+
+  case class PlayState(paddlePos: Option[Pos],
+                       ballPos: Option[Pos],
+                       score: Option[Value]) {
+
+    def updated(pos: Pos, value: Value): PlayState = (pos, value) match {
+      case (Pos(-1, 0), score) => // score
+        copy(score = Some(score))
+      case (pos, 3) => // paddle
+        copy(paddlePos = Some(pos))
+      case (pos, 4) => // ball
+        copy(ballPos = Some(pos))
+      case (_, _) =>
+        this
+    }
+  }
+
   def playGame(program: Memory): Value = {
 
-    def renderOutputs(outputs: LazyList[Value]): (Map[Pos, Tile], Option[Value]) = {
-      outputs.grouped(3).foldLeft((Map.empty[Pos, Tile], Option.empty[Value]))({
-        case ((paint, _), LazyList(-1, 0, score)) =>
-          (paint, Some(score))
-        case ((paint, score), LazyList(x, y, tile)) =>
-          val pos = Pos(x.toInt, y.toInt)
-          (paint + (pos -> tile.toInt), score)
-      })
-    }
-
     @tailrec
-    def helper(programState: ProgramState, prevPaint: Map[Pos, Tile], prevScore: Option[Value]): Value = {
+    def helper(programState: ProgramState, playState: PlayState): Value = {
       val execs = programState.execs
-      if (execs.isEmpty)
-        prevScore.get
+      if (execs.isEmpty) // halted
+        playState.score.get
       else {
-        val lastState = execs.last._1
         val outputs = execs.flatMap(_._2)
-        val (paint_, score) = renderOutputs(outputs)
-        val paint = prevPaint ++ paint_
-        //printPaint(paint)
-        //println(score)
+        val newPlayState = outputs.grouped(3).foldLeft(playState)({
+          case (prevState, LazyList(x, y, value)) =>
+            prevState.updated(Pos(x.toInt, y.toInt), value)
+        })
 
-        val ballPos = paint.find(_._2 == 4).get._1 // linear search
-        val paddlePos = paint.find(_._2 == 3).get._1 // linear search
-        //println(ballPos, paddlePos)
+        val ballPosX = newPlayState.ballPos.get.x
+        val paddlePosX = newPlayState.paddlePos.get.x
         val newInput = {
-          if (ballPos.x < paddlePos.x)
+          if (ballPosX < paddlePosX)
             -1
-          else if (ballPos.x > paddlePos.x)
+          else if (ballPosX > paddlePosX)
             1
           else
             0
         }
 
-        helper(lastState.copy(inputs = LazyList(newInput)), paint, score)
+        val newProgramState = execs.last._1.copy(inputs = LazyList(newInput))
+        helper(newProgramState, newPlayState)
       }
     }
 
     val newProgram = program + (0 -> 2L)
-    helper(ProgramState(newProgram), Map.empty, None)
+    helper(ProgramState(newProgram), PlayState(None, None, None))
   }
 
   def printPaint(paint: Map[Pos, Tile]): Unit = {
@@ -91,7 +97,6 @@ object Day13 {
 
   def main(args: Array[String]): Unit = {
     println(countBlocks(parseProgram(input)))
-
     println(playGame(parseProgram(input)))
   }
 }
