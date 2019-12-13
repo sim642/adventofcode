@@ -58,14 +58,7 @@ object Day13 {
 
         val ballPosX = newPlayState.ballPos.get.x
         val paddlePosX = newPlayState.paddlePos.get.x
-        val newInput = {
-          if (ballPosX < paddlePosX)
-            -1
-          else if (ballPosX > paddlePosX)
-            1
-          else
-            0
-        }
+        val newInput = (ballPosX compareTo paddlePosX).sign // use .sign to clamp to -1, 0, 1
 
         val newProgramState = execs.last._1.copy(inputs = LazyList(newInput))
         helper(newProgramState, newPlayState)
