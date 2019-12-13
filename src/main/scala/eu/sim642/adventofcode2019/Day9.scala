@@ -40,9 +40,13 @@ object Day9 {
           val newMemory = writeParam(2, newValue)
           Some((copy(memory = newMemory, ip = ip + 4), None))
         case 3 => // input
-          val (input #:: newInputs) = inputs
-          val newMemory = writeParam(0, input)
-          Some((copy(memory = newMemory, ip = ip + 2, inputs = newInputs), None))
+          inputs match {
+            case LazyList() =>
+              None // TODO: out of input indistinguishable from halt
+            case input #:: newInputs =>
+              val newMemory = writeParam(0, input)
+              Some((copy(memory = newMemory, ip = ip + 2, inputs = newInputs), None))
+          }
         case 4 => // output
           val newValue = readParam(0)
           Some((copy(ip = ip + 2), Some(newValue)))

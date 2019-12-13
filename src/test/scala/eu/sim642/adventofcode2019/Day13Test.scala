@@ -19,4 +19,8 @@ class Day13Test extends FunSuite {
   test("Part 1 input answer") {
     assert(countBlocks(parseProgram(input)) == 247)
   }
+
+  test("Part 2 input answer") {
+    assert(playGame(parseProgram(input)) == 12954)
+  }
 }
