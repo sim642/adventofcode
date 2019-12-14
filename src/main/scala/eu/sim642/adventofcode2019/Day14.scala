@@ -25,6 +25,7 @@ object Day14 {
           case (q, r) => (q + 1, outputAmount - r)
         }
 
+        // TODO: avoid recursion when amount will be 0 (reactionRepeat is 0)?
         val (ore, inputExcess) = inputChemicals.foldLeft((0L, excessWithoutAmount))({
           case ((ore, excess), (inputChemical, inputAmount)) =>
             val (inputOre, inputExcess) = helper(inputChemical, reactionRepeat * inputAmount, excess)
@@ -42,6 +43,7 @@ object Day14 {
     def f(fuelAmount: Long): Long = oreForFuel(reactions, fuelAmount)
 
     // copied & modified from 2018 Day 10
+    // TODO: move binary & exponential search to library
     @tailrec
     def search(min: Long, max: Long): Long = {
       if (min >= max)
