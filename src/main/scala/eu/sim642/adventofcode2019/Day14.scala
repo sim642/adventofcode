@@ -41,12 +41,7 @@ object Day14 {
   }
 
   def fuelForOre(reactions: Reactions, oreAmount: Long = 1000000000000L): Long = {
-
-    def f(fuelAmount: Long): Long = oreForFuel(reactions, fuelAmount)
-
-    val (min, max) = OrderedSearch.exponentialUpper(f, 0L)(oreAmount)
-    val minSecond = OrderedSearch.binaryUpper(f, min, max)(oreAmount)
-    minSecond
+    OrderedSearch.exponentialBinaryUpper(oreForFuel(reactions, _), 0L)(oreAmount)
   }
 
   private val chemicalRegex = """(\d+) ([A-Z]+)""".r

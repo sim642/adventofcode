@@ -119,4 +119,31 @@ object OrderedSearch {
     assume(f(min) <= x)
     helper(aZero, aOne)
   }
+
+  /**
+    * Finds the smallest (first) element, which is at least `x` (lower bound).
+    * If image of `f` contains `x`, then it is the leftmost `x`.
+    *
+    * @param min inclusive
+    * @see [[exponentialLower]]
+    * @see [[binaryLower]]
+    */
+  def exponentialBinaryLower[A, B](f: A => B, min: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): A = {
+    val (min2, max) = exponentialLower(f, min)(x)
+    binaryLower(f, min2, max)(x)
+  }
+
+  /**
+    * Finds the largest (last) element, which is at most `x` (upper bound).
+    * If image of `f` contains `x`, then it is the rightmost `x`.
+    *
+    * @param min inclusive
+    *
+    * @see [[exponentialUpper]]
+    * @see [[binaryUpper]]
+    */
+  def exponentialBinaryUpper[A, B](f: A => B, min: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): A = {
+    val (min2, max) = exponentialUpper(f, min)(x)
+    binaryUpper(f, min2, max)(x)
+  }
 }
