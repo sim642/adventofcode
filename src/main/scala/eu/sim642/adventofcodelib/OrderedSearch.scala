@@ -89,8 +89,10 @@ object OrderedSearch {
         helper(hi, aTwo * hi)
     }
 
-    assume(f(min) < x) // TODO: unnecessary in practice? required for invariant
-    helper(aZero, aOne)
+    if (f(min) < x) // required for invariant
+      helper(aZero, aOne)
+    else // f(min) >= x
+      (min, min + aOne) // trivial range
   }
 
   /**
