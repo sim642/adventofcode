@@ -3,6 +3,7 @@ package eu.sim642.adventofcode2018
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.LazyListImplicits._
+import eu.sim642.adventofcodelib.OrderedSearch
 
 object Day10 {
 
@@ -52,17 +53,6 @@ object Day10 {
     override def minimizePointsArea(points: Seq[Point]): (Seq[Point], Int) = {
       def slope(t: Int): Long = stepBoundingArea(points, t + 1) - stepBoundingArea(points, t)
 
-      def search(min: Int, max: Int): Int = {
-        if (min == max)
-          return min
-
-        val mid = (min + max) / 2
-        if (slope(mid) > 0)
-          search(min, mid)
-        else
-          search(mid + 1, max)
-      }
-
       def searchBounds(max: Int = 1): (Int, Int) = {
         val max2 = 2 * max
         if (slope(max2) > 0)
@@ -72,7 +62,7 @@ object Day10 {
       }
 
       val (min, max) = searchBounds()
-      val minSecond = search(min, max)
+      val minSecond = OrderedSearch.binaryLower(slope, min, max)(0)
       (points.map(_.step(minSecond)), minSecond)
     }
   }

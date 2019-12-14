@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2019
 
+import eu.sim642.adventofcodelib.OrderedSearch
+
 import Integral.Implicits._
 import scala.annotation.tailrec
 
@@ -45,18 +47,6 @@ object Day14 {
     // copied & modified from 2018 Day 10
     // TODO: move binary & exponential search to library
     @tailrec
-    def search(min: Long, max: Long): Long = {
-      if (min >= max)
-        return min - 1
-
-      val mid = (min + max) / 2
-      if (f(mid) > oreAmount)
-        search(min, mid)
-      else
-        search(mid + 1, max)
-    }
-
-    @tailrec
     def searchBounds(max: Long = 1L): (Long, Long) = {
       if (f(max) < oreAmount)
         searchBounds(2 * max)
@@ -65,7 +55,7 @@ object Day14 {
     }
 
     val (min, max) = searchBounds()
-    val minSecond = search(min, max)
+    val minSecond = OrderedSearch.binaryUpper(f, min, max)(oreAmount)
     minSecond
   }
 
