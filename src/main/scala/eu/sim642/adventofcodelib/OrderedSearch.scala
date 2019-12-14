@@ -21,7 +21,7 @@ object OrderedSearch {
     val aTwo = aIntegral.fromInt(2)
 
     @tailrec
-    def helper(lo: A, hi: A): A = {
+    def helper(lo: A, hi: A): A = { // [lo, hi)
       if (lo >= hi)
         lo // lower specific
       else {
@@ -51,7 +51,7 @@ object OrderedSearch {
     val aTwo = aIntegral.fromInt(2)
 
     @tailrec
-    def helper(lo: A, hi: A): A = {
+    def helper(lo: A, hi: A): A = { // [lo, hi)
       if (lo >= hi)
         lo - aOne // upper specific
       else {
@@ -64,5 +64,59 @@ object OrderedSearch {
     }
 
     helper(min, max)
+  }
+
+  /**
+    * Finds the range that contains the smallest (first) element, which is at least `x` (lower bound), starting from `min`.
+    *
+    * @param min inclusive
+    * @return min (inclusive), max (exclusive)
+    *
+    * @see [[binaryLower]]
+    * @see [[https://en.wikipedia.org/wiki/Exponential_search]]
+    */
+  def exponentialLower[A, B](f: A => B, min: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): (A, A) = {
+    val aZero = aIntegral.zero
+    val aOne = aIntegral.one
+    val aTwo = aIntegral.fromInt(2)
+
+    @tailrec
+    def helper(lo: A, hi: A): (A, A) = { // (lo, hi]
+      // invariant: f(min + lo) < x
+      if (f(min + hi) >= x) // lower specific
+        (min + lo + aOne, min + hi + aOne)
+      else
+        helper(hi, aTwo * hi)
+    }
+
+    assume(f(min) < x) // TODO: unnecessary in practice? required for invariant
+    helper(aZero, aOne)
+  }
+
+  /**
+    * Finds the range that contains the largest (last) element, which is at most `x` (upper bound), starting from `min`.
+    *
+    * @param min inclusive
+    * @return min (inclusive), max (exclusive)
+    *
+    * @see [[binaryUpper]]
+    * @see [[https://en.wikipedia.org/wiki/Exponential_search]]
+    */
+  def exponentialUpper[A, B](f: A => B, min: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): (A, A) = {
+    val aZero = aIntegral.zero
+    val aOne = aIntegral.one
+    val aTwo = aIntegral.fromInt(2)
+
+    @tailrec
+    def helper(lo: A, hi: A): (A, A) = { // [lo, hi)
+      // invariant: f(min + lo) <= x
+      if (f(min + hi) > x) // upper specific
+        (min + lo, min + hi)
+      else
+        helper(hi, aTwo * hi)
+    }
+
+    assume(f(min) <= x)
+    helper(aZero, aOne)
   }
 }

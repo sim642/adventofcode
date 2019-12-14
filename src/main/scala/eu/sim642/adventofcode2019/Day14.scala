@@ -44,17 +44,7 @@ object Day14 {
 
     def f(fuelAmount: Long): Long = oreForFuel(reactions, fuelAmount)
 
-    // copied & modified from 2018 Day 10
-    // TODO: move binary & exponential search to library
-    @tailrec
-    def searchBounds(max: Long = 1L): (Long, Long) = {
-      if (f(max) < oreAmount)
-        searchBounds(2 * max)
-      else
-        (max / 2, max)
-    }
-
-    val (min, max) = searchBounds()
+    val (min, max) = OrderedSearch.exponentialUpper(f, 0L)(oreAmount)
     val minSecond = OrderedSearch.binaryUpper(f, min, max)(oreAmount)
     minSecond
   }
