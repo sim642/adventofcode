@@ -1,30 +1,31 @@
 package eu.sim642.adventofcode2019
 
 import Integral.Implicits._
+import scala.annotation.tailrec
 
 object Day14 {
 
   type Chemical = String
-  type ChemicalAmounts = Map[Chemical, Int]
-  type Reactions = Map[Chemical, (Int, ChemicalAmounts)]
+  type ChemicalAmounts = Map[Chemical, Long]
+  type Reactions = Map[Chemical, (Long, ChemicalAmounts)]
 
-  def oreForFuel(reactions: Reactions): Int = {
+  def oreForFuel(reactions: Reactions, fuelAmount: Long = 1): Long = {
 
-    def helper(chemical: Chemical, amount: Int, excess: ChemicalAmounts): (Int, ChemicalAmounts) = chemical match {
+    def helper(chemical: Chemical, amount: Long, excess: ChemicalAmounts): (Long, ChemicalAmounts) = chemical match {
       case "ORE" =>
         (amount, excess)
       case chemical =>
-        val amountWithoutExcess = 0 max (amount - excess(chemical))
+        val amountWithoutExcess = 0L max (amount - excess(chemical))
         val amountFromExcess = amount - amountWithoutExcess
         val excessWithoutAmount = excess + (chemical -> (excess(chemical) - amountFromExcess))
 
         val (outputAmount, inputChemicals) = reactions(chemical)
         val (reactionRepeat, outputExcess) = amountWithoutExcess /% outputAmount match {
-          case (q, 0) => (q, 0)
+          case (q, 0) => (q, 0L)
           case (q, r) => (q + 1, outputAmount - r)
         }
 
-        val (ore, inputExcess) = inputChemicals.foldLeft((0, excessWithoutAmount))({
+        val (ore, inputExcess) = inputChemicals.foldLeft((0L, excessWithoutAmount))({
           case ((ore, excess), (inputChemical, inputAmount)) =>
             val (inputOre, inputExcess) = helper(inputChemical, reactionRepeat * inputAmount, excess)
             (ore + inputOre, inputExcess)
@@ -33,13 +34,43 @@ object Day14 {
         (ore, inputExcess + (chemical -> (inputExcess(chemical) + outputExcess)))
     }
 
-    helper("FUEL", 1, Map.empty.withDefaultValue(0))._1
+    helper("FUEL", fuelAmount, Map.empty.withDefaultValue(0))._1
+  }
+
+  def fuelForOre(reactions: Reactions, oreAmount: Long = 1000000000000L): Long = {
+
+    def f(fuelAmount: Long): Long = oreForFuel(reactions, fuelAmount)
+
+    // copied & modified from 2018 Day 10
+    @tailrec
+    def search(min: Long, max: Long): Long = {
+      if (min >= max)
+        return min - 1
+
+      val mid = (min + max) / 2
+      if (f(mid) > oreAmount)
+        search(min, mid)
+      else
+        search(mid + 1, max)
+    }
+
+    @tailrec
+    def searchBounds(max: Long = 1L): (Long, Long) = {
+      if (f(max) < oreAmount)
+        searchBounds(2 * max)
+      else
+        (max / 2, max)
+    }
+
+    val (min, max) = searchBounds()
+    val minSecond = search(min, max)
+    minSecond
   }
 
   private val chemicalRegex = """(\d+) ([A-Z]+)""".r
 
-  def parseReaction(s: String): (Chemical, (Int, ChemicalAmounts)) = {
-    val chemicals = chemicalRegex.findAllMatchIn(s).map(m => m.group(2) -> m.group(1).toInt).toSeq
+  def parseReaction(s: String): (Chemical, (Long, ChemicalAmounts)) = {
+    val chemicals = chemicalRegex.findAllMatchIn(s).map(m => m.group(2) -> m.group(1).toLong).toSeq
     val inputChemicals = chemicals.init.toMap
     val outputChemical = chemicals.last
     (outputChemical._1, (outputChemical._2, inputChemicals))
@@ -51,5 +82,6 @@ object Day14 {
 
   def main(args: Array[String]): Unit = {
     println(oreForFuel(parseReactions(input)))
+    println(fuelForOre(parseReactions(input)))
   }
 }

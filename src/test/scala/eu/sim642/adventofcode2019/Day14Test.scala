@@ -91,4 +91,21 @@ class Day14Test extends FunSuite with ScalaCheckPropertyChecks {
   test("Part 1 input answer") {
     assert(oreForFuel(parseReactions(input)) == 319014)
   }
+
+  test("Part 2 examples") {
+    val inputExpectedFuel = Table(
+      ("input", "expectedFuel"),
+      (exampleInput3, 82892753),
+      (exampleInput4, 5586022),
+      (exampleInput5, 460664),
+    )
+
+    forAll (inputExpectedFuel) { (input, expectedFuel) =>
+      assert(fuelForOre(parseReactions(input)) == expectedFuel)
+    }
+  }
+
+  test("Part 2 input answer") {
+    assert(fuelForOre(parseReactions(input)) == 4076490)
+  }
 }
