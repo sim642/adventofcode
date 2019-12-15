@@ -1,12 +1,16 @@
 package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcode2019.Day9._
-import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, GraphTraversal, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 
 object Day15 {
 
+  // TODO: use enum?
   type Status = Int
+  private val STATUS_WALL = 0
+  private val STATUS_EMPTY = 1
+  private val STATUS_OXYGEN_SYSTEM = 2
 
   private val inputOffsets = Seq(
     1 -> Pos(0, 1), // north
@@ -15,42 +19,53 @@ object Day15 {
     4 -> Pos(1, 0), // east
   )
 
-  def oxygenSystemMoves(program: Memory): Int = {
+  // only use pos for equality in BFS, not status or program state
+  case class Node(pos: Pos)(val status: Status, val programState: ProgramState) {
 
-    /*def dfs(programState: ProgramState, pos: Pos, map: Map[Pos, Status]): Map[Pos, Status] = {
-      ???
+    def neighbors: IterableOnce[Node] = {
+      for {
+        (input, offset) <- inputOffsets
+        (newProgramState, output) = programState.copy(inputs = LazyList(input)).outputStates.head
+        newStatus = output.toInt
+        if newStatus != STATUS_WALL
+        newPos = pos + offset
+      } yield Node(newPos)(newStatus, newProgramState)
+    }
+  }
+
+  def findOxygenSystem(program: Memory): (Node, Int) = {
+
+    val graphSearch = new GraphSearch[Node] with UnitNeighbors[Node] {
+      override val startNode: Node = Node(Pos.zero)(STATUS_EMPTY, ProgramState(program))
+
+      override def unitNeighbors(node: Node): IterableOnce[Node] = node.neighbors
+
+      override def isTargetNode(node: Node, dist: Int): Boolean = node.status == STATUS_OXYGEN_SYSTEM
     }
 
-    dfs(ProgramState(program), Pos.zero, Map.empty)*/
+    BFS.search(graphSearch).target.get
+  }
 
-    val graphSearch = new GraphSearch[(Pos, Status, ProgramState)] with UnitNeighbors[(Pos, Status, ProgramState)] {
-      override val startNode: (Pos, Status, ProgramState) = {
-        (Pos.zero, 1, ProgramState(program))
-      }
+  def oxygenSystemMoves(program: Memory): Int = findOxygenSystem(program)._2
 
-      override def unitNeighbors(node: (Pos, Status, ProgramState)): IterableOnce[(Pos, Status, ProgramState)] = {
-        val (pos, status, programState) = node
-        for {
-          (input, offset) <- inputOffsets
-          (newProgramState, output) = programState.copy(inputs = LazyList(input)).outputStates.head
-          newStatus = output.toInt
-          if newStatus != 0
-          newPos = pos + offset
-        } yield (newPos, newStatus, newProgramState)
-      }
+  def oxygenFillMinutes(program: Memory): Int = {
+    val oxygenSystemNode = findOxygenSystem(program)._1
 
-      override def isTargetNode(node: (Pos, Status, ProgramState), dist: Int): Boolean = {
-        val (pos, status, programState) = node
-        status == 2
-      }
+    val graphTraversal = new GraphTraversal[Node] with UnitNeighbors[Node] {
+      override val startNode: Node = oxygenSystemNode
+
+      override def unitNeighbors(node: Node): IterableOnce[Node] = node.neighbors
     }
 
-    BFS.search(graphSearch).target.get._2
+    BFS.traverse(graphTraversal).distances.values.max
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(oxygenSystemMoves(parseProgram(input)))
+    println(oxygenFillMinutes(parseProgram(input)))
+
+    // 393 - too high
   }
 }
