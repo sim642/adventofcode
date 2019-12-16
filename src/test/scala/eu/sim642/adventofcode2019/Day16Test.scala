@@ -52,8 +52,7 @@ class Day16Test extends FunSuite with ScalaCheckPropertyChecks {
     }
   }
 
-  ignore("Part 2 input answer") {
-    // TODO: takes forever, optimize
+  test("Part 2 input answer") {
     assert(stepPhasesEight2(parseSignal(input)) == "53201602")
   }
 }
