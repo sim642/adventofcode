@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcodelib.IteratorImplicits._
 import eu.sim642.adventofcodelib.IterableImplicits._
+import Integral.Implicits._
 
 object Day16 {
 
@@ -25,7 +26,8 @@ object Day16 {
 
     override def stepPhasesEightOffset(signal: Signal, phases: Int): String = {
       val messageOffset = signal.take(7).mkString.toInt
-      val initialSignal = Iterator.fill(10000)(signal).flatten.drop(messageOffset).toIndexedSeq
+      val (q, r) = messageOffset /% signal.length // avoid constructing prefix of string which will be dropped anyway
+      val initialSignal = Iterator.fill(10000 - q)(signal).flatten.drop(r).toIndexedSeq
       stepPhases(initialSignal, phases, messageOffset).take(8).mkString
     }
   }
