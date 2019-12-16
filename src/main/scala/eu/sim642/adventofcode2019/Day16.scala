@@ -4,51 +4,97 @@ import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day16 {
 
-  private val basePattern = Seq(0, 1, 0, -1)
+  type Signal = IndexedSeq[Int]
 
-  def stepPhase(offset: Int)(signal: IndexedSeq[Int]): IndexedSeq[Int] = {
-    val prefixSum: IndexedSeq[Int] = signal.scanLeft(0)(_ + _)
+  trait Solution {
+    def stepPhasesEight(signal: Signal, phases: Int = 100): String
+    def stepPhasesEightOffset(signal: Signal, phases: Int = 100): String
+  }
 
-    def posRanges(repeat: Int): Iterator[Range.Inclusive] = {
-      Iterator.from(0)
-        .map(i => (4 * i * repeat + repeat - 1) to (4 * i * repeat + 2 * repeat - 1 - 1))
+  trait StepPhaseSolution extends Solution {
+    def stepPhase(offset: Int)(signal: Signal): Signal
+
+    def stepPhases(signal: Signal, phases: Int, offset: Int = 0): Signal = {
+      Iterator.iterate(signal)(stepPhase(offset))(phases)
     }
 
-    def negRanges(repeat: Int): Iterator[Range.Inclusive] = {
-      Iterator.from(0)
-        .map(i => (4 * i * repeat + 3 * repeat - 1) to (4 * i * repeat + 4 * repeat - 1 - 1))
+    override def stepPhasesEight(signal: Signal, phases: Int): String = {
+      stepPhases(signal, phases).take(8).mkString
     }
 
-    (for {
-      (number, i) <- signal.view.zipWithIndex
-      repeat = i + 1 + offset
-      posSum = posRanges(repeat).takeWhile(_.start < signal.length + offset).map(r => prefixSum((r.end + 1 - offset) min (prefixSum.length - 1)) - prefixSum(r.start - offset)).sum
-      negSum = negRanges(repeat).takeWhile(_.start < signal.length + offset).map(r => prefixSum((r.end + 1 - offset) min (prefixSum.length - 1)) - prefixSum(r.start - offset)).sum
-      sum = posSum - negSum
-      newNumber = (sum % 10).abs
-    } yield newNumber).toIndexedSeq
+    override def stepPhasesEightOffset(signal: Signal, phases: Int): String = {
+      val messageOffset = signal.take(7).mkString.toInt
+      val initialSignal = Iterator.fill(10000)(signal).flatten.drop(messageOffset).toIndexedSeq
+      stepPhases(initialSignal, phases, messageOffset).take(8).mkString
+    }
   }
 
-  def stepPhases(signal: IndexedSeq[Int], phases: Int, offset: Int = 0): IndexedSeq[Int] = {
-    Iterator.iterate(signal)(stepPhase(offset))(phases)
+  private val basePattern = Seq(0, 1, 0, -1) // TODO: Add back naive solution
+
+  /**
+    * Optimization of naive solution by specializing for [[basePattern]] positive and negative ranges.
+    * Ranges of 0-s can be ignored, other ranges can be calculated by prefix sums.
+    */
+  object RangeSolution extends StepPhaseSolution {
+    override def stepPhase(offset: Int)(signal: Signal): Signal = {
+      val totalLength = offset + signal.length
+
+      val prefixSum: Signal = signal.scanLeft(0)(_ + _)
+
+      def ranges(repeat: Int, baseI: Int): Iterator[Range] = {
+        Iterator.from(0)
+          .map(i => 4 * i * repeat - 1)
+          .map(baseStart => baseStart + baseI * repeat)
+          .takeWhile(_ < signal.length + offset)
+          .map(start => start until ((start + repeat) min totalLength))
+      }
+
+      def rangeSum(range: Range): Int = {
+        prefixSum(range.max + 1 - offset) - prefixSum(range.min - offset)
+      }
+
+      IndexedSeq.tabulate(signal.length)({ i =>
+        val repeat = (offset + i) + 1
+        val posSum = ranges(repeat, 1).map(rangeSum).sum
+        val negSum = ranges(repeat, 3).map(rangeSum).sum
+        val sum = posSum - negSum
+        (sum % 10).abs
+      })
+    }
   }
 
-  def stepPhasesEight(signal: IndexedSeq[Int], phases: Int = 100): String = {
-    stepPhases(signal, phases).take(8).mkString
+  /**
+    * Optimization of [[RangeSolution]] by specializing for offsets beyond signal midpoint.
+    * In such case there is only one positive range to the end and no negative ranges.
+    */
+  object UpperTriangularSolution extends StepPhaseSolution {
+    def upperTriangularStepPhase(offset: Int)(signal: Signal): Signal = {
+      assume(offset >= signal.length)
+
+      val prefixSum: Signal = signal.scanLeft(0)(_ + _)
+
+      IndexedSeq.tabulate(signal.length)({ i =>
+        val sum = prefixSum.last - prefixSum(i)
+        (sum % 10).abs
+      })
+    }
+
+    override def stepPhase(offset: Int)(signal: Signal): Signal = {
+      if (offset >= signal.length)
+        upperTriangularStepPhase(offset)(signal)
+      else
+        RangeSolution.stepPhase(offset)(signal) // fall back for part 1
+    }
   }
 
-  def stepPhasesEight2(signal: IndexedSeq[Int], phases: Int = 100): String = {
-    val messageOffset = signal.take(7).mkString.toInt
-    val initialSignal = Iterator.fill(10000)(signal).flatten.toIndexedSeq.drop(messageOffset)
-    stepPhases(initialSignal, phases, messageOffset).take(8).mkString
-  }
-
-  def parseSignal(input: String): IndexedSeq[Int] = input.map(_.asDigit)
+  def parseSignal(input: String): Signal = input.map(_.asDigit)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import UpperTriangularSolution._
+
     println(stepPhasesEight(parseSignal(input)))
-    println(stepPhasesEight2(parseSignal(input)))
+    println(stepPhasesEightOffset(parseSignal(input)))
   }
 }
