@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.IterableImplicits._
 
 object Day16 {
 
@@ -29,7 +30,18 @@ object Day16 {
     }
   }
 
-  private val basePattern = Seq(0, 1, 0, -1) // TODO: Add back naive solution
+  private val basePattern = Seq(0, 1, 0, -1)
+
+  object NaiveSolution extends StepPhaseSolution {
+    override def stepPhase(offset: Int)(signal: Signal): Signal = {
+      IndexedSeq.tabulate(signal.length)({ i =>
+        val repeat = (offset + i) + 1
+        val pattern = basePattern.view.flatMap(Iterator.fill(repeat)(_))
+        val sum = (signal.view zip pattern.cycle.drop(offset + 1)).map({ case (a, b) => a * b}).sum
+        (sum % 10).abs
+      })
+    }
+  }
 
   /**
     * Optimization of naive solution by specializing for [[basePattern]] positive and negative ranges.

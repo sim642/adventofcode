@@ -6,6 +6,7 @@ import org.scalatest.{FunSuite, Suites}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class Day16Test extends Suites(
+  new NaiveSolutionTest,
   new RangeSolutionTest,
   new UpperTriangularSolutionTest,
 )
@@ -67,6 +68,10 @@ object Day16Test {
         assert(solution.stepPhasesEightOffset(parseSignal(input)) == "53201602")
       }
     }
+  }
+
+  class NaiveSolutionTest extends SolutionTest(NaiveSolution) {
+    override protected val testPart2: Boolean = false
   }
 
   class RangeSolutionTest extends SolutionTest(RangeSolution) {
