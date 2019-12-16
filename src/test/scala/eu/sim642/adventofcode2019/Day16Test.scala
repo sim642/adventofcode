@@ -38,4 +38,22 @@ class Day16Test extends FunSuite with ScalaCheckPropertyChecks {
   test("Part 1 input answer") {
     assert(stepPhasesEight(parseSignal(input)) == "25131128")
   }
+
+  test("Part 2 examples") {
+    val inputExpectedEight = Table(
+      ("input", "expectedEight"),
+      ("03036732577212944063491565474664", "84462026"),
+      ("02935109699940807407585447034323", "78725270"),
+      ("03081770884921959731165446850517", "53553731"),
+    )
+
+    forAll (inputExpectedEight) { (input, expectedEight) =>
+      assert(stepPhasesEight2(parseSignal(input)) == expectedEight)
+    }
+  }
+
+  ignore("Part 2 input answer") {
+    // TODO: takes forever, optimize
+    assert(stepPhasesEight2(parseSignal(input)) == "53201602")
+  }
 }
