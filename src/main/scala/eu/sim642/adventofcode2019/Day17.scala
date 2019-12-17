@@ -4,6 +4,7 @@ import eu.sim642.adventofcode2019.Day9._
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.IteratorImplicits._
 import eu.sim642.adventofcode2018.Day13.DirectionPos
 
 object Day17 {
@@ -82,50 +83,66 @@ object Day17 {
     helper(pos, direction)
   }
 
-  private val factorPathMaxLength: Int = 20 // comma delimited
-  private val factorPathMaxLength2: Int = (20 + 1) / 2 // comma delimited
-
-  def factorPath(path: Path): Seq[Path] = {
-    for {
-      n <- (1 to factorPathMaxLength2).reverse
-      (init, tail) = path.splitAt(n)
-      if pathToString(init).lengthIs <= factorPathMaxLength
-      if tail.containsSlice(init)
-    } {
-      println(init)
+  def split[A](seq: List[A], delimiter: List[A]): List[List[A]] = {
+    val i = seq.indexOfSlice(delimiter)
+    if (i < 0) {
+      List(seq)
     }
+    else {
+      val prefix = seq.take(i)
+      val suffix = seq.drop(i + delimiter.size)
+      prefix +: split(suffix, delimiter)
+    }
+  }
 
-    // TODO: complete path factoring
-    ???
+  private val pathStringMaxLength: Int = 20
+  private val pathMaxLength: Int = (20 + 1) / 2 // comma delimited
+
+  def factorPathParts(pathParts: Seq[Path], maxParts: Int = 3): Iterator[List[Path]] = {
+    if (pathParts.isEmpty)
+      Iterator(Nil)
+    else if (maxParts <= 0)
+      Iterator.empty
+    else {
+      val firstPathPart = pathParts.head
+      for {
+        n <- (1 to (firstPathPart.size min pathMaxLength)).reverse.iterator
+        init = firstPathPart.take(n)
+        if pathToString(init).lengthIs <= pathStringMaxLength
+        newPathParts = pathParts.flatMap(split(_, init).filter(_.nonEmpty))
+        tailPathParts <- factorPathParts(newPathParts, maxParts - 1)
+      } yield init :: tailPathParts
+    }
+  }
+
+  // TODO: do this already in factorPathParts simultaneously
+  def reconstructMainPaths(path: Path, pathParts: Seq[Path]): Iterator[List[Int]] = {
+    if (path.isEmpty)
+      Iterator(Nil)
+    else {
+      for {
+        (pathPart, i) <- pathParts.iterator.zipWithIndex
+        if path.startsWith(pathPart)
+        tailPath = path.drop(pathPart.size)
+        tailMainPath <- reconstructMainPaths(tailPath, pathParts)
+      } yield i :: tailMainPath
+    }
   }
 
   def dustCollected(program: Memory, grid: Grid[Char]): Int = {
     val path = getPath(grid)
-    println(pathToString(path))
-    //println(factorPath(path))
-
-    // manually factored for my input...
-    /*
-
-    R,6,L,10,R,10,R,10,L,10,L,12,R,10,R,6,L,10,R,10,R,10,L,10,L,12,R,10,R,6,L,10,R,10,R,10,R,6,L,12,L,10,R,6,L,10,R,10,R,10,R,6,L,12,L,10,L,10,L,12,R,10,R,6,L,12,L,10
-    A = R,6,L,10,R,10,R,10
-    A,L,10,L,12,R,10,A,L,10,L,12,R,10,A,R,6,L,12,L,10,A,R,6,L,12,L,10,L,10,L,12,R,10,R,6,L,12,L,10
-    B = L,10,L,12,R,10
-    A,B,A,B,A,R,6,L,12,L,10,A,R,6,L,12,L,10,B,R,6,L,12,L,10
-    C = R,6,L,12,L,10
-    A,B,A,B,A,C,A,C,B,C
-
-     */
+    val pathParts = factorPathParts(Seq(path)).head
+    val mainPath = reconstructMainPaths(path, pathParts).head
 
     val newProgram = program + (0 -> 2L)
 
+    val mainPathString = mainPath.map(i => ('A' + i).toChar).mkString(",")
+    val pathPartsString = pathParts.map(pathToString).mkString("\n")
     val inputString =
-      """A,B,A,B,A,C,A,C,B,C
-        |R,6,L,10,R,10,R,10
-        |L,10,L,12,R,10
-        |R,6,L,12,L,10
-        |n
-        |""".stripMargin
+      s"""$mainPathString
+         |$pathPartsString
+         |n
+         |""".stripMargin
     val inputs = inputString.map(_.toLong).to(LazyList)
 
     ProgramState(newProgram, inputs = inputs).outputs.last.toInt
@@ -151,6 +168,19 @@ object Day17 {
     printGrid(parseInput(input))
     println(sumAlignmentParameters(parseInput(input)))
     println(dustCollected(parseProgram(input), parseInput(input))) // 962913
+
+    // manually factored for my input for part 2...
+    /*
+
+    R,6,L,10,R,10,R,10,L,10,L,12,R,10,R,6,L,10,R,10,R,10,L,10,L,12,R,10,R,6,L,10,R,10,R,10,R,6,L,12,L,10,R,6,L,10,R,10,R,10,R,6,L,12,L,10,L,10,L,12,R,10,R,6,L,12,L,10
+    A = R,6,L,10,R,10,R,10
+    A,L,10,L,12,R,10,A,L,10,L,12,R,10,A,R,6,L,12,L,10,A,R,6,L,12,L,10,L,10,L,12,R,10,R,6,L,12,L,10
+    B = L,10,L,12,R,10
+    A,B,A,B,A,R,6,L,12,L,10,A,R,6,L,12,L,10,B,R,6,L,12,L,10
+    C = R,6,L,12,L,10
+    A,B,A,B,A,C,A,C,B,C
+
+     */
 
     // 46 - not right
   }
