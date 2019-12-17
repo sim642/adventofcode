@@ -3,6 +3,7 @@ package eu.sim642.adventofcode2019
 import org.scalatest.FunSuite
 import Day17._
 import Day9.parseProgram
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 class Day17Test extends FunSuite {
 
@@ -41,7 +42,19 @@ class Day17Test extends FunSuite {
   }
 
   ignore("Part 2 examples") {
-    //assert(dustCollected(parseGrid(exampleGrid2)) == 0)
+    // internal logic of dustCollected
+    // TODO: fix this test, currently fails because even a trivial eager factoring works
+
+    val path = getPath(parseGrid(exampleGrid2))
+    assert(pathToString(path) == "R,8,R,8,R,4,R,4,R,8,L,6,L,2,R,4,R,4,R,8,R,8,R,8,L,6,L,2")
+
+    val pathParts = factorPathParts(Seq(path)).head
+    assert(pathToString(pathParts(0)) == "R,8,R,8")
+    assert(pathToString(pathParts(1)) == "R,4,R,4,R,8")
+    assert(pathToString(pathParts(2)) == "L,6,L,2")
+
+    val mainPath = reconstructMainPaths(path, pathParts).head
+    assert(mainPathToString(mainPath) == "A,B,C,B,A,C")
   }
 
   test("Part 2 input answer") {

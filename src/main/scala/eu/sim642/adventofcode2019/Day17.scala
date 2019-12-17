@@ -35,7 +35,7 @@ object Day17 {
 
   type Path = List[Move]
 
-  def pathToString(path: Path): String = path.mkString("", ",", "")
+  def pathToString(path: Path): String = path.mkString(",")
 
   def findRobot(grid: Grid[Char]): (Pos, Pos) = {
     def parseRobotDirection(cell: Char): Option[Pos] = cell match {
@@ -131,6 +131,8 @@ object Day17 {
     }
   }
 
+  def mainPathToString(mainPath: Seq[Int]): String = mainPath.map(i => ('A' + i).toChar).mkString(",")
+
   def dustCollected(program: Memory, grid: Grid[Char]): Int = {
     val path = getPath(grid)
     val pathParts = factorPathParts(Seq(path)).head
@@ -138,7 +140,7 @@ object Day17 {
 
     val newProgram = program + (0 -> 2L)
 
-    val mainPathString = mainPath.map(i => ('A' + i).toChar).mkString(",")
+    val mainPathString = mainPathToString(mainPath)
     val pathPartsString = pathParts.map(pathToString).mkString("\n")
     val inputString =
       s"""$mainPathString
