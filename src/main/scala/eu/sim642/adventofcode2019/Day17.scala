@@ -20,6 +20,8 @@ object Day17 {
     } yield pos.x * pos.y).sum
   }
 
+  def sumAlignmentParameters(program: Memory): Int = sumAlignmentParameters(parseInputGrid(program))
+
   sealed trait Move
   case object Left extends Move {
     override def toString: String = "L"
@@ -148,6 +150,8 @@ object Day17 {
     ProgramState(newProgram, inputs = inputs).outputs.last.toInt
   }
 
+  def dustCollected(program: Memory): Int = dustCollected(program, parseInputGrid(program))
+
   def printGrid(grid: Grid[Char]): Unit = {
     for (row <- grid) {
       for (cell <- row)
@@ -158,16 +162,17 @@ object Day17 {
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
-  def parseInput(input: String): Grid[Char] = {
+  def parseInputGrid(program: Memory): Grid[Char] = {
     parseGrid(ProgramState(parseProgram(input)).outputs.map(_.toChar).mkString)
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    printGrid(parseInput(input))
-    println(sumAlignmentParameters(parseInput(input)))
-    println(dustCollected(parseProgram(input), parseInput(input))) // 962913
+    printGrid(parseInputGrid(parseProgram(input)))
+
+    println(sumAlignmentParameters(parseProgram(input)))
+    println(dustCollected(parseProgram(input))) // 962913
 
     // manually factored for my input for part 2...
     /*

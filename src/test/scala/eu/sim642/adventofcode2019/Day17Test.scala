@@ -37,7 +37,7 @@ class Day17Test extends FunSuite {
   }
 
   test("Part 1 input answer") {
-    assert(sumAlignmentParameters(parseInput(input)) == 3660)
+    assert(sumAlignmentParameters(parseProgram(input)) == 3660)
   }
 
   ignore("Part 2 examples") {
@@ -45,6 +45,6 @@ class Day17Test extends FunSuite {
   }
 
   test("Part 2 input answer") {
-    assert(dustCollected(parseProgram(input), parseInput(input)) == 962913)
+    assert(dustCollected(parseProgram(input)) == 962913)
   }
 }
