@@ -7,76 +7,74 @@ import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, GraphTravers
 
 object Day18 {
 
+  // TODO: move to library, reuse elsewhere?
   implicit class DisjointSetOps[A](thisSet: Set[A]) {
     def disjoint(thatSet: Set[A]): Boolean = !thisSet.exists(thatSet)
   }
 
   def collectKeysSteps(input: Input): Int = {
-
+    // precompute BFS between keys (and entrances for starting, one way)
     case class PathData(distance: Int, pathDoors: Set[Pos], pathKeys: Set[Pos])
 
-    val keyNeighbors: Map[Pos, Map[Pos, PathData]] = (input.entrances ++ input.keys.keySet).view.map({ fromPos =>
+    val keyNeighbors: Map[Pos, Map[Pos, PathData]] = (input.entrances.view ++ input.keys.keySet.view).map({ fromPos =>
+        // TODO: remove hack to keep sets in node, generalize BFS to arbitrary data keeping, not just distance
+        case class PathPos(pos: Pos)(val pathDoors: Set[Pos], val pathKeys: Set[Pos])
 
-      case class KeyNode(pos: Pos)(val pathDoors: Set[Pos], val pathKeys: Set[Pos])
+        val graphTraversal = new GraphTraversal[PathPos] with UnitNeighbors[PathPos] {
+          override val startNode: PathPos = PathPos(fromPos)(Set.empty, Set.empty)
 
-      val graphTraversal = new GraphTraversal[KeyNode] with UnitNeighbors[KeyNode] {
-        override val startNode: KeyNode = KeyNode(fromPos)(Set.empty, Set.empty)
+          override def unitNeighbors(pathPos: PathPos): IterableOnce[PathPos] = {
+            val PathPos(pos) = pathPos
+            val pathDoors = pathPos.pathDoors
+            val pathKeys = pathPos.pathKeys
 
-        override def unitNeighbors(keyNode: KeyNode): IterableOnce[KeyNode] = {
-          val KeyNode(pos) = keyNode
-          val pathDoors = keyNode.pathDoors
-          val pathKeys = keyNode.pathKeys
-
-          if (false)//if (pos != fromPos && input.keys.contains(pos))
-            Iterator.empty
-          else {
             for {
               offset <- Pos.axisOffsets.iterator
               newPos = pos + offset
               if !input.walls(newPos)
               newPathDoors = if (input.doors.contains(newPos)) pathDoors + newPos else pathDoors
               newPathKeys = if (input.keys.contains(newPos)) pathKeys + newPos else pathKeys
-            } yield KeyNode(newPos)(newPathDoors, newPathKeys)
+            } yield PathPos(newPos)(newPathDoors, newPathKeys)
           }
         }
-      }
 
-      val distances = BFS.traverse(graphTraversal).distances
-      val keyDistances = distances.filter({ case (KeyNode(toPos), _) =>
-        toPos != fromPos && input.keys.keySet.contains(toPos)
-      }).groupMap(_._1.pos)(identity).transform({ case (toPos, x) =>
-        assert(x.sizeIs == 1)
-        val (keyNode, distance) = x.head
-        PathData(distance, keyNode.pathDoors, keyNode.pathKeys - toPos)
-      })
+        val distances = BFS.traverse(graphTraversal).distances
+        val keyDistances = distances.filter({ case (PathPos(toPos), _) =>
+            toPos != fromPos && input.keys.keySet.contains(toPos)
+          })
+        val toPosPathDatas = keyDistances.groupMapReduce(_._1.pos)({ case (pathPos@PathPos(toPos), distance) =>
+              PathData(distance, pathPos.pathDoors, pathPos.pathKeys - toPos)
+            })((x, _) => x) // TODO: check that reduce actually never gets called, should be unique positions
 
-      fromPos -> keyDistances
-    }).toMap
+        fromPos -> toPosPathDatas
+      }).toMap
 
-    case class Node(poss: Seq[Pos], keys: Map[Pos, Char], doors: Map[Pos, Char])
+
+    // use precomputed BFS for Dijkstra on only keys (and entrances for starting)
+    case class Node(robots: Seq[Pos], missingKeys: Map[Pos, Char], doors: Map[Pos, Char])
 
     val graphSearch = new GraphSearch[Node] {
       override val startNode: Node = Node(input.entrances.toSeq, input.keys, input.doors)
 
       override def neighbors(node: Node): IterableOnce[(Node, Int)] = {
-        val Node(poss, keys, doors) = node
+        val Node(robots, missingKeys, doors) = node
 
         for {
-          (pos, posI) <- poss.view.zipWithIndex
+          (robot, robotI) <- robots.view.zipWithIndex
 
-          (keyPos, PathData(distance, pathDoors, pathKeys)) <- keyNeighbors(pos)
-          if keys.contains(keyPos)
-          if doors.keySet disjoint pathDoors
-          if keys.keySet disjoint pathKeys
+          (key, PathData(distance, pathDoors, pathKeys)) <- keyNeighbors(robot)
+          if missingKeys.contains(key) // key is still needed
+          if doors.keySet disjoint pathDoors // no doors in the way to key
+          if missingKeys.keySet disjoint pathKeys // no other keys on the way to key
 
-          key = keys(keyPos)
-          newPoss = poss.updated(posI, keyPos)
-          newKeys = keys - keyPos
-          newDoors = doors.filterNot(_._2 == key.toUpper)
-        } yield Node(newPoss, newKeys, newDoors) -> distance
+          keyChar = missingKeys(key)
+          newRobots = robots.updated(robotI, key)
+          newMissingKeys = missingKeys - key
+          newDoors = doors.filterNot(_._2 == keyChar.toUpper) // TODO: optimize removal
+        } yield Node(newRobots, newMissingKeys, newDoors) -> distance
       }
 
-      override def isTargetNode(node: Node, dist: Int): Boolean = node.keys.isEmpty
+      override def isTargetNode(node: Node, dist: Int): Boolean = node.missingKeys.isEmpty
     }
 
     Dijkstra.search(graphSearch).target.get._2
