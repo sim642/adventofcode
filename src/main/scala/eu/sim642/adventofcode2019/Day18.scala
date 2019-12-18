@@ -8,9 +8,7 @@ import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, GraphTravers
 object Day18 {
 
   implicit class DisjointSetOps[A](thisSet: Set[A]) {
-    def disjoint(thatSet: Set[A]): Boolean = {
-      (thisSet intersect thatSet).isEmpty
-    }
+    def disjoint(thatSet: Set[A]): Boolean = !thisSet.exists(thatSet)
   }
 
   def collectKeysSteps(input: Input): Int = {
