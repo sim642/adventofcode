@@ -107,7 +107,6 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
   }
 
   test("Part 1 input answer") {
-    // TODO: optimize
     assert(collectKeysSteps(parseInput(input)) == 4204)
   }
 
@@ -134,7 +133,6 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
   }
 
   test("Part 2 input answer") {
-    // TODO: optimize
     assert(collectKeysStepsSplit(parseInput(input)) == 1682)
   }
 }

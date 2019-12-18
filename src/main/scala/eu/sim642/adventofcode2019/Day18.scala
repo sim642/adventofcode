@@ -127,6 +127,6 @@ object Day18 {
 
   def main(args: Array[String]): Unit = {
     println(collectKeysSteps(parseInput(input)))
-    //println(collectKeysStepsSplit(parseInput(input)))
+    println(collectKeysStepsSplit(parseInput(input)))
   }
 }
