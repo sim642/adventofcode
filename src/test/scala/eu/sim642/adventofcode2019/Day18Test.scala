@@ -44,7 +44,7 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
       |###g#h#i################
       |########################""".stripMargin
 
-  val exampleInputParallel =
+  val exampleInputUnsplit =
     """#######
       |#a.#Cd#
       |##...##
@@ -52,6 +52,44 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
       |##...##
       |#cB#Ab#
       |#######""".stripMargin
+
+  val exampleInputSplit =
+    """#######
+      |#a.#Cd#
+      |##@#@##
+      |#######
+      |##@#@##
+      |#cB#Ab#
+      |#######""".stripMargin
+
+  val exampleInputSplit2 =
+    """###############
+      |#d.ABC.#.....a#
+      |######@#@######
+      |###############
+      |######@#@######
+      |#b.....#.....c#
+      |###############""".stripMargin
+
+  val exampleInputSplit3 =
+    """#############
+      |#DcBa.#.GhKl#
+      |#.###@#@#I###
+      |#e#d#####j#k#
+      |###C#@#@###J#
+      |#fEbA.#.FgHi#
+      |#############""".stripMargin
+
+  val exampleInputSplit4 =
+    """#############
+      |#g#f.D#..h#l#
+      |#F###e#E###.#
+      |#dCba@#@BcIJ#
+      |#############
+      |#nK.L@#@G...#
+      |#M###N#H###.#
+      |#o#m..#i#jk.#
+      |#############""".stripMargin
 
   test("Part 1 examples") {
     val inputExpectedSteps = Table(
@@ -73,9 +111,26 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
     assert(collectKeysSteps(parseInput(input)) == 4204)
   }
 
-  test("Part 2 examples") {
-    assert(collectKeysStepsSplit(parseInput(exampleInputParallel)) == 8)
-    // TODO: add other tests
+  test("splitEntrance") {
+    assert(splitEntrance(parseInput(exampleInputUnsplit)) == parseInput(exampleInputSplit))
+  }
+
+  test("Part 2 examples (unsplit)") {
+    assert(collectKeysStepsSplit(parseInput(exampleInputUnsplit)) == 8)
+  }
+
+  test("Part 2 examples (split)") {
+    val inputExpectedSteps = Table(
+      ("input", "expectedSteps"),
+      (exampleInputSplit, 8),
+      (exampleInputSplit2, 24),
+      (exampleInputSplit3, 32),
+      (exampleInputSplit4, 72),
+    )
+
+    forAll (inputExpectedSteps) { (input, expectedSteps) =>
+      assert(collectKeysSteps(parseInput(input)) == expectedSteps)
+    }
   }
 
   test("Part 2 input answer") {

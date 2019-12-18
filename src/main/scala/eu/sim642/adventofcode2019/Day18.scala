@@ -3,8 +3,6 @@ package eu.sim642.adventofcode2019
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits._
-import eu.sim642.adventofcodelib.IteratorImplicits._
-import eu.sim642.adventofcode2018.Day13.DirectionPos
 import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, GraphTraversal, UnitNeighbors}
 
 object Day18 {
@@ -14,7 +12,7 @@ object Day18 {
     case class Node(poss: Seq[Pos], keys: Map[Pos, Char], doors: Map[Pos, Char])
 
     val graphSearch = new GraphSearch[Node] {
-      override val startNode: Node = Node(input.entrances, input.keys, input.doors)
+      override val startNode: Node = Node(input.entrances.toSeq, input.keys, input.doors)
 
       override def neighbors(node: Node): IterableOnce[(Node, Int)] = {
         val Node(poss, keys, doors) = node
@@ -58,9 +56,10 @@ object Day18 {
   }
 
   def splitEntrance(input: Input): Input = {
-    val Seq(entrance) = input.entrances // assume exactly one
+    assume(input.entrances.size == 1)
+    val entrance = input.entrances.head
 
-    val newEntrances = Pos.diagonalOffsets.map(entrance + _)
+    val newEntrances = Pos.diagonalOffsets.map(entrance + _).toSet
     val newWalls = (entrance +: Pos.axisOffsets.map(entrance + _)).foldLeft(input.walls)((walls, pos) => walls.updatedGrid(pos, true))
 
     input.copy(entrances = newEntrances, walls = newWalls)
@@ -69,7 +68,7 @@ object Day18 {
   def collectKeysStepsSplit(input: Input): Int = collectKeysSteps(splitEntrance(input))
 
   case class Input(walls: Grid[Boolean],
-                   entrances: Seq[Pos],
+                   entrances: Set[Pos],
                    keys: Map[Pos, Char],
                    doors: Map[Pos, Char])
 
@@ -79,7 +78,12 @@ object Day18 {
     val grid = parseGrid(input)
 
     val walls = grid.mapGrid(_ == '#')
-    val entrances = Seq(grid.posOf('@'))
+    // TODO: refactor Grid iterations
+    val entrances = (for {
+      (row, y) <- grid.view.zipWithIndex
+      (cell, x) <- row.view.zipWithIndex
+      if cell == '@'
+    } yield Pos(x, y)).toSet
     val keys = (for {
       (row, y) <- grid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
