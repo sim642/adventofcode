@@ -11,7 +11,7 @@ object Day18 {
 
     case class KeyNode(pos: Pos)(val pathDoors: Set[Pos], val pathKeys: Set[Pos])
 
-    val keyNeighbors: Map[Pos, collection.Map[KeyNode, Int]] = (input.entrances ++ input.keys.keySet).view.map({ fromPos =>
+    val keyNeighbors: Map[Pos, Map[Pos, (KeyNode, Int)]] = (input.entrances ++ input.keys.keySet).view.map({ fromPos =>
 
       val graphTraversal = new GraphTraversal[KeyNode] with UnitNeighbors[KeyNode] {
         override val startNode: KeyNode = KeyNode(fromPos)(Set.empty, Set.empty)
@@ -38,6 +38,9 @@ object Day18 {
       val distances = BFS.traverse(graphTraversal).distances
       val keyDistances = distances.filter({ case (KeyNode(toPos), _) =>
         toPos != fromPos && input.keys.keySet.contains(toPos)
+      }).groupMap(_._1.pos)(identity).transform({ case (_, x) =>
+        assert(x.sizeIs == 1)
+        x.head
       })
 
       fromPos -> keyDistances
@@ -52,24 +55,19 @@ object Day18 {
 
       override def neighbors(node: Node): IterableOnce[(Node, Int)] = {
         val Node(poss, keys, doors) = node
-        //println(node)
-
-        val distances: Map[Pos, (Int, Int)] = poss.view.zipWithIndex.map({ case (pos, posI) =>
-          val asd: Map[Pos, (Int, Int)] = (for {
-            (keyNode@KeyNode(toPos), distance) <- keyNeighbors(pos)
-            pathDoors = keyNode.pathDoors
-            pathKeys = keyNode.pathKeys
-            if keys.contains(toPos)
-            if (doors.keySet intersect pathDoors).isEmpty
-            if (keys.keySet intersect pathKeys).sizeIs == 1
-          } yield toPos -> (posI, distance: Int)).toMap
-
-          asd
-        }).reduce(_ ++ _)
 
         (for {
-          (keyPos, key) <- keys.iterator
-          (posI, distance) <- distances.get(keyPos)
+          (pos, posI) <- poss.view.zipWithIndex
+          //(keyPos, key) <- keys.iterator
+
+          (keyPos, (keyNode, distance)) <- keyNeighbors(pos)
+          pathDoors = keyNode.pathDoors
+          pathKeys = keyNode.pathKeys
+          if keys.contains(keyPos)
+          if (doors.keySet intersect pathDoors).isEmpty
+          if (keys.keySet intersect pathKeys).sizeIs == 1
+
+          key = keys(keyPos)
           newPoss = poss.updated(posI, keyPos)
           newKeys = keys - keyPos
           newDoors = doors.filterNot(_._2 == key.toUpper)
