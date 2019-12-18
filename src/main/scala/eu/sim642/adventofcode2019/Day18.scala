@@ -11,57 +11,10 @@ object Day18 {
 
   def collectKeysSteps(input: Input): Int = {
 
-    case class Node(pos: Pos, keys: Map[Pos, Char], doors: Map[Pos, Char])
-
-    val graphSearch = new GraphSearch[Node] {
-      override val startNode: Node = Node(input.entrance, input.keys, input.doors)
-
-      override def neighbors(node: Node): IterableOnce[(Node, Int)] = {
-        val Node(pos, keys, doors) = node
-
-        val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
-          override val startNode: Pos = pos
-
-          override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
-            if (keys.contains(pos))
-              Iterator.empty
-            else {
-              for {
-                offset <- Pos.axisOffsets
-                newPos = pos + offset
-                if !input.walls(newPos)
-                if !doors.contains(newPos)
-              } yield newPos
-            }
-          }
-        }
-
-        val distances = BFS.traverse(graphTraversal).distances
-
-        for {
-          (keyPos, key) <- keys.iterator
-          distance <- distances.get(keyPos)
-          newKeys = keys - keyPos
-          newDoors = doors.filterNot(_._2 == key.toUpper)
-        } yield Node(keyPos, newKeys, newDoors) -> distance
-      }
-
-      override def isTargetNode(node: Node, dist: Int): Boolean = node.keys.isEmpty
-    }
-
-    Dijkstra.search(graphSearch).target.get._2
-  }
-
-  def collectKeysStepsParallel(input: Input): Int = {
-    // TODO: reduce duplication
-
     case class Node(poss: Seq[Pos], keys: Map[Pos, Char], doors: Map[Pos, Char])
 
-    val entrances = Pos.diagonalOffsets.map(input.entrance + _)
-    val walls = (input.entrance +: Pos.axisOffsets.map(input.entrance + _)).foldLeft(input.walls)((walls, pos) => walls.updatedGrid(pos, true))
-
     val graphSearch = new GraphSearch[Node] {
-      override val startNode: Node = Node(entrances, input.keys, input.doors)
+      override val startNode: Node = Node(input.entrances, input.keys, input.doors)
 
       override def neighbors(node: Node): IterableOnce[(Node, Int)] = {
         val Node(poss, keys, doors) = node
@@ -77,7 +30,7 @@ object Day18 {
                 for {
                   offset <- Pos.axisOffsets
                   newPos = pos + offset
-                  if !walls(newPos)
+                  if !input.walls(newPos)
                   if !doors.contains(newPos)
                 } yield newPos
               }
@@ -104,8 +57,19 @@ object Day18 {
     Dijkstra.search(graphSearch).target.get._2
   }
 
+  def splitEntrance(input: Input): Input = {
+    val Seq(entrance) = input.entrances // assume exactly one
+
+    val newEntrances = Pos.diagonalOffsets.map(entrance + _)
+    val newWalls = (entrance +: Pos.axisOffsets.map(entrance + _)).foldLeft(input.walls)((walls, pos) => walls.updatedGrid(pos, true))
+
+    input.copy(entrances = newEntrances, walls = newWalls)
+  }
+
+  def collectKeysStepsSplit(input: Input): Int = collectKeysSteps(splitEntrance(input))
+
   case class Input(walls: Grid[Boolean],
-                   entrance: Pos,
+                   entrances: Seq[Pos],
                    keys: Map[Pos, Char],
                    doors: Map[Pos, Char])
 
@@ -115,7 +79,7 @@ object Day18 {
     val grid = parseGrid(input)
 
     val walls = grid.mapGrid(_ == '#')
-    val entrance = grid.posOf('@')
+    val entrances = Seq(grid.posOf('@'))
     val keys = (for {
       (row, y) <- grid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
@@ -127,13 +91,13 @@ object Day18 {
       if cell.isLetter && cell.isUpper
     } yield Pos(x, y) -> cell).toMap
 
-    Input(walls, entrance, keys, doors)
+    Input(walls, entrances, keys, doors)
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(collectKeysSteps(parseInput(input)))
-    println(collectKeysStepsParallel(parseInput(input)))
+    println(collectKeysStepsSplit(parseInput(input)))
   }
 }

@@ -68,18 +68,18 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
     }
   }
 
-  ignore("Part 1 input answer") {
+  test("Part 1 input answer") {
     // TODO: optimize
     assert(collectKeysSteps(parseInput(input)) == 4204)
   }
 
   test("Part 2 examples") {
-    assert(collectKeysStepsParallel(parseInput(exampleInputParallel)) == 8)
+    assert(collectKeysStepsSplit(parseInput(exampleInputParallel)) == 8)
     // TODO: add other tests
   }
 
-  ignore("Part 2 input answer") {
+  test("Part 2 input answer") {
     // TODO: optimize
-    assert(collectKeysStepsParallel(parseInput(input)) == 1682)
+    assert(collectKeysStepsSplit(parseInput(input)) == 1682)
   }
 }
