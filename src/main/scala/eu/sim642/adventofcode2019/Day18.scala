@@ -49,8 +49,6 @@ object Day18 {
       fromPos -> keyDistances
     }).toMap
 
-    //println(keyNeighbors)
-
     case class Node(poss: Seq[Pos], keys: Map[Pos, Char], doors: Map[Pos, Char])
 
     val graphSearch = new GraphSearch[Node] {
@@ -59,7 +57,7 @@ object Day18 {
       override def neighbors(node: Node): IterableOnce[(Node, Int)] = {
         val Node(poss, keys, doors) = node
 
-        (for {
+        for {
           (pos, posI) <- poss.view.zipWithIndex
 
           (keyPos, PathData(distance, pathDoors, pathKeys)) <- keyNeighbors(pos)
@@ -71,18 +69,13 @@ object Day18 {
           newPoss = poss.updated(posI, keyPos)
           newKeys = keys - keyPos
           newDoors = doors.filterNot(_._2 == key.toUpper)
-        } yield Node(newPoss, newKeys, newDoors) -> distance)// .tapEach(p => println("NEIGH", p))
+        } yield Node(newPoss, newKeys, newDoors) -> distance
       }
 
-      override def isTargetNode(node: Node, dist: Int): Boolean = {
-        //println("TARGET", node, dist)
-        node.keys.isEmpty
-      }
+      override def isTargetNode(node: Node, dist: Int): Boolean = node.keys.isEmpty
     }
 
-    val value = Dijkstra.search(graphSearch)
-    //println(value.nodes)
-    value.target.get._2
+    Dijkstra.search(graphSearch).target.get._2
   }
 
   def splitEntrance(input: Input): Input = {
