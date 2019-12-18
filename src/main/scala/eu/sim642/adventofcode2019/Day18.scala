@@ -7,6 +7,12 @@ import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, GraphTravers
 
 object Day18 {
 
+  implicit class DisjointSetOps[A](thisSet: Set[A]) {
+    def disjoint(thatSet: Set[A]): Boolean = {
+      (thisSet intersect thatSet).isEmpty
+    }
+  }
+
   def collectKeysSteps(input: Input): Int = {
 
     case class PathData(distance: Int, pathDoors: Set[Pos], pathKeys: Set[Pos])
@@ -40,10 +46,10 @@ object Day18 {
       val distances = BFS.traverse(graphTraversal).distances
       val keyDistances = distances.filter({ case (KeyNode(toPos), _) =>
         toPos != fromPos && input.keys.keySet.contains(toPos)
-      }).groupMap(_._1.pos)(identity).transform({ case (_, x) =>
+      }).groupMap(_._1.pos)(identity).transform({ case (toPos, x) =>
         assert(x.sizeIs == 1)
         val (keyNode, distance) = x.head
-        PathData(distance, keyNode.pathDoors, keyNode.pathKeys)
+        PathData(distance, keyNode.pathDoors, keyNode.pathKeys - toPos)
       })
 
       fromPos -> keyDistances
@@ -62,8 +68,8 @@ object Day18 {
 
           (keyPos, PathData(distance, pathDoors, pathKeys)) <- keyNeighbors(pos)
           if keys.contains(keyPos)
-          if (doors.keySet intersect pathDoors).isEmpty
-          if (keys.keySet intersect pathKeys).sizeIs == 1
+          if doors.keySet disjoint pathDoors
+          if keys.keySet disjoint pathKeys
 
           key = keys(keyPos)
           newPoss = poss.updated(posI, keyPos)
