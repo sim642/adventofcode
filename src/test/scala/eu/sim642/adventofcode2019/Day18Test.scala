@@ -44,6 +44,15 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
       |###g#h#i################
       |########################""".stripMargin
 
+  val exampleInputParallel =
+    """#######
+      |#a.#Cd#
+      |##...##
+      |##.@.##
+      |##...##
+      |#cB#Ab#
+      |#######""".stripMargin
+
   test("Part 1 examples") {
     val inputExpectedSteps = Table(
       ("input", "expectedSteps"),
@@ -59,7 +68,18 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
     }
   }
 
-  test("Part 1 input answer") {
+  ignore("Part 1 input answer") {
+    // TODO: optimize
     assert(collectKeysSteps(parseInput(input)) == 4204)
+  }
+
+  test("Part 2 examples") {
+    assert(collectKeysStepsParallel(parseInput(exampleInputParallel)) == 8)
+    // TODO: add other tests
+  }
+
+  ignore("Part 2 input answer") {
+    // TODO: optimize
+    assert(collectKeysStepsParallel(parseInput(input)) == 1682)
   }
 }

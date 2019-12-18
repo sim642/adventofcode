@@ -52,6 +52,58 @@ object Day18 {
     Dijkstra.search(graphSearch).target.get._2
   }
 
+  def collectKeysStepsParallel(input: Input): Int = {
+    // TODO: reduce duplication
+
+    case class Node(poss: Seq[Pos], keys: Map[Pos, Char], doors: Map[Pos, Char])
+
+    val entrances = Pos.diagonalOffsets.map(input.entrance + _)
+    val walls = (input.entrance +: Pos.axisOffsets.map(input.entrance + _)).foldLeft(input.walls)((walls, pos) => walls.updatedGrid(pos, true))
+
+    val graphSearch = new GraphSearch[Node] {
+      override val startNode: Node = Node(entrances, input.keys, input.doors)
+
+      override def neighbors(node: Node): IterableOnce[(Node, Int)] = {
+        val Node(poss, keys, doors) = node
+
+        val distances = poss.view.zipWithIndex.map({ case (pos, posI) =>
+          val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
+            override val startNode: Pos = pos
+
+            override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
+              if (keys.contains(pos))
+                Iterator.empty
+              else {
+                for {
+                  offset <- Pos.axisOffsets
+                  newPos = pos + offset
+                  if !walls(newPos)
+                  if !doors.contains(newPos)
+                } yield newPos
+              }
+            }
+          }
+
+          BFS.traverse(graphTraversal).distances.map({ case (pos, distance) =>
+            pos -> (posI, distance)
+          })
+        }).reduce(_ ++ _)
+
+        for {
+          (keyPos, key) <- keys.iterator
+          (posI, distance) <- distances.get(keyPos)
+          newPoss = poss.updated(posI, keyPos)
+          newKeys = keys - keyPos
+          newDoors = doors.filterNot(_._2 == key.toUpper)
+        } yield Node(newPoss, newKeys, newDoors) -> distance
+      }
+
+      override def isTargetNode(node: Node, dist: Int): Boolean = node.keys.isEmpty
+    }
+
+    Dijkstra.search(graphSearch).target.get._2
+  }
+
   case class Input(walls: Grid[Boolean],
                    entrance: Pos,
                    keys: Map[Pos, Char],
@@ -82,5 +134,6 @@ object Day18 {
 
   def main(args: Array[String]): Unit = {
     println(collectKeysSteps(parseInput(input)))
+    println(collectKeysStepsParallel(parseInput(input)))
   }
 }
