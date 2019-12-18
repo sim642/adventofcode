@@ -9,16 +9,17 @@ object Day18 {
 
   def collectKeysSteps(input: Input): Int = {
 
-    case class KeyNode(pos: Pos)(val pathDoors: Set[Pos])
+    case class KeyNode(pos: Pos)(val pathDoors: Set[Pos], val pathKeys: Set[Pos])
 
     val keyNeighbors: Map[Pos, collection.Map[KeyNode, Int]] = (input.entrances ++ input.keys.keySet).view.map({ fromPos =>
 
       val graphTraversal = new GraphTraversal[KeyNode] with UnitNeighbors[KeyNode] {
-        override val startNode: KeyNode = KeyNode(fromPos)(Set.empty)
+        override val startNode: KeyNode = KeyNode(fromPos)(Set.empty, Set.empty)
 
         override def unitNeighbors(keyNode: KeyNode): IterableOnce[KeyNode] = {
           val KeyNode(pos) = keyNode
           val pathDoors = keyNode.pathDoors
+          val pathKeys = keyNode.pathKeys
 
           if (false)//if (pos != fromPos && input.keys.contains(pos))
             Iterator.empty
@@ -28,7 +29,8 @@ object Day18 {
               newPos = pos + offset
               if !input.walls(newPos)
               newPathDoors = if (input.doors.contains(newPos)) pathDoors + newPos else pathDoors
-            } yield KeyNode(newPos)(newPathDoors)
+              newPathKeys = if (input.keys.contains(newPos)) pathKeys + newPos else pathKeys
+            } yield KeyNode(newPos)(newPathDoors, newPathKeys)
           }
         }
       }
@@ -56,8 +58,10 @@ object Day18 {
           val asd: Map[Pos, (Int, Int)] = (for {
             (keyNode@KeyNode(toPos), distance) <- keyNeighbors(pos)
             pathDoors = keyNode.pathDoors
+            pathKeys = keyNode.pathKeys
             if keys.contains(toPos)
             if (doors.keySet intersect pathDoors).isEmpty
+            if (keys.keySet intersect pathKeys).sizeIs == 1
           } yield toPos -> (posI, distance: Int)).toMap
 
           asd
