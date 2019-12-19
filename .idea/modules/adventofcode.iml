@@ -15,16 +15,31 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scala-sbt:test-interface:1.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-parser-combinators_2.13:1.1.2:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.13.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.1:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.lihaoyi:upickle-core_2.13:0.7.5:jar" level="project" />
     <orderEntry type="library" name="sbt: com.lihaoyi:ujson_2.13:0.7.5:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest_2.13:3.0.8:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalactic:scalactic_2.13:3.0.8:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="sbt: org.scalacheck:scalacheck_2.13:1.14.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: com.fasterxml.jackson.core:jackson-annotations:2.9.9:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: com.fasterxml.jackson.core:jackson-core:2.9.9:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: com.fasterxml.jackson.core:jackson-databind:2.9.9:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: com.fasterxml.jackson.module:jackson-module-paranamer:2.9.9:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: com.fasterxml.jackson.module:jackson-module-scala_2.13:2.9.9:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: com.storm-enroute:scalameter-core_2.13:0.19:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: com.storm-enroute:scalameter_2.13:0.19:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: com.thoughtworks.paranamer:paranamer:2.8:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: commons-io:commons-io:2.4:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: io.spray:spray-json_2.13:1.3.5:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.apache.commons:commons-lang3:3.4:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.apache.commons:commons-math3:3.2:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.jline:jline:3.10.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.ow2.asm:asm:5.0.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.0.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.1.1:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="sbt: org.scala-lang.modules:scala-xml_2.13:1.2.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-parser-combinators_2.13:1.1.2:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scala-sbt:test-interface:1.0:jar" level="project" />
   </component>
 </module>
