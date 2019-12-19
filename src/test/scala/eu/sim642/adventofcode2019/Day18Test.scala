@@ -1,10 +1,17 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Suites}
 import Day18._
+import eu.sim642.adventofcode2019.Day18Test._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day18Test extends Suites(
+  new BaseTest,
+  new BFSKeyNeighborsSolutionTest,
+  new FloydWarshallKeyNeighborsSolutionTest,
+)
+
+object Day18Test {
 
   val exampleInput =
     """#########
@@ -91,48 +98,57 @@ class Day18Test extends FunSuite with ScalaCheckPropertyChecks {
       |#o#m..#i#jk.#
       |#############""".stripMargin
 
-  test("Part 1 examples") {
-    val inputExpectedSteps = Table(
-      ("input", "expectedSteps"),
-      (exampleInput, 8),
-      (exampleInput2, 86),
-      (exampleInput3, 132),
-      (exampleInput4, 136),
-      (exampleInput5, 81),
-    )
-
-    forAll (inputExpectedSteps) { (input, expectedSteps) =>
-      assert(collectKeysSteps(parseInput(input)) == expectedSteps)
+  class BaseTest extends FunSuite {
+    test("splitEntrance") {
+      assert(splitEntrance(parseInput(exampleInputUnsplit)) == parseInput(exampleInputSplit))
     }
   }
 
-  test("Part 1 input answer") {
-    assert(collectKeysSteps(parseInput(input)) == 4204)
-  }
+  sealed abstract class SolutionTest(solution: Solution) extends FunSuite with ScalaCheckPropertyChecks {
 
-  test("splitEntrance") {
-    assert(splitEntrance(parseInput(exampleInputUnsplit)) == parseInput(exampleInputSplit))
-  }
+    test("Part 1 examples") {
+      val inputExpectedSteps = Table(
+        ("input", "expectedSteps"),
+        (exampleInput, 8),
+        (exampleInput2, 86),
+        (exampleInput3, 132),
+        (exampleInput4, 136),
+        (exampleInput5, 81),
+      )
 
-  test("Part 2 examples (unsplit)") {
-    assert(collectKeysStepsSplit(parseInput(exampleInputUnsplit)) == 8)
-  }
+      forAll (inputExpectedSteps) { (input, expectedSteps) =>
+        assert(solution.collectKeysSteps(parseInput(input)) == expectedSteps)
+      }
+    }
 
-  test("Part 2 examples (split)") {
-    val inputExpectedSteps = Table(
-      ("input", "expectedSteps"),
-      (exampleInputSplit, 8),
-      (exampleInputSplit2, 24),
-      (exampleInputSplit3, 32),
-      (exampleInputSplit4, 72),
-    )
+    test("Part 1 input answer") {
+      assert(solution.collectKeysSteps(parseInput(input)) == 4204)
+    }
 
-    forAll (inputExpectedSteps) { (input, expectedSteps) =>
-      assert(collectKeysSteps(parseInput(input)) == expectedSteps)
+    test("Part 2 examples (unsplit)") {
+      assert(solution.collectKeysStepsSplit(parseInput(exampleInputUnsplit)) == 8)
+    }
+
+    test("Part 2 examples (split)") {
+      val inputExpectedSteps = Table(
+        ("input", "expectedSteps"),
+        (exampleInputSplit, 8),
+        (exampleInputSplit2, 24),
+        (exampleInputSplit3, 32),
+        (exampleInputSplit4, 72),
+      )
+
+      forAll (inputExpectedSteps) { (input, expectedSteps) =>
+        assert(solution.collectKeysSteps(parseInput(input)) == expectedSteps)
+      }
+    }
+
+    test("Part 2 input answer") {
+      assert(solution.collectKeysStepsSplit(parseInput(input)) == 1682)
     }
   }
 
-  test("Part 2 input answer") {
-    assert(collectKeysStepsSplit(parseInput(input)) == 1682)
-  }
+  class BFSKeyNeighborsSolutionTest extends SolutionTest(BFSKeyNeighborsSolution)
+
+  class FloydWarshallKeyNeighborsSolutionTest extends SolutionTest(FloydWarshallKeyNeighborsSolution)
 }
