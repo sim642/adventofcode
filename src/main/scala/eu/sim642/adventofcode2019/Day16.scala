@@ -83,7 +83,7 @@ object Day16 {
     */
   object UpperTriangularSolution extends StepPhaseSolution {
     def upperTriangularStepPhase(offset: Int)(signal: Signal): Signal = {
-      assume(offset >= signal.length)
+      require(offset >= signal.length)
 
       val prefixSum: Signal = signal.scanLeft(0)(_ + _)
 

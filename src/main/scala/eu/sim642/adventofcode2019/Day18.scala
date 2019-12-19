@@ -81,7 +81,7 @@ object Day18 {
   }
 
   def splitEntrance(input: Input): Input = {
-    assume(input.entrances.size == 1)
+    require(input.entrances.size == 1)
     val entrance = input.entrances.head
 
     val newEntrances = Pos.diagonalOffsets.map(entrance + _).toSet
