@@ -59,27 +59,46 @@ object Day20 {
 
     val innerBox = Box(Pos(3, 3), Pos(grid.map(_.size).max - 1 - 3, grid.size - 1 - 3))
 
+    // TODO: generalize "landmark BFS" - BFS + Dijkstra
+    val portalPoss = portals.values.flatten.toSet
+    val portalPosNeighbors: Map[Pos, Map[Pos, Int]] = portalPoss.view.map({ fromPortalPos =>
+
+        val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
+          override val startNode: Pos = fromPortalPos
+
+          override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
+            for {
+              offset <- Pos.axisOffsets.iterator
+              newPos = pos + offset
+              if grid(newPos) != Wall
+            } yield newPos
+          }
+        }
+
+        val distances = BFS.traverse(graphTraversal).distances
+        fromPortalPos -> portalPoss.view.flatMap(toPortalPos => distances.get(toPortalPos).map(toPortalPos -> _)).toMap
+      }).toMap
+
+
     case class Node(pos: Pos, level: Int)
 
-    val graphSearch = new GraphSearch[Node] with UnitNeighbors[Node] with TargetNode[Node] {
+    val graphSearch = new GraphSearch[Node] with TargetNode[Node] {
       override val startNode: Node = Node(grid.posOf(startPortal), 0)
 
-      override def unitNeighbors(node: Node): IterableOnce[Node] = {
+      override def neighbors(node: Node): IterableOnce[(Node, Int)] = {
         val Node(pos, level) = node
 
         val moveNeighbors = for {
-          offset <- Pos.axisOffsets.iterator
-          newPos = pos + offset
-          if grid(newPos) != Wall
-        } yield Node(newPos, level)
+          (newPos, distance) <- portalPosNeighbors(pos).iterator
+        } yield Node(newPos, level) -> distance
 
         val portalNeighbors = grid(pos) match {
           case NormalPortal(portal) =>
             val otherPos = (portals(portal) - pos).head
             if (innerBox.contains(pos))
-              Iterator(Node(otherPos, level + 1))
+              Iterator(Node(otherPos, level + 1) -> 1)
             else if (level > 0)
-              Iterator(Node(otherPos, level - 1))
+              Iterator(Node(otherPos, level - 1) -> 1)
             else
               Iterator.empty
           case _ => Iterator.empty
@@ -91,7 +110,7 @@ object Day20 {
       override val targetNode: Node = Node(grid.posOf(targetPortal), 0)
     }
 
-    BFS.search(graphSearch).target.get._2
+    Dijkstra.search(graphSearch).target.get._2
   }
 
   case class Input(grid: Grid[Tile], portals: Map[Portal, Set[Pos]])
