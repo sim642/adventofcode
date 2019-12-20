@@ -24,19 +24,8 @@ object Day20 {
     }
   }
 
-  def findOtherPortalPos(grid: Grid[Tile], portalPos: Pos): Pos = {
-    val portal = grid(portalPos)
-    // TODO: Grid posWhere? would need pos argument for this though
-    (for {
-      (row, y) <- grid.view.zipWithIndex
-      (cell, x) <- row.view.zipWithIndex
-      pos = Pos(x, y)
-      if pos != portalPos
-      if cell == portal
-    } yield Pos(x, y)).head
-  }
-
-  def steps(grid: Grid[Tile]): Int = {
+  def steps(input: Input): Int = {
+    val Input(grid, portals) = input
 
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
       override val startNode: Pos = grid.posOf(startPortal)
@@ -49,8 +38,8 @@ object Day20 {
         } yield newPos
 
         val portalNeighbors = grid(pos) match {
-          case NormalPortal(_) =>
-            val otherPos = findOtherPortalPos(grid, pos)
+          case NormalPortal(portal) =>
+            val otherPos = (portals(portal) - pos).head
             Iterator(otherPos)
           case _ => Iterator.empty
         }
@@ -64,8 +53,9 @@ object Day20 {
     BFS.search(graphSearch).target.get._2
   }
 
-  def stepsRecursive(grid: Grid[Tile]): Int = {
+  def stepsRecursive(input: Input): Int = {
     // TODO: reduce duplication
+    val Input(grid, portals) = input
 
     val innerBox = Box(Pos(3, 3), Pos(grid.map(_.size).max - 1 - 3, grid.size - 1 - 3))
 
@@ -84,8 +74,8 @@ object Day20 {
         } yield Node(newPos, level)
 
         val portalNeighbors = grid(pos) match {
-          case NormalPortal(_) =>
-            val otherPos = findOtherPortalPos(grid, pos)
+          case NormalPortal(portal) =>
+            val otherPos = (portals(portal) - pos).head
             if (innerBox.contains(pos))
               Iterator(Node(otherPos, level + 1))
             else if (level > 0)
@@ -104,7 +94,9 @@ object Day20 {
     BFS.search(graphSearch).target.get._2
   }
 
-  def parseGrid(input: String): Grid[Tile] = {
+  case class Input(grid: Grid[Tile], portals: Map[Portal, Set[Pos]])
+
+  def parseGrid(input: String): Input = {
     val charGrid = input.linesIterator.map(_.toVector).toVector
 
     val wallGrid = charGrid.mapGrid({
@@ -113,7 +105,7 @@ object Day20 {
     })
 
     // TODO: refactor Grid iterations
-    val portals = (for {
+    val posPortal = (for {
       (row, y) <- wallGrid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
       if cell == Open
@@ -130,13 +122,15 @@ object Day20 {
       if cell2.isLetter
 
       label = if (pos1 <= pos2) s"$cell1$cell2" else s"$cell2$cell1"
-    } yield pos -> label).toMap
+    } yield pos -> Portal(label)).toMap
 
-    val grid = portals.foldLeft(wallGrid)({ case (grid, (pos, label)) =>
-      grid.updatedGrid(pos, Portal(label))
+    val grid = posPortal.foldLeft(wallGrid)({ case (grid, (pos, portal)) =>
+      grid.updatedGrid(pos, portal)
     })
 
-    grid
+    val portals = posPortal.groupMap(_._2)(_._1).transform({ (_, v) => v.toSet })
+
+    Input(grid, portals)
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.stripLineEnd
