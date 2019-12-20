@@ -11,12 +11,32 @@ object Day20 {
   sealed trait Tile
   case object Wall extends Tile
   case object Open extends Tile
-  case class Portal(from: Char, to: Char) extends Tile
+  case class Portal(label: String) extends Tile
+
+  private val startPortal = Portal("AA")
+  private val targetPortal = Portal("ZZ")
+
+  object NormalPortal {
+    def unapply(tile: Tile): Option[Portal] = tile match {
+      case portal@Portal(_) if portal != startPortal && portal != targetPortal =>
+        Some(portal)
+      case _ => None
+    }
+  }
+
+  def findOtherPortalPos(grid: Grid[Tile], portalPos: Pos): Pos = {
+    val portal = grid(portalPos)
+    // TODO: Grid posWhere? would need pos argument for this though
+    (for {
+      (row, y) <- grid.view.zipWithIndex
+      (cell, x) <- row.view.zipWithIndex
+      pos = Pos(x, y)
+      if pos != portalPos
+      if cell == portal
+    } yield Pos(x, y)).head
+  }
 
   def steps(grid: Grid[Tile]): Int = {
-
-    val startPortal = Portal('A', 'A')
-    val targetPortal = Portal('Z', 'Z')
 
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
       override val startNode: Pos = grid.posOf(startPortal)
@@ -29,18 +49,9 @@ object Day20 {
         } yield newPos
 
         val portalNeighbors = grid(pos) match {
-          case portal@Portal(_, _) if portal != startPortal && portal != targetPortal =>
-            //val portalPos = grid.posOf(Portal(to, from))
-            // TODO: Grid posWhere
-            val portalPos =
-              for {
-                (row, y) <- grid.view.zipWithIndex
-                (cell, x) <- row.view.zipWithIndex
-                portalPos = Pos(x, y)
-                if portalPos != pos
-                if cell == portal
-              } yield Pos(x, y)
-            Iterator(portalPos.head)
+          case NormalPortal(_) =>
+            val otherPos = findOtherPortalPos(grid, pos)
+            Iterator(otherPos)
           case _ => Iterator.empty
         }
 
@@ -54,9 +65,7 @@ object Day20 {
   }
 
   def stepsRecursive(grid: Grid[Tile]): Int = {
-
-    val startPortal = Portal('A', 'A')
-    val targetPortal = Portal('Z', 'Z')
+    // TODO: reduce duplication
 
     val innerBox = Box(Pos(3, 3), Pos(grid.map(_.size).max - 1 - 3, grid.size - 1 - 3))
 
@@ -75,22 +84,14 @@ object Day20 {
         } yield Node(newPos, level)
 
         val portalNeighbors = grid(pos) match {
-          case portal@Portal(_, _) if portal != startPortal && portal != targetPortal =>
-            //val portalPos = grid.posOf(Portal(to, from))
-            // TODO: Grid posWhere
-            val portalPos =
-              for {
-                (row, y) <- grid.view.zipWithIndex
-                (cell, x) <- row.view.zipWithIndex
-                portalPos = Pos(x, y)
-                if portalPos != pos
-                if cell == portal
-              } yield Pos(x, y)
-            val newLevel = if (innerBox.contains(pos)) level + 1 else level - 1
-            if (newLevel < 0)
-              Iterator.empty
+          case NormalPortal(_) =>
+            val otherPos = findOtherPortalPos(grid, pos)
+            if (innerBox.contains(pos))
+              Iterator(Node(otherPos, level + 1))
+            else if (level > 0)
+              Iterator(Node(otherPos, level - 1))
             else
-              Iterator(Node(portalPos.head, newLevel))
+              Iterator.empty
           case _ => Iterator.empty
         }
 
@@ -116,18 +117,23 @@ object Day20 {
       (row, y) <- wallGrid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
       if cell == Open
+
       pos = Pos(x, y)
       offset <- Pos.axisOffsets
+
       pos1 = pos + offset
       cell1 = charGrid(pos1)
       if cell1.isLetter
+
       pos2 = pos + 2 *: offset
       cell2 = charGrid(pos2)
       if cell2.isLetter
-    } yield pos -> (if (pos1 <= pos2) cell1 -> cell2 else cell2 -> cell1)).toMap
 
-    val grid = portals.foldLeft(wallGrid)({ case (grid, (pos, (from, to))) =>
-      grid.updatedGrid(pos, Portal(from, to))
+      label = if (pos1 <= pos2) s"$cell1$cell2" else s"$cell2$cell1"
+    } yield pos -> label).toMap
+
+    val grid = portals.foldLeft(wallGrid)({ case (grid, (pos, label)) =>
+      grid.updatedGrid(pos, Portal(label))
     })
 
     grid
