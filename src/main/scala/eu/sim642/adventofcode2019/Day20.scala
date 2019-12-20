@@ -29,19 +29,17 @@ object Day20 {
         } yield newPos
 
         val portalNeighbors = grid(pos) match {
-          case portal@Portal(from, to) if portal != startPortal && portal != targetPortal =>
+          case portal@Portal(_, _) if portal != startPortal && portal != targetPortal =>
             //val portalPos = grid.posOf(Portal(to, from))
             // TODO: Grid posWhere
             val portalPos =
-              (for {
+              for {
                 (row, y) <- grid.view.zipWithIndex
                 (cell, x) <- row.view.zipWithIndex
                 portalPos = Pos(x, y)
                 if portalPos != pos
-                if cell == portal// || cell == Portal(to, from)
-              } yield Pos(x, y))
-            println(portalPos.toSeq)
-            assert(portalPos.size == 1)
+                if cell == portal
+              } yield Pos(x, y)
             Iterator(portalPos.head)
           case _ => Iterator.empty
         }
@@ -81,18 +79,13 @@ object Day20 {
             //val portalPos = grid.posOf(Portal(to, from))
             // TODO: Grid posWhere
             val portalPos =
-              (for {
+              for {
                 (row, y) <- grid.view.zipWithIndex
                 (cell, x) <- row.view.zipWithIndex
                 portalPos = Pos(x, y)
                 if portalPos != pos
                 if cell == portal
-              } yield Pos(x, y))
-            println(portalPos.toSeq)
-            for (pp <- portalPos) {
-              println(pp, grid(pp), portal)
-            }
-            assert(portalPos.size == 1)
+              } yield Pos(x, y)
             val newLevel = if (innerBox.contains(pos)) level + 1 else level - 1
             if (newLevel < 0)
               Iterator.empty
