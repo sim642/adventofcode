@@ -7,10 +7,10 @@ import Day9.parseProgram
 class Day21Test extends FunSuite {
 
   test("Part 1 input answer") {
-    assert(hullDamageWalk(parseProgram(input)) == 19358262)
+    assert(Part1.hullDamage(parseProgram(input)) == 19358262)
   }
 
   test("Part 2 input answer") {
-    assert(hullDamageRun(parseProgram(input)) == 1142686742)
+    assert(Part2.hullDamage(parseProgram(input)) == 1142686742)
   }
 }
