@@ -22,11 +22,11 @@ object Day21 {
     // (-C & D) | -A
     override val inputString: String =
       """NOT C J
-         |AND D J
-         |NOT A T
-         |OR T J
-         |WALK
-         |""".stripMargin
+        |AND D J
+        |NOT A T
+        |OR T J
+        |WALK
+        |""".stripMargin
   }
 
   object Part2 extends Part {
