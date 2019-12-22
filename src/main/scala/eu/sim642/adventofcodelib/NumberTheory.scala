@@ -31,6 +31,8 @@ object NumberTheory {
 
   def bezoutCoefs[A: Integral](a: A, b: A): (A, A) = extendedGcd(a, b)._1
 
+  def modInv[A: Integral](a: A, m: A): A = bezoutCoefs(a, m)._1 %+ m
+
   private def crt2[A: Integral](an1: (A, A), an2: (A, A)): (A, A) = {
     val (a1, n1) = an1
     val (a2, n2) = an2

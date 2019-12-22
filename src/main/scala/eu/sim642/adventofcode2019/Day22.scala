@@ -14,8 +14,6 @@ object Day22 {
 
   type Techniques = Seq[Technique]
 
-  // TODO move to NumberTheory
-  def modInv(a: Long, m: Long): Long = NumberTheory.bezoutCoefs(a, m)._1 %+ m
 
   trait Part1Solution {
     def shuffleFactoryOrderPosition(techniques: Techniques, size: Long = 10007, card: Long = 2019): Long
@@ -35,7 +33,7 @@ object Day22 {
       case Cut(n) => deck.rotateLeft(n)
       case DealWithIncrement(n) =>
         val size = deck.size
-        val nInv = modInv(n, size)
+        val nInv = NumberTheory.modInv(n, size)
         Vector.tabulate(size)(i => deck(((nInv * i) % size).toInt))
     }
 
@@ -98,7 +96,7 @@ object Day22 {
           // x = aInv * (y - b) (mod size)
           // x = aInv * y - aInv * b (mod size)
           // aInv * y - aInv * b = x
-          val aInv = modInv(a, m)
+          val aInv = NumberTheory.modInv(a, m)
           Linear(aInv, (-safeMul(aInv, b)) %+ m)
         }
       }
