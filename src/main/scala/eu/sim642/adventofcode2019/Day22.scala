@@ -77,6 +77,15 @@ object Day22 {
       }
 
       def apply(i: Long): Long = (longMul(a, i) + b) %+ size
+
+      def inverse: Linear = {
+        // ax + b = y (mod size)
+        // x = aInv * (y - b) (mod size)
+        // x = aInv * y - aInv * b (mod size)
+        // aInv * y - aInv * b = x
+        val aInv = modInv(a, size)
+        Linear(aInv, (-longMul(aInv, b)) %+ size)
+      }
     }
 
     def toLinear(technique: Technique): Linear = technique match {
@@ -110,10 +119,7 @@ object Day22 {
     }
 
     val linear2 = pow(linear, 101741582076661L)
-
-    // ax + b = i (mod size)
-    val x = longMul(modInv(linear2.a, size), i - linear2.b)
-    x
+    linear2.inverse(i)
   }
 
   private val cutRegex = """cut (-?\d+)""".r
