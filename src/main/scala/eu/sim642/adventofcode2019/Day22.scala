@@ -59,34 +59,60 @@ object Day22 {
     techniques.foldLeft(card)((i, technique) => technique.applyPos(i, n))
   }
 
-  def shuffleFactoryOrderPositionReverse(techniques: Seq[Technique], size: Long = 119315717514047L, i: Long = 2020): Long = {
-
-    // TODO: clean this mess up
-
-    def longMul(a: Long, b: Long): Long = {
-      ((BigInt(a) * b) %+ size).toLong
-    }
-
+  case class Modular(m: Long) {
     case class Linear(a: Long, b: Long) {
       // ax + b
+
+      private def longMul(a: Long, b: Long): Long = {
+        ((BigInt(a) * b) %+ m).toLong
+      }
 
       def compose(that: Linear): Linear = {
         val Linear(c, d) = that // cx + d
         // a(cx + d) + b = (ac)x + (ad + b)
-        Linear(longMul(a, c), (longMul(a, d) + b) %+ size)
+        Linear(longMul(a, c), (longMul(a, d) + b) %+ m)
       }
 
-      def apply(i: Long): Long = (longMul(a, i) + b) %+ size
+      def apply(i: Long): Long = (longMul(a, i) + b) %+ m
+
+      // copied from IntegralImplicits
+      // TODO: optimize using tailrec or loop
+      def pow(n: Long): Linear = {
+        if (n == 0)
+          Linear.identity
+        else {
+          val (q, r) = n /% 2
+          val half = pow(q)
+          val halfSquare = half compose half
+          if (r == 0)
+            halfSquare
+          else
+            this compose halfSquare
+        }
+      }
 
       def inverse: Linear = {
         // ax + b = y (mod size)
         // x = aInv * (y - b) (mod size)
         // x = aInv * y - aInv * b (mod size)
         // aInv * y - aInv * b = x
-        val aInv = modInv(a, size)
-        Linear(aInv, (-longMul(aInv, b)) %+ size)
+        val aInv = modInv(a, m)
+        Linear(aInv, (-longMul(aInv, b)) %+ m)
       }
     }
+
+    object Linear {
+      val identity: Linear = Linear(1, 0)
+    }
+
+  }
+
+  def shuffleFactoryOrderPositionReverse(techniques: Seq[Technique], size: Long = 119315717514047L, i: Long = 2020): Long = {
+
+    // TODO: clean this mess up
+
+    val modular = Modular(size)
+    import modular._
 
     def toLinear(technique: Technique): Linear = technique match {
       case DealIntoNewStack => Linear(-1, size - 1)
@@ -96,29 +122,7 @@ object Day22 {
 
     val linear = techniques.map(toLinear).reduce((a, b) => b.compose(a))
 
-    // copied from IntegralImplicits
-    def pow(a: Linear, n: Long): Linear = {
-      val one = Linear(1, 0)
-
-      // TODO: optimize using tailrec or loop
-      def helper(a: Linear, n: Long): Linear = {
-        if (n == 0)
-          one
-        else {
-          val (q, r) = n /% 2
-          val half = helper(a, q)
-          val halfSquare = half compose half
-          if (r == 0)
-            halfSquare
-          else
-            a compose halfSquare
-        }
-      }
-
-      helper(a, n)
-    }
-
-    val linear2 = pow(linear, 101741582076661L)
+    val linear2 = linear.pow(101741582076661L)
     linear2.inverse(i)
   }
 
