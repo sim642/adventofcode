@@ -28,7 +28,7 @@ object Day22 {
   }
 
   object NaivePart1Solution extends Part1Solution {
-    type Deck = Seq[Long]
+    type Deck = Vector[Long]
 
     def applyDeck(technique: Technique, deck: Deck): Deck = technique match {
       case DealIntoNewStack => deck.reverse
@@ -36,11 +36,11 @@ object Day22 {
       case DealWithIncrement(n) =>
         val size = deck.size
         val nInv = modInv(n, size)
-        Seq.tabulate(size)(i => deck(((nInv * i) % size).toInt))
+        Vector.tabulate(size)(i => deck(((nInv * i) % size).toInt))
     }
 
     def shuffleFactoryOrder(techniques: Techniques, size: Long): Deck = {
-      techniques.foldLeft(Seq.range(0, size))((deck, technique) => applyDeck(technique, deck))
+      techniques.foldLeft(Vector.range(0, size))((deck, technique) => applyDeck(technique, deck))
     }
 
     override def shuffleFactoryOrderPosition(techniques: Techniques, size: Long, card: Long): Long = {

@@ -58,7 +58,8 @@ object Day22Test {
   }
 
 
-  class NaivePart1SolutionTest extends FunSuite with ScalaCheckPropertyChecks {
+  class NaivePart1SolutionTest extends Part1SolutionTest with ScalaCheckPropertyChecks {
+    override val solution: Part1Solution = NaivePart1Solution
 
     test("Part 1 examples") {
       val inputExpectedDeck = Table(
@@ -76,8 +77,6 @@ object Day22Test {
         assert(NaivePart1Solution.shuffleFactoryOrder(parseTechniques(input), 10) == expectedDeck)
       }
     }
-
-    // should pass Part1SolutionTest also but takes ~20s
   }
 
   class PositionPart1SolutionTest extends Part1SolutionTest {
