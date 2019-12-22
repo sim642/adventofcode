@@ -10,14 +10,19 @@ object Day22 {
 
   sealed trait Technique {
     def apply(deck: Deck): Deck
+    def applyPos(i: Int, size: Int): Int
   }
 
   case object DealIntoNewStack extends Technique {
     override def apply(deck: Deck): Deck = deck.reverse
+
+    override def applyPos(i: Int, size: Int): Int = size - 1 - i
   }
 
   case class Cut(n: Int) extends Technique {
     override def apply(deck: Deck): Deck = deck.rotateLeft(n)
+
+    override def applyPos(i: Int, size: Int): Int = (i - n) %+ size
   }
 
   case class DealWithIncrement(n: Int) extends Technique {
@@ -29,6 +34,8 @@ object Day22 {
 
       Seq.tabulate(deck.size)(i => deck((nInv * i) % deck.size))
     }
+
+    override def applyPos(i: Int, size: Int): Int = (n * i) %+ size
   }
 
   def shuffleFactoryOrder(techniques: Seq[Technique], n: Int): Deck = {
@@ -36,7 +43,8 @@ object Day22 {
   }
 
   def shuffleFactoryOrderPosition(techniques: Seq[Technique], n: Int = 10007, card: Int = 2019): Int = {
-    shuffleFactoryOrder(techniques, n).indexOf(card)
+    //shuffleFactoryOrder(techniques, n).indexOf(card)
+    techniques.foldLeft(card)((i, technique) => technique.applyPos(i, n))
   }
 
   private val cutRegex = """cut (-?\d+)""".r
