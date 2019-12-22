@@ -7,123 +7,134 @@ import Integral.Implicits._
 
 object Day22 {
 
-  type Deck = Seq[Int]
+  sealed trait Technique
+  case object DealIntoNewStack extends Technique
+  case class Cut(n: Int) extends Technique
+  case class DealWithIncrement(n: Int) extends Technique
 
-  sealed trait Technique {
-    def apply(deck: Deck): Deck
-    def applyPos(i: Long, size: Long): Long
-    def applyPosReverse(i: Long, size: Long): Long
-  }
+  type Techniques = Seq[Technique]
 
-  case object DealIntoNewStack extends Technique {
-    override def apply(deck: Deck): Deck = deck.reverse
-
-    override def applyPos(i: Long, size: Long): Long = size - 1 - i
-
-    override def applyPosReverse(i: Long, size: Long): Long = size - 1 - i
-  }
-
-  case class Cut(n: Int) extends Technique {
-    override def apply(deck: Deck): Deck = deck.rotateLeft(n)
-
-    override def applyPos(i: Long, size: Long): Long = (i - n) %+ size
-
-    override def applyPosReverse(i: Long, size: Long): Long = (i + n) %+ size
-  }
-
+  // TODO move to NumberTheory
   def modInv(a: Long, m: Long): Long = NumberTheory.bezoutCoefs(a, m)._1 %+ m
 
-  case class DealWithIncrement(n: Int) extends Technique {
-    // TODO move to NumberTheory
+  trait Part1Solution {
+    def shuffleFactoryOrderPosition(techniques: Techniques, size: Long = 10007, card: Long = 2019): Long
+  }
 
-    override def apply(deck: Deck): Deck = {
-      val nInv = modInv(n, deck.size)
-      Seq.tabulate(deck.size)(i => deck(((nInv * i) % deck.size).toInt))
+  trait Part2Solution {
+    def shuffleFactoryOrderPositionInverse(techniques: Techniques, size: Long = 119315717514047L, i: Long = 2020): Long
+
+    val inverseRepeat = 101741582076661L
+  }
+
+  object NaivePart1Solution extends Part1Solution {
+    type Deck = Seq[Long]
+
+    def applyDeck(technique: Technique, deck: Deck): Deck = technique match {
+      case DealIntoNewStack => deck.reverse
+      case Cut(n) => deck.rotateLeft(n)
+      case DealWithIncrement(n) =>
+        val size = deck.size
+        val nInv = modInv(n, size)
+        Seq.tabulate(size)(i => deck(((nInv * i) % size).toInt))
     }
 
-    override def applyPos(i: Long, size: Long): Long = (n * i) %+ size
+    def shuffleFactoryOrder(techniques: Techniques, size: Long): Deck = {
+      techniques.foldLeft(Seq.range(0, size))((deck, technique) => applyDeck(technique, deck))
+    }
 
-    override def applyPosReverse(i: Long, size: Long): Long = {
-      val nInv = modInv(n, size)
-      //(nInv * i) %+ size
-      ((BigInt(nInv) * i) %+ size).toLong
+    override def shuffleFactoryOrderPosition(techniques: Techniques, size: Long, card: Long): Long = {
+      shuffleFactoryOrder(techniques, size).indexOf(card)
     }
   }
 
-  def shuffleFactoryOrder(techniques: Seq[Technique], n: Int): Deck = {
-    techniques.foldLeft(Seq.range(0, n))((deck, technique) => technique(deck))
+  object PositionPart1Solution extends Part1Solution {
+    def applyPosition(technique: Technique, i: Long, size: Long): Long = technique match {
+      case DealIntoNewStack => size - 1 - i
+      case Cut(n) => (i - n) %+ size
+      case DealWithIncrement(n) => (n * i) %+ size
+    }
+
+    override def shuffleFactoryOrderPosition(techniques: Techniques, size: Long, card: Long): Long = {
+      techniques.foldLeft(card)((i, technique) => applyPosition(technique, i, size))
+    }
   }
 
-  def shuffleFactoryOrderPosition(techniques: Seq[Technique], n: Long = 10007, card: Long = 2019): Long = {
-    //shuffleFactoryOrder(techniques, n).indexOf(card)
-    techniques.foldLeft(card)((i, technique) => technique.applyPos(i, n))
-  }
+  object LinearSolution extends Part1Solution with Part2Solution {
+    case class Modular(m: Long) {
+      case class Linear(a: Long, b: Long) {
+        // ax + b
 
-  case class Modular(m: Long) {
-    case class Linear(a: Long, b: Long) {
-      // ax + b
+        private def safeMul(a: Long, b: Long): Long = {
+          ((BigInt(a) * b) %+ m).toLong
+        }
 
-      private def longMul(a: Long, b: Long): Long = {
-        ((BigInt(a) * b) %+ m).toLong
-      }
+        def compose(that: Linear): Linear = {
+          val Linear(c, d) = that // cx + d
+          // a(cx + d) + b = (ac)x + (ad + b)
+          Linear(safeMul(a, c), (safeMul(a, d) + b) %+ m)
+        }
 
-      def compose(that: Linear): Linear = {
-        val Linear(c, d) = that // cx + d
-        // a(cx + d) + b = (ac)x + (ad + b)
-        Linear(longMul(a, c), (longMul(a, d) + b) %+ m)
-      }
+        def apply(i: Long): Long = (safeMul(a, i) + b) %+ m
 
-      def apply(i: Long): Long = (longMul(a, i) + b) %+ m
+        // copied from IntegralImplicits
+        // TODO: optimize using tailrec or loop
+        def pow(n: Long): Linear = {
+          if (n == 0)
+            Linear.identity
+          else {
+            val (q, r) = n /% 2
+            val half = pow(q)
+            val halfSquare = half compose half
+            if (r == 0)
+              halfSquare
+            else
+              this compose halfSquare
+          }
+        }
 
-      // copied from IntegralImplicits
-      // TODO: optimize using tailrec or loop
-      def pow(n: Long): Linear = {
-        if (n == 0)
-          Linear.identity
-        else {
-          val (q, r) = n /% 2
-          val half = pow(q)
-          val halfSquare = half compose half
-          if (r == 0)
-            halfSquare
-          else
-            this compose halfSquare
+        def inverse: Linear = {
+          // ax + b = y (mod size)
+          // x = aInv * (y - b) (mod size)
+          // x = aInv * y - aInv * b (mod size)
+          // aInv * y - aInv * b = x
+          val aInv = modInv(a, m)
+          Linear(aInv, (-safeMul(aInv, b)) %+ m)
         }
       }
 
-      def inverse: Linear = {
-        // ax + b = y (mod size)
-        // x = aInv * (y - b) (mod size)
-        // x = aInv * y - aInv * b (mod size)
-        // aInv * y - aInv * b = x
-        val aInv = modInv(a, m)
-        Linear(aInv, (-longMul(aInv, b)) %+ m)
+      object Linear {
+        val identity: Linear = Linear(1, 0)
       }
     }
 
-    object Linear {
-      val identity: Linear = Linear(1, 0)
+    def toLinear(technique: Technique, modular: Modular): modular.Linear = {
+      import modular._
+      val size = m
+
+      technique match {
+        case DealIntoNewStack => Linear(-1, size - 1)
+        case Cut(n) => Linear(1, (-n.toLong) %+ size)
+        case DealWithIncrement(n) => Linear(n, 0)
+      }
     }
 
-  }
-
-  def shuffleFactoryOrderPositionReverse(techniques: Seq[Technique], size: Long = 119315717514047L, i: Long = 2020): Long = {
-
-    // TODO: clean this mess up
-
-    val modular = Modular(size)
-    import modular._
-
-    def toLinear(technique: Technique): Linear = technique match {
-      case DealIntoNewStack => Linear(-1, size - 1)
-      case Cut(n) => Linear(1, (-n.toLong) %+ size)
-      case DealWithIncrement(n) => Linear(n, 0)
+    def toLinear(techniques: Techniques, modular: Modular): modular.Linear = {
+      techniques.map(toLinear(_, modular)).reduce((a, b) => b.compose(a))
     }
 
-    val linear = techniques.map(toLinear).reduce((a, b) => b.compose(a))
+    override def shuffleFactoryOrderPosition(techniques: Techniques, size: Long, card: Long): Long = {
+      val modular = Modular(size)
+      val linear = toLinear(techniques, modular)
+      linear(card)
+    }
 
-    val linear2 = linear.pow(101741582076661L)
-    linear2.inverse(i)
+    override def shuffleFactoryOrderPositionInverse(techniques: Techniques, size: Long, i: Long): Long = {
+      val modular = Modular(size)
+      val linear = toLinear(techniques, modular)
+      val linearRepeat = linear.pow(inverseRepeat)
+      linearRepeat.inverse(i)
+    }
   }
 
   private val cutRegex = """cut (-?\d+)""".r
@@ -135,13 +146,15 @@ object Day22 {
     case dealWithIncrementRegex(n) => DealWithIncrement(n.toInt)
   }
 
-  def parseTechniques(input: String): Seq[Technique] = input.linesIterator.map(parseTechnique).toSeq
+  def parseTechniques(input: String): Techniques = input.linesIterator.map(parseTechnique).toSeq
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import LinearSolution._
+
     println(shuffleFactoryOrderPosition(parseTechniques(input)))
-    println(shuffleFactoryOrderPositionReverse(parseTechniques(input)))
+    println(shuffleFactoryOrderPositionInverse(parseTechniques(input)))
 
     // 40340147547378 - too low
   }
