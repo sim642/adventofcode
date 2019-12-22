@@ -53,4 +53,8 @@ class Day22Test extends FunSuite with ScalaCheckPropertyChecks {
   test("Part 1 input answer") {
     assert(shuffleFactoryOrderPosition(parseTechniques(input)) == 7665)
   }
+
+  test("Part 2 input answer") {
+    assert(shuffleFactoryOrderPositionReverse(parseTechniques(input)) == 41653717360577L)
+  }
 }
