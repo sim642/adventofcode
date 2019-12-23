@@ -1,0 +1,83 @@
+package eu.sim642.adventofcode2019
+
+import Day9._
+
+import scala.annotation.tailrec
+import scala.collection.immutable.Queue
+
+object Day23 {
+
+  case class Packet(x: Value, y: Value) {
+    def toInput: LazyList[Value] = LazyList(x, y)
+  }
+
+  case class Computer(programState: ProgramState, inQueue: Queue[Packet])
+
+  def runNetwork(program: Memory): Value = {
+
+    var iter = 0
+    @tailrec
+    def helper(computers: Vector[Computer]): Value = {
+      println(s"Iteration $iter:")
+      iter += 1
+
+      val (newComputers, outPackets) = computers.zipWithIndex.map({
+        case (Computer(programState, inQueue), i) =>
+          //print(s"Running $i... ")
+          val inputs = {
+            if (inQueue.nonEmpty)
+              inQueue.head.toInput
+            else
+              LazyList(-1L)
+            //(inQueue.flatMap(_.toInput) :+ -1L).to(LazyList)
+          }
+
+          val (newProgramState, outPacket) = programState.copy(inputs = inputs).outputStates.take(3) match {
+            case LazyList() => // halted
+              //println("no output")
+              //(programState, None)
+              (programState.copy(inputs = inputs).execs.last._1, None) // TODO: why is this execs.last necessary?
+            case LazyList((_, outAddress), (_, outX), (newProgramState, outY)) =>
+              println(s"$i -> $outAddress $outX $outY")
+              (newProgramState, Some((outAddress.toInt, Packet(outX, outY))))
+          }
+
+          val newInQueue = {
+            if (inQueue.nonEmpty && newProgramState.inputs.isEmpty)
+              inQueue.tail
+            else
+              inQueue
+            //inQueue.takeRight((newProgramState.inputs.size - 1) / 2)
+          }
+          val newComputer = Computer(newProgramState, newInQueue)
+          (newComputer, outPacket)
+      }).unzip
+
+      outPackets.flatten.find(_._1 == 255) match {
+        case Some((_, packet)) =>
+          packet.y
+        case None =>
+          val newComputers2 = outPackets.flatten.foldLeft(newComputers)({ case (newComputers, (i, packet)) =>
+            println(i, packet)
+            val computerI = newComputers(i)
+            val newComputerI = computerI.copy(inQueue = computerI.inQueue :+ packet)
+            newComputers.updated(i, newComputerI)
+          })
+
+          helper(newComputers2)
+      }
+    }
+
+    val computers = Vector.tabulate(50)({ i =>
+      Computer(ProgramState(program, inputs = LazyList(i)).execOne.get._1, Queue.empty)
+    })
+
+    helper(computers)
+  }
+
+  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
+
+  def main(args: Array[String]): Unit = {
+    println(runNetwork(parseProgram(input)))
+  }
+}
