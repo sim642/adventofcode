@@ -57,4 +57,12 @@ class Day24Test extends FunSuite with ScalaCheckPropertyChecks {
   test("Part 1 input answer") {
     assert(findCycleBiodiversityRating(parseGrid(input)) == 18859569)
   }
+
+  test("Part 2 examples") {
+    assert(countRecBugs(parseGrid(exampleInput), 10) == 99)
+  }
+
+  test("Part 2 input answer") {
+    assert(countRecBugs(parseGrid(input)) == 2067)
+  }
 }
