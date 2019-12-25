@@ -1,8 +1,12 @@
 package eu.sim642.adventofcode2019
 
 import org.scalatest.FunSuite
+import Day25._
+import Day9.parseProgram
 
 class Day25Test extends FunSuite {
 
-  // TODO: automate and test solution
+  test("Part 1 input answer") {
+    assert(findPassword(parseProgram(input)) == 2622472)
+  }
 }
