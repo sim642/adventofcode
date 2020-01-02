@@ -91,6 +91,8 @@ object Intcode {
         output.map((state, _))
       })
     }
+
+    def execFinal: ProgramState = execs.last._1
   }
 
 
