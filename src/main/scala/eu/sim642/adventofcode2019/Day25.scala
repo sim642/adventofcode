@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2019
 
-import eu.sim642.adventofcode2019.Day9._
+import Intcode._
 import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, UnitNeighbors}
 import eu.sim642.adventofcodelib.IteratorImplicits._
 

@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2019
 
 import org.scalatest.{FunSuite, Suites}
-import Day9.parseProgram
+import Intcode.parseProgram
 import Day11._
 import eu.sim642.adventofcode2019.Day11Test._
 

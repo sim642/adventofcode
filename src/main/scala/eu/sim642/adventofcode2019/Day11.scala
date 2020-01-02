@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcode2017.Day22.OffsetPos
-import Day9._
+import Intcode._
 import eu.sim642.adventofcodelib.box.Box
 
 import scala.annotation.tailrec
