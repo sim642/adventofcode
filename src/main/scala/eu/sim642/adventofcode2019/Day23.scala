@@ -18,7 +18,7 @@ object Day23 {
     var iter = 0
     @tailrec
     def helper(computers: Vector[Computer]): Value = {
-      println(s"Iteration $iter:")
+      //println(s"Iteration $iter:")
       iter += 1
 
       val (newComputers, outPackets) = computers.zipWithIndex.map({
@@ -38,7 +38,7 @@ object Day23 {
               //(programState, None)
               (programState.copy(inputs = inputs).execs.last._1, None) // TODO: why is this execs.last necessary?
             case LazyList((_, outAddress), (_, outX), (newProgramState, outY)) =>
-              println(s"$i -> $outAddress $outX $outY")
+              //println(s"$i -> $outAddress $outX $outY")
               (newProgramState, Some((outAddress.toInt, Packet(outX, outY))))
           }
 
@@ -58,7 +58,7 @@ object Day23 {
           packet.y
         case None =>
           val newComputers2 = outPackets.flatten.foldLeft(newComputers)({ case (newComputers, (i, packet)) =>
-            println(i, packet)
+            //println(i, packet)
             val computerI = newComputers(i)
             val newComputerI = computerI.copy(inQueue = computerI.inQueue :+ packet)
             newComputers.updated(i, newComputerI)
@@ -80,7 +80,7 @@ object Day23 {
     var iter = 0
     @tailrec
     def helper(computers: Vector[Computer], natPacket: Option[Packet], prevNatY: Option[Value]): Value = {
-      println(s"Iteration $iter:")
+      //println(s"Iteration $iter:")
       iter += 1
 
       val (newComputers, outPackets) = computers.zipWithIndex.map({
@@ -100,7 +100,7 @@ object Day23 {
               //(programState, None)
               (programState.copy(inputs = inputs).execs.last._1, None) // TODO: why is this execs.last necessary?
             case LazyList((_, outAddress), (_, outX), (newProgramState, outY)) =>
-              println(s"$i -> $outAddress $outX $outY")
+              //println(s"$i -> $outAddress $outX $outY")
               (newProgramState, Some((outAddress.toInt, Packet(outX, outY))))
           }
 
@@ -120,7 +120,7 @@ object Day23 {
       val idle = outPackets2.isEmpty && newComputers.forall(computer => computer.inQueue.isEmpty && computer.programState.opcode == 3) // TODO: remove opcode hack
       val (outPackets3, newPrevNatY) = {
         if (idle) {
-          println("IDLE")
+          //println("IDLE")
           val packet@Packet(_, natY) = natPacket.get
           if (prevNatY.contains(natY))
             return natY // TODO: remove return hack
@@ -132,7 +132,7 @@ object Day23 {
       }
 
       val (newComputers2, newNatPacket) = outPackets3.foldLeft((newComputers, natPacket))({ case ((newComputers, newNatPacket), (i, packet)) =>
-        println(i, packet)
+        //println(i, packet)
         if (i == 255) {
           (newComputers, Some(packet))
         }

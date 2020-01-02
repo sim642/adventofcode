@@ -47,7 +47,7 @@ object Day25 {
       val inputs = (command + "\n").map(_.toLong).to(LazyList)
       val outputStates = programState.copy(inputs = inputs).outputStates
       val outputString = outputStates.map(_._2.toChar).mkString
-      Console.err.println(outputString)
+      // Console.err.println(outputString) // debug output
       val newProgramState = outputStates.last._1
 
       outputString match {
@@ -88,7 +88,7 @@ object Day25 {
     def apply(programState: ProgramState): DroidState = {
       val outputStates = programState.outputStates
       val outputString = outputStates.map(_._2.toChar).mkString
-      Console.err.println(outputString)
+      // Console.err.println(outputString) // debug output
       val newProgramState = outputStates.last._1
 
       outputString match {

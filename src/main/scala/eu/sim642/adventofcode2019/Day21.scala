@@ -12,7 +12,7 @@ object Day21 {
 
       val outputs = ProgramState(program, inputs = inputs).outputs
       val outputString = outputs.map(_.toChar).mkString
-      Console.err.println(outputString)
+      // Console.err.println(outputString) // debug output
 
       outputs.last.toInt
     }
