@@ -3,6 +3,7 @@ name := "adventofcode"
 version := "0.1"
 
 scalaVersion := "2.13.1"
+scalacOptions ++= Seq("-deprecation")
 
 // TODO: unnecessary for scalameter because it exists on maven central?
 //resolvers += "Sonatype OSS Snapshots" at
