@@ -6,9 +6,11 @@ case class ProgramState(memory: Memory,
                         relativeBase: Address = 0) {
 
   def instruction(i: Int): Value = memory(ip + i)
-  def opcode: Int = (instruction(0) % 100).toInt
+
+  private lazy val instruction0: Value = instruction(0) // cache value to avoid repeated lookups
+  def opcode: Int = (instruction0 % 100).toInt
   def param(i: Int): Value = instruction(i + 1)
-  def paramMode(i: Int): Int = ((instruction(0) / math.pow(10, 2 + i).toInt) % 10).toInt // TODO: Int pow
+  def paramMode(i: Int): Int = ((instruction0 / math.pow(10, 2 + i).toInt) % 10).toInt // TODO: Int pow
   def readParam(i: Int): Value = paramMode(i) match {
     case 0 => memory(param(i).toInt)
     case 1 => param(i)
