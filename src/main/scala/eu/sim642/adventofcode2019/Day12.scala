@@ -87,6 +87,28 @@ object Day12 {
     }
   }
 
+  def xVelocities(moons: Seq[Moon]): Seq[Int] = moons.map(_.vel.x)
+  def yVelocities(moons: Seq[Moon]): Seq[Int] = moons.map(_.vel.y)
+  def zVelocities(moons: Seq[Moon]): Seq[Int] = moons.map(_.vel.z)
+  val xyzVelocities = Seq(xVelocities _, yVelocities _, zVelocities _)
+
+  /**
+    * Part 2 solution which finds per-axis half-cycles with the first velocity repeating.
+    * Optimization of [[LcmPart2Solution]].
+    */
+  object HalfwayLcmPart2Solution extends Part2Solution {
+    override def simulateCycleSteps(moons: Seq[Moon]): Long = {
+      val iterateMoons = LazyList.iterate(moons)(stepMoons)
+
+      def halfCycleLength[A](f: Seq[Moon] => A): Int = {
+        iterateMoons.view.map(f).indexOf(f(moons), 1)
+      }
+
+      val xyzCycleLengths = xyzVelocities.map(2 * halfCycleLength(_).toLong)
+      NumberTheory.lcm(xyzCycleLengths)
+    }
+  }
+
   /**
     * Part 2 solution which finds per-axis cycles in general.
     * Overall cycle step count is calculated by CRT of the per-axis cycles.
