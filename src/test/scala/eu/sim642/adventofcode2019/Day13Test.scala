@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2019
 
 import org.scalatest.FunSuite
 import Day13._
-import Intcode.parseProgram
+import intcode.parseProgram
 import eu.sim642.adventofcodelib.pos.Pos
 
 class Day13Test extends FunSuite {

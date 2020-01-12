@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2019
 
 import org.scalatest.FunSuite
 import Day2._
-import Intcode._
+import intcode._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class Day2Test extends FunSuite with ScalaCheckPropertyChecks {

@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2019
 
-object Intcode {
+package object intcode {
 
   // copied & modified from 2019 Day 7
 

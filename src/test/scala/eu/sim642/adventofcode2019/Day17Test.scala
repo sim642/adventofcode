@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2019
 
 import org.scalatest.FunSuite
 import Day17._
-import Intcode.parseProgram
+import intcode.parseProgram
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
 class Day17Test extends FunSuite {

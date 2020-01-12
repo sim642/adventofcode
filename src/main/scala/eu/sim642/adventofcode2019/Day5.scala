@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2019
 
-import Intcode._
+import intcode._
 
 object Day5 {
 

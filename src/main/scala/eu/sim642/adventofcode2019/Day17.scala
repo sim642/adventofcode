@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2019
 
-import Intcode._
+import intcode._
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits._

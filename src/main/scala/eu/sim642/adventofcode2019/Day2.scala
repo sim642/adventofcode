@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcodelib.IteratorImplicits._
-import Intcode._
+import intcode._
 
 object Day2 {
 

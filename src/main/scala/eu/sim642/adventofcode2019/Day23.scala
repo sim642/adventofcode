@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2019
 
-import Intcode._
+import intcode._
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue

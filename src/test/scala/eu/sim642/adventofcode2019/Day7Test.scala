@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2019
 
 import org.scalatest.FunSuite
-import Intcode._
+import intcode._
 import Day7._
 
 class Day7Test extends FunSuite {
