@@ -6,7 +6,6 @@ package object intcode {
 
   type Value = Long
   type Address = Int
-  type Memory = Map[Address, Value]
 
   case class ProgramState(memory: Memory,
                           inputs: LazyList[Value] = LazyList.empty,
@@ -96,5 +95,5 @@ package object intcode {
   }
 
 
-  def parseProgram(input: String): Memory = input.split(',').view.zipWithIndex.map({ case (value, i) => i -> value.toLong}).toMap.withDefaultValue(0)
+  def parseProgram(input: String): Memory = Memory.parse(input) // TODO: inline parseProgram?
 }
