@@ -260,7 +260,7 @@ object Day23 {
         Box3(Pos3(min.x, mid.y + 1, mid.z + 1), Pos3(mid.x, max.y, max.z)),
         Box3(Pos3(mid.x + 1, min.y, mid.z + 1), Pos3(max.x, mid.y, max.z)),
         Box3(Pos3(mid.x + 1, mid.y + 1, mid.z + 1), Pos3(max.x, max.y, max.z)),
-      ) ensuring(_.forall(box => box.min.x <= box.max.x && box.min.y <= box.max.y && box.min.z <= box.max.z), box)
+      ).ensuring(_.forall(box => box.min.x <= box.max.x && box.min.y <= box.max.y && box.min.z <= box.max.z), box)
     }
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
