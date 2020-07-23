@@ -5,7 +5,7 @@ import scala.collection.{AbstractIterator, immutable}
 object IteratorImplicits {
 
   implicit class IndexIteratorOps[A](it: Iterator[A]) {
-    def headOption: Option[A] = if (it.nonEmpty) Some(it.next) else None
+    def headOption: Option[A] = if (it.nonEmpty) Some(it.next()) else None
     def head: A = headOption.get
 
     def lastOption: Option[A] = it.reduceOption((_, x) => x)
