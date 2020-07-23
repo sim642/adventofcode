@@ -8,7 +8,7 @@ object Day23 {
   type Integer = Long
 
   def isPrime(n: Int): Boolean = n >= 2 && (2 to Math.sqrt(n).toInt).forall(n % _ != 0)
-  def isPrime(n: Long): Boolean = n >= 2 && (2 to Math.sqrt(n).toInt).forall(n % _ != 0)
+  def isPrime(n: Long): Boolean = n >= 2 && (2 to Math.sqrt(n.toDouble).toInt).forall(n % _ != 0)
 
   trait Solution {
     def countMul(input: String): Int
