@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2019
 
-import eu.sim642.adventofcode2019.Day9._
+import intcode._
 import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, GraphTraversal, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 

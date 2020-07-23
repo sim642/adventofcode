@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2019
 
 import eu.sim642.adventofcode2017.Day22.OffsetPos
-import eu.sim642.adventofcode2019.Day9._
+import intcode._
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 
