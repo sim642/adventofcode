@@ -166,7 +166,7 @@ object Day25 {
     val pressureSensitiveFloorDoor = findPressureSensitiveFloorDoor(droidStateSecurity)
     //println(pressureSensitiveFloorDoor)
 
-    val password = droidStateSecurity.inventory.subsets.map({ dropItems =>
+    val password = droidStateSecurity.inventory.subsets().map({ dropItems =>
       val droidStateDropped = dropItems.foldLeft(droidStateSecurity)(_.drop(_))
       droidStateDropped.move(pressureSensitiveFloorDoor)
     }).flatMap(_.password).head
