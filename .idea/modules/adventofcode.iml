@@ -31,8 +31,7 @@
     <orderEntry type="library" scope="TEST" name="sbt: org.apache.commons:commons-math3:3.2:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="sbt: org.jline:jline:3.10.0:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="sbt: org.ow2.asm:asm:5.0.4:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.0.0:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.1.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.1.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-parser-combinators_2.13:1.1.2:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="sbt: org.scala-lang.modules:scala-xml_2.13:1.2.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.3:jar" level="project" />
