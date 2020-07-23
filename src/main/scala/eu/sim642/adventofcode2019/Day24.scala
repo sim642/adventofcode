@@ -62,6 +62,7 @@ object Day24 {
               case Pos(-1, 0) => Iterator.tabulate(5)(y => (level + 1, Pos(4, y)))
               case Pos(0, 1) => Iterator.tabulate(5)(x => (level + 1, Pos(x, 0)))
               case Pos(0, -1) => Iterator.tabulate(5)(x => (level + 1, Pos(x, 4)))
+              case _ => throw new IllegalArgumentException("illegal offset")
             }
           // level neighbors
           case pos => Iterator((level, pos))
