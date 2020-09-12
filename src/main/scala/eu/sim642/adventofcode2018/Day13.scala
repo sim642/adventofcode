@@ -9,21 +9,25 @@ object Day13 {
   implicit class DirectionPos(pos: Pos) {
     def left: Pos = Pos(pos.y, -pos.x)
     def right: Pos = Pos(-pos.y, pos.x)
+
+    // Reflections from: https://www.reddit.com/r/adventofcode/comments/a5qd71/2018_day_13_solutions/eboleqg
+    def reflectMajor: Pos = Pos(pos.y, pos.x) // \
+    def reflectMinor: Pos = Pos(-pos.y, -pos.x) // /
   }
 
   case class Cart(pos: Pos, direction: Pos, intersections: Int = 0) {
     private def tickMove: Cart = copy(pos = pos + direction)
 
     private def tickTurn(grid: Grid[Char]): Cart = {
-      (direction, grid(pos)) match {
-        case (_, '+') =>
+      grid(pos) match {
+        case '+' =>
           copy(direction = intersections % 3 match {
             case 0 => direction.left // left
             case 1 => direction // straight
             case 2 => direction.right // right
           }, intersections = intersections + 1)
-        case (Pos(_, 0), '/') | (Pos(0, _), '\\') => copy(direction = direction.left)
-        case (Pos(0, _), '/') | (Pos(_, 0), '\\') => copy(direction = direction.right)
+        case '/' => copy(direction = direction.reflectMinor)
+        case '\\' => copy(direction = direction.reflectMajor)
         case _ => this
       }
     }
