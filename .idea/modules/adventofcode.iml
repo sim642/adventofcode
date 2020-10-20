@@ -12,6 +12,9 @@
       <sourceFolder url="file://$MODULE_DIR$/../../target/scala-2.13/src_managed/main" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../target/scala-2.13/src_managed/test" isTestSource="true" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/../../target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../target/scala-2.12" />
+      <excludeFolder url="file://$MODULE_DIR$/../../target/streams" />
+      <excludeFolder url="file://$MODULE_DIR$/../../target/test-reports" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -37,8 +40,23 @@
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.3:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.13.3:jar" level="project" />
     <orderEntry type="library" scope="TEST" name="sbt: org.scala-sbt:test-interface:1.0:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalacheck:scalacheck_2.13:1.14.0:jar" level="project" />
-    <orderEntry type="library" name="sbt: org.scalactic:scalactic_2.13:3.0.8:jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest_2.13:3.0.8:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalacheck:scalacheck_2.13:1.14.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalactic:scalactic_2.13:3.2.2:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-compatible:3.2.2:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-core_2.13:3.2.2:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-diagrams_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-featurespec_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-flatspec_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-freespec_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-funspec_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-funsuite_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-matchers-core_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-mustmatchers_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-propspec_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-refspec_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-shouldmatchers_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest-wordspec_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatest:scalatest_2.13:3.2.0:jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="sbt: org.scalatestplus:scalacheck-1-14_2.13:3.2.2.0:jar" level="project" />
   </component>
 </module>

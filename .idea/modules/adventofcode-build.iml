@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="adventofcode-build" external.linked.project.path="$MODULE_DIR$/../../project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="_root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.scala.xml.{TopScope=&amp;gt;SUB:DOLLARscope}" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, file:/home/simmo/.sbt/preloaded|maven|local-preloaded, /home/simmo/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="adventofcode-build" external.linked.project.path="$MODULE_DIR$/../../project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="_root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.scalafix.sbt.ScalafixPlugin.autoImport._, _root_.scalafix.sbt.ScalafixTestkitPlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.scalafix.sbt.ScalafixPlugin, _root_.scalafix.sbt.ScalafixTestkitPlugin, _root_.scala.xml.{TopScope=&amp;gt;SUB:DOLLARscope}" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, file:/home/simmo/.sbt/preloaded|maven|local-preloaded, /home/simmo/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../project/target/idea-classes" />
     <output-test url="file://$MODULE_DIR$/../../project/target/idea-test-classes" />
@@ -14,6 +14,13 @@
     <orderEntry type="module-library">
       <library name="sbt: sbt-and-plugins">
         <CLASSES>
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/sbt-scalafix_2.12_1.0/0.9.21/sbt-scalafix-0.9.21.jar!/" />
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/scalafix-interfaces/0.9.21/scalafix-interfaces-0.9.21.jar!/" />
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/geirsson/coursier-small_2.12/1.3.3/coursier-small_2.12-1.3.3.jar!/" />
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/googlecode/javaewah/JavaEWAH/1.1.7/JavaEWAH-1.1.7.jar!/" />
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/0.0.25/interface-0.0.25.jar!/" />
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/jgit/org.eclipse.jgit/5.9.0.202009080501-r/org.eclipse.jgit-5.9.0.202009080501-r.jar!/" />
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.26/slf4j-api-1.7.26.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.10/lib/jansi.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.10/lib/jline.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.10/lib/scala-compiler.jar!/" />
@@ -109,6 +116,6 @@
   </component>
   <component name="SbtModule">
     <option name="buildForURI" value="file:$MODULE_DIR$/../../" />
-    <option name="imports" value="_root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.scala.xml.{TopScope=&gt;SUB:DOLLARscope}" />
+    <option name="imports" value="_root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.scalafix.sbt.ScalafixPlugin.autoImport._, _root_.scalafix.sbt.ScalafixTestkitPlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.scalafix.sbt.ScalafixPlugin, _root_.scalafix.sbt.ScalafixTestkitPlugin, _root_.scala.xml.{TopScope=&gt;SUB:DOLLARscope}" />
   </component>
 </module>
