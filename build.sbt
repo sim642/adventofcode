@@ -9,9 +9,10 @@ scalacOptions ++= Seq("-deprecation")
 //resolvers += "Sonatype OSS Snapshots" at
 //  "https://oss.sonatype.org/content/repositories/snapshots"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.8"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.1.2"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.2" % "test"
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"
+libraryDependencies += "org.scalatestplus" %% "scalacheck-1-14" % "3.1.2.0" % "test"
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
 libraryDependencies += "com.lihaoyi" %% "ujson" % "0.7.5"
 libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.19" % "test"
