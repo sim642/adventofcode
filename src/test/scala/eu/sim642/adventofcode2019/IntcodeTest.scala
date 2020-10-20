@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 
 class IntcodeTest extends Suites(
   new Day2Test,

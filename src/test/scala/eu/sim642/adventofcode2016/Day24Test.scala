@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2016
 
-import org.scalatest.FunSuite
 import Day24._
 import eu.sim642.adventofcodelib.pos.Pos
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day24Test extends FunSuite {
+class Day24Test extends AnyFunSuite {
 
   val exampleInput =
     """###########

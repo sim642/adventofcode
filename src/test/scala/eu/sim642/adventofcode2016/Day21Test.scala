@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import org.scalatest.FunSuite
 import Day21._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day21Test extends FunSuite {
+class Day21Test extends AnyFunSuite {
 
   val exampleInput =
     """swap position 4 with position 0

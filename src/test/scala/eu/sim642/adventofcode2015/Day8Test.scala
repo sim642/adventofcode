@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day8._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day8Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day8Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleInput =
     """""

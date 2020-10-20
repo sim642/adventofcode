@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day15._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day15Test extends FunSuite {
+class Day15Test extends AnyFunSuite {
 
   val exampleInput =
     """Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8

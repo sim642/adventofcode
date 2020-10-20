@@ -2,7 +2,8 @@ package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcode2018.Day21._
 import eu.sim642.adventofcode2018.Day21Test.{ReverseEngineeredSolutionTest, SimulatedSolutionTest}
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day21Test extends Suites(
   new SimulatedSolutionTest,
@@ -11,7 +12,7 @@ class Day21Test extends Suites(
 
 object Day21Test {
 
-  sealed abstract class SolutionTest(solution: Solution) extends FunSuite {
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
     test("Part 1 input answer") {
       assert(solution.firstHaltr0(input) == 13970209)
     }

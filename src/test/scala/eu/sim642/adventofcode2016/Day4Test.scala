@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
 import Day4._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day4Test extends FunSuite {
+class Day4Test extends AnyFunSuite {
 
   test("parseRoom") {
     assert(parseRoom("aaaaa-bbb-z-y-x-123[abxyz]") == Room("aaaaa-bbb-z-y-x", 123, "abxyz"))

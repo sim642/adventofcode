@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
 import Day10._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day10Test extends FunSuite {
+class Day10Test extends AnyFunSuite {
 
   val exampleInput =
     """value 5 goes to bot 2

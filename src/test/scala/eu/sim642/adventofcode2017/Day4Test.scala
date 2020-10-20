@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2017
 
 import Day4._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day4Test extends FunSuite {
+class Day4Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(Part1.isValidPassphrase("aa bb cc dd ee"))

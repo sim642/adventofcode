@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day10._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day10Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day10Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   test("Part 1 examples") {
     val seqs = Table(

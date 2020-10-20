@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day22._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day22Test extends FunSuite {
+class Day22Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     val initialState = State(myHitpoints = 10, myMana = 250,

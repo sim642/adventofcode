@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
 import Day11._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day11Test extends FunSuite {
+class Day11Test extends AnyFunSuite {
 
   val exampleInput =
     """The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.

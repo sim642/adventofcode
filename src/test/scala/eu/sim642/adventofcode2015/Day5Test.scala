@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day5._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day5Test extends FunSuite {
+class Day5Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(Part1.isNice("ugknbfddgicrmopn"))

@@ -1,11 +1,11 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import Day13._
 import intcode.parseProgram
 import eu.sim642.adventofcodelib.pos.Pos
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day13Test extends FunSuite {
+class Day13Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(renderOutputs(LazyList(1L,2,3,6,5,4)) ==

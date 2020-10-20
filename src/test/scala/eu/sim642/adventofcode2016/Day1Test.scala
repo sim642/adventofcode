@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
 import Day1._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day1Test extends FunSuite {
+class Day1Test extends AnyFunSuite {
 
   test("parseInstructions") {
     assert(parseInstructions("R2, L3") == Seq(Right(2), Left(3)))

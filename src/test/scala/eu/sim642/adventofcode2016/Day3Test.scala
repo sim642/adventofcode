@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
 import Day3._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day3Test extends FunSuite {
+class Day3Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(!isValidTriangle(5, 10, 25))

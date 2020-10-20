@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.FunSuite
 import Day11._
 import eu.sim642.adventofcodelib.pos.Pos
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day11Test extends FunSuite {
+class Day11Test extends AnyFunSuite {
 
   test("powerLevel") {
     assert(powerLevel(8)(Pos(3, 5)) == 4)

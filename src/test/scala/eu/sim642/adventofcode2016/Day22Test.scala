@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import org.scalatest.FunSuite
 import Day22._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day22Test extends FunSuite {
+class Day22Test extends AnyFunSuite {
 
   val exampleInput =
     """Filesystem            Size  Used  Avail  Use%

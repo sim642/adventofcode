@@ -1,11 +1,11 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import Day17._
 import intcode.parseProgram
 import eu.sim642.adventofcodelib.IteratorImplicits._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day17Test extends FunSuite {
+class Day17Test extends AnyFunSuite {
 
   val exampleGrid =
     """..#..........

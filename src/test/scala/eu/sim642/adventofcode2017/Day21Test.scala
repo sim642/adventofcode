@@ -2,10 +2,10 @@ package eu.sim642.adventofcode2017
 
 import Day21._
 import eu.sim642.adventofcodelib.GridImplicits._
-import org.scalatest.FunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day21Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day21Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleRules = """../.# => ##./#../...
                        |.#./..#/### => #..#/..../..../#..#""".stripMargin

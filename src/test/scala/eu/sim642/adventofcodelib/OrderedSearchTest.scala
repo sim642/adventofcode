@@ -1,10 +1,10 @@
 package eu.sim642.adventofcodelib
 
 import OrderedSearch._
-import org.scalatest.FunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class OrderedSearchTest extends FunSuite with ScalaCheckPropertyChecks {
+class OrderedSearchTest extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   // TODO: custom generators
   // TODO: test specifically case where seq contains (multiple) x

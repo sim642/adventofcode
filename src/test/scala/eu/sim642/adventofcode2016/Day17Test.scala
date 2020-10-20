@@ -1,11 +1,11 @@
 package eu.sim642.adventofcode2016
 
-import org.scalatest.FunSuite
 import Day17._
 import eu.sim642.adventofcodelib.pos.Pos
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day17Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day17Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleInput = "hijkl"
 

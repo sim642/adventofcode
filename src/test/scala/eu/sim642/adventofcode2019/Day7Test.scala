@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import intcode._
 import Day7._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day7Test extends FunSuite {
+class Day7Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(Part1.findMaxSignal(parseProgram("3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0")) == 43210)

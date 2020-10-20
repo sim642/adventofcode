@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day21._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day21Test extends FunSuite {
+class Day21Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(leastWinGold(input) == 111)

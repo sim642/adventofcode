@@ -1,8 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import Day10._
 import eu.sim642.adventofcode2018.Day10Test._
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day10Test extends Suites(
   new NaiveSolutionTest,
@@ -44,7 +45,7 @@ object Day10Test {
       |position=<14,  7> velocity=<-2,  0>
       |position=<-3,  6> velocity=< 2, -1>""".stripMargin
 
-  sealed abstract class SolutionTest(solution: Solution) extends FunSuite {
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
     test("Part 2 examples") {
       val (minPoints, minSecond) = solution.minimizePointsArea(parsePoints(exampleInput))
       assert(minSecond == 3)

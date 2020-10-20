@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day19._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day19Test extends FunSuite {
+class Day19Test extends AnyFunSuite {
 
   val exampleInputReplacements =
     """H => HO

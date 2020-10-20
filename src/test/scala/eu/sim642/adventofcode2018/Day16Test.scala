@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.FunSuite
 import Day16._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day16Test extends FunSuite {
+class Day16Test extends AnyFunSuite {
 
   val exampleSample =
     """Before: [3, 2, 1, 1]

@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2017
 
 import Day13._
-import org.scalatest.FunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day13Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day13Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleRanges = Map(0 -> 3, 1 -> 2, 4 -> 4, 6 -> 4)
 

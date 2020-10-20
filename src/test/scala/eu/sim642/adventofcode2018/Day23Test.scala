@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import Day23._
 import eu.sim642.adventofcodelib.pos.Pos3
 import eu.sim642.adventofcode2018.Day23Test._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day23Test extends Suites(
   new Part1Test,
@@ -16,7 +17,7 @@ class Day23Test extends Suites(
 
 object Day23Test {
 
-  class Part1Test extends FunSuite {
+  class Part1Test extends AnyFunSuite {
 
     val exampleInput1 =
       """pos=<0,0,0>, r=4
@@ -38,7 +39,7 @@ object Day23Test {
     }
   }
 
-  sealed abstract class Part2SolutionTest(part2Solution: Part2Solution) extends FunSuite with ScalaCheckPropertyChecks {
+  sealed abstract class Part2SolutionTest(part2Solution: Part2Solution) extends AnyFunSuite with ScalaCheckPropertyChecks {
 
     val exampleInput2 =
       """pos=<10,12,12>, r=2

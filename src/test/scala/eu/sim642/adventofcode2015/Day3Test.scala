@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day3._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day3Test extends FunSuite {
+class Day3Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(Part1.countAtLeastOne(">") == 2)

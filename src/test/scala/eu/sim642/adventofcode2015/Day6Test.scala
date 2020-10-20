@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day6._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day6Test extends FunSuite {
+class Day6Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(countLit(input) == 569999)

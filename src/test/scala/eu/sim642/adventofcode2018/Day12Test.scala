@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.FunSuite
 import Day12._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day12Test extends FunSuite {
+class Day12Test extends AnyFunSuite {
 
   val exampleInput =
     """initial state: #..#.#..##......###...###

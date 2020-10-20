@@ -1,11 +1,11 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day25._
 import eu.sim642.adventofcodelib.pos.Pos
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day25Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day25Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   test("Part 1 examples") {
     val posIndexTable = Table(

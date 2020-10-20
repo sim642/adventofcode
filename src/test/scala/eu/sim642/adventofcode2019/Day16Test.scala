@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2019
 
 import Day16._
 import eu.sim642.adventofcode2019.Day16Test._
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day16Test extends Suites(
   new NaiveSolutionTest,
@@ -13,7 +14,7 @@ class Day16Test extends Suites(
 
 object Day16Test {
 
-  sealed abstract class SolutionTest(solution: Solution) extends FunSuite with ScalaCheckPropertyChecks {
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite with ScalaCheckPropertyChecks {
 
     test("Part 1 examples (small)") {
       val input = "12345678"

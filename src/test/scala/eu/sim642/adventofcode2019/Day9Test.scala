@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import Day9._
 import intcode._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day9Test extends FunSuite {
+class Day9Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     // TODO: move to IntcodeTest?

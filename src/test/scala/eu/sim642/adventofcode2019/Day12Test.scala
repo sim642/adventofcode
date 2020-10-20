@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import Day12._
 import eu.sim642.adventofcode2019.Day12Test._
 import eu.sim642.adventofcodelib.pos.Pos3
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day12Test extends Suites(
   new BaseTest,
@@ -27,7 +28,7 @@ object Day12Test {
       |<x=2, y=-7, z=3>
       |<x=9, y=-8, z=-3>""".stripMargin
 
-  class BaseTest extends FunSuite {
+  class BaseTest extends AnyFunSuite {
 
     test("parseMoon") {
       assert(parseMoons(exampleInput) ==
@@ -51,7 +52,7 @@ object Day12Test {
 
   }
 
-  sealed abstract class Part2SolutionTest(part2Solution: Part2Solution) extends FunSuite {
+  sealed abstract class Part2SolutionTest(part2Solution: Part2Solution) extends AnyFunSuite {
 
     test("Part 2 example (short)") {
       assert(part2Solution.simulateCycleSteps(parseMoons(exampleInput)) == 2772)

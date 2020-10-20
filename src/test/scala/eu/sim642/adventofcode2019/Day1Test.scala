@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import Day1._
 import eu.sim642.adventofcode2019.Day1Test._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day1Test extends Suites(
   new Part1Test,
@@ -13,7 +14,7 @@ class Day1Test extends Suites(
 
 object Day1Test {
 
-  class Part1Test extends FunSuite with ScalaCheckPropertyChecks {
+  class Part1Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
     test("Part 1 examples") {
       val massExpectedFuels = Table(
@@ -34,7 +35,7 @@ object Day1Test {
     }
   }
 
-  sealed abstract class Part2SolutionTest(part2Solution: Part2Solution) extends FunSuite with ScalaCheckPropertyChecks {
+  sealed abstract class Part2SolutionTest(part2Solution: Part2Solution) extends AnyFunSuite with ScalaCheckPropertyChecks {
 
     test("Part 2 examples") {
       val massExpectedFuels = Table(

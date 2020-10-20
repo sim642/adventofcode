@@ -1,9 +1,9 @@
 package eu.sim642.adventofcodelib
 
-import org.scalatest.FunSuite
 import IterableOnceImplicits._
+import org.scalatest.funsuite.AnyFunSuite
 
-class IterableOnceImplicitsTest extends FunSuite {
+class IterableOnceImplicitsTest extends AnyFunSuite {
 
   //noinspection EmptyCheck,OptionEqualsSome
   test("minStrict") {

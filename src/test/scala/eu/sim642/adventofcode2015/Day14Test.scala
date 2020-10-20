@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day14._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day14Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day14Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val comet = Reindeer(14, 10, 127)
   val dancer = Reindeer(16, 11, 162)

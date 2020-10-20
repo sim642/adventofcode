@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2017
 
 import Day12._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day12Test extends FunSuite {
+class Day12Test extends AnyFunSuite {
 
   val exampleInput = """0 <-> 2
                        |1 <-> 1

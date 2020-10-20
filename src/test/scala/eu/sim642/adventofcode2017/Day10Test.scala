@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2017
 
 import Day10._
-import org.scalatest.FunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day10Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day10Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleInitialState = KnotState(Vector(0, 1, 2, 3, 4))
 

@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import org.scalatest.FunSuite
 import Day15._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day15Test extends FunSuite {
+class Day15Test extends AnyFunSuite {
 
   val exampleInput =
     """Disc #1 has 5 positions; at time=0, it is at position 4.

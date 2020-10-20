@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcode2017.Day6._
 import eu.sim642.adventofcode2017.Day6Test._
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day6Test extends Suites(
   new BaseTest,
@@ -15,7 +16,7 @@ class Day6Test extends Suites(
 
 object Day6Test {
 
-  class BaseTest extends FunSuite with ScalaCheckPropertyChecks {
+  class BaseTest extends AnyFunSuite with ScalaCheckPropertyChecks {
     test("reallocCycle") {
       val nextMemories = Table(
         ("memory", "nextMemory"),
@@ -53,7 +54,7 @@ object Day6Test {
     }
   }
 
-  sealed abstract class SolutionTest(solution: Solution) extends FunSuite {
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
     test("Part 1 example") {
       assert(solution.reallocCycleCount(IndexedSeq(0, 2, 7, 0)) == 5)
     }

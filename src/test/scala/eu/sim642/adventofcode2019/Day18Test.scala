@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import Day18._
 import eu.sim642.adventofcode2019.Day18Test._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day18Test extends Suites(
   new BaseTest,
@@ -98,13 +99,13 @@ object Day18Test {
       |#o#m..#i#jk.#
       |#############""".stripMargin
 
-  class BaseTest extends FunSuite {
+  class BaseTest extends AnyFunSuite {
     test("splitEntrance") {
       assert(splitEntrance(parseInput(exampleInputUnsplit)) == parseInput(exampleInputSplit))
     }
   }
 
-  sealed abstract class SolutionTest(solution: Solution) extends FunSuite with ScalaCheckPropertyChecks {
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite with ScalaCheckPropertyChecks {
 
     test("Part 1 examples") {
       val inputExpectedSteps = Table(

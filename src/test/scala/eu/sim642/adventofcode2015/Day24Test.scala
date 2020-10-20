@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day24._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day24Test extends FunSuite {
+class Day24Test extends AnyFunSuite {
 
   val exampleWeights = ((1 to 5) ++ (7 to 11)).toList
 

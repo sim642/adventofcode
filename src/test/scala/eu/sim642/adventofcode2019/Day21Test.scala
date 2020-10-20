@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import Day21._
 import intcode.parseProgram
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day21Test extends FunSuite {
+class Day21Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(Part1.hullDamage(parseProgram(input)) == 19358262)

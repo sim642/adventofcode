@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import org.scalatest.FunSuite
 import Day19._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day19Test extends FunSuite {
+class Day19Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(Part1.lastElf(5) == 3)

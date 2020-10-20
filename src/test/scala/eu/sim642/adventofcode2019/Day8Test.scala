@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import Day8._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day8Test extends FunSuite {
+class Day8Test extends AnyFunSuite {
 
   val exampleInput = "123456789012"
   val exampleInput2 = "0222112222120000"

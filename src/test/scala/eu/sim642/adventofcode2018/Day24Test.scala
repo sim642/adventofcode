@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.FunSuite
 import Day24._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day24Test extends FunSuite {
+class Day24Test extends AnyFunSuite {
 
   val exampleInput =
     """Immune System:

@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day12._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day12Test extends FunSuite {
+class Day12Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(Part1.sumNumbers("""[1,2,3]""") == 6)

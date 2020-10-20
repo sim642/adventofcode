@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2017
 
 import Day19._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day19Test extends FunSuite {
+class Day19Test extends AnyFunSuite {
 
   lazy val exampleInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19example.txt")).mkString.stripLineEnd
 

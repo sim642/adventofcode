@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import intcode.parseProgram
 import Day11._
 import eu.sim642.adventofcode2019.Day11Test._
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day11Test extends Suites(
   new KnotTyingSolutionTest,
@@ -12,7 +13,7 @@ class Day11Test extends Suites(
 
 object Day11Test {
 
-  sealed abstract class SolutionTest(solution: Solution) extends FunSuite {
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
 
     // manually constructed Intcode program which just outputs the example values
     val exampleInput = "104,1,104,0,104,0,104,0,104,1,104,0,104,1,104,0,104,0,104,1,104,1,104,0,104,1,104,0,99"

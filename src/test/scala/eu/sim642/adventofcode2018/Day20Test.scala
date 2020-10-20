@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.FunSuite
 import Day20._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day20Test extends FunSuite {
+class Day20Test extends AnyFunSuite {
 
   val exampleInput1 = "^WNE$"
   val exampleInput2 = "^N(E|W)N$"

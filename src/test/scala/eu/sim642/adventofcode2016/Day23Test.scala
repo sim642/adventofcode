@@ -1,8 +1,9 @@
 package eu.sim642.adventofcode2016
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import Day23._
 import eu.sim642.adventofcode2016.Day23Test.{ReverseEngineeredSolutionTest, SimulatedSolutionTest}
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day23Test extends Suites(
   new SimulatedSolutionTest,
@@ -20,7 +21,7 @@ object Day23Test {
       |dec a
       |dec a""".stripMargin
 
-  sealed abstract class SolutionTest(val solution: Solution) extends FunSuite {
+  sealed abstract class SolutionTest(val solution: Solution) extends AnyFunSuite {
     test("Part 1 input answer") {
       assert(solution.safeValue(input, part1eggs) == 11893)
     }

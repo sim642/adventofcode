@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import Day4._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day4Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day4Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   test("toDigitList") {
     forAll { number: Int =>

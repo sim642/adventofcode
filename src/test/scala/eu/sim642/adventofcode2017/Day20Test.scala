@@ -3,7 +3,8 @@ package eu.sim642.adventofcode2017
 import Day20._
 import eu.sim642.adventofcode2017.Day20Test._
 import eu.sim642.adventofcodelib.pos.Pos3
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day20Test extends Suites(
   new BaseTest,
@@ -13,13 +14,13 @@ class Day20Test extends Suites(
 
 object Day20Test {
 
-  class BaseTest extends FunSuite {
+  class BaseTest extends AnyFunSuite {
     test("parseParticle") {
       assert(parseParticle("p=<2366,784,-597>, v=<-12,-41,50>, a=<-5,1,-2>") == Particle(Pos3(2366, 784, -597), Pos3(-12, -41, 50), Pos3(-5, 1, -2)))
     }
   }
 
-  sealed abstract class SolutionTest(solution: Solution) extends FunSuite {
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
 
     val exampleInput = """p=< 3,0,0>, v=< 2,0,0>, a=<-1,0,0>
                          |p=< 4,0,0>, v=< 0,0,0>, a=<-2,0,0>""".stripMargin

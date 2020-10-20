@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day2._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day2Test extends FunSuite {
+class Day2Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(wrappingPaperArea(2, 3, 4) == 58)

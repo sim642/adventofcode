@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day16._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day16Test extends FunSuite {
+class Day16Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(Part1.findWrappingSue(input) == 373)

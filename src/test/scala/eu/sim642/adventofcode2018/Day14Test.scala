@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2018
 
-import org.scalatest.FunSuite
 import Day14._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day14Test extends FunSuite {
+class Day14Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(tenScores(9) == "5158916779")

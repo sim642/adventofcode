@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2016
 
 import Day7._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day7Test extends FunSuite {
+class Day7Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(supportsTLS("abba[mnop]qrst"))

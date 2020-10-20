@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.{FunSuite, Suites}
+import org.scalatest.Suites
 import Day22._
 import eu.sim642.adventofcode2019.Day22Test._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
 class Day22Test extends Suites(
   new NaivePart1SolutionTest,
@@ -41,7 +42,7 @@ object Day22Test {
       |cut -1""".stripMargin
 
 
-  trait Part1SolutionTest extends FunSuite {
+  trait Part1SolutionTest extends AnyFunSuite {
     val solution: Part1Solution
 
     test("Part 1 input answer") {
@@ -49,7 +50,7 @@ object Day22Test {
     }
   }
 
-  trait Part2SolutionTest extends FunSuite {
+  trait Part2SolutionTest extends AnyFunSuite {
     val solution: Part2Solution
 
     test("Part 2 input answer") {

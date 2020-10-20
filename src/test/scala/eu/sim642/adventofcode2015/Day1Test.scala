@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2015
 
-import org.scalatest.FunSuite
 import Day1._
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day1Test extends FunSuite {
+class Day1Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(finalFloor("(())") == 0)

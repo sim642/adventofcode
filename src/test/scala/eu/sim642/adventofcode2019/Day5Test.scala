@@ -1,11 +1,11 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import Day5._
 import intcode._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day5Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day5Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   test("Part 1 input answer") {
     assert(execDiagnostic(parseProgram(input), 1) == 15259545)

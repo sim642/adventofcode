@@ -1,11 +1,11 @@
 package eu.sim642.adventofcode2019
 
-import org.scalatest.FunSuite
 import Day2._
 import intcode._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class Day2Test extends FunSuite with ScalaCheckPropertyChecks {
+class Day2Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   test("Part 1 examples") {
     val initialExpectedFinals = Table(
