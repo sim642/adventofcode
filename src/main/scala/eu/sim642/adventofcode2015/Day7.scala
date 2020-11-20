@@ -70,16 +70,15 @@ object Day7 extends RegexParsers {
 
     def expr: Parser[Expr] = (
       "NOT" ~> simpleExpr ^^ Not
-    // TODO: avoid repeating operator in case?
-    | simpleExpr ~ "AND" ~ simpleExpr ^^ { case left ~ "AND" ~ right => And(left, right)}
-    | simpleExpr ~ "OR" ~ simpleExpr ^^ { case left ~ "OR" ~ right => Or(left, right)}
-    | simpleExpr ~ "LSHIFT" ~ simpleExpr ^^ { case left ~ "LSHIFT" ~ right => Lshift(left, right)}
-    | simpleExpr ~ "RSHIFT" ~ simpleExpr ^^ { case left ~ "RSHIFT" ~ right => Rshift(left, right)}
+    | simpleExpr ~ "AND" ~ simpleExpr ^^ { case left ~ _ ~ right => And(left, right)}
+    | simpleExpr ~ "OR" ~ simpleExpr ^^ { case left ~ _ ~ right => Or(left, right)}
+    | simpleExpr ~ "LSHIFT" ~ simpleExpr ^^ { case left ~ _ ~ right => Lshift(left, right)}
+    | simpleExpr ~ "RSHIFT" ~ simpleExpr ^^ { case left ~ _ ~ right => Rshift(left, right)}
     | simpleExpr
     )
 
     def instruction: Parser[(String, Expr)] = (
-      expr ~ "->" ~ ident ^^ { case expr ~ "->" ~ ident => ident -> expr}
+      expr ~ "->" ~ ident ^^ { case expr ~ _ ~ ident => ident -> expr}
     )
 
     parseAll(instruction, s) match {
