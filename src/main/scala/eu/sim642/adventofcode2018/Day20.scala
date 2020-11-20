@@ -139,7 +139,7 @@ object Day20 extends RegexParsers {
 
     parseAll(inputRegexNode, input) match {
       case Success(result, next) => result
-      case NoSuccess(msg, next) => throw new RuntimeException(s"Regex parsing error: $msg ($next)")
+      case noSuccess: NoSuccess => throw new RuntimeException(s"Regex parsing error: ${noSuccess.msg} (${noSuccess.next})")
     }
   }
 

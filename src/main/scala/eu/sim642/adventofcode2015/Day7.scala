@@ -83,7 +83,7 @@ object Day7 extends RegexParsers {
 
     parseAll(instruction, s) match {
       case Success(result, next) => result
-      case NoSuccess(msg, next) => throw new RuntimeException(s"Assignment parsing error: $msg ($next)")
+      case noSuccess: NoSuccess => throw new RuntimeException(s"Assignment parsing error: ${noSuccess.msg} ($noSuccess.next)")
     }
   }
 
