@@ -47,6 +47,8 @@ object Day11 {
           }
           val newPos = pos + newOffset
           PaintState(newPos, newOffset, newPaint)
+        case (_, _) =>
+          throw new IllegalArgumentException("incomplete output")
       })
 
       paintStates.last

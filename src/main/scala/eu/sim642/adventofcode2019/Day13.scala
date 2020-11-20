@@ -54,6 +54,8 @@ object Day13 {
         val newPlayState = outputs.grouped(3).foldLeft(playState)({
           case (prevState, LazyList(x, y, value)) =>
             prevState.updated(Pos(x.toInt, y.toInt), value)
+          case (_, _) =>
+            throw new IllegalArgumentException("incomplete output")
         })
 
         val ballPosX = newPlayState.ballPos.get.x
