@@ -21,6 +21,7 @@ object Hash {
   // https://stackoverflow.com/a/5992852
   trait DigestOps[A <: DigestOps[A]] {
     def apply(s: String): String
+    def apply(): String
     def prefix(prefix: String): A
   }
   // TODO: implementation without clone()
@@ -31,6 +32,11 @@ object Hash {
     override def apply(s: String): String = {
       val md = messageDigest()
       bytesToHex(md.digest(s.getBytes))
+    }
+
+    override def apply(): String = {
+      val md = messageDigest()
+      bytesToHex(md.digest())
     }
 
     override def prefix(prefix: String): Digest = {

@@ -20,7 +20,7 @@ object Day17 {
 
   case class VaultPos(pos: Pos, path: String)(md5: Hash.Digest) {
     private lazy val doors = {
-      md5("").take(4).map(_ >= 'b')
+      md5().take(4).map(_ >= 'b')
     }
 
     def moves: Seq[VaultPos] = {
