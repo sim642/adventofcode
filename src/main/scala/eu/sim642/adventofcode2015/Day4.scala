@@ -8,7 +8,8 @@ object Day4 {
     protected val prefix: String
 
     def findZeroHash(input: String): Int = {
-      Iterator.from(1).find(i => Hash.md5(input + i).startsWith(prefix)).get
+      val md5 = Hash.md5.prefix(input)
+      Iterator.from(1).find(i => md5(i.toString).startsWith(prefix)).get
     }
   }
 

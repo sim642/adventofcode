@@ -19,7 +19,29 @@ object Hash {
   }
 
   // https://stackoverflow.com/a/5992852
-  def md5(s: String): String = {
-    bytesToHex(MessageDigest.getInstance("MD5").digest(s.getBytes))
+  trait DigestOps[A <: DigestOps[A]] {
+    def apply(s: String): String
+    def prefix(prefix: String): A
   }
+  // TODO: implementation without clone()
+
+  class Digest(messageDigest: MessageDigest) extends DigestOps[Digest] {
+    private def messageDigest(): MessageDigest = messageDigest.clone().asInstanceOf[MessageDigest]
+
+    override def apply(s: String): String = {
+      val md = messageDigest()
+      bytesToHex(md.digest(s.getBytes))
+    }
+
+    override def prefix(prefix: String): Digest = {
+      val md = messageDigest()
+      md.update(prefix.getBytes)
+      new Digest(md)
+    }
+  }
+
+  class DigestFactory(algorithm: String) extends Digest(MessageDigest.getInstance(algorithm))
+
+  // TODO: conditionally choose implementation without clone()
+  object md5 extends DigestFactory("MD5")
 }

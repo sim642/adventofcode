@@ -18,9 +18,9 @@ object Day17 {
     'R' -> Pos(1, 0),
   )
 
-  case class VaultPos(passcode: String, pos: Pos, path: String) {
+  case class VaultPos(pos: Pos, path: String)(md5: Hash.Digest) {
     private lazy val doors = {
-      Hash.md5(passcode + path).take(4).map(_ >= 'b')
+      md5("").take(4).map(_ >= 'b')
     }
 
     def moves: Seq[VaultPos] = {
@@ -32,8 +32,14 @@ object Day17 {
           if isOpen
           newPos = pos + offset
           if vaultBox.contains(newPos)
-        } yield copy(pos = newPos, path = path + move)
+        } yield copy(pos = newPos, path = path + move)(md5.prefix(move.toString))
       }
+    }
+  }
+
+  object VaultPos {
+    def apply(passcode: String, pos: Pos, path: String): VaultPos = {
+      VaultPos(pos, path)(Hash.md5.prefix(passcode + path))
     }
   }
 

@@ -36,7 +36,7 @@ object Day14 {
 
   object Part2 extends Part {
     override def hash(s: String): String = {
-      Iterator.iterate(s)(Hash.md5)(2017)
+      Iterator.iterate(s)(Hash.md5(_))(2017)
     }
   }
 
