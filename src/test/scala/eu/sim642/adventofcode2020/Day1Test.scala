@@ -14,10 +14,18 @@ class Day1Test extends AnyFunSuite {
       |1456""".stripMargin
 
   test("Part 1 examples") {
-    assert(entryProduct2020(parseEntries(exampleInput)) == 514579)
+    assert(entryProduct2020(parseEntries(exampleInput), 2) == 514579)
   }
 
   test("Part 1 input answer") {
-    assert(entryProduct2020(parseEntries(input)) == 713184)
+    assert(entryProduct2020(parseEntries(input), 2) == 713184)
+  }
+
+  test("Part 2 examples") {
+    assert(entryProduct2020(parseEntries(exampleInput), 3) == 241861950)
+  }
+
+  test("Part 2 input answer") {
+    assert(entryProduct2020(parseEntries(input), 3) == 261244452)
   }
 }
