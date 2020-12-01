@@ -1,7 +1,5 @@
 package eu.sim642.adventofcode2020
 
-import eu.sim642.adventofcodelib.IteratorImplicits._
-
 object Day1 {
 
   sealed trait Solution {
@@ -10,14 +8,14 @@ object Day1 {
 
   object NaiveSolution extends Solution {
     override def entryProduct2020(entries: Seq[Int], n: Int): Int = {
-      entries.combinations(n).filter(_.sum == 2020).head.product
+      entries.combinations(n).find(_.sum == 2020).get.product
     }
   }
 
   object SetContainsSolution extends Solution {
     override def entryProduct2020(entries: Seq[Int], n: Int): Int = {
       val entriesSet = entries.toSet
-      val init = entries.combinations(n - 1).filter(c => entriesSet.contains(2020 - c.sum)).head
+      val init = entries.combinations(n - 1).find(c => entriesSet.contains(2020 - c.sum)).get
       init.product * (2020 - init.sum)
     }
   }
