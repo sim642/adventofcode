@@ -15,15 +15,14 @@ object Day2 {
   object Part1 extends Part {
     override def isValid(policy: Policy, password: Password): Boolean = {
       val Policy(min, max, char) = policy
-      val count = password.count(_ == char)
-      min <= count && count <= max
+      s"[^$char]*($char[^$char]*){$min,$max}".r.matches(password)
     }
   }
 
   object Part2 extends Part {
     override def isValid(policy: Policy, password: Password): Boolean = {
       val Policy(min, max, char) = policy
-      (password(min - 1) == char) ^ (password(max - 1) == char)
+      s"(?=.{$min}(?<=$char))(?!.{$max}(?<=$char)).*|(?!.{$min}(?<=$char))(?=.{$max}(?<=$char)).*".r.matches(password)
     }
   }
 
