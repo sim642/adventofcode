@@ -6,12 +6,26 @@ object Day2 {
 
   type Password = String
 
-  def isValid(policy: Policy, password: Password): Boolean = {
-    val count = password.count(_ == policy.char)
-    policy.min <= count && count <= policy.max
+  sealed trait Part {
+    def isValid(policy: Policy, password: Password): Boolean
+
+    def countValid(passwordPolicies: Seq[(Policy, Password)]): Int = passwordPolicies.count((isValid _).tupled)
   }
 
-  def countValid(passwordPolicies: Seq[(Policy, Password)]): Int = passwordPolicies.count((isValid _).tupled)
+  object Part1 extends Part {
+    override def isValid(policy: Policy, password: Password): Boolean = {
+      val Policy(min, max, char) = policy
+      val count = password.count(_ == char)
+      min <= count && count <= max
+    }
+  }
+
+  object Part2 extends Part {
+    override def isValid(policy: Policy, password: Password): Boolean = {
+      val Policy(min, max, char) = policy
+      (password(min - 1) == char) ^ (password(max - 1) == char)
+    }
+  }
 
 
   private val passwordPolicyRegex = """(\d+)-(\d+) (\w): (\w+)""".r
@@ -26,6 +40,7 @@ object Day2 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countValid(parsePasswordPolicies(input)))
+    println(Part1.countValid(parsePasswordPolicies(input)))
+    println(Part2.countValid(parsePasswordPolicies(input)))
   }
 }

@@ -11,10 +11,18 @@ class Day2Test extends AnyFunSuite {
       |2-9 c: ccccccccc""".stripMargin
 
   test("Part 1 examples") {
-    assert(countValid(parsePasswordPolicies(exampleInput)) == 2)
+    assert(Part1.countValid(parsePasswordPolicies(exampleInput)) == 2)
   }
 
   test("Part 1 input answer") {
-    assert(countValid(parsePasswordPolicies(input)) == 383)
+    assert(Part1.countValid(parsePasswordPolicies(input)) == 383)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.countValid(parsePasswordPolicies(exampleInput)) == 1)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.countValid(parsePasswordPolicies(input)) == 272)
   }
 }
