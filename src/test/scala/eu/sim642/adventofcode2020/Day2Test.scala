@@ -11,6 +11,10 @@ class Day2Test extends AnyFunSuite {
       |2-9 c: ccccccccc""".stripMargin
 
   test("Part 1 examples") {
+    assert(Part1.isValid(Policy(1, 3, 'a'), "abcde"))
+    assert(!Part1.isValid(Policy(1, 3, 'b'), "cdefg"))
+    assert(Part1.isValid(Policy(2, 9, 'c'), "ccccccccc"))
+
     assert(Part1.countValid(parsePasswordPolicies(exampleInput)) == 2)
   }
 
@@ -19,6 +23,10 @@ class Day2Test extends AnyFunSuite {
   }
 
   test("Part 2 examples") {
+    assert(Part2.isValid(Policy(1, 3, 'a'), "abcde"))
+    assert(!Part2.isValid(Policy(1, 3, 'b'), "cdefg"))
+    assert(!Part2.isValid(Policy(2, 9, 'c'), "ccccccccc"))
+
     assert(Part2.countValid(parsePasswordPolicies(exampleInput)) == 1)
   }
 
