@@ -13,7 +13,14 @@ object Day3 {
       row(pos.x % row.size)
     }
 
-    @tailrec
+    // original row-by-row solution generalized to bigger y steps
+    (grid.indices by slope.y).view.zipWithIndex.count({ case (y, i) =>
+      val x = slope.x * i
+      gridRepeat(Pos(x, y)) == '#'
+    })
+
+    // alternative iterative solution
+    /*@tailrec
     def helper(pos: Pos, count: Int): Int = {
       if (pos.y < grid.size) {
         val countDelta = gridRepeat(pos) match {
@@ -26,7 +33,7 @@ object Day3 {
         count
     }
 
-    helper(Pos.zero, 0)
+    helper(Pos.zero, 0)*/
   }
 
   private val multiplySlopes = Seq(
