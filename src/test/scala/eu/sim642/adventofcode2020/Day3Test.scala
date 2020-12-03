@@ -25,4 +25,12 @@ class Day3Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countSlopeTrees(parseGrid(input)) == 164)
   }
+
+  test("Part 2 examples") {
+    assert(multiplySlopeTrees(parseGrid(exampleInput)) == 336)
+  }
+
+  test("Part 2 input answer") {
+    assert(multiplySlopeTrees(parseGrid(input)) == 5007658656L)
+  }
 }
