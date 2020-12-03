@@ -15,10 +15,10 @@ object Day3 {
     }
 
     // original row-by-row solution generalized to bigger y steps
-    (grid.indices by slope.y).view.zipWithIndex.count({ case (y, i) =>
-      val x = slope.x * i
-      gridRepeat(Pos(x, y))
-    })
+    (grid.indices by slope.y)
+      .view.zipWithIndex
+      .map({ case (y, i) => Pos(slope.x * i, y) })
+      .count(gridRepeat)
 
     // alternative iterative solution
     /*@tailrec
