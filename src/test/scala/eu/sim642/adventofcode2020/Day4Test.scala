@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2020
 
 import Day4._
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day4Test extends AnyFunSuite {
+class Day4Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleInput =
     """ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
@@ -55,6 +56,33 @@ class Day4Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(Part1.countValid(parsePassports(input)) == 226)
+  }
+
+  test("Part 2 field validators") {
+    val fieldValueExpectedValid = Table(
+      ("field", "value", "expectedValid"),
+      ("byr", "2002", true),
+      ("byr", "2003", false),
+
+      ("hgt", "60in", true),
+      ("hgt", "190cm", true),
+      ("hgt", "190in", false),
+      ("hgt", "190", false),
+
+      ("hcl", "#123abc", true),
+      ("hcl", "#123abz", false),
+      ("hcl", "123abc", false),
+
+      ("ecl", "brn", true),
+      ("ecl", "wat", false),
+
+      ("pid", "000000001", true),
+      ("pid", "0123456789", false),
+    )
+
+    forAll(fieldValueExpectedValid) { (field, value, expectedValid) =>
+      assert(Part2.fieldValidators(field)(value) == expectedValid)
+    }
   }
 
   test("Part 2 examples") {
