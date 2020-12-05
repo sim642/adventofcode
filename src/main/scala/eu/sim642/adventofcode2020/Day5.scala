@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2020
 
+import scala.collection.immutable.SortedSet
+
 object Day5 {
 
   case class Seat(row: Int, column: Int) {
@@ -9,11 +11,8 @@ object Day5 {
   def highestSeatId(seats: Seq[Seat]): Int = seats.map(_.seatId).max
 
   def missingSeatId(seats: Seq[Seat]): Int = {
-    val seatIds = seats.map(_.seatId).toSet
-    val allSeatIds = (seatIds.min to seatIds.max).toSet
-    val missingSeatIds = allSeatIds -- seatIds
-    assert(missingSeatIds.size == 1)
-    missingSeatIds.head
+    val seatIds = seats.map(_.seatId).to(SortedSet)
+    (seatIds.min to seatIds.max).find(!seatIds.contains(_)).get
   }
 
 
