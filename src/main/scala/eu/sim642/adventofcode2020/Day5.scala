@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2020
 
 import scala.collection.immutable.SortedSet
+import eu.sim642.adventofcodelib.StringImplicits._
 
 object Day5 {
 
@@ -19,8 +20,8 @@ object Day5 {
   def parseSeat(s: String): Seat = {
     val (row, column) = s.splitAt(7)
     Seat(
-      Integer.parseInt(row.replace('F', '0').replace('B', '1'), 2),
-      Integer.parseInt(column.replace('L', '0').replace('R', '1'), 2),
+      row.replace('F', '0').replace('B', '1').toInt(2),
+      column.replace('L', '0').replace('R', '1').toInt(2)
     )
   }
 
