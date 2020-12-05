@@ -25,4 +25,8 @@ class Day5Test extends AnyFunSuite with ScalaCheckPropertyChecks {
   test("Part 1 input answer") {
     assert(highestSeatId(parseSeats(input)) == 828)
   }
+
+  test("Part 2 input answer") {
+    assert(missingSeatId(parseSeats(input)) == 565)
+  }
 }
