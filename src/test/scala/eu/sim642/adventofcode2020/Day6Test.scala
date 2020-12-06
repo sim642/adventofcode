@@ -28,11 +28,19 @@ class Day6Test extends AnyFunSuite {
       |b""".stripMargin
 
   test("Part 1 examples") {
-    assert(countYesGroups(parseGroups(exampleInput)) == 6)
-    assert(countYesGroups(parseGroups(exampleInput2)) == 11)
+    assert(Part1.countYesGroups(parseGroups(exampleInput)) == 6)
+    assert(Part1.countYesGroups(parseGroups(exampleInput2)) == 11)
   }
 
   test("Part 1 input answer") {
-    assert(countYesGroups(parseGroups(input)) == 6630)
+    assert(Part1.countYesGroups(parseGroups(input)) == 6630)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.countYesGroups(parseGroups(exampleInput2)) == 6)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.countYesGroups(parseGroups(input)) == 3437)
   }
 }
