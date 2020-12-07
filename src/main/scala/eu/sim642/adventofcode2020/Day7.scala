@@ -44,7 +44,7 @@ object Day7 {
     case s => s.split(", ").map(parseContain).toMap
   }
 
-  private val ruleRegex = """([a-z ]+) bags contain (.*).""".r
+  private val ruleRegex = """([a-z ]+) bags contain (.*)\.""".r
 
   def parseRule(s: String): (Color, Map[Color, Int]) = s match {
     case ruleRegex(key, contains) => key -> parseContains(contains)
