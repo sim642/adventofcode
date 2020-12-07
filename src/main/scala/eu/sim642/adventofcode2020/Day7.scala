@@ -1,13 +1,13 @@
 package eu.sim642.adventofcode2020
 
-import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, GraphTraversal, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
 
 object Day7 {
 
   type Color = String
   type Rules = Map[Color, Map[Color, Int]]
 
-  def countContaining(rules: Rules, color: Color = "shiny gold"): Int = {
+  def countContainingColors(rules: Rules, color: Color = "shiny gold"): Int = {
     val graphTraversal = new GraphTraversal[Color] with UnitNeighbors[Color] {
       override val startNode: Color = color
 
@@ -21,6 +21,15 @@ object Day7 {
     }
 
     BFS.traverse(graphTraversal).nodes.size - 1 // exclude color itself
+  }
+
+  def countContainedBags(rules: Rules, color: Color = "shiny gold"): Int = {
+    // TODO: optimize by topological sort or helper memoization?
+    def helper(color: Color): Int = 1 + rules(color).map({ case (color, count) =>
+      count * helper(color)
+    }).sum
+
+    helper(color) - 1 // exclude color itself
   }
 
 
@@ -46,6 +55,7 @@ object Day7 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countContaining(parseRules(input)))
+    println(countContainingColors(parseRules(input)))
+    println(countContainedBags(parseRules(input)))
   }
 }
