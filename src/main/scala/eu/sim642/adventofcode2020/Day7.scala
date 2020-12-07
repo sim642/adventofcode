@@ -8,16 +8,16 @@ object Day7 {
   type Rules = Map[Color, Map[Color, Int]]
 
   def countContainingColors(rules: Rules, color: Color = "shiny gold"): Int = {
+    val rulesInverted =
+      (for {
+        (key, contains) <- rules.iterator
+        (color, _) <- contains
+      } yield color -> key).toSet.groupMap[Color, Color](_._1)(_._2).withDefaultValue(Set.empty)
+
     val graphTraversal = new GraphTraversal[Color] with UnitNeighbors[Color] {
       override val startNode: Color = color
 
-      override def unitNeighbors(node: Color): IterableOnce[Color] = {
-        // TODO: optimize by inverting ahead of time
-        for {
-          (key, contains) <- rules
-          if contains.contains(node)
-        } yield key
-      }
+      override def unitNeighbors(color: Color): IterableOnce[Color] = rulesInverted(color)
     }
 
     BFS.traverse(graphTraversal).nodes.size - 1 // exclude color itself
