@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2020
 
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
-import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.LazyListImplicits._
 
 object Day8 {
 
@@ -13,38 +13,44 @@ object Day8 {
   type Instructions = Vector[Instruction]
 
   case class ProgramState(instructions: Instructions, ip: Int = 0, acc: Int = 0) {
-    def execOne: ProgramState = instructions(ip) match {
-      case Acc(arg) =>
-        copy(ip = ip + 1, acc = acc + arg)
-      case Jmp(arg) =>
-        copy(ip = ip + arg)
-      case Nop(arg) =>
-        copy(ip = ip + 1)
+    def execOne: Option[ProgramState] = {
+      if (instructions.indices.contains(ip))
+        Some(instructions(ip) match {
+          case Acc(arg) =>
+            copy(ip = ip + 1, acc = acc + arg)
+          case Jmp(arg) =>
+            copy(ip = ip + arg)
+          case Nop(arg) =>
+            copy(ip = ip + 1)
+        })
+      else
+        None
     }
+
+    def execs: LazyList[ProgramState] = LazyList.unfold0(this)(_.execOne)
   }
 
   def accBeforeLoop(instructions: Instructions): Int = {
     val programState = ProgramState(instructions)
+    // TODO: IterableOnce argument for cycle finders
     // TODO: refactor findBy: better type inference, indexing
-    val cycle = NaiveCycleFinder.findBy(programState, (_: ProgramState).execOne)(_.ip)
+    val cycle = NaiveCycleFinder.findBy(programState.execs.iterator)(_.ip)
     cycle.cycleHeadRepeat.acc
   }
 
   def accAfterFix(instructions: Instructions): Int = {
     def result(instructions: Instructions): Option[Int] = {
       val programState = ProgramState(instructions)
+      val execs = programState.execs
       // TODO: refactor cycle finding to handle non-existent cycle
       try {
-        val cycle = NaiveCycleFinder.findBy(programState, (_: ProgramState).execOne)(_.ip)
+        val cycle = NaiveCycleFinder.findBy(execs.iterator)(_.ip)
         None
       } catch {
-        case _: IndexOutOfBoundsException =>
-          //println("index")
-          val last = Iterator.iterate(programState)(_.execOne).takeWhile(ps => ps.instructions.indices.contains(ps.ip)).last
-          val last2 = last.execOne
-          //println(last2)
-          if (last2.ip == last2.instructions.size)
-            Some(last2.acc)
+        case _: NoSuchElementException =>
+          val last = execs.last
+          if (last.ip == last.instructions.size) // required by text but actually unnecessary
+            Some(last.acc)
           else
             None
       }
