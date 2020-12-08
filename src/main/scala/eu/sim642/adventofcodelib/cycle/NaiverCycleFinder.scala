@@ -2,8 +2,11 @@ package eu.sim642.adventofcodelib.cycle
 
 import scala.collection.mutable
 
-object NaiverCycleFinder {
-  def find[A](coll: IterableOnce[A]): Option[Cycle[A] with Indexing[A]] = {
+object NaiverCycleFinder
+  extends IterableOnceCycleFinder
+    with FunctionCycleFinder {
+
+  override def find[A](coll: IterableOnce[A]): Option[Cycle[A] with Indexing[A]] = {
     val prevs = mutable.Map[A, Int]()
     val values = Vector.newBuilder[A]
 
@@ -18,7 +21,7 @@ object NaiverCycleFinder {
       })
   }
 
-  def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
+  override def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
     find(Iterator.iterate(x0)(f)).get
   }
 }

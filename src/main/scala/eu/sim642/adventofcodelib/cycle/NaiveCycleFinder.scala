@@ -4,8 +4,13 @@ import scala.collection.mutable
 
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
-object NaiveCycleFinder {
-  def find[A](coll: IterableOnce[A]): Option[Cycle[A]] = {
+object NaiveCycleFinder
+  extends IterableOnceCycleFinder
+    with IterableOnceCycleByFinder
+    with FunctionCycleFinder
+    with FunctionCycleByFinder {
+
+  override def find[A](coll: IterableOnce[A]): Option[Cycle[A]] = {
     val prevs = mutable.Map[A, Int]()
 
     coll.iterator.zipWithPrev
@@ -21,7 +26,7 @@ object NaiveCycleFinder {
       })
   }
 
-  def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
+  override def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
     val cycle = find(Iterator.iterate(x0)(f)).get
     FunctionCycle(
       stemLength = cycle.stemLength,
@@ -32,7 +37,7 @@ object NaiveCycleFinder {
   }
 
 
-  def findBy[A, B](coll: IterableOnce[A])(m: A => B): Option[CycleBy[A]] = {
+  override def findBy[A, B](coll: IterableOnce[A])(m: A => B): Option[CycleBy[A]] = {
     val prevs = mutable.Map[B, (A, Int)]()
 
     coll.iterator.zipWithPrev
@@ -49,7 +54,7 @@ object NaiveCycleFinder {
       })
   }
 
-  def findBy[A, B](x0: A, f: A => A)(m: A => B): CycleBy[A] = {
+  override def findBy[A, B](x0: A, f: A => A)(m: A => B): CycleBy[A] = {
     findBy(Iterator.iterate(x0)(f))(m).get
   }
 }
