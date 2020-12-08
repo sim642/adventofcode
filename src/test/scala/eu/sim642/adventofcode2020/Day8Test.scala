@@ -23,4 +23,12 @@ class Day8Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(accBeforeLoop(parseInstructions(input)) == 1801)
   }
+
+  test("Part 2 examples") {
+    assert(accAfterFix(parseInstructions(exampleInput)) == 8)
+  }
+
+  test("Part 2 input answer") {
+    assert(accAfterFix(parseInstructions(input)) == 2060)
+  }
 }

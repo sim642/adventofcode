@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2020
 
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day8 {
 
@@ -29,6 +30,35 @@ object Day8 {
     cycle.cycleHeadRepeat.acc
   }
 
+  def accAfterFix(instructions: Instructions): Int = {
+    def result(instructions: Instructions): Option[Int] = {
+      val programState = ProgramState(instructions)
+      // TODO: refactor cycle finding to handle non-existent cycle
+      try {
+        val cycle = NaiveCycleFinder.findBy(programState, (_: ProgramState).execOne)(_.ip)
+        None
+      } catch {
+        case _: IndexOutOfBoundsException =>
+          //println("index")
+          val last = Iterator.iterate(programState)(_.execOne).takeWhile(ps => ps.instructions.indices.contains(ps.ip)).last
+          val last2 = last.execOne
+          //println(last2)
+          if (last2.ip == last2.instructions.size)
+            Some(last2.acc)
+          else
+            None
+      }
+    }
+
+    instructions.indices.flatMap({ i =>
+      instructions(i) match {
+        case Acc(arg) => None
+        case Jmp(arg) => Some(instructions.updated(i, Nop(arg)))
+        case Nop(arg) => Some(instructions.updated(i, Jmp(arg)))
+      }
+    }).flatMap(result).head
+  }
+
   private val instructionRegex = """([a-z]+) ([+-]\d+)""".r
 
   def parseInstruction(s: String): Instruction = s match {
@@ -45,5 +75,6 @@ object Day8 {
 
   def main(args: Array[String]): Unit = {
     println(accBeforeLoop(parseInstructions(input)))
+    println(accAfterFix(parseInstructions(input)))
   }
 }
