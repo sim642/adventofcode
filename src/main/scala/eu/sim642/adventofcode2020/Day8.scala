@@ -34,7 +34,7 @@ object Day8 {
     val programState = ProgramState(instructions)
     // TODO: IterableOnce argument for cycle finders
     // TODO: refactor findBy: better type inference, indexing
-    val cycle = NaiveCycleFinder.findBy(programState.execs.iterator)(_.ip)
+    val cycle = NaiveCycleFinder.findBy(programState.execs.iterator)(_.ip).get
     cycle.cycleHeadRepeat.acc
   }
 
@@ -42,12 +42,9 @@ object Day8 {
     def result(instructions: Instructions): Option[Int] = {
       val programState = ProgramState(instructions)
       val execs = programState.execs
-      // TODO: refactor cycle finding to handle non-existent cycle
-      try {
-        val cycle = NaiveCycleFinder.findBy(execs.iterator)(_.ip)
-        None
-      } catch {
-        case _: NoSuchElementException =>
+      NaiveCycleFinder.findBy(execs.iterator)(_.ip) match {
+        case Some(_) => None
+        case None =>
           val last = execs.last
           if (last.ip == last.instructions.size) // required by text but actually unnecessary
             Some(last.acc)

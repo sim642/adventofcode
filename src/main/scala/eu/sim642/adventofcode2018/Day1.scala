@@ -8,7 +8,7 @@ object Day1 {
 
   def firstTwiceFreq(freqChanges: Seq[Int]): Int = {
     val it = freqChanges.cycle.scanLeft(0)(_ + _)
-    NaiveCycleFinder.find(it).cycleHead
+    NaiveCycleFinder.find(it).get.cycleHead
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day1.txt")).mkString.trim

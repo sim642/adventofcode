@@ -14,7 +14,7 @@ object Day21 {
     def firstHaltr0(input: String): Int = iterater2(input).head
 
     def lastHaltr0(input: String): Int = {
-      NaiveCycleFinder.find(iterater2(input)).cycleLast
+      NaiveCycleFinder.find(iterater2(input)).get.cycleLast
     }
   }
 
