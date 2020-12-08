@@ -4,26 +4,30 @@ import scala.collection.mutable
 
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
-object NaiveCycleFinder {
-  def find[A](it: Iterator[A]): Cycle[A] = {
+object NaiveCycleFinder
+  extends IterableOnceCycleFinder
+    with IterableOnceCycleByFinder
+    with FunctionCycleFinder
+    with FunctionCycleByFinder {
+
+  override def find[A](coll: IterableOnce[A]): Option[Cycle[A]] = {
     val prevs = mutable.Map[A, Int]()
 
-    val (Some(lastX), x, Some(prevI), i) =
-      it.zipWithPrev
-        .zipWithIndex
-        .map({ case ((lastX, x), i) => (lastX, x, prevs.put(x, i), i) }) // nasty side-effecting
-        .find(_._3.isDefined).get
-
-    SimpleCycle(
-      stemLength = prevI,
-      cycleLength = i - prevI,
-      cycleHead = x,
-      cycleLast = lastX
-    )
+    coll.iterator.zipWithPrev
+      .zipWithIndex
+      .map({ case ((lastX, x), i) => (lastX, x, prevs.put(x, i), i) }) // nasty side-effecting
+      .collectFirst({ case (Some(lastX), x, Some(prevI), i) =>
+        SimpleCycle(
+          stemLength = prevI,
+          cycleLength = i - prevI,
+          cycleHead = x,
+          cycleLast = lastX
+        )
+      })
   }
 
-  def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
-    val cycle = find(Iterator.iterate(x0)(f))
+  override def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
+    val cycle = find(Iterator.iterate(x0)(f)).get
     FunctionCycle(
       stemLength = cycle.stemLength,
       cycleLength = cycle.cycleLength,
@@ -33,25 +37,24 @@ object NaiveCycleFinder {
   }
 
 
-  def findBy[A, B](it: Iterator[A])(m: A => B): CycleBy[A] = {
+  override def findBy[A, B](coll: IterableOnce[A])(m: A => B): Option[CycleBy[A]] = {
     val prevs = mutable.Map[B, (A, Int)]()
 
-    val (Some(lastX), x, Some((prevX, prevI)), i) =
-      it.zipWithPrev
-        .zipWithIndex
-        .map({ case ((lastX, x), i) => (lastX, x, prevs.put(m(x), (x, i)), i) }) // nasty side-effecting
-        .find(_._3.isDefined).get
-
-    SimpleCycleBy(
-      stemLength = prevI,
-      cycleLength = i - prevI,
-      cycleHead = prevX,
-      cycleLast = lastX,
-      cycleHeadRepeat = x
-    )
+    coll.iterator.zipWithPrev
+      .zipWithIndex
+      .map({ case ((lastX, x), i) => (lastX, x, prevs.put(m(x), (x, i)), i) }) // nasty side-effecting
+      .collectFirst({ case (Some(lastX), x, Some((prevX, prevI)), i) =>
+        SimpleCycleBy(
+          stemLength = prevI,
+          cycleLength = i - prevI,
+          cycleHead = prevX,
+          cycleLast = lastX,
+          cycleHeadRepeat = x
+        )
+      })
   }
 
-  def findBy[A, B](x0: A, f: A => A)(m: A => B): CycleBy[A] = {
-    findBy(Iterator.iterate(x0)(f))(m)
+  override def findBy[A, B](x0: A, f: A => A)(m: A => B): CycleBy[A] = {
+    findBy(Iterator.iterate(x0)(f))(m).get
   }
 }

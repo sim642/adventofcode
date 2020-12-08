@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2017
 
-import eu.sim642.adventofcodelib.cycle.{BrentCycleFinder, FloydCycleFinder, NaiveCycleFinder, NaiverCycleFinder}
+import eu.sim642.adventofcodelib.cycle.{BrentCycleFinder, FloydCycleFinder, FunctionCycleFinder, NaiveCycleFinder, NaiverCycleFinder}
 
 import Integral.Implicits._
 
@@ -28,45 +28,23 @@ object Day6 {
     def reallocCycleLoop(initialMemory: Memory): Int
   }
 
-  object NaiveSolution extends Solution {
+  class FunctionCycleFinderSolution(cycleFinder: FunctionCycleFinder) extends Solution {
     override def reallocCycleCount(initialMemory: Memory): Int = {
-      NaiveCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
+      cycleFinder.find(initialMemory, reallocCycle).stemCycleLength
     }
 
     override def reallocCycleLoop(initialMemory: Memory): Int = {
-      NaiveCycleFinder.find(initialMemory, reallocCycle).cycleLength
+      cycleFinder.find(initialMemory, reallocCycle).cycleLength
     }
   }
 
-  object NaiverSolution extends Solution {
-    override def reallocCycleCount(initialMemory: Memory): Int = {
-      NaiverCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
-    }
+  object NaiveSolution extends FunctionCycleFinderSolution(NaiveCycleFinder)
 
-    override def reallocCycleLoop(initialMemory: Memory): Int = {
-      NaiverCycleFinder.find(initialMemory, reallocCycle).cycleLength
-    }
-  }
+  object NaiverSolution extends FunctionCycleFinderSolution(NaiverCycleFinder)
 
-  object FloydSolution extends Solution {
-    override def reallocCycleCount(initialMemory: Memory): Int = {
-      FloydCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
-    }
+  object FloydSolution extends FunctionCycleFinderSolution(FloydCycleFinder)
 
-    override def reallocCycleLoop(initialMemory: Memory): Int = {
-      FloydCycleFinder.find(initialMemory, reallocCycle).cycleLength
-    }
-  }
-
-  object BrentSolution extends Solution {
-    override def reallocCycleCount(initialMemory: Memory): Int = {
-      BrentCycleFinder.find(initialMemory, reallocCycle).stemCycleLength
-    }
-
-    override def reallocCycleLoop(initialMemory: Memory): Int = {
-      BrentCycleFinder.find(initialMemory, reallocCycle).cycleLength
-    }
-  }
+  object BrentSolution extends FunctionCycleFinderSolution(BrentCycleFinder)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
   lazy val inputSeq: IndexedSeq[Int] = input.split("\\s+").toIndexedSeq.map(_.toInt)

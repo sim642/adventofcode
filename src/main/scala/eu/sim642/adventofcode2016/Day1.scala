@@ -61,7 +61,7 @@ object Day1 {
       (accState(instruction), accIterator ++ accState.applyIntermediate(instruction))
     })._2.map(_.pos)
 
-    val firstTwicePos = NaiveCycleFinder.find(posIt).cycleHead
+    val firstTwicePos = NaiveCycleFinder.find(posIt).get.cycleHead
     firstTwicePos manhattanDistance Pos.zero
   }
 

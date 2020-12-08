@@ -35,7 +35,7 @@ object Day12 {
   }
 
   def sumPlantsCycle(initial: String, notes: Map[String, Char], generations: Long = 50000000000L): Long = {
-    val cycle = NaiveCycleFinder.findBy(iterateGenerations(initial, notes))(_._1)
+    val cycle = NaiveCycleFinder.findBy(iterateGenerations(initial, notes))(_._1).get
     //val cycle = BrentCycleFinder.findBy((initial, 0), (simulateGeneration(notes) _).tupled)(_._1)
     require(cycle.cycleLength == 1) // works here, otherwise need divmod next
 
