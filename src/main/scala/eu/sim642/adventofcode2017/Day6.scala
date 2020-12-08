@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcodelib.cycle.{BrentCycleFinder, FloydCycleFinder, NaiveCycleFinder, NaiverCycleFinder}
 
-import scala.collection.AbstractIterator
+import Integral.Implicits._
 
 object Day6 {
 
@@ -10,8 +10,7 @@ object Day6 {
 
   def reallocCycle(memory: Memory): Memory = {
     val (max, maxIndex) = memory.view.zipWithIndex.maxBy(_._1)
-    val d = max / memory.size
-    val r = max % memory.size
+    val (d, r) = max /% memory.size
     val wrapAround: Boolean = maxIndex + r >= memory.size
 
     memory.updated(maxIndex, 0).map(_ + d).zipWithIndex.map({ case (x, i) =>
