@@ -5,10 +5,10 @@ import scala.collection.mutable
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object NaiveCycleFinder {
-  def find[A](it: Iterator[A]): Option[Cycle[A]] = {
+  def find[A](coll: IterableOnce[A]): Option[Cycle[A]] = {
     val prevs = mutable.Map[A, Int]()
 
-    it.zipWithPrev
+    coll.iterator.zipWithPrev
       .zipWithIndex
       .map({ case ((lastX, x), i) => (lastX, x, prevs.put(x, i), i) }) // nasty side-effecting
       .collectFirst({ case (Some(lastX), x, Some(prevI), i) =>
@@ -32,10 +32,10 @@ object NaiveCycleFinder {
   }
 
 
-  def findBy[A, B](it: Iterator[A])(m: A => B): Option[CycleBy[A]] = {
+  def findBy[A, B](coll: IterableOnce[A])(m: A => B): Option[CycleBy[A]] = {
     val prevs = mutable.Map[B, (A, Int)]()
 
-    it.zipWithPrev
+    coll.iterator.zipWithPrev
       .zipWithIndex
       .map({ case ((lastX, x), i) => (lastX, x, prevs.put(m(x), (x, i)), i) }) // nasty side-effecting
       .collectFirst({ case (Some(lastX), x, Some((prevX, prevI)), i) =>

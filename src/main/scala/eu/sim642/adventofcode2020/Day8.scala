@@ -32,9 +32,8 @@ object Day8 {
 
   def accBeforeLoop(instructions: Instructions): Int = {
     val programState = ProgramState(instructions)
-    // TODO: IterableOnce argument for cycle finders
     // TODO: refactor findBy: better type inference, indexing
-    val cycle = NaiveCycleFinder.findBy(programState.execs.iterator)(_.ip).get
+    val cycle = NaiveCycleFinder.findBy(programState.execs)(_.ip).get
     cycle.cycleHeadRepeat.acc
   }
 
@@ -42,7 +41,7 @@ object Day8 {
     def result(instructions: Instructions): Option[Int] = {
       val programState = ProgramState(instructions)
       val execs = programState.execs
-      NaiveCycleFinder.findBy(execs.iterator)(_.ip) match {
+      NaiveCycleFinder.findBy(execs)(_.ip) match {
         case Some(_) => None
         case None =>
           val last = execs.last

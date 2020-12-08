@@ -3,11 +3,11 @@ package eu.sim642.adventofcodelib.cycle
 import scala.collection.mutable
 
 object NaiverCycleFinder {
-  def find[A](it: Iterator[A]): Option[Cycle[A] with Indexing[A]] = {
+  def find[A](coll: IterableOnce[A]): Option[Cycle[A] with Indexing[A]] = {
     val prevs = mutable.Map[A, Int]()
     val values = Vector.newBuilder[A]
 
-    it.zipWithIndex
+    coll.iterator.zipWithIndex
       .map({ case (x, i) =>
         values += x // nasty side-effecting
         (x, prevs.put(x, i), i) // nasty side-effecting
