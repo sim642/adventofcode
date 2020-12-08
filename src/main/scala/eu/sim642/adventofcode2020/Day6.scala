@@ -22,7 +22,7 @@ object Day6 {
 
   def parseGroup(s: String): Group = s.linesIterator.toSeq
 
-  def parseGroups(input: String): Seq[Group] = input.split("\n\n").map(parseGroup)
+  def parseGroups(input: String): Seq[Group] = input.split("\n\n").toSeq.map(parseGroup)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
 

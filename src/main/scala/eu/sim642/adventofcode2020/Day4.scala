@@ -50,9 +50,9 @@ object Day4 {
     case fieldRegex(key, value) => (key, value)
   }
 
-  def parsePassport(s: String): Passport = s.split("\\s+").map(parseField).toMap
+  def parsePassport(s: String): Passport = s.split("\\s+").view.map(parseField).toMap
 
-  def parsePassports(input: String): Seq[Passport] = input.split("\n\n").map(parsePassport)
+  def parsePassports(input: String): Seq[Passport] = input.split("\n\n").toSeq.map(parsePassport)
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
 
