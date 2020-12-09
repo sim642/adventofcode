@@ -1,5 +1,8 @@
 package eu.sim642.adventofcode2020
 
+import scala.annotation.tailrec
+import scala.collection.immutable.Queue
+
 object Day9 {
 
   def firstInvalid(numbers: Seq[Long], preambleLength: Int = 25): Long = {
@@ -13,15 +16,32 @@ object Day9 {
   }
 
   def contiguousSumRange(numbers: Seq[Long], sum: Long): Seq[Long] = {
-    // TODO: optimize instead of naive combinations
-    val sumNumbers = numbers.scanLeft(0L)(_ + _)
+    // optimized sliding window solution
+    @tailrec
+    def helper(range: Queue[Long], rangeSum: Long, suffix: List[Long]): Seq[Long] = {
+      if (rangeSum == sum && range.lengthIs > 1)
+        range
+      else if (rangeSum < sum) {
+        val x :: newSuffix = suffix
+        helper(range.enqueue(x), rangeSum + x, newSuffix)
+      }
+      else {
+        val (x, newRange) = range.dequeue
+        helper(newRange, rangeSum - x, suffix)
+      }
+    }
+
+    helper(Queue.empty, 0, numbers.toList)
+
+    // original naive solution
+    /*val sumNumbers = numbers.scanLeft(0L)(_ + _)
     sumNumbers
       .zipWithIndex
       .combinations(2)
       .collectFirst({ case Seq((sum1, i1), (sum2, i2)) if i1 + 1 < i2 && sum1 + sum == sum2 =>
         numbers.slice(i1, i2)
       })
-      .get
+      .get*/
   }
 
   def encryptionWeakness(numbers: Seq[Long], preambleLength: Int = 25): Long = {
