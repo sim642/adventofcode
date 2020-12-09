@@ -34,4 +34,12 @@ class Day9Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(firstInvalid(parseNumbers(input)) == 248131121)
   }
+
+  test("Part 2 examples") {
+    assert(encryptionWeakness(parseNumbers(exampleInput), 5) == 62)
+  }
+
+  test("Part 2 input answer") {
+    assert(encryptionWeakness(parseNumbers(input)) == 31580383)
+  }
 }
