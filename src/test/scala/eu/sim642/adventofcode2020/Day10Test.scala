@@ -10,6 +10,7 @@ class Day10Test extends Suites(
   new DynamicProgrammingPart2SolutionTest,
   new ListKnotTyingPart2SolutionTest,
   new MapKnotTyingPart2SolutionTest,
+  new GapPart2SolutionTest,
 )
 
 object Day10Test {
@@ -89,4 +90,6 @@ object Day10Test {
   class ListKnotTyingPart2SolutionTest extends Part2SolutionTest(ListKnotTyingPart2Solution)
 
   class MapKnotTyingPart2SolutionTest extends Part2SolutionTest(MapKnotTyingPart2Solution)
+
+  class GapPart2SolutionTest extends Part2SolutionTest(GapPart2Solution)
 }

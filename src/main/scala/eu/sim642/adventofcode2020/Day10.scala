@@ -3,6 +3,7 @@ package eu.sim642.adventofcode2020
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
 import scala.annotation.tailrec
+import scala.collection.compat.immutable.ArraySeq
 import scala.language.implicitConversions
 
 object Day10 {
@@ -96,6 +97,25 @@ object Day10 {
           .withDefaultValue(0L)
 
       arrangements(builtinJolt)
+    }
+  }
+
+  object GapPart2Solution extends Part2Solution {
+    override def countArrangements(jolts: Seq[Int]): Long = {
+      val initialJolt = 0
+      // could avoid builtinJolt here, but requires extra fold step
+      val builtinJolt = jolts.max + 3
+      val allJolts = initialJolt +: builtinJolt +: jolts
+      val diffsIterator = allJolts.sorted.iterator.zipWithTail.map({ case (a, b) => b - a })
+
+      val tribonacci = ArraySeq(1, 1, 2, 4, 7) // enough for inputs
+
+      diffsIterator.foldLeft((1L, 0))({ case ((product, length), gap) =>
+        gap match {
+          case 1 => (product, length + 1)
+          case 3 => (product * tribonacci(length), 0)
+        }
+      })._1
     }
   }
 
