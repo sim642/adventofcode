@@ -1,10 +1,11 @@
 package eu.sim642.adventofcode2020
 
 import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.LazyMap
+import eu.sim642.adventofcodelib.LazyMapImplicits._
 
 import scala.annotation.tailrec
 import scala.collection.compat.immutable.ArraySeq
-import scala.language.implicitConversions
 
 object Day10 {
 
@@ -68,25 +69,6 @@ object Day10 {
     override def countArrangements(jolts: Seq[Int]): Long = {
       val builtinJolt = jolts.max + 3
       val allJolts = builtinJolt +: jolts
-
-      // TODO: move lazy things to library
-      class LazyCell[+A](value: => A) {
-        lazy val get: A = value
-      }
-
-      object LazyCell {
-        def apply[A](value: => A): LazyCell[A] = new LazyCell(value)
-      }
-
-      implicit class LazyCellAnyOps[A](key: A) {
-        def ~>[B](value: => B): (A, LazyCell[B]) = key -> LazyCell(value)
-      }
-
-      implicit def LazyCell2Any[A](lazyCell: LazyCell[A]): A = lazyCell.get
-
-      implicit def Any2LazyCell[A](value: => A): LazyCell[A] = LazyCell(value)
-
-      type LazyMap[K, +V] = Map[K, LazyCell[V]]
 
       lazy val arrangements: LazyMap[Int, Long] =
         (allJolts
