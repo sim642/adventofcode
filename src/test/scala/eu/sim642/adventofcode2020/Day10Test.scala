@@ -52,11 +52,20 @@ class Day10Test extends AnyFunSuite {
       |3""".stripMargin
 
   test("Part 1 examples") {
-    assert(differencesProductAll(parseJolts(exampleInput)) == 7 * 5)
-    assert(differencesProductAll(parseJolts(exampleInput2)) == 22 * 10)
+    assert(differencesProduct(parseJolts(exampleInput)) == 7 * 5)
+    assert(differencesProduct(parseJolts(exampleInput2)) == 22 * 10)
   }
 
   test("Part 1 input answer") {
-    assert(differencesProductAll(parseJolts(input)) == 2070)
+    assert(differencesProduct(parseJolts(input)) == 2070)
+  }
+
+  test("Part 2 examples") {
+    assert(countArrangements(parseJolts(exampleInput)) == 8)
+    assert(countArrangements(parseJolts(exampleInput2)) == 19208)
+  }
+
+  test("Part 2 input answer") {
+    assert(countArrangements(parseJolts(input)) == 24179327893504L)
   }
 }
