@@ -1,9 +1,18 @@
 package eu.sim642.adventofcode2020
 
 import Day10._
+import Day10Test._
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day10Test extends AnyFunSuite {
+class Day10Test extends Suites(
+  new Part1Test,
+  new DynamicProgrammingPart2SolutionTest,
+  new ListKnotTyingPart2SolutionTest,
+  new MapKnotTyingPart2SolutionTest,
+)
+
+object Day10Test {
 
   val exampleInput =
     """16
@@ -51,21 +60,33 @@ class Day10Test extends AnyFunSuite {
       |10
       |3""".stripMargin
 
-  test("Part 1 examples") {
-    assert(differencesProduct(parseJolts(exampleInput)) == 7 * 5)
-    assert(differencesProduct(parseJolts(exampleInput2)) == 22 * 10)
+  class Part1Test extends AnyFunSuite {
+
+    test("Part 1 examples") {
+      assert(differencesProduct(parseJolts(exampleInput)) == 7 * 5)
+      assert(differencesProduct(parseJolts(exampleInput2)) == 22 * 10)
+    }
+
+    test("Part 1 input answer") {
+      assert(differencesProduct(parseJolts(input)) == 2070)
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(differencesProduct(parseJolts(input)) == 2070)
+  sealed abstract class Part2SolutionTest(part2Solution: Part2Solution) extends AnyFunSuite {
+
+    test("Part 2 examples") {
+      assert(part2Solution.countArrangements(parseJolts(exampleInput)) == 8)
+      assert(part2Solution.countArrangements(parseJolts(exampleInput2)) == 19208)
+    }
+
+    test("Part 2 input answer") {
+      assert(part2Solution.countArrangements(parseJolts(input)) == 24179327893504L)
+    }
   }
 
-  test("Part 2 examples") {
-    assert(countArrangements(parseJolts(exampleInput)) == 8)
-    assert(countArrangements(parseJolts(exampleInput2)) == 19208)
-  }
+  class DynamicProgrammingPart2SolutionTest extends Part2SolutionTest(DynamicProgrammingPart2Solution)
 
-  test("Part 2 input answer") {
-    assert(countArrangements(parseJolts(input)) == 24179327893504L)
-  }
+  class ListKnotTyingPart2SolutionTest extends Part2SolutionTest(ListKnotTyingPart2Solution)
+
+  class MapKnotTyingPart2SolutionTest extends Part2SolutionTest(MapKnotTyingPart2Solution)
 }
