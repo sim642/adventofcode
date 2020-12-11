@@ -10,40 +10,54 @@ import scala.annotation.tailrec
 object Day11 {
 
   sealed trait Part {
-    def step(grid: Grid[Char]): Grid[Char]
+    protected def getNeighborsGrid(grid: Grid[Char]): Grid[Seq[Pos]]
+
+    protected val tolerance: Int
+
+    // based on 2018 Day 18
+    private def step(grid: Grid[Char], neighborsGrid: Grid[Seq[Pos]]): Grid[Char] = {
+      for ((row, y) <- grid.zipWithIndex)
+        yield for ((cell, x) <- row.zipWithIndex)
+          yield {
+            // TODO: avoid these on floors
+            val pos = Pos(x, y)
+            val neighbors = neighborsGrid(pos).map(grid(_))
+            val occupied = neighbors.count(_ == '#')
+            cell match {
+              case 'L' if occupied == 0 => '#'
+              case '#' if occupied >= tolerance => 'L'
+              case c => c
+            }
+          }
+    }
 
     def countOccupiedStable(grid: Grid[Char]): Int = {
-      val cycle = NaiveCycleFinder.find(grid, step)
+      val neighborsGrid = getNeighborsGrid(grid)
+      val cycle = NaiveCycleFinder.find(grid, step(_, neighborsGrid))
       assert(cycle.cycleLength == 1)
       cycle.cycleHead.countGrid(_ == '#')
     }
   }
 
-  // TODO: reduce duplication
-
   object Part1 extends Part {
-    // based on 2018 Day 18
-    override def step(grid: Grid[Char]): Grid[Char] = {
+
+    override protected def getNeighborsGrid(grid: Grid[Char]): Grid[Seq[Pos]] = {
       for ((row, y) <- grid.zipWithIndex)
         yield for ((cell, x) <- row.zipWithIndex)
           yield {
             val pos = Pos(x, y)
-            val neighbors = Pos.allOffsets.map(pos + _).filter(grid.containsPos).map(grid(_))
-            val occupied = neighbors.count(_ == '#')
-            cell match {
-              case 'L' if occupied == 0 => '#'
-              case '#' if occupied >= 4 => 'L'
-              case c => c
-            }
+            Pos.allOffsets.map(pos + _).filter(grid.containsPos)
           }
     }
+
+    override protected val tolerance: Int = 4
   }
 
   object Part2 extends Part {
-    // based on 2018 Day 18
-    override def step(grid: Grid[Char]): Grid[Char] = {
 
-      // TODO: precalculate/memoize findVisible
+    override protected def getNeighborsGrid(grid: Grid[Char]): Grid[Seq[Pos]] = {
+
+      // TODO: replace with iterator
       @tailrec
       def findVisible(pos: Pos, offset: Pos): Option[Pos] = {
         val newPos = pos + offset
@@ -61,15 +75,11 @@ object Day11 {
         yield for ((cell, x) <- row.zipWithIndex)
           yield {
             val pos = Pos(x, y)
-            val neighbors = Pos.allOffsets.flatMap(findVisible(pos, _)).map(grid(_))
-            val occupied = neighbors.count(_ == '#')
-            cell match {
-              case 'L' if occupied == 0 => '#'
-              case '#' if occupied >= 5 => 'L'
-              case c => c
-            }
+            Pos.allOffsets.flatMap(findVisible(pos, _))
           }
     }
+
+    override protected val tolerance: Int = 5
   }
 
 
