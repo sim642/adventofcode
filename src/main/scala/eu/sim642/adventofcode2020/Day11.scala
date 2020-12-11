@@ -5,8 +5,6 @@ import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 import eu.sim642.adventofcodelib.pos.Pos
 
-import scala.annotation.tailrec
-
 object Day11 {
 
   sealed trait Part {
@@ -57,18 +55,11 @@ object Day11 {
 
     override protected def getNeighborsGrid(grid: Grid[Char]): Grid[Seq[Pos]] = {
 
-      // TODO: replace with iterator
-      @tailrec
       def findVisible(pos: Pos, offset: Pos): Option[Pos] = {
-        val newPos = pos + offset
-        if (grid.containsPos(newPos)) {
-          grid(newPos) match {
-            case 'L' | '#' => Some(newPos)
-            case _ => findVisible(newPos, offset)
-          }
-        }
-        else
-          None
+        Iterator.iterate(pos)(_ + offset)
+          .drop(1)
+          .takeWhile(grid.containsPos)
+          .find(grid(_) != '.')
       }
 
       for ((row, y) <- grid.zipWithIndex)
