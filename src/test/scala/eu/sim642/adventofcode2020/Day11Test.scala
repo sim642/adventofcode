@@ -18,10 +18,18 @@ class Day11Test extends AnyFunSuite {
       |L.LLLLL.LL""".stripMargin
 
   test("Part 1 examples") {
-    assert(countOccupiedStable(parseGrid(exampleInput)) == 37)
+    assert(Part1.countOccupiedStable(parseGrid(exampleInput)) == 37)
   }
 
   test("Part 1 input answer") {
-    assert(countOccupiedStable(parseGrid(input)) == 2204)
+    assert(Part1.countOccupiedStable(parseGrid(input)) == 2204)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.countOccupiedStable(parseGrid(exampleInput)) == 26)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.countOccupiedStable(parseGrid(input)) == 1986)
   }
 }
