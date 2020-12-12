@@ -14,52 +14,56 @@ object Day12 {
   case class Right(degrees: Int) extends Move
   case class Forward(amount: Int) extends Move
 
+  case class Ship(pos: Pos, direction: Pos)
+
   sealed trait Part {
-    def movesDistance(moves: Seq[Move]): Int
+    protected def applyMove(ship: Ship, move: Move): Ship
+
+    protected val initialDirection: Pos
+
+    def movesDistance(moves: Seq[Move]): Int = {
+      val initialShip = Ship(Pos.zero, initialDirection)
+      val finalShip = moves.foldLeft(initialShip)(applyMove)
+      initialShip.pos manhattanDistance finalShip.pos
+    }
   }
 
   object Part1 extends Part {
 
-    case class Ship(pos: Pos, direction: Pos) {
-      def applyMove(move: Move): Ship = move match {
-        case North(amount) => copy(pos = pos + amount *: Pos(0, -1))
-        case South(amount) => copy(pos = pos + amount *: Pos(0, 1))
-        case East(amount) => copy(pos = pos + amount *: Pos(1, 0))
-        case West(amount) => copy(pos = pos + amount *: Pos(-1, 0))
-        case Left(90) | Right(270) => copy(direction = direction.left)
-        case Left(180) | Right(180) => copy(direction = -1 *: direction)
-        case Left(270) | Right(90) => copy(direction = direction.right)
-        case Forward(amount) => copy(pos = pos + amount *: direction)
+    override def applyMove(ship: Ship, move: Move): Ship = {
+      val Ship(pos, direction) = ship
+      move match {
+        case North(amount) => ship.copy(pos = pos + amount *: Pos(0, -1))
+        case South(amount) => ship.copy(pos = pos + amount *: Pos(0, 1))
+        case East(amount) => ship.copy(pos = pos + amount *: Pos(1, 0))
+        case West(amount) => ship.copy(pos = pos + amount *: Pos(-1, 0))
+        case Left(90) | Right(270) => ship.copy(direction = direction.left)
+        case Left(180) | Right(180) => ship.copy(direction = -1 *: direction)
+        case Left(270) | Right(90) => ship.copy(direction = direction.right)
+        case Forward(amount) => ship.copy(pos = pos + amount *: direction)
       }
     }
 
-    def movesDistance(moves: Seq[Move]): Int = {
-      val initialShip = Ship(Pos.zero, Pos(1, 0))
-      val finalShip = moves.foldLeft(initialShip)(_.applyMove(_))
-      initialShip.pos manhattanDistance finalShip.pos
-    }
+    override protected val initialDirection: Pos = Pos(1, 0)
   }
 
   object Part2 extends Part {
 
-    case class Ship(pos: Pos, direction: Pos) {
-      def applyMove(move: Move): Ship = move match {
-        case North(amount) => copy(direction = direction + amount *: Pos(0, -1))
-        case South(amount) => copy(direction = direction + amount *: Pos(0, 1))
-        case East(amount) => copy(direction = direction + amount *: Pos(1, 0))
-        case West(amount) => copy(direction = direction + amount *: Pos(-1, 0))
-        case Left(90) | Right(270) => copy(direction = direction.left)
-        case Left(180) | Right(180) => copy(direction = -1 *: direction)
-        case Left(270) | Right(90) => copy(direction = direction.right)
-        case Forward(amount) => copy(pos = pos + amount *: direction)
+    override def applyMove(ship: Ship, move: Move): Ship = {
+      val Ship(pos, direction) = ship
+      move match {
+        case North(amount) => ship.copy(direction = direction + amount *: Pos(0, -1))
+        case South(amount) => ship.copy(direction = direction + amount *: Pos(0, 1))
+        case East(amount) => ship.copy(direction = direction + amount *: Pos(1, 0))
+        case West(amount) => ship.copy(direction = direction + amount *: Pos(-1, 0))
+        case Left(90) | Right(270) => ship.copy(direction = direction.left)
+        case Left(180) | Right(180) => ship.copy(direction = -1 *: direction)
+        case Left(270) | Right(90) => ship.copy(direction = direction.right)
+        case Forward(amount) => ship.copy(pos = pos + amount *: direction)
       }
     }
 
-    def movesDistance(moves: Seq[Move]): Int = {
-      val initialShip = Ship(Pos.zero, Pos(10, -1))
-      val finalShip = moves.foldLeft(initialShip)(_.applyMove(_))
-      initialShip.pos manhattanDistance finalShip.pos
-    }
+    override protected val initialDirection: Pos = Pos(10, -1)
   }
 
 
