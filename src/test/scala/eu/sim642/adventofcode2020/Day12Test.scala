@@ -13,10 +13,18 @@ class Day12Test extends AnyFunSuite {
       |F11""".stripMargin
 
   test("Part 1 examples") {
-    assert(movesDistance(parseMoves(exampleInput)) == 25)
+    assert(Part1.movesDistance(parseMoves(exampleInput)) == 25)
   }
 
   test("Part 1 input answer") {
-    assert(movesDistance(parseMoves(input)) == 858)
+    assert(Part1.movesDistance(parseMoves(input)) == 858)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.movesDistance(parseMoves(exampleInput)) == 286)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.movesDistance(parseMoves(input)) == 39140)
   }
 }
