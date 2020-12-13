@@ -34,13 +34,18 @@ object NumberTheory {
   def modInv[A: Integral](a: A, m: A): A = bezoutCoefs(a, m)._1 %+ m
 
   private def crt2[A: Integral](an1: (A, A), an2: (A, A)): (A, A) = {
+    // https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Existence_(constructive_proof)
+    // https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Generalization_to_non-coprime_moduli
+    // https://forthright48.com/chinese-remainder-theorem-part-2-non-coprime-moduli/
     val (a1, n1) = an1
     val (a2, n2) = an2
-    val (m1, m2) = bezoutCoefs(n1, n2)
-    //val N = n1 * n2
-    val N = lcm(n1, n2) // TODO: is this right generalization?
+    val ((m1, m2), g, _) = extendedGcd(n1, n2)
+    if ((a1 - a2) % g != 0)
+      throw new NoSuchElementException("contradictory CRT constraints") // TODO: use Option return value instead
+    val N = n1 / g * n2 // lcm(n1, n2)
     // TODO: avoid overflow if possible
-    val x = a1 * m2 * n2 + a2 * m1 * n1
+    //val x = (a1 * m2 * n2 + a2 * m1 * n1) / g
+    val x = a1 * m2 * (n2 / g) + a2 * m1 * (n1 / g)
     (x %+ N, N)
   }
 
