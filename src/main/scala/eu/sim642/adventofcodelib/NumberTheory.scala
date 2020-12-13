@@ -50,4 +50,22 @@ object NumberTheory {
   }
 
   def crt[A: Integral](ans: Seq[(A, A)]): (A, A) = ans.reduce(crt2(_, _))
+
+  // TODO: test & benchmark sieveCrt
+  private def sieveCrt2[A: Integral](an1: (A, A), an2: (A, A)): (A, A) = {
+    // https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving
+    val (a1, n1) = an1
+    val (a2, n2) = an2
+    val g = gcd(n1, n2)
+    if ((a1 - a2) % g != 0)
+      throw new NoSuchElementException("contradictory CRT constraints") // TODO: use Option return value instead
+    val N = n1 / g * n2 // lcm(n1, n2)
+    val x = Iterator.iterate(a1)(_ + n1).find(_ % n2 == a2).get
+    (x, N)
+  }
+
+  def sieveCrt[A](ans: Seq[(A, A)])(implicit aIntegral: Integral[A]): (A, A) = {
+    ans.sortBy(_._2)(aIntegral.reverse)
+      .reduceLeft(sieveCrt2(_, _))
+  }
 }
