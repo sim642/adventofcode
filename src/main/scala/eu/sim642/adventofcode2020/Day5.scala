@@ -18,7 +18,7 @@ object Day5 {
 
 
   def parseBinary(zero: Char, one: Char)(s: String): Int =
-    s.replace(zero, '0').replace(one, '1').toInt(2)
+    s.replace(zero, '0').replace(one, '1').toIntRadix(2)
 
   def parseSeat(s: String): Seat = {
     val (row, column) = s.splitAt(7)
