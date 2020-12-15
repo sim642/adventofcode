@@ -1,7 +1,6 @@
 package eu.sim642.adventofcode2020
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 
 object Day15 {
 
@@ -9,14 +8,14 @@ object Day15 {
     protected val defaultReturnIndex: Int
 
     def simulateNumber(startingNumbers: Seq[Int], returnIndex: Int = defaultReturnIndex): Int = {
-      // mutable.Map because immutable.Map is too slow
-      // LongMap because it avoids key boxing
-      val numberIndices =
+      // primitive array because immutable.Map, mutable.Map and LongMap are slower
+      val numberIndices: Array[Int] = Array.fill(returnIndex)(-1)
       startingNumbers
-        .map(_.toLong)
         .init
         .zipWithIndex
-        .to(mutable.LongMap)
+        .foreach({ case (number, i) =>
+          numberIndices(number) = i
+        })
 
       @tailrec
       def helper(i: Int, prevNumber: Int): Int = {
@@ -24,8 +23,11 @@ object Day15 {
           prevNumber
         else {
           val prevI = i - 1
-          val number = prevI - numberIndices.getOrElse(prevNumber, prevI)
-          numberIndices += prevNumber.toLong -> prevI
+          val number = numberIndices(prevNumber) match {
+            case prevNumberI if prevNumberI < 0 => 0
+            case prevNumberI => prevI - prevNumberI
+          }
+          numberIndices(prevNumber) = prevI
           helper(i + 1, number)
         }
       }

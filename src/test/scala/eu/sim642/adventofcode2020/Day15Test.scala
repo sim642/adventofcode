@@ -27,8 +27,7 @@ class Day15Test extends AnyFunSuite with ScalaCheckPropertyChecks {
     assert(Part1.simulateNumber(parseStartingNumbers(input)) == 981)
   }
 
-  // TODO: optimize part 2 (42s)
-  ignore("Part 2 examples") {
+  test("Part 2 examples") {
     val inputExpectedNumber = Table(
       ("input", "expectedNumber"),
       ("0,3,6", 175594),
