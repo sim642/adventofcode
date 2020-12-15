@@ -9,12 +9,12 @@ object Day15 {
 
     def simulateNumber(startingNumbers: Seq[Int], returnIndex: Int = defaultReturnIndex): Int = {
       // primitive array because immutable.Map, mutable.Map and LongMap are slower
-      val numberIndices: Array[Int] = Array.fill(returnIndex)(-1)
+      val numberIndices: Array[Int] = Array.ofDim(returnIndex) // 0-initialized by default
       startingNumbers
         .init
         .zipWithIndex
         .foreach({ case (number, i) =>
-          numberIndices(number) = i
+          numberIndices(number) = i + 1 // 1-indexed to avoid conflict with 0-initialization
         })
 
       @tailrec
@@ -22,12 +22,11 @@ object Day15 {
         if (i == returnIndex)
           prevNumber
         else {
-          val prevI = i - 1
           val number = numberIndices(prevNumber) match {
-            case prevNumberI if prevNumberI < 0 => 0
-            case prevNumberI => prevI - prevNumberI
+            case 0 => 0
+            case prevNumberI => i - prevNumberI
           }
-          numberIndices(prevNumber) = prevI
+          numberIndices(prevNumber) = i
           helper(i + 1, number)
         }
       }
