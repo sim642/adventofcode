@@ -19,12 +19,12 @@ class Day15Test extends AnyFunSuite with ScalaCheckPropertyChecks {
     )
 
     forAll(inputExpectedNumber) { (input, expectedNumber) =>
-      assert(simulateNumber(parseStartingNumbers(input)) == expectedNumber)
+      assert(Part1.simulateNumber(parseStartingNumbers(input)) == expectedNumber)
     }
   }
 
   test("Part 1 input answer") {
-    assert(simulateNumber(parseStartingNumbers(input)) == 981)
+    assert(Part1.simulateNumber(parseStartingNumbers(input)) == 981)
   }
 
   // TODO: optimize part 2 (42s)
@@ -41,11 +41,11 @@ class Day15Test extends AnyFunSuite with ScalaCheckPropertyChecks {
     )
 
     forAll(inputExpectedNumber) { (input, expectedNumber) =>
-      assert(simulateNumber(parseStartingNumbers(input), part2ReturnIndex) == expectedNumber)
+      assert(Part2.simulateNumber(parseStartingNumbers(input)) == expectedNumber)
     }
   }
 
   test("Part 2 input answer") {
-    assert(simulateNumber(parseStartingNumbers(input), part2ReturnIndex) == 164878)
+    assert(Part2.simulateNumber(parseStartingNumbers(input)) == 164878)
   }
 }
