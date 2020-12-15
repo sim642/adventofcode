@@ -1,26 +1,33 @@
 package eu.sim642.adventofcode2020
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 
 object Day15 {
 
   def simulateNumber(startingNumbers: Seq[Int], returnIndex: Int = 2020): Int = {
+    // mutable.Map because immutable.Map is too slow
+    // LongMap because it avoids key boxing
+    val numberIndices =
+      startingNumbers
+        .map(_.toLong)
+        .init
+        .zipWithIndex
+        .to(mutable.LongMap)
 
     @tailrec
-    def helper(i: Int, numberIndices: Map[Int, Int], prevNumber: Int): Int = {
-      //println(i, numberIndices, prevNumber)
+    def helper(i: Int, prevNumber: Int): Int = {
       if (i == returnIndex)
         prevNumber
-      else if (numberIndices.contains(prevNumber)) {
-        val prevNumberIndex = numberIndices(prevNumber)
-        val number = i - 1 - prevNumberIndex
-        helper(i + 1, numberIndices + (prevNumber -> (i - 1)), number)
+      else {
+        val prevI = i - 1
+        val number = prevI - numberIndices.getOrElse(prevNumber, prevI)
+        numberIndices += prevNumber.toLong -> prevI
+        helper(i + 1, number)
       }
-      else
-        helper(i + 1, numberIndices + (prevNumber -> (i - 1)), 0)
     }
 
-    helper(startingNumbers.length, startingNumbers.init.zipWithIndex.toMap, startingNumbers.last)
+    helper(startingNumbers.length, startingNumbers.last)
   }
 
   // TODO: optimize part 2
