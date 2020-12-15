@@ -23,6 +23,9 @@ object Day15 {
     helper(startingNumbers.length, startingNumbers.init.zipWithIndex.toMap, startingNumbers.last)
   }
 
+  // TODO: optimize part 2
+  val part2ReturnIndex: Int = 30000000
+
 
   def parseStartingNumbers(input: String): Seq[Int] = input.split(",").toSeq.map(_.toInt)
 
@@ -31,5 +34,6 @@ object Day15 {
 
   def main(args: Array[String]): Unit = {
     println(simulateNumber(parseStartingNumbers(input)))
+    println(simulateNumber(parseStartingNumbers(input), returnIndex = part2ReturnIndex))
   }
 }
