@@ -56,7 +56,7 @@ class Day16Test extends AnyFunSuite {
     assert(ticketScanningErrorRate(parseInput(input)) == 26869)
   }
 
-  test("Part 2 examples") {
-    myTicketDepartureProduct(parseInput(exampleInput2))
+  test("Part 2 input answer") {
+    assert(myTicketDepartureProduct(parseInput(input)) == 855275529001L)
   }
 }

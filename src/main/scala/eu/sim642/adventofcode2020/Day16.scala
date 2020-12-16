@@ -31,7 +31,7 @@ object Day16 {
       .sum
   }
 
-  def myTicketDepartureProduct(input: Input): Int = {
+  def myTicketDepartureProduct(input: Input): Long = {
     val Input(fields, myTicket, nearbyTickets) = input
     val invalidValues = fieldsInvalidValues(fields)
     val validNearbyTickets = nearbyTickets.filter(invalidValues(_).isEmpty)
@@ -44,23 +44,32 @@ object Day16 {
         .transpose
         .map(_.toSet)
 
-    val fieldOrder = fieldValidValues
-      .toSeq
-      .permutations
-      .find({ fieldValidValues =>
-        fieldValidValues.corresponds(columnValues)({ case ((_, validValues), values) =>
-          values.subsetOf(validValues)
-        })
-      })
-      .get
-      .map(_._1)
-    println(fieldOrder)
+    val columnFields = columnValues.map(columnValue =>
+      fieldValidValues.filter(p => columnValue.subsetOf(p._2)).map(_._1)
+    )
+
+    def helper[A](cs: List[(Seq[Field], A)], seen: Set[Field]): Iterator[List[(Field, A)]] = {
+      cs match {
+        case Nil =>
+          Iterator(Nil)
+        case (c, a) :: cs =>
+          for {
+            field <- c.iterator
+            if !seen.contains(field)
+            rest <- helper(cs, seen + field)
+          } yield (field, a) :: rest
+      }
+    }
+
+    val cs = columnFields.zipWithIndex.sortBy(_._1.size).toList
+    val fieldOrder = helper(cs, Set.empty).head.sortBy(_._2).map(_._1)
 
     fieldOrder
       .zipWithIndex
       .filter(_._1.name.startsWith("departure"))
       .map(_._2)
       .map(myTicket)
+      .map(_.toLong)
       .product
   }
 
@@ -88,5 +97,7 @@ object Day16 {
   def main(args: Array[String]): Unit = {
     println(ticketScanningErrorRate(parseInput(input)))
     println(myTicketDepartureProduct(parseInput(input)))
+
+    // part 2: 577037097 - too low (Int overflowed in product)
   }
 }
