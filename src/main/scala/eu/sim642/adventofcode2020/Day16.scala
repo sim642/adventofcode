@@ -43,33 +43,40 @@ object Day16 {
       (myTicket +: validNearbyTickets)
         .transpose
         .map(_.toSet)
-
-    val columnFields = columnValues.map(columnValue =>
-      fieldValidValues.filter(p => columnValue.subsetOf(p._2)).map(_._1)
+    val columnValidFields = columnValues.map(columnValue =>
+      fieldValidValues
+        .view
+        .collect({ case (field, validValue) if columnValue.subsetOf(validValue) => field })
+        .toSet
     )
 
-    def helper[A](cs: List[(Seq[Field], A)], seen: Set[Field]): Iterator[List[(Field, A)]] = {
-      cs match {
+    def helper[A](columnValidFields: List[(Set[Field], A)], usedFields: Set[Field]): Iterator[List[(Field, A)]] = {
+      columnValidFields match {
         case Nil =>
           Iterator(Nil)
-        case (c, a) :: cs =>
+        case (columnValidField, aux) :: newColumnValidFields =>
           for {
-            field <- c.iterator
-            if !seen.contains(field)
-            rest <- helper(cs, seen + field)
-          } yield (field, a) :: rest
+            field <- columnValidField.iterator
+            if !usedFields.contains(field)
+            rest <- helper(newColumnValidFields, usedFields + field)
+          } yield (field, aux) :: rest
       }
     }
 
-    val cs = columnFields.zipWithIndex.sortBy(_._1.size).toList
-    val fieldOrder = helper(cs, Set.empty).head.sortBy(_._2).map(_._1)
+    val columnValidFieldsSorted =
+      columnValidFields
+        .zipWithIndex
+        .sortBy(_._1.size)
+        .toList
+    val fieldOrder =
+      helper(columnValidFieldsSorted, Set.empty)
+        .head
+        .sortBy(_._2)
+        .map(_._1)
 
     fieldOrder
-      .zipWithIndex
-      .filter(_._1.name.startsWith("departure"))
-      .map(_._2)
-      .map(myTicket)
-      .map(_.toLong)
+      .lazyZip(myTicket)
+      .collect({ case (Field(name, _, _), value) if name.startsWith("departure") => value.toLong })
       .product
   }
 
