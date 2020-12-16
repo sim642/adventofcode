@@ -10,9 +10,7 @@ object Day16 {
 
   case class Input(fields: Seq[Field], myTicket: Ticket, nearbyTickets: Seq[Ticket])
 
-  def ticketScanningErrorRate(input: Input): Int = {
-    val Input(fields, _, nearbyTickets) = input
-
+  def fieldsInvalidValues(fields: Seq[Field]): Ticket => Seq[Int] = {
     val allValidValues =
       fields
         .view
@@ -21,11 +19,49 @@ object Day16 {
         })
         .toSet
 
-    def invalidValues(ticket: Ticket): Seq[Int] = ticket.filterNot(allValidValues)
+    _.filterNot(allValidValues)
+  }
+
+  def ticketScanningErrorRate(input: Input): Int = {
+    val Input(fields, _, nearbyTickets) = input
+    val invalidValues = fieldsInvalidValues(fields)
 
     nearbyTickets
       .flatMap(invalidValues)
       .sum
+  }
+
+  def myTicketDepartureProduct(input: Input): Int = {
+    val Input(fields, myTicket, nearbyTickets) = input
+    val invalidValues = fieldsInvalidValues(fields)
+    val validNearbyTickets = nearbyTickets.filter(invalidValues(_).isEmpty)
+
+    val fieldValidValues = fields.map({ case field@Field(_, range1, range2) =>
+      field -> (range1.view ++ range2.view).toSet
+    })
+    val columnValues =
+      (myTicket +: validNearbyTickets)
+        .transpose
+        .map(_.toSet)
+
+    val fieldOrder = fieldValidValues
+      .toSeq
+      .permutations
+      .find({ fieldValidValues =>
+        fieldValidValues.corresponds(columnValues)({ case ((_, validValues), values) =>
+          values.subsetOf(validValues)
+        })
+      })
+      .get
+      .map(_._1)
+    println(fieldOrder)
+
+    fieldOrder
+      .zipWithIndex
+      .filter(_._1.name.startsWith("departure"))
+      .map(_._2)
+      .map(myTicket)
+      .product
   }
 
 
@@ -51,5 +87,6 @@ object Day16 {
 
   def main(args: Array[String]): Unit = {
     println(ticketScanningErrorRate(parseInput(input)))
+    println(myTicketDepartureProduct(parseInput(input)))
   }
 }
