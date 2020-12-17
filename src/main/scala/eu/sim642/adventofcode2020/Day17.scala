@@ -5,30 +5,35 @@ import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.IteratorImplicits._
 import eu.sim642.adventofcodelib.pos.{Pos, Pos3, Pos4, PosOps}
 
+import scala.language.implicitConversions
+
 object Day17 {
+
+  implicit def boolean2Int(b: Boolean): Int = if (b) 1 else 0
 
   sealed trait Part {
     type A <: PosOps[A]
 
+    val zero: A
     val allOffsets: Seq[A]
 
-    def syms(pos: A): Int
-    def syms2(pos: A): Int = 1 << syms(pos)
-    def symKeep(pos: A): Boolean
-    def symNeigh(pos: A, neigh: A): Int
+    def relativeSymmetryDimensions(pos1: A, pos2: A): Int
+    private def relativeSymmetries(pos1: A, pos2: A): Int = 1 << relativeSymmetryDimensions(pos1, pos2)
+
+    def neighborPredicate(pos: A): Boolean
 
     private def neighbors(pos: A): Iterator[A] = allOffsets.iterator.map(pos + _)
 
     def step(state: Set[A]): Set[A] = {
-      println(docount(state))
+      println(countSymmetric(state))
       state.iterator
         .flatMap(pos =>
           neighbors(pos)
+            .filter(neighborPredicate)
             .flatMap(neigh =>
-              Iterator.fill(symNeigh(pos, neigh))(neigh)
+              Iterator.fill(relativeSymmetries(pos, neigh))(neigh)
             )
         )
-        .filter(symKeep)
         .groupMapReduce(identity)(_ => 1)(_ + _)
         .collect({
           case (pos, 3) => pos
@@ -48,30 +53,33 @@ object Day17 {
       } yield embedPos(pos)).toSet
     }
 
+    private def symmetries(pos: A): Int = relativeSymmetries(pos, zero)
+
+    private def countSymmetric(state: Set[A]) = {
+      state
+        .view
+        .map(symmetries)
+        .sum
+    }
+
     def countCubesBooted(grid: Grid[Boolean], steps: Int = 6): Int = {
       val initialState = fromGrid(grid)
       val finalState = Iterator.iterate(initialState)(step)(steps)
-      docount(finalState)
-    }
-
-    private def docount(finalState: Set[A]) = {
-      finalState
-        .view
-        .map(syms2)
-        .sum
+      countSymmetric(finalState)
     }
   }
 
   object Part1 extends Part {
     override type A = Pos3
 
-    override def syms(pos: Pos3): Int = if (pos.z > 0) 1 else 0
-
-    override def symKeep(pos: Pos3): Boolean = pos.z >= 0
-
-    override def symNeigh(pos: Pos3, neigh: Pos3): Int = if (pos.z > 0 && neigh.z == 0) 2 else 1
-
+    override val zero: Pos3 = Pos3.zero
     override val allOffsets: Seq[Pos3] = Pos3.allOffsets
+
+    override def relativeSymmetryDimensions(pos1: Pos3, pos2: Pos3): Int = {
+      (pos1.z > 0 && pos2.z == 0).toInt
+    }
+
+    override def neighborPredicate(pos: Pos3): Boolean = pos.z >= 0
 
     override def embedPos(pos: Pos): Pos3 = Pos3(pos.x, pos.y, 0)
   }
@@ -79,27 +87,14 @@ object Day17 {
   object Part2 extends Part {
     override type A = Pos4
 
-    override def syms(pos: Pos4): Int = (if (pos.z > 0) 1 else 0) + (if (pos.w > 0) 1 else 0)
+    override val zero: Pos4 = Pos4.zero
+    override val allOffsets: Seq[Pos4] = Pos4.allOffsets
 
-    override def symKeep(pos: Pos4): Boolean = pos.z >= 0 && pos.w >= 0
-
-    override def symNeigh(pos: Pos4, neigh: Pos4): Int = {
-      ((pos.z > 0, pos.w > 0), (neigh.z > 0, neigh.w > 0)) match {
-        case ((true, true), (true, false)) => 2
-        case ((true, true), (false, true)) => 2
-        case ((true, true), (false, false)) => 4
-
-        case ((true, false), (false, false)) => 2
-        case ((true, false), (false, true)) => 2
-
-        case ((false, true), (false, false)) => 2
-        case ((false, true), (true, false)) => 2
-
-        case ((_, _), (_, _)) => 1
-      }
+    override def relativeSymmetryDimensions(pos1: Pos4, pos2: Pos4): Int = {
+      (pos1.z > 0 && pos2.z == 0).toInt + (pos1.w > 0 && pos2.w == 0).toInt
     }
 
-    override val allOffsets: Seq[Pos4] = Pos4.allOffsets
+    override def neighborPredicate(pos: Pos4): Boolean = pos.z >= 0 && pos.w >= 0
 
     override def embedPos(pos: Pos): Pos4 = Pos4(pos.x, pos.y, 0, 0)
   }
