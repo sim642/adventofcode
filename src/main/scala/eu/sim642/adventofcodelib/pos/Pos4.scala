@@ -22,4 +22,14 @@ case class Pos4(x: Int, y: Int, z: Int, w: Int) extends BoxPosOps[Pos4] {
 
 object Pos4 extends PosFactory[Pos4] {
   override val zero: Pos4 = Pos4(0, 0, 0, 0)
+
+  val allOffsets: Seq[Pos4] =
+    for {
+      w <- -1 to 1
+      z <- -1 to 1
+      y <- -1 to 1
+      x <- -1 to 1
+      pos = Pos4(x, y, z, w)
+      if pos != Pos4.zero
+    } yield pos
 }
