@@ -12,11 +12,25 @@ object Day17 {
 
     val allOffsets: Seq[A]
 
+    def syms(pos: A): Int
+    def syms2(pos: A): Int = 1 << syms(pos)
+    def symKeep(pos: A): Boolean
+
     private def neighbors(pos: A): Iterator[A] = allOffsets.iterator.map(pos + _)
 
     def step(state: Set[A]): Set[A] = {
+      println(docount(state))
       state.iterator
-        .flatMap(neighbors)
+        .flatMap(pos =>
+          neighbors(pos)
+            .flatMap(neigh =>
+              if (syms(pos) > syms(neigh))
+                Iterator.fill(syms2(pos) / syms2(neigh))(neigh)
+              else
+                Iterator(neigh)
+            )
+        )
+        .filter(symKeep)
         .groupMapReduce(identity)(_ => 1)(_ + _)
         .collect({
           case (pos, 3) => pos
@@ -39,12 +53,23 @@ object Day17 {
     def countCubesBooted(grid: Grid[Boolean], steps: Int = 6): Int = {
       val initialState = fromGrid(grid)
       val finalState = Iterator.iterate(initialState)(step)(steps)
-      finalState.size
+      docount(finalState)
+    }
+
+    private def docount(finalState: Set[A]) = {
+      finalState
+        .view
+        .map(syms2)
+        .sum
     }
   }
 
   object Part1 extends Part {
     override type A = Pos3
+
+    override def syms(pos: Pos3): Int = if (pos.z > 0) 1 else 0
+
+    override def symKeep(pos: Pos3): Boolean = pos.z >= 0
 
     override val allOffsets: Seq[Pos3] = Pos3.allOffsets
 
@@ -53,6 +78,10 @@ object Day17 {
 
   object Part2 extends Part {
     override type A = Pos4
+
+    override def syms(pos: Pos4): Int = (if (pos.z > 0) 1 else 0) + (if (pos.w > 0) 1 else 0)
+
+    override def symKeep(pos: Pos4): Boolean = pos.z >= 0 && pos.w >= 0
 
     override val allOffsets: Seq[Pos4] = Pos4.allOffsets
 
