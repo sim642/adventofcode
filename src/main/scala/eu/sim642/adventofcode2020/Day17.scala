@@ -14,19 +14,15 @@ object Day17 {
 
     private def neighbors(pos: A): Iterator[A] = allOffsets.iterator.map(pos + _)
 
-    private def possibles(state: Set[A]): Set[A] = state ++ state.flatMap(neighbors)
-
     def step(state: Set[A]): Set[A] = {
-      possibles(state)
-        .filter({ pos =>
-          val active = neighbors(pos).count(state)
-          state.contains(pos) match {
-            case true if active == 2 || active == 3 => true
-            case true => false
-            case false if active == 3 => true
-            case false => false
-          }
+      state.iterator
+        .flatMap(neighbors)
+        .groupMapReduce(identity)(_ => 1)(_ + _)
+        .collect({
+          case (pos, 3) => pos
+          case (pos, 2) if state(pos) => pos
         })
+        .toSet
     }
 
     def embedPos(pos: Pos): A
