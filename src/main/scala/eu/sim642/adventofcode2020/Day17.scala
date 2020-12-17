@@ -15,6 +15,7 @@ object Day17 {
     def syms(pos: A): Int
     def syms2(pos: A): Int = 1 << syms(pos)
     def symKeep(pos: A): Boolean
+    def symNeigh(pos: A, neigh: A): Int
 
     private def neighbors(pos: A): Iterator[A] = allOffsets.iterator.map(pos + _)
 
@@ -24,10 +25,7 @@ object Day17 {
         .flatMap(pos =>
           neighbors(pos)
             .flatMap(neigh =>
-              if (syms(pos) > syms(neigh))
-                Iterator.fill(syms2(pos) / syms2(neigh))(neigh)
-              else
-                Iterator(neigh)
+              Iterator.fill(symNeigh(pos, neigh))(neigh)
             )
         )
         .filter(symKeep)
@@ -71,6 +69,8 @@ object Day17 {
 
     override def symKeep(pos: Pos3): Boolean = pos.z >= 0
 
+    override def symNeigh(pos: Pos3, neigh: Pos3): Int = if (pos.z > 0 && neigh.z == 0) 2 else 1
+
     override val allOffsets: Seq[Pos3] = Pos3.allOffsets
 
     override def embedPos(pos: Pos): Pos3 = Pos3(pos.x, pos.y, 0)
@@ -82,6 +82,22 @@ object Day17 {
     override def syms(pos: Pos4): Int = (if (pos.z > 0) 1 else 0) + (if (pos.w > 0) 1 else 0)
 
     override def symKeep(pos: Pos4): Boolean = pos.z >= 0 && pos.w >= 0
+
+    override def symNeigh(pos: Pos4, neigh: Pos4): Int = {
+      ((pos.z > 0, pos.w > 0), (neigh.z > 0, neigh.w > 0)) match {
+        case ((true, true), (true, false)) => 2
+        case ((true, true), (false, true)) => 2
+        case ((true, true), (false, false)) => 4
+
+        case ((true, false), (false, false)) => 2
+        case ((true, false), (false, true)) => 2
+
+        case ((false, true), (false, false)) => 2
+        case ((false, true), (true, false)) => 2
+
+        case ((_, _), (_, _)) => 1
+      }
+    }
 
     override val allOffsets: Seq[Pos4] = Pos4.allOffsets
 
