@@ -5,11 +5,16 @@ import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.IteratorImplicits._
 import eu.sim642.adventofcodelib.pos.{Pos, Pos3, Pos4, PosOps}
 
-import scala.language.implicitConversions
-
 object Day17 {
 
-  implicit def boolean2Int(b: Boolean): Int = if (b) 1 else 0
+  def relativeSymmetry(value1: Int, value2: Int): Int = {
+    if (value2 < 0)
+      0
+    else if (value1 > 0 && value2 == 0)
+      2
+    else
+      1
+  }
 
   sealed trait Part {
     type A <: PosOps[A]
@@ -17,10 +22,7 @@ object Day17 {
     val zero: A
     val allOffsets: Seq[A]
 
-    def relativeSymmetryDimensions(pos1: A, pos2: A): Int
-    private def relativeSymmetries(pos1: A, pos2: A): Int = 1 << relativeSymmetryDimensions(pos1, pos2)
-
-    def neighborPredicate(pos: A): Boolean
+    def relativeSymmetries(pos1: A, pos2: A): Int
 
     private def neighbors(pos: A): Iterator[A] = allOffsets.iterator.map(pos + _)
 
@@ -29,7 +31,6 @@ object Day17 {
       state.iterator
         .flatMap(pos =>
           neighbors(pos)
-            .filter(neighborPredicate)
             .flatMap(neigh =>
               Iterator.fill(relativeSymmetries(pos, neigh))(neigh)
             )
@@ -75,11 +76,9 @@ object Day17 {
     override val zero: Pos3 = Pos3.zero
     override val allOffsets: Seq[Pos3] = Pos3.allOffsets
 
-    override def relativeSymmetryDimensions(pos1: Pos3, pos2: Pos3): Int = {
-      (pos1.z > 0 && pos2.z == 0).toInt
+    override def relativeSymmetries(pos1: Pos3, pos2: Pos3): Int = {
+      relativeSymmetry(pos1.z, pos2.z)
     }
-
-    override def neighborPredicate(pos: Pos3): Boolean = pos.z >= 0
 
     override def embedPos(pos: Pos): Pos3 = Pos3(pos.x, pos.y, 0)
   }
@@ -90,11 +89,9 @@ object Day17 {
     override val zero: Pos4 = Pos4.zero
     override val allOffsets: Seq[Pos4] = Pos4.allOffsets
 
-    override def relativeSymmetryDimensions(pos1: Pos4, pos2: Pos4): Int = {
-      (pos1.z > 0 && pos2.z == 0).toInt + (pos1.w > 0 && pos2.w == 0).toInt
+    override def relativeSymmetries(pos1: Pos4, pos2: Pos4): Int = {
+      relativeSymmetry(pos1.z, pos2.z) * relativeSymmetry(pos1.w, pos2.w)
     }
-
-    override def neighborPredicate(pos: Pos4): Boolean = pos.z >= 0 && pos.w >= 0
 
     override def embedPos(pos: Pos): Pos4 = Pos4(pos.x, pos.y, 0, 0)
   }
