@@ -27,15 +27,14 @@ object Day17 {
     private def neighbors(pos: A): Iterator[A] = allOffsets.iterator.map(pos + _)
 
     def step(state: Set[A]): Set[A] = {
-      println(countSymmetric(state))
       state.iterator
         .flatMap(pos =>
           neighbors(pos)
-            .flatMap(neigh =>
-              Iterator.fill(relativeSymmetries(pos, neigh))(neigh)
+            .map(neigh =>
+              neigh -> relativeSymmetries(pos, neigh)
             )
         )
-        .groupMapReduce(identity)(_ => 1)(_ + _)
+        .groupMapReduce(_._1)(_._2)(_ + _)
         .collect({
           case (pos, 3) => pos
           case (pos, 2) if state(pos) => pos
