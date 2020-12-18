@@ -17,35 +17,61 @@ object Day18 extends RegexParsers {
 
   def sumEvals(exprs: Seq[Expr]): Long = exprs.map(eval).sum
 
+  sealed trait Part {
+    def parseExpr(s: String): Expr
 
-  def parseExpr(s: String): Expr = {
+    def parseExprs(input: String): Seq[Expr] = input.linesIterator.map(parseExpr).toSeq
+  }
 
-    def op: Parser[(Expr, Expr) => Expr] = (
-      "+" ^^^ Add
-    | "*" ^^^ Mul
-    )
+  // TODO: reduce duplication
 
-    def simpleExpr: Parser[Expr] = (
-      "\\d+".r ^^ { value => Num(value.toInt) }
-    | "(" ~> expr <~ ")"
-    )
+  object Part1 extends Part {
 
-    def expr: Parser[Expr] = (
-      chainl1(simpleExpr, op)
-    )
+    override def parseExpr(s: String): Expr = {
 
-    parseAll(expr, s) match {
-      case Success(result, next) => result
-      case noSuccess: NoSuccess => throw new RuntimeException(s"Expr parsing error: ${noSuccess.msg} (${noSuccess.next})")
+      def simple: Parser[Expr] = (
+        "\\d+".r ^^ { value => Num(value.toInt) }
+      | "(" ~> expr <~ ")"
+      )
+
+      def op: Parser[(Expr, Expr) => Expr] = (
+        "+" ^^^ Add
+      | "*" ^^^ Mul
+      )
+
+      def expr: Parser[Expr] = chainl1(simple, op)
+
+      parseAll(expr, s) match {
+        case Success(result, next) => result
+        case noSuccess: NoSuccess => throw new RuntimeException(s"Expr parsing error: ${noSuccess.msg} (${noSuccess.next})")
+      }
     }
   }
 
-  def parseExprs(input: String): Seq[Expr] = input.linesIterator.map(parseExpr).toSeq
+  object Part2 extends Part {
+
+    override def parseExpr(s: String): Expr = {
+      def term: Parser[Expr] = (
+        "\\d+".r ^^ { value => Num(value.toInt) }
+      | "(" ~> expr <~ ")"
+      )
+
+      def factor: Parser[Expr] = chainl1(term, "+" ^^^ Add)
+
+      def expr: Parser[Expr] = chainl1(factor, "*" ^^^ Mul)
+
+      parseAll(expr, s) match {
+        case Success(result, next) => result
+        case noSuccess: NoSuccess => throw new RuntimeException(s"Expr parsing error: ${noSuccess.msg} (${noSuccess.next})")
+      }
+    }
+  }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(sumEvals(parseExprs(input)))
+    println(sumEvals(Part1.parseExprs(input)))
+    println(sumEvals(Part2.parseExprs(input)))
 
     // part 1: 16948449650 - too low (Int overflowed in eval)
   }
