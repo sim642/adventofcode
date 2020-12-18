@@ -16,6 +16,8 @@ object Day17 {
       1
   }
 
+  // TODO: add back non-symmetric solution? just make relativeSymmetries 1?
+
   sealed trait Part {
     type A <: PosOps[A]
 
@@ -87,6 +89,8 @@ object Day17 {
 
     override val zero: Pos4 = Pos4.zero
     override val allOffsets: Seq[Pos4] = Pos4.allOffsets
+
+    // TODO: also use symmetry around w=z axis
 
     override def relativeSymmetries(pos1: Pos4, pos2: Pos4): Int = {
       relativeSymmetry(pos1.z, pos2.z) * relativeSymmetry(pos1.w, pos2.w)
