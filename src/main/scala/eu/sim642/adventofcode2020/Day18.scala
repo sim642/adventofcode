@@ -17,54 +17,41 @@ object Day18 extends RegexParsers {
 
   def sumEvals(exprs: Seq[Expr]): Long = exprs.map(eval).sum
 
+
   sealed trait Part {
-    def parseExpr(s: String): Expr
+
+    def simple: Parser[Expr] = (
+      "\\d+".r ^^ { value => Num(value.toInt) }
+    | "(" ~> expr <~ ")"
+    )
+
+    def expr: Parser[Expr]
+
+    def parseExpr(s: String): Expr = {
+      parseAll(expr, s) match {
+        case Success(result, next) => result
+        case noSuccess: NoSuccess => throw new RuntimeException(s"Expr parsing error: ${noSuccess.msg} (${noSuccess.next})")
+      }
+    }
 
     def parseExprs(input: String): Seq[Expr] = input.linesIterator.map(parseExpr).toSeq
   }
 
-  // TODO: reduce duplication
-
   object Part1 extends Part {
 
-    override def parseExpr(s: String): Expr = {
+    def op: Parser[(Expr, Expr) => Expr] = (
+      "+" ^^^ Add
+    | "*" ^^^ Mul
+    )
 
-      def simple: Parser[Expr] = (
-        "\\d+".r ^^ { value => Num(value.toInt) }
-      | "(" ~> expr <~ ")"
-      )
-
-      def op: Parser[(Expr, Expr) => Expr] = (
-        "+" ^^^ Add
-      | "*" ^^^ Mul
-      )
-
-      def expr: Parser[Expr] = chainl1(simple, op)
-
-      parseAll(expr, s) match {
-        case Success(result, next) => result
-        case noSuccess: NoSuccess => throw new RuntimeException(s"Expr parsing error: ${noSuccess.msg} (${noSuccess.next})")
-      }
-    }
+    def expr: Parser[Expr] = chainl1(simple, op)
   }
 
   object Part2 extends Part {
 
-    override def parseExpr(s: String): Expr = {
-      def term: Parser[Expr] = (
-        "\\d+".r ^^ { value => Num(value.toInt) }
-      | "(" ~> expr <~ ")"
-      )
+    def factor: Parser[Expr] = chainl1(simple, "+" ^^^ Add)
 
-      def factor: Parser[Expr] = chainl1(term, "+" ^^^ Add)
-
-      def expr: Parser[Expr] = chainl1(factor, "*" ^^^ Mul)
-
-      parseAll(expr, s) match {
-        case Success(result, next) => result
-        case noSuccess: NoSuccess => throw new RuntimeException(s"Expr parsing error: ${noSuccess.msg} (${noSuccess.next})")
-      }
-    }
+    def expr: Parser[Expr] = chainl1(factor, "*" ^^^ Mul)
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
