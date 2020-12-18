@@ -29,8 +29,8 @@ object Day17 {
 
     def fromGrid(grid: Grid[Boolean]): Set[A] = {
       (for {
-        (row, y) <- grid.zipWithIndex.view
-        (cell, x) <- row.zipWithIndex.view
+        (row, y) <- grid.view.zipWithIndex
+        (cell, x) <- row.view.zipWithIndex
         if cell
         pos = Pos(x, y)
       } yield embedPos(pos)).toSet
