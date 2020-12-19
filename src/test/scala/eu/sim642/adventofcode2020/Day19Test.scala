@@ -1,9 +1,18 @@
 package eu.sim642.adventofcode2020
 
 import Day19._
+import Day19Test._
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day19Test extends AnyFunSuite {
+class Day19Test extends Suites(
+  new BaseTest,
+  new RegexSolutionTest,
+  new ParserSolutionTest,
+  new EarleySolutionTest,
+)
+
+object Day19Test {
 
   val exampleRules =
     """0: 1 2
@@ -82,30 +91,50 @@ class Day19Test extends AnyFunSuite {
       |babaaabbbaaabaababbaabababaaab
       |aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba""".stripMargin
 
-  test("parseRules") {
-    println(parseRules(exampleRules))
-    println(parseRules(exampleRules2))
+  class BaseTest extends AnyFunSuite {
+
+    test("parseRules") {
+      parseRules(exampleRules)
+      parseRules(exampleRules2)
+    }
+
+    test("parseInput") {
+      parseInput(exampleInput)
+      parseInput(input)
+    }
   }
 
-  test("parseInput") {
-    println(parseInput(exampleInput))
-    println(parseInput(input))
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
+
+    test("Part 1 examples") {
+      assert(solution.countMatchingMessages(parseInput(exampleInput)) == 2)
+    }
+
+    test("Part 1 input answer") {
+      assert(solution.countMatchingMessages(parseInput(input)) == 226)
+    }
+
+    protected val testPart2: Boolean = true
+
+    if (testPart2) {
+      test("Part 2 examples") {
+        assert(solution.countMatchingMessages(parseInput(exampleInput2)) == 3)
+        assert(solution.countMatchingMessagesFixed(parseInput(exampleInput2)) == 12)
+      }
+
+      test("Part 2 input answer") {
+        assert(solution.countMatchingMessagesFixed(parseInput(input)) == 355)
+      }
+    }
   }
 
-  test("Part 1 examples") {
-    assert(Part1.countMatchingMessages(parseInput(exampleInput)) == 2)
+  class RegexSolutionTest extends SolutionTest(RegexSolution) {
+    override protected val testPart2: Boolean = false
   }
 
-  test("Part 1 input answer") {
-    assert(Part1.countMatchingMessages(parseInput(input)) == 226)
+  class ParserSolutionTest extends SolutionTest(ParserSolution) {
+    override protected val testPart2: Boolean = false // TODO: fix solution
   }
 
-  test("Part 2 examples") {
-    assert(Part1.countMatchingMessages(parseInput(exampleInput2)) == 3)
-    assert(Part2.countMatchingMessages(parseInput(exampleInput2)) == 12)
-  }
-
-  test("Part 2 input answer") {
-    assert(Part2.countMatchingMessages(parseInput(input)) == 355)
-  }
+  class EarleySolutionTest extends SolutionTest(EarleySolution)
 }
