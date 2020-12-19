@@ -15,7 +15,8 @@ object Earley {
 
   private def parse[N, T](grammar: Grammar[N, T], initial: N, input: Seq[T]): collection.Set[State[N, T]] = {
 
-    def nProductions(n: N): Seq[Production[N, T]] = grammar.filter(_._1 == n)
+    // TODO: make Grammar a Map to begin with
+    val nProductions = grammar.groupBy(_._1)
 
     val S = IndexedSeq.fill(input.length + 1)(mutable.LinkedHashSet.empty[State[N, T]])
     val initialProductions = nProductions(initial)
