@@ -90,9 +90,9 @@ object Day19 {
   object EarleySolution extends Solution {
     override def rules2Predicate(rules: Rules): String => Boolean = {
 
-      def helper(rule: Rule): Seq[Seq[Either[Int, Char]]] = rule match {
-        case Literal(char) => Seq(Seq(Right(char)))
-        case Sub(i) => Seq(Seq(Left(i)))
+      def helper(rule: Rule): Set[ProductionBody[Int, Char]] = rule match {
+        case Literal(char) => Set(Seq(Right(char)))
+        case Sub(i) => Set(Seq(Left(i)))
         case Concat(left, right) =>
           for {
             l <- helper(left)
@@ -101,9 +101,7 @@ object Day19 {
         case Choice(left, right) => helper(left) ++ helper(right)
       }
 
-      def helper2(i: Int, rule: Rule): Grammar[Int, Char] = helper(rule).map(i -> _)
-
-      val grammar = rules.toSeq.flatMap({ case (i, rule) => helper2(i, rule) })
+      val grammar: Grammar[Int, Char] = rules.view.mapValues(helper).toMap
       Earley.matches(grammar, 0, _)
     }
   }

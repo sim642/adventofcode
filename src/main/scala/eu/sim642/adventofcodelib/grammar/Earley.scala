@@ -15,13 +15,10 @@ object Earley {
 
   private def parse[N, T](grammar: Grammar[N, T], initial: N, input: Seq[T]): collection.Set[State[N, T]] = {
 
-    // TODO: make Grammar a Map to begin with
-    val nProductions = grammar.groupBy(_._1)
-
     val S = IndexedSeq.fill(input.length + 1)(mutable.LinkedHashSet.empty[State[N, T]])
-    val initialProductions = nProductions(initial)
-    for (production <- initialProductions)
-      S(0).add(State(production, 0, 0, 0))
+    val initialProductionsBodies = grammar(initial)
+    for (productionBody <- initialProductionsBodies)
+      S(0).add(State(initial -> productionBody, 0, 0, 0))
 
     for (k <- 0 to input.length) {
       val SkQueue = S(k).to(mutable.Queue)
@@ -37,8 +34,8 @@ object Earley {
           state.current match {
             case Left(n) =>
               // prediction
-              for (production <- nProductions(n))
-                addSk(State(production, 0, k, 0))
+              for (productionBody <- grammar(n))
+                addSk(State(n -> productionBody, 0, k, 0))
             case Right(t) =>
               // scanning
               if (k < input.length && t == input(k))
@@ -56,7 +53,7 @@ object Earley {
     }
 
     S.last.collect({
-      case state@State(production, _, 0, _) if initialProductions.contains(production) && state.isComplete => state
+      case state@State((n, productionBody), _, 0, _) if n == initial && initialProductionsBodies.contains(productionBody) && state.isComplete => state
     })
   }
 

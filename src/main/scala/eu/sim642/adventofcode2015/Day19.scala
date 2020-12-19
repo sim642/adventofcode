@@ -36,7 +36,7 @@ object Day19 {
     val grammar: Grammar[String, String] = {
       elems.map(elem => (elem, Seq(Right(elem)))) ++
         elemReplacements.map({ case (n, rhs) => (n, rhs.map(Left(_))) })
-    }
+    }.groupMapReduce(_._1)(p => Set(p._2))(_ ++ _) // Seq of pairs to MultiDict
 
     val elemS = elemSplit(s)
     Earley.minDerivation(grammar, "e", elemS) - elemS.length
