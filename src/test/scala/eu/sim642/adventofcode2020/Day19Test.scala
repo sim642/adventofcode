@@ -8,7 +8,8 @@ import org.scalatest.funsuite.AnyFunSuite
 class Day19Test extends Suites(
   new BaseTest,
   new RegexSolutionTest,
-  new ParserSolutionTest,
+  new CombinatorParserSolutionTest,
+  new ManualParserSolutionTest,
   new EarleySolutionTest,
 )
 
@@ -132,9 +133,11 @@ object Day19Test {
     override protected val testPart2: Boolean = false
   }
 
-  class ParserSolutionTest extends SolutionTest(ParserSolution) {
+  class CombinatorParserSolutionTest extends SolutionTest(CombinatorParserSolution) {
     override protected val testPart2: Boolean = false // TODO: fix solution
   }
+
+  class ManualParserSolutionTest extends SolutionTest(ManualParserSolution)
 
   class EarleySolutionTest extends SolutionTest(EarleySolution)
 }

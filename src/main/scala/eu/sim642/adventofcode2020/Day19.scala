@@ -49,7 +49,7 @@ object Day19 {
     }
   }
 
-  object ParserSolution extends Solution with RegexParsers {
+  object CombinatorParserSolution extends Solution with RegexParsers {
 
     // TODO: figure out why parser combinators didn't work right
     override def rules2Predicate(rules: Rules): String => Boolean = {
@@ -64,6 +64,24 @@ object Day19 {
 
       val parser = helper(Sub(0))
       parseAll(parser, _).successful
+    }
+  }
+
+  object ManualParserSolution extends Solution {
+    override def rules2Predicate(rules: Rules): String => Boolean = {
+
+      // Iterator instead of Option allows necessary backtracking
+      def helper(rule: Rule, chars: List[Char]): Iterator[List[Char]] = rule match {
+        case Literal(char) => chars match {
+          case firstChar :: restChars if firstChar == char => Iterator(restChars)
+          case _ => Iterator.empty
+        }
+        case Sub(i) => helper(rules(i), chars)
+        case Concat(left, right) => helper(left, chars).flatMap(helper(right, _))
+        case Choice(left, right) => helper(left, chars) ++ helper(right, chars)
+      }
+
+      message => helper(Sub(0), message.toList).contains(Nil)
     }
   }
 
@@ -179,7 +197,7 @@ object Day19 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    import EarleySolution._
+    import ManualParserSolution._
 
     println(countMatchingMessages(parseInput(input)))
     println(countMatchingMessagesFixed(parseInput(input)))
