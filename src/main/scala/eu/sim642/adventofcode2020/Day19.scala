@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2020
 
+import eu.sim642.adventofcodelib.grammar._
+
 import scala.collection.mutable
 import scala.util.parsing.combinator.RegexParsers
 
@@ -86,61 +88,6 @@ object Day19 {
   }
 
   object EarleySolution extends Solution {
-
-    // copied & modified from 2015 Day 19
-    // TODO: move earley parser to library
-    // https://en.wikipedia.org/wiki/Earley_parser
-    // https://old.reddit.com/r/adventofcode/comments/3xflz8/day_19_solutions/cy6gv3z/
-    type Production[N, T] = (N, Seq[Either[N, T]])
-    def earley[N, T](grammar: Seq[Production[N, T]], initial: N, input: Seq[T]): Boolean = {
-
-      def nProductions(n: N): Seq[Production[N, T]] = grammar.filter(_._1 == n)
-
-      case class State(production: Production[N, T], dot: Int, j: Int, count: Int) {
-        def isComplete: Boolean = dot >= production._2.length
-        def current: Either[N, T] = production._2(dot)
-      }
-
-      val S = IndexedSeq.fill(input.length + 1)(mutable.LinkedHashSet.empty[State])
-      val initialProductions = nProductions(initial)
-      for (production <- initialProductions)
-        S(0).add(State(production, 0, 0, 0))
-
-      for (k <- 0 to input.length) {
-        val SkQueue = S(k).to(mutable.Queue)
-
-        def addSk(state: State): Unit = {
-          if (S(k).add(state))
-            SkQueue.enqueue(state)
-        }
-
-        while (SkQueue.nonEmpty) {
-          val state@State((n, _), _, j, count) = SkQueue.dequeue()
-          if (!state.isComplete) {
-            state.current match {
-              case Left(n) =>
-                // prediction
-                for (production <- nProductions(n))
-                  addSk(State(production, 0, k, 0))
-              case Right(t) =>
-                // scanning
-                if (k < input.length && t == input(k))
-                  S(k + 1).add(state.copy(dot = state.dot + 1))
-            }
-          }
-          else {
-            // completion
-            for {
-              jState <- S(j)
-              if !jState.isComplete && jState.current == Left(n)
-            } addSk(jState.copy(dot = jState.dot + 1, count = jState.count + 1 + count))
-          }
-        }
-      }
-
-      S.last.exists(s => s.isComplete && initialProductions.contains(s.production))
-    }
-
     override def rules2Predicate(rules: Rules): String => Boolean = {
 
       def helper(rule: Rule): Seq[Seq[Either[Int, Char]]] = rule match {
@@ -154,10 +101,10 @@ object Day19 {
         case Choice(left, right) => helper(left) ++ helper(right)
       }
 
-      def helper2(i: Int, rule: Rule): Seq[Production[Int, Char]] = helper(rule).map(i -> _)
+      def helper2(i: Int, rule: Rule): Grammar[Int, Char] = helper(rule).map(i -> _)
 
       val grammar = rules.toSeq.flatMap({ case (i, rule) => helper2(i, rule) })
-      earley(grammar, 0, _)
+      Earley.matches(grammar, 0, _)
     }
   }
 
