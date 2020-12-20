@@ -121,4 +121,12 @@ class Day20Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(cornerIdProduct(parseTiles(input)) == 15006909892229L)
   }
+
+  test("Part 2 examples") {
+    assert(checkSeaMonsters(parseTiles(exampleInput)) == 273)
+  }
+
+  test("Part 2 input answer") {
+    assert(checkSeaMonsters(parseTiles(input)) == 2190)
+  }
 }

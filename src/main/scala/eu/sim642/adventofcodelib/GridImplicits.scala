@@ -43,6 +43,16 @@ object GridImplicits {
       })
     }
 
+    def slidingGrid2(sizeRow: Int, sizeCol: Int): Iterator[Iterator[Grid[A]]] = {
+      grid.sliding(sizeRow).map({ rows =>
+        rows.map(_.sliding(sizeCol).toVector).transpose.iterator
+      })
+    }
+
+    def correspondsGrid[B](otherGrid: Grid[B])(p: (A, B) => Boolean): Boolean = {
+      grid.corresponds(otherGrid)(_.corresponds(_)(p))
+    }
+
     def sumGrid(implicit num: Numeric[A]): A =
       grid.iterator.map(_.sum).sum
   }
