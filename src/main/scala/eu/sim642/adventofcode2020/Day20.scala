@@ -5,43 +5,54 @@ import eu.sim642.adventofcodelib.GridImplicits._
 
 object Day20 {
 
-  case class Tile(id: Int, grid: Grid[Boolean])
+  type Border = Vector[Boolean]
+
+  case class Tile(id: Int, grid: Grid[Boolean]) {
+    def borderTop: Border = grid.head
+    def borderBottom: Border = grid.last
+    def borderLeft: Border = grid.map(_.head)
+    def borderRight: Border = grid.map(_.last)
+
+    override def toString: String = id.toString
+  }
 
   def findCorners(tiles: Seq[Tile]): Seq[Tile] = {
 
-    def borders(tile: Tile): Seq[Vector[Boolean]] = Seq(
-      tile.grid.head,
-      tile.grid.last,
-      tile.grid.map(_.head),
-      tile.grid.map(_.last),
-    )
+    def borders(tile: Tile): Seq[Border] = {
+      Seq(
+        tile.borderTop,
+        tile.borderBottom,
+        tile.borderLeft,
+        tile.borderRight
+      )
+        .flatMap(border =>
+          Seq(border,  border.reverse)
+        )
+    }
 
-    val edges =
+    val borderTiles =
       tiles
         .flatMap(tile =>
-          borders(tile)
-            .flatMap(border =>
-              Seq(border,  border.reverse)
-            )
-            .map(_ -> tile)
+          borders(tile).map(_ -> tile)
         )
         .groupMap(_._1)(_._2)
-        .filter(_._2.size == 1)
+    val edgeBorderTiles =
+      borderTiles
+        .collect({
+          case (border, Seq(tile)) => border -> tile
+        })
 
-    val edgeTiles =
-      (for {
-        (border, tiles) <- edges.view
-        tile <- tiles
-      } yield tile -> border)
-        .groupMapReduce(_._1)(p => Set(p._2))(_ ++ _)
+    val tileEdgeBorders =
+      edgeBorderTiles
+        .groupMapReduce(_._2)(p => Set(p._1))(_ ++ _)
 
-    for ((a, b) <- edges)
-      println(s"$a: ${b.map(_.id)}")
+    /*for ((a, b) <- edgeBorderTiles)
+      println(s"$a: $b")
 
-    for ((a, b) <- edgeTiles)
-      println(s"${a.id}: ${b.size}")
+    for ((a, b) <- tileEdgeBorders)
+      println(s"${a.id}: ${b.size}")*/
 
-    edgeTiles.filter(_._2.size == 4).keys.toSeq
+    tileEdgeBorders.filter(_._2.size == 4).keys.toSeq
   }
 
   def cornerIdProduct(tiles: Seq[Tile]): Long = findCorners(tiles).map(_.id.toLong).product
