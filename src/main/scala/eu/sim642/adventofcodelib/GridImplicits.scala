@@ -37,21 +37,16 @@ object GridImplicits {
     def groupedGrid(groupSize: Int): Grid[Grid[A]] =
       grid.grouped(groupSize).map(_.map(_.grouped(groupSize).toVector).transpose).toVector
 
-    def slidingGrid(size: Int): Iterator[Iterator[Grid[A]]] = {
-      grid.sliding(size).map({ rows =>
-        rows.map(_.sliding(size).toVector).transpose.iterator
+    def slidingGrid(size: Pos): Iterator[Iterator[Grid[A]]] = {
+      grid.sliding(size.y).map({ rows =>
+        rows.map(_.sliding(size.x).toVector).transpose.iterator
       })
     }
 
-    def slidingGrid2(sizeRow: Int, sizeCol: Int): Iterator[Iterator[Grid[A]]] = {
-      grid.sliding(sizeRow).map({ rows =>
-        rows.map(_.sliding(sizeCol).toVector).transpose.iterator
-      })
-    }
+    def slidingGrid(size: Int): Iterator[Iterator[Grid[A]]] = slidingGrid(Pos(size, size))
 
-    def correspondsGrid[B](otherGrid: Grid[B])(p: (A, B) => Boolean): Boolean = {
+    def correspondsGrid[B](otherGrid: Grid[B])(p: (A, B) => Boolean): Boolean =
       grid.corresponds(otherGrid)(_.corresponds(_)(p))
-    }
 
     def sumGrid(implicit num: Numeric[A]): A =
       grid.iterator.map(_.sum).sum
