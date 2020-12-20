@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2020
 
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 
 object Day20 {
@@ -157,35 +158,27 @@ object Day20 {
     val grid = solved.mapGrid(_.innerGrid).flattenGrid // TODO: try all orientations
     //printGrid(grid)
 
+    def grid2PosSet(grid: Grid[Boolean]): Set[Pos] = {
+      (for {
+        (row, y) <- grid.view.zipWithIndex
+        (cell, x) <- row.view.zipWithIndex
+        if cell
+      } yield Pos(x, y)).toSet
+    }
+
+    val monster = seamonster.linesIterator.map(_.toVector).toVector.mapGrid(_ == '#')
+    val monsterPosSet = grid2PosSet(monster)
+
     def doOrientation(grid: Grid[Boolean]): Option[Int] = {
-      val monster = seamonster.linesIterator.map(_.toVector).toVector.mapGrid(_ == '#')
-      //printGrid(monster)
-      val monsterPoss =
-        (for {
-          (row, y) <- grid.slidingGrid2(monster.size, monster.head.size).zipWithIndex
-          (window, x) <- row.zipWithIndex
-          if window.correspondsGrid(monster)({
-            case (true, true) => true
-            case (_, false) => true
-            case (_, _) => false
-          })
-        } yield Pos(x, y)).toSet
-      //println(monsterPoss)
-
-      if (monsterPoss.isEmpty)
-        return None
-
-      def grid2PosSet(grid: Grid[Boolean]): Set[Pos] = {
-        (for {
-          (row, y) <- grid.view.zipWithIndex
-          (cell, x) <- row.view.zipWithIndex
-          if cell
-        } yield Pos(x, y)).toSet
-      }
-
-      val monsterPosSet = monsterPoss.flatMap(pos => grid2PosSet(monster).map(pos + _))
       val gridPosSet = grid2PosSet(grid)
-      Some((gridPosSet -- monsterPosSet).size)
+
+      val monsterPosSet2 =
+        Box(Pos.zero, Pos(grid.head.length - monster.head.length - 1, grid.length - monster.length - 1)).iterator
+          .map(pos => monsterPosSet.map(pos + _))
+          .filter(_.subsetOf(gridPosSet))
+          .reduceOption(_ ++ _)
+
+      monsterPosSet2.map(s => (gridPosSet -- s).size)
     }
 
     grid.orientations.flatMap(doOrientation).head
