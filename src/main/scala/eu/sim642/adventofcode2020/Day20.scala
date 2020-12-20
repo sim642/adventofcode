@@ -127,7 +127,7 @@ object Day20 {
   }
 
   private val seaMonster =
-    """                  #
+    """                  #.
       |#    ##    ##    ###
       | #  #  #  #  #  #   """.stripMargin
 
@@ -144,13 +144,14 @@ object Day20 {
       } yield Pos(x, y)).toSet
     }
 
-    val seaMonsterGrid = seaMonster.linesIterator.map(_.toVector).toVector.mapGrid(_ == '#')
-    val seaMonsterPoss = booleanGrid2Poss(seaMonsterGrid)
-    val seaMonsterSize = Pos(seaMonsterGrid.head.length, seaMonsterGrid.length)
+    val gridPoss = booleanGrid2Poss(grid)
+    val gridSize = Pos(grid.head.length, grid.length)
 
-    def checkSeaMonstersGrid(grid: Grid[Boolean]): Option[Int] = {
-      val gridPoss = booleanGrid2Poss(grid)
-      val gridSize = Pos(grid.head.length, grid.length)
+    // orienting sea monster is slightly faster than orienting grid
+
+    def checkGridSeaMonster(seaMonsterGrid: Grid[Boolean]): Option[Int] = {
+      val seaMonsterPoss = booleanGrid2Poss(seaMonsterGrid)
+      val seaMonsterSize = Pos(seaMonsterGrid.head.length, seaMonsterGrid.length)
 
       Box(Pos.zero, gridSize - seaMonsterSize - Pos(1, 1)).iterator
         .map(pos => seaMonsterPoss.map(pos + _))
@@ -159,7 +160,8 @@ object Day20 {
         .map(seaMonsterPoss => (gridPoss -- seaMonsterPoss).size)
     }
 
-    grid.orientations.flatMap(checkSeaMonstersGrid).head
+    val seaMonsterGrid = seaMonster.linesIterator.map(_.toVector).toVector.mapGrid(_ == '#')
+    seaMonsterGrid.orientations.flatMap(checkGridSeaMonster).head
   }
 
   private val tileIdRegex = """Tile (\d+):""".r
