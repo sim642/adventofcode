@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2020
 
+import eu.sim642.adventofcodelib.IteratorImplicits._
+
 object Day21 {
 
   case class Food(ingredients: Set[String], allergens: Set[String])
@@ -26,6 +28,36 @@ object Day21 {
       .sum
   }
 
+  def solveAllergenIngredients(foods: Seq[Food]): Map[String, String] = {
+
+    def helper(allergenIngredients: Map[String, Set[String]]): Iterator[Map[String, String]] = {
+      if (allergenIngredients.isEmpty)
+        Iterator(Map.empty)
+      else {
+        val (allergen, ingredients) = allergenIngredients.head
+        val newAllergenIngredients = allergenIngredients - allergen
+        for {
+          ingredient <- ingredients.iterator
+          newAllergenIngredients2 = newAllergenIngredients.view.mapValues(_ - ingredient).toMap
+          rest <- helper(newAllergenIngredients2)
+        } yield rest + (allergen -> ingredient)
+      }
+    }
+
+    val allergenIngredients = findAllergenIngredients(foods)
+    helper(allergenIngredients).head
+  }
+
+  def canonicalBadIngredients(foods: Seq[Food]): String = {
+    val allergenIngredients = solveAllergenIngredients(foods)
+
+    allergenIngredients
+      .toSeq
+      .sortBy(_._1)
+      .map(_._2)
+      .mkString(",")
+  }
+
 
   private val foodRegex = """(.*) \(contains (.*)\)""".r
 
@@ -43,5 +75,6 @@ object Day21 {
 
   def main(args: Array[String]): Unit = {
     println(countGoodIngredients(parseFoods(input)))
+    println(canonicalBadIngredients(parseFoods(input)))
   }
 }
