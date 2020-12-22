@@ -73,9 +73,9 @@ object Day22 {
             playWinner(recDecks)
           } else {
             if (card1 > card2)
-              Left()
+              Left(())
             else
-              Right()
+              Right(())
           }
         }
 
