@@ -1,12 +1,11 @@
 package eu.sim642.adventofcode2020
 
-import scala.collection.immutable.Queue
 import eu.sim642.adventofcodelib.LazyListImplicits._
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
 object Day22 {
 
-  type Deck = Queue[Int]
+  type Deck = Vector[Int]
   type Decks = (Deck, Deck)
 
   sealed trait Part {
@@ -38,17 +37,14 @@ object Day22 {
         Right(lastDeck2)
     }
 
-    private def playRound(decks: Decks): Option[Decks] = {
-      val (deck1, deck2) = decks
-      (deck1.dequeueOption, deck2.dequeueOption) match {
-        case (Some((card1, newDeck1)), Some((card2, newDeck2))) =>
-          if (card1 > card2)
-            Some((newDeck1.enqueue(card1).enqueue(card2), newDeck2))
-          else
-            Some((newDeck1, newDeck2.enqueue(card2).enqueue(card1)))
-        case (_, _) =>
-          None
-      }
+    private def playRound(decks: Decks): Option[Decks] = decks match {
+      case (card1 +: newDeck1, card2 +: newDeck2) =>
+        if (card1 > card2)
+          Some((newDeck1 :+ card1 :+ card2, newDeck2))
+        else
+          Some((newDeck1, newDeck2 :+ card2 :+ card1))
+      case (_, _) =>
+        None
     }
   }
 
@@ -69,37 +65,33 @@ object Day22 {
       }
     }
 
-    private def playRound(decks: Decks): Option[Decks] = {
-      val (deck1, deck2) = decks
-      (deck1.dequeueOption, deck2.dequeueOption) match {
-        case (Some((card1, newDeck1)), Some((card2, newDeck2))) =>
-          val winner: Either[Any, Any] = {
-            // TODO: Queue has inefficient length?
-            if (newDeck1.length >= card1 && newDeck2.length >= card2) {
-              val recDecks = (newDeck1.take(card1), newDeck2.take(card2))
-              playWinner(recDecks)
-            } else {
-              if (card1 > card2)
-                Left()
-              else
-                Right()
-            }
+    private def playRound(decks: Decks): Option[Decks] = decks match {
+      case (card1 +: newDeck1, card2 +: newDeck2) =>
+        val winner: Either[Any, Any] = {
+          if (newDeck1.lengthIs >= card1 && newDeck2.lengthIs >= card2) {
+            val recDecks = (newDeck1.take(card1), newDeck2.take(card2))
+            playWinner(recDecks)
+          } else {
+            if (card1 > card2)
+              Left()
+            else
+              Right()
           }
+        }
 
-          winner match {
-            case Left(_) =>
-              Some((newDeck1.enqueue(card1).enqueue(card2), newDeck2))
-            case Right(_) =>
-              Some((newDeck1, newDeck2.enqueue(card2).enqueue(card1)))
-          }
-        case (_, _) =>
-          None
-      }
+        winner match {
+          case Left(_) =>
+            Some((newDeck1 :+ card1 :+ card2, newDeck2))
+          case Right(_) =>
+            Some((newDeck1, newDeck2 :+ card2 :+ card1))
+        }
+      case (_, _) =>
+        None
     }
   }
 
 
-  def parseDeck(s: String): Deck = s.linesIterator.drop(1).map(_.toInt).to(Queue) // TODO: Iterator tail
+  def parseDeck(s: String): Deck = s.linesIterator.drop(1).map(_.toInt).toVector // TODO: Iterator tail
 
   def parseDecks(input: String): Decks = {
     val Seq(s1, s2) = input.split("\n\n").toSeq
