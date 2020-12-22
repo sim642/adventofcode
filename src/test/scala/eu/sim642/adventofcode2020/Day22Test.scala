@@ -21,10 +21,18 @@ class Day22Test extends AnyFunSuite {
       |10""".stripMargin
 
   test("Part 1 examples") {
-    assert(winningScore(parseDecks(exampleInput)) == 306)
+    assert(Part1.winningScore(parseDecks(exampleInput)) == 306)
   }
 
   test("Part 1 input answer") {
-    assert(winningScore(parseDecks(input)) == 35202)
+    assert(Part1.winningScore(parseDecks(input)) == 35202)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.winningScore(parseDecks(exampleInput)) == 291)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.winningScore(parseDecks(input)) == 32317)
   }
 }
