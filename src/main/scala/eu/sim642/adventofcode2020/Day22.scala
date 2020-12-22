@@ -69,8 +69,19 @@ object Day22 {
       case (card1 +: newDeck1, card2 +: newDeck2) =>
         val winner: Either[Any, Any] = {
           if (newDeck1.lengthIs >= card1 && newDeck2.lengthIs >= card2) {
-            val recDecks = (newDeck1.take(card1), newDeck2.take(card2))
-            playWinner(recDecks)
+            val recDec1 = newDeck1.take(card1)
+            val recDec2 = newDeck2.take(card2)
+            // "Supercard" optimization:
+            // https://github.com/glguy/advent2020/blob/1776cb3388581a1fbab79f1802650d43e24ffa66/execs/Day22.hs#L62-L65
+            // No difference on my input, 20× difference on mstksg input
+            val recDec1Max = recDec1.max
+            val recDec2Max = recDec2.max
+            if (recDec1Max > recDec2Max && recDec1Max >= (card1 + card2))
+              Left(())
+            else {
+              val recDecks = (recDec1, recDec2)
+              playWinner(recDecks)
+            }
           } else {
             if (card1 > card2)
               Left(())

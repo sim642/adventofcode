@@ -20,6 +20,8 @@ class Day22Test extends AnyFunSuite {
       |7
       |10""".stripMargin
 
+  lazy val mstksgInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22mstksg.txt")).mkString.trim
+
   test("Part 1 examples") {
     assert(Part1.winningScore(parseDecks(exampleInput)) == 306)
   }
@@ -34,5 +36,9 @@ class Day22Test extends AnyFunSuite {
 
   test("Part 2 input answer") {
     assert(Part2.winningScore(parseDecks(input)) == 32317)
+  }
+
+  test("Part 2 mstksg") {
+    assert(Part2.winningScore(parseDecks(mstksgInput)) == 32760) // unconfirmed answer
   }
 }
