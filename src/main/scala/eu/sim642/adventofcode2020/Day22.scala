@@ -10,12 +10,12 @@ object Day22 {
   type Decks = (Deck, Deck)
 
   sealed trait Part {
-    def playWinner(decks: Decks): Either[Decks, Decks]
+    def playWinner(decks: Decks): Either[Deck, Deck]
 
     def winningScore(decks: Decks): Int = {
       val winningDeck = playWinner(decks) match {
-        case Left((deck1, _)) => deck1
-        case Right((_, deck2)) => deck2
+        case Left(deck1) => deck1
+        case Right(deck2) => deck2
       }
       winningDeck
         .reverseIterator
@@ -25,18 +25,20 @@ object Day22 {
     }
   }
 
+  // TODO: reduce duplication
+
   object Part1 extends Part {
 
-    override def playWinner(decks: Decks): Either[Decks, Decks] = {
-      val roundDecks = LazyList.unfold0(decks)(playRound)
-      val lastDecks@(lastDeck1, _) = roundDecks.last
+    override def playWinner(decks: Decks): Either[Deck, Deck] = {
+      val roundDecks = decks #:: LazyList.unfold0(decks)(playRound) // unfold0 doesn't include first
+      val (lastDeck1, lastDeck2) = roundDecks.last
       if (lastDeck1.nonEmpty)
-        Left(lastDecks)
+        Left(lastDeck1)
       else
-        Right(lastDecks)
+        Right(lastDeck2)
     }
 
-    def playRound(decks: Decks): Option[Decks] = {
+    private def playRound(decks: Decks): Option[Decks] = {
       val (deck1, deck2) = decks
       (deck1.dequeueOption, deck2.dequeueOption) match {
         case (Some((card1, newDeck1)), Some((card2, newDeck2))) =>
@@ -51,46 +53,44 @@ object Day22 {
   }
 
   object Part2 extends Part {
+    // TODO: optimize
 
-    override def playWinner(decks: Decks): Either[Decks, Decks] = {
-      //println(s"GAME: $decks")
-      val roundDecks = decks #:: LazyList.unfold0(decks)(playRound)
+    override def playWinner(decks: Decks): Either[Deck, Deck] = {
+      val roundDecks = decks #:: LazyList.unfold0(decks)(playRound) // unfold0 doesn't include first
       NaiveCycleFinder.find(roundDecks) match {
         case None =>
-          val lastDecks@(lastDeck1, _) = roundDecks.last
-          //println("GAME OVER (normal)")
+          val (lastDeck1, lastDeck2) = roundDecks.last
           if (lastDeck1.nonEmpty)
-            Left(lastDecks)
+            Left(lastDeck1)
           else
-            Right(lastDecks)
+            Right(lastDeck2)
         case Some(cycle) =>
-          //println("GAME OVER (cycle)")
-          Left(cycle.cycleHead)
+          Left(cycle.cycleHead._1)
       }
     }
 
-    def playRound(decks: Decks): Option[Decks] = {
-      //println(s"ROUND: $decks")
+    private def playRound(decks: Decks): Option[Decks] = {
       val (deck1, deck2) = decks
       (deck1.dequeueOption, deck2.dequeueOption) match {
         case (Some((card1, newDeck1)), Some((card2, newDeck2))) =>
-          //println(s"  $card1 vs $card2")
-          // TODO: Queue has inefficient length?
-          if (!(newDeck1.length >= card1 && newDeck2.length >= card2)) {
-            if (card1 > card2)
-              Some((newDeck1.enqueue(card1).enqueue(card2), newDeck2))
-            else
-              Some((newDeck1, newDeck2.enqueue(card2).enqueue(card1)))
-          }
-          else {
-            val recDeck1 = newDeck1.take(card1)
-            val recDeck2 = newDeck2.take(card2)
-            playWinner((recDeck1, recDeck2)) match {
-              case Left(_) =>
-                Some((newDeck1.enqueue(card1).enqueue(card2), newDeck2))
-              case Right(_) =>
-                Some((newDeck1, newDeck2.enqueue(card2).enqueue(card1)))
+          val winner: Either[Any, Any] = {
+            // TODO: Queue has inefficient length?
+            if (newDeck1.length >= card1 && newDeck2.length >= card2) {
+              val recDecks = (newDeck1.take(card1), newDeck2.take(card2))
+              playWinner(recDecks)
+            } else {
+              if (card1 > card2)
+                Left()
+              else
+                Right()
             }
+          }
+
+          winner match {
+            case Left(_) =>
+              Some((newDeck1.enqueue(card1).enqueue(card2), newDeck2))
+            case Right(_) =>
+              Some((newDeck1, newDeck2.enqueue(card2).enqueue(card1)))
           }
         case (_, _) =>
           None
