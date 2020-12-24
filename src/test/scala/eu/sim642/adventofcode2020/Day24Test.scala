@@ -34,4 +34,12 @@ class Day24Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countBlackTiles(parseDirections(input)) == 277)
   }
+
+  test("Part 2 examples") {
+    assert(countBlackTilesAfter(parseDirections(exampleInput)) == 2208)
+  }
+
+  test("Part 2 input answer") {
+    assert(countBlackTilesAfter(parseDirections(input)) == 3531)
+  }
 }
