@@ -9,4 +9,4 @@
 | 2017 | [Solutions](src/main/scala/eu/sim642/adventofcode2017) | [My inputs](src/main/resources/eu/sim642/adventofcode2017) | [Tests](src/test/scala/eu/sim642/adventofcode2017) |
 | 2018 | [Solutions](src/main/scala/eu/sim642/adventofcode2018) | [My inputs](src/main/resources/eu/sim642/adventofcode2018), [other inputs](src/test/resources/eu/sim642/adventofcode2018) | [Tests](src/test/scala/eu/sim642/adventofcode2018) |
 | 2019 | [Solutions](src/main/scala/eu/sim642/adventofcode2019) | [My inputs](src/main/resources/eu/sim642/adventofcode2019) | [Tests](src/test/scala/eu/sim642/adventofcode2019) |
-| 2020 | [Solutions](src/main/scala/eu/sim642/adventofcode2020) | [My inputs](src/main/resources/eu/sim642/adventofcode2020) | [Tests](src/test/scala/eu/sim642/adventofcode2020) |
+| 2020 | [Solutions](src/main/scala/eu/sim642/adventofcode2020) | [My inputs](src/main/resources/eu/sim642/adventofcode2020), [other inputs](src/test/resources/eu/sim642/adventofcode2020) | [Tests](src/test/scala/eu/sim642/adventofcode2020) |
