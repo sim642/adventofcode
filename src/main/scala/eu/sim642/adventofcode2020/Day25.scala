@@ -1,6 +1,8 @@
 package eu.sim642.adventofcode2020
 
 import eu.sim642.adventofcodelib.IntegralImplicits._
+import eu.sim642.adventofcodelib.NumberTheory
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day25 {
 
@@ -10,12 +12,37 @@ object Day25 {
     subjectNumber.toLong.modPow(loopSize, modulo).toInt
   }
 
-  def findLoopSize(publicKey: Int, subjectNumber: Int = 7): Int = {
-    Iterator.iterate(1)(value => (subjectNumber * value) % modulo)
+  // TODO: move discrete log to NumberTheory
+
+  def discreteLogNaive(a: Int, b: Int, n: Int): Int = {
+    Iterator.iterate(1)(value => (a * value) % n)
       .zipWithIndex
-      .find(_._1 == publicKey)
+      .find(_._1 == b)
       .get
       ._2
+  }
+
+  def discreteLogBabyStepGiantStep(a: Int, b: Int, n: Int): Int = {
+    // https://en.wikipedia.org/wiki/Baby-step_giant-step
+    val m = math.sqrt(n).ceil.toInt
+    val map = {
+      Iterator.iterate(1, m)(acc => ((a * acc.toLong) % n).toInt)
+        .zipWithIndex
+        .toMap
+    }
+
+    val amm = NumberTheory.modInv(a.toLong, n).modPow(m, n).toInt
+    Iterator.iterate(b, m)(acc => ((amm * acc.toLong) % n).toInt)
+      .zipWithIndex
+      .flatMap({ case (gamma, i) =>
+        map.get(gamma).map(j => i * m + j)
+      })
+      .head
+  }
+
+  def findLoopSize(publicKey: Int, subjectNumber: Int = 7): Int = {
+    //discreteLogNaive(subjectNumber, publicKey, modulo)
+    discreteLogBabyStepGiantStep(subjectNumber, publicKey, modulo)
   }
 
   def findEncryptionKey(publicKeys: (Int, Int)): Int = {
