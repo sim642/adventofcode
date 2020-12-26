@@ -33,6 +33,11 @@ object NumberTheory {
 
   def modInv[A: Integral](a: A, m: A): A = bezoutCoefs(a, m)._1 %+ m
 
+  // TODO: implement alternative non-coprime CRT
+  // https://github.com/ephemient/aoc2020/blob/ae97985412eed9ed39589fbc00f2889f5649caf8/hs/src/Common.hs#L12-L21
+  // https://gist.github.com/ephemient/d6b11a869593e22ea15a9199b2c794c3
+  // https://github.com/sympy/sympy/blob/9e8f62e059d83178c1d8a1e19acac5473bdbf1c1/sympy/ntheory/modular.py#L186-L206
+
   private def crt2[A: Integral](an1: (A, A), an2: (A, A)): (A, A) = {
     // https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Existence_(constructive_proof)
     // https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Generalization_to_non-coprime_moduli
