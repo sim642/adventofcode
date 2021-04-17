@@ -2,7 +2,7 @@ name := "adventofcode"
 
 version := "0.1"
 
-scalaVersion := "2.13.4"
+scalaVersion := "2.13.5"
 scalacOptions ++= Seq("-deprecation")
 
 // TODO: unnecessary for scalameter because it exists on maven central?
