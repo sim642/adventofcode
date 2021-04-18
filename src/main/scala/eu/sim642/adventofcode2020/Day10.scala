@@ -5,7 +5,7 @@ import eu.sim642.adventofcodelib.LazyMap
 import eu.sim642.adventofcodelib.LazyMapImplicits._
 
 import scala.annotation.tailrec
-import scala.collection.compat.immutable.ArraySeq
+import scala.collection.immutable.ArraySeq
 
 object Day10 {
 

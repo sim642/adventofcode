@@ -31,7 +31,7 @@ object Day25 {
         .toMap
     }
 
-    val amm = NumberTheory.modInv(a.toLong, n).modPow(m, n).toInt
+    val amm = NumberTheory.modInv(a.toLong, n.toLong).modPow(m, n).toInt
     Iterator.iterate(b, m)(acc => ((amm * acc.toLong) % n).toInt)
       .zipWithIndex
       .flatMap({ case (gamma, i) =>

@@ -53,7 +53,7 @@ object Day10 {
     override def minimizePointsArea(points: Seq[Point]): (Seq[Point], Int) = {
       def slope(t: Int): Long = stepBoundingArea(points, t + 1) - stepBoundingArea(points, t)
 
-      val minSecond = OrderedSearch.exponentialBinaryLower(slope, 0)(0)
+      val minSecond = OrderedSearch.exponentialBinaryLower(slope, 0)(0L)
       (points.map(_.step(minSecond)), minSecond)
     }
   }
