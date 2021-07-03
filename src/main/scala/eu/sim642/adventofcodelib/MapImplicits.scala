@@ -6,7 +6,7 @@ import scala.language.implicitConversions
 
 object MapImplicits {
 
-  class IntersectionMapOps[Repr, M <: IsMap[Repr]](coll: Repr, map: M) {
+  extension [Repr](coll: Repr)(using map: IsMap[Repr]) {
     // TODO: is BuildFrom even necessary?
     // TODO: generalize that Map
     def intersect[That](thatColl: Repr)(f: (map.V, map.V) => map.V)(implicit bf: BuildFrom[Repr, (map.K, map.V), That]): That = {
@@ -27,7 +27,4 @@ object MapImplicits {
       )
     }
   }
-
-  implicit def IntersectionMapOps[Repr](coll: Repr)(implicit map: IsMap[Repr]): IntersectionMapOps[Repr, map.type] =
-    new IntersectionMapOps(coll, map)
 }

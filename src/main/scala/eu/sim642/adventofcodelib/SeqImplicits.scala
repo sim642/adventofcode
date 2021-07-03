@@ -8,7 +8,7 @@ import scala.language.implicitConversions
 
 object SeqImplicits {
 
-  class RotateSeqOps[Repr, S <: IsSeq[Repr]](coll: Repr, seq: S) {
+  extension [Repr](coll: Repr)(using seq: IsSeq[Repr]) {
     def rotateLeft[That](n: Int)(implicit bf: BuildFrom[Repr, seq.A, That]): That = {
       val seqOps = seq(coll)
       val realN = n %+ seqOps.length
@@ -32,7 +32,4 @@ object SeqImplicits {
      def rotateRight[That](n: Int)(implicit bf: BuildFrom[Repr, seq.A, That], seqIsRepr: seq.C =:= Repr): That =
        rotateLeft(-n)
   }*/
-
-  implicit def RotateSeqOps[Repr](coll: Repr)(implicit seq: IsSeq[Repr]): RotateSeqOps[Repr, seq.type] =
-    new RotateSeqOps(coll, seq)
 }
