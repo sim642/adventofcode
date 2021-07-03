@@ -40,6 +40,7 @@ object Day12 {
         case Left(90) | Right(270) => ship.copy(direction = direction.left)
         case Left(180) | Right(180) => ship.copy(direction = -1 *: direction)
         case Left(270) | Right(90) => ship.copy(direction = direction.right)
+        case Left(_) | Right(_) => throw new IllegalArgumentException("illegal degrees")
         case Forward(amount) => ship.copy(pos = pos + amount *: direction)
       }
     }
@@ -59,6 +60,7 @@ object Day12 {
         case Left(90) | Right(270) => ship.copy(direction = direction.left)
         case Left(180) | Right(180) => ship.copy(direction = -1 *: direction)
         case Left(270) | Right(90) => ship.copy(direction = direction.right)
+        case Left(_) | Right(_) => throw new IllegalArgumentException("illegal degrees")
         case Forward(amount) => ship.copy(pos = pos + amount *: direction)
       }
     }
