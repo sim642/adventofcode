@@ -118,7 +118,8 @@ object Day22 {
     }
 
     def toLinear(techniques: Techniques, modular: Modular): modular.Linear = {
-      techniques.map(toLinear(_, modular)).reduce((a, b) => b.compose(a))
+      val linears: Seq[modular.Linear] = techniques.map(toLinear(_, modular)) // TODO: why is this type annotation necessary in Scala 3?
+      linears.reduce((a, b) => b.compose(a))
     }
 
     override def shuffleFactoryOrderPosition(techniques: Techniques, size: Long, card: Long): Long = {
