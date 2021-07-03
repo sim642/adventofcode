@@ -26,8 +26,8 @@ object Day10 {
 
     val comparisons = mutable.Map[Target, Set[Set[Int]]]().withDefaultValue(Set.empty)
 
-    var changed: Boolean = false
-    do {
+    var changed: Boolean = true // always run loop body at least once, a la do..while, which is unsupported in Scala 3
+    while (changed) {
       changed = false
 
       targets.find(_._2.size == 2) match {
@@ -48,7 +48,7 @@ object Day10 {
           }
         case None =>
       }
-    } while (changed)
+    }
 
     //println(targets)
     //println(comparisons)

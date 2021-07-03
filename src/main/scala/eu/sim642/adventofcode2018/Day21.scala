@@ -45,7 +45,7 @@ object Day21 {
         r5 = r2 | 65536
         r2 = 2238642
         breakable {
-          do {
+          while (true) {
             r3 = r5 & 255
             r2 += r3
             r2 &= 16777215
@@ -68,7 +68,7 @@ object Day21 {
             }
             else
               break()
-          } while (true)
+          }
         }
 
         Seq(r0, r1, r2, r3, r4, r5)
