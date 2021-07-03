@@ -3,7 +3,9 @@
   <component name="ScalaCompilerConfiguration">
     <option name="deprecationWarnings" value="true" />
     <profile name="sbt 1" modules="adventofcode">
-      <option name="deprecationWarnings" value="true" />
+      <parameters>
+        <parameter value="-source:3.0-migration" />
+      </parameters>
     </profile>
   </component>
 </project>
