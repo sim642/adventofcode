@@ -7,7 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class Day4Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   test("toDigitList") {
-    forAll { number: Int =>
+    forAll { (number: Int) =>
       whenever (number >= 0) {
         assert(toDigitList(number) == number.toString.toList.map(_.asDigit))
       }

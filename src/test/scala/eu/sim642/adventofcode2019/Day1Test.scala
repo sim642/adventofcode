@@ -60,7 +60,7 @@ object Day1Test {
   class ClosedFormPart2SolutionTest extends Part2SolutionTest(ClosedFormPart2Solution) {
 
     test("Equivalent to recursive") {
-      forAll ("mass") { mass: Int =>
+      forAll ("mass") { (mass: Int) =>
         whenever (mass >= 0) {
           assert(ClosedFormPart2Solution.requiredFuel(mass) == RecursivePart2Solution.requiredFuel(mass))
         }
