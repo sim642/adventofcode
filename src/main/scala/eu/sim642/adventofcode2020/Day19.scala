@@ -126,9 +126,9 @@ object Day19 {
                 .map(i =>
                   Sub(i.toInt)
                 )
-                .reduce(Concat)
+                .reduce(Concat.apply)
             )
-            .reduce(Choice)
+            .reduce(Choice.apply)
       })
   }
 

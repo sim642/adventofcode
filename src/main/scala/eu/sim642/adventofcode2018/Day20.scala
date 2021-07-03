@@ -128,13 +128,13 @@ object Day20 extends RegexParsers {
 
     def inputRegexNode: Parser[RegexNode] = "^" ~> concatNode <~ "$"
 
-    def concatNode: Parser[ConcatNode] = rep1(regexNode) ^^ ConcatNode
+    def concatNode: Parser[ConcatNode] = rep1(regexNode) ^^ ConcatNode.apply
 
     def emptyNode: Parser[StringNode] = "" ^^^ StringNode("")
 
     def regexNode: Parser[RegexNode] = (
-      "[NESW]+".r ^^ StringNode
-    | "(" ~> repsep(concatNode | emptyNode, "|") <~ ")" ^^ ChoiceNode
+      "[NESW]+".r ^^ StringNode.apply
+    | "(" ~> repsep(concatNode | emptyNode, "|") <~ ")" ^^ ChoiceNode.apply
     )
 
     parseAll(inputRegexNode, input) match {

@@ -49,9 +49,9 @@ object Day18 extends RegexParsers {
 
   object Part2 extends Part {
 
-    def factor: Parser[Expr] = chainl1(simple, "+" ^^^ Add)
+    def factor: Parser[Expr] = chainl1(simple, "+" ^^^ Add.apply)
 
-    def expr: Parser[Expr] = chainl1(factor, "*" ^^^ Mul)
+    def expr: Parser[Expr] = chainl1(factor, "*" ^^^ Mul.apply)
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim

@@ -65,11 +65,11 @@ object Day7 extends RegexParsers {
 
     def simpleExpr: Parser[SimpleExpr] = (
       "\\d+".r ^^ { value => Const(value.toInt) }
-    | ident ^^ Wire
+    | ident ^^ Wire.apply
     )
 
     def expr: Parser[Expr] = (
-      "NOT" ~> simpleExpr ^^ Not
+      "NOT" ~> simpleExpr ^^ Not.apply
     | simpleExpr ~ "AND" ~ simpleExpr ^^ { case left ~ _ ~ right => And(left, right)}
     | simpleExpr ~ "OR" ~ simpleExpr ^^ { case left ~ _ ~ right => Or(left, right)}
     | simpleExpr ~ "LSHIFT" ~ simpleExpr ^^ { case left ~ _ ~ right => Lshift(left, right)}
