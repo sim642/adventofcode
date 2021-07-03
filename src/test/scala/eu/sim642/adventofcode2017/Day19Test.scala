@@ -5,7 +5,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class Day19Test extends AnyFunSuite {
 
-  lazy val exampleInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day19example.txt")).mkString.stripLineEnd
+  lazy val exampleInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19example.txt")).mkString.stripLineEnd
 
   test("Part 1 example") {
     assert(pathLetters(exampleInput) == "ABCDEF")
