@@ -38,7 +38,7 @@ object Day22 {
     }
 
     def shuffleFactoryOrder(techniques: Techniques, size: Long): Deck = {
-      techniques.foldLeft(Vector.range(0, size))((deck, technique) => applyDeck(technique, deck))
+      techniques.foldLeft(Vector.range(0L, size))((deck, technique) => applyDeck(technique, deck))
     }
 
     override def shuffleFactoryOrderPosition(techniques: Techniques, size: Long, card: Long): Long = {
