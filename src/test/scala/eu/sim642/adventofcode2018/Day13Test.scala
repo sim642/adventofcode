@@ -3,37 +3,33 @@ package eu.sim642.adventofcode2018
 import Day13._
 import org.scalatest.funsuite.AnyFunSuite
 
-import scala.collection.immutable.StringOps
-
 class Day13Test extends AnyFunSuite {
 
-  // TODO: remove workaround for Scala 3 scalatest stripMargin workaround (https://github.com/scalatest/scalatest/issues/2004)
-
-  val exampleInput1 = new StringOps(
+  val exampleInput1 =
     """|
       !v
       !|
       !|
       !|
       !^
-      !|""").stripMargin('!')
+      !|""".stripMargin('!')
 
-  val exampleInput2 = new StringOps(
+  val exampleInput2 =
     """/->-\
       !|   |  /----\
       !| /-+--+-\  |
       !| | |  | v  |
       !\-+-/  \-+--/
-      !  \------/   """).stripMargin('!')
+      !  \------/   """.stripMargin('!')
 
-  val exampleInput3 = new StringOps(
+  val exampleInput3 =
     """/>-<\
       !|   |
       !| /<+-\
       !| | | v
       !\>+</ |
       !  |   ^
-      !  \<->/""").stripMargin('!')
+      !  \<->/""".stripMargin('!')
 
   test("Part 1 examples") {
     assert(firstCollisionPos(exampleInput1) == "0,3")
