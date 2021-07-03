@@ -5,6 +5,8 @@
     <profile name="sbt 1" modules="adventofcode">
       <parameters>
         <parameter value="-source:3.0-migration" />
+        <parameter value="-explain" />
+        <parameter value="-explain-types" />
       </parameters>
     </profile>
   </component>

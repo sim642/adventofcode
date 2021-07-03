@@ -11,6 +11,8 @@ scalacOptions ++= {
     (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((3, _)) => Seq(
         "-source:3.0-migration",
+        "-explain",
+        "-explain-types",
       )
       case _ => Seq(
         "-deprecation",
