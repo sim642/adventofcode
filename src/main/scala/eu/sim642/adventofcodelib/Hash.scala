@@ -27,20 +27,20 @@ object Hash {
   // TODO: implementation without clone()
 
   class Digest(messageDigest: MessageDigest) extends DigestOps[Digest] {
-    private def messageDigest(): MessageDigest = messageDigest.clone().asInstanceOf[MessageDigest]
+    private def cloneMessageDigest(): MessageDigest = messageDigest.clone().asInstanceOf[MessageDigest]
 
     override def apply(s: String): String = {
-      val md = messageDigest()
+      val md = cloneMessageDigest()
       bytesToHex(md.digest(s.getBytes))
     }
 
     override def apply(): String = {
-      val md = messageDigest()
+      val md = cloneMessageDigest()
       bytesToHex(md.digest())
     }
 
     override def prefix(prefix: String): Digest = {
-      val md = messageDigest()
+      val md = cloneMessageDigest()
       md.update(prefix.getBytes)
       new Digest(md)
     }
