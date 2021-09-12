@@ -3,22 +3,11 @@ name := "adventofcode"
 version := "0.1"
 
 scalaVersion := "3.0.0"
-crossScalaVersions ++= Seq("2.13.6", "3.0.0")
-scalacOptions ++= {
-  Seq(
-    //"-deprecation",
-  ) ++
-    (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((3, _)) => Seq(
-        "-source:3.0-migration",
-        "-explain",
-        "-explain-types",
-      )
-      case _ => Seq(
-        "-deprecation",
-      )
-    })
-}
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-explain",
+  "-explain-types",
+)
 
 // TODO: unnecessary for scalameter because it exists on maven central?
 //resolvers += "Sonatype OSS Snapshots" at
