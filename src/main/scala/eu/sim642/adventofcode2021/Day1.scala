@@ -2,8 +2,8 @@ package eu.sim642.adventofcode2021
 
 object Day1 {
 
-  def countIncreases(depths: Seq[Int]): Int = {
-    depths.sliding(2).count({
+  def countIncreases(depths: Seq[Int], window: Int = 1): Int = {
+    depths.sliding(window).map(_.sum).sliding(2).count({
       case Seq(a, b) if a < b => true
       case _ => false
     })
@@ -15,5 +15,6 @@ object Day1 {
 
   def main(args: Array[String]): Unit = {
     println(countIncreases(parseDepths(input)))
+    println(countIncreases(parseDepths(input), 3))
   }
 }

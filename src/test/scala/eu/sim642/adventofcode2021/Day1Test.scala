@@ -24,4 +24,12 @@ class Day1Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countIncreases(parseDepths(input)) == 1301)
   }
+
+  test("Part 2 examples") {
+    assert(countIncreases(parseDepths(exampleInput), 3) == 5)
+  }
+
+  test("Part 2 input answer") {
+    assert(countIncreases(parseDepths(input), 3) == 1346)
+  }
 }
