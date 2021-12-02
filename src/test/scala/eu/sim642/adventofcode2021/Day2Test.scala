@@ -14,10 +14,18 @@ class Day2Test extends AnyFunSuite {
       |forward 2""".stripMargin
 
   test("Part 1 examples") {
-    assert(multiplyFinalPos(parseCommands(exampleInput)) == 150)
+    assert(Part1.multiplyFinalPos(parseCommands(exampleInput)) == 150)
   }
 
   test("Part 1 input answer") {
-    assert(multiplyFinalPos(parseCommands(input)) == 1962940)
+    assert(Part1.multiplyFinalPos(parseCommands(input)) == 1962940)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.multiplyFinalPos(parseCommands(exampleInput)) == 900)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.multiplyFinalPos(parseCommands(input)) == 1813664422)
   }
 }
