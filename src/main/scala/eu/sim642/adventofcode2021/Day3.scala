@@ -10,8 +10,12 @@ object Day3 {
     binary.foldLeft(0)({ case (acc, bit) => (acc << 1) | (if bit then 1 else 0) })
   }
 
+  def mostCommonBit(bits: Seq[Boolean]): Boolean = {
+    2 * bits.count(_ == true) >= bits.size // multiply instead of dividing to avoid truncation
+  }
+
   def gammaRate(binaries: Seq[Binary]): Binary = {
-    binaries.transpose.map(2 * _.count(_ == true) >= binaries.size) // multiply instead of dividing to avoid truncation
+    binaries.transpose.map(mostCommonBit)
   }
 
   def powerConsumption(binaries: Seq[Binary]): Int = {
@@ -39,14 +43,12 @@ object Day3 {
   }
 
   def oxygenGeneratorRatingBitCriteria(bits: Seq[Boolean]): Boolean => Boolean = {
-    val mostCommon = 2 * bits.count(_ == true) >= bits.size // multiply instead of dividing to avoid truncation
+    val mostCommon = mostCommonBit(bits)
     _ == mostCommon
   }
 
   def co2ScrubberRatingBitCriteria(bits: Seq[Boolean]): Boolean => Boolean = {
-    // TODO: deduplicate
-    val mostCommon = 2 * bits.count(_ == true) >= bits.size // multiply instead of dividing to avoid truncation
-    val leastCommon = !mostCommon
+    val leastCommon = !mostCommonBit(bits)
     _ == leastCommon
   }
 
