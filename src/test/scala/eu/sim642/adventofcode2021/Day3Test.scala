@@ -28,4 +28,14 @@ class Day3Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(powerConsumption(parseBinaries(input)) == 693486)
   }
+
+  test("Part 2 examples") {
+    assert(oxygenGeneratorRating(parseBinaries(exampleInput)) == parseBinary("10111"))
+    assert(co2ScrubberRating(parseBinaries(exampleInput)) == parseBinary("01010"))
+    assert(lifeSupportRating(parseBinaries(exampleInput)) == 230)
+  }
+
+  test("Part 2 input answer") {
+    assert(lifeSupportRating(parseBinaries(input)) == 3379326)
+  }
 }

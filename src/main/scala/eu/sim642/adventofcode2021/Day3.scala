@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2021
 
+import scala.annotation.tailrec
+
 object Day3 {
 
   type Binary = Seq[Boolean]
@@ -9,13 +11,53 @@ object Day3 {
   }
 
   def gammaRate(binaries: Seq[Binary]): Binary = {
-    binaries.transpose.map(_.count(_ == true) >= binaries.size / 2)
+    binaries.transpose.map(2 * _.count(_ == true) >= binaries.size) // multiply instead of dividing to avoid truncation
   }
 
   def powerConsumption(binaries: Seq[Binary]): Int = {
     val gamma = gammaRate(binaries)
     val epsilon = gamma.map(!_)
     binary2int(gamma) * binary2int(epsilon)
+  }
+
+
+  type BitCriteria = Seq[Boolean] => Boolean => Boolean
+
+  def filterBitCriteria(binaries: Seq[Binary], bitCriteria: BitCriteria): Binary = {
+
+    @tailrec
+    def helper(binaries: Seq[Binary], i: Int): Binary = {
+      val p = bitCriteria(binaries.map(_(i)))
+      val newBinaries = binaries.filter(b => p(b(i)))
+      newBinaries match {
+        case Seq(rating) => rating
+        case _ => helper(newBinaries, i + 1)
+      }
+    }
+
+    helper(binaries, 0)
+  }
+
+  def oxygenGeneratorRatingBitCriteria(bits: Seq[Boolean]): Boolean => Boolean = {
+    val mostCommon = 2 * bits.count(_ == true) >= bits.size // multiply instead of dividing to avoid truncation
+    _ == mostCommon
+  }
+
+  def co2ScrubberRatingBitCriteria(bits: Seq[Boolean]): Boolean => Boolean = {
+    // TODO: deduplicate
+    val mostCommon = 2 * bits.count(_ == true) >= bits.size // multiply instead of dividing to avoid truncation
+    val leastCommon = !mostCommon
+    _ == leastCommon
+  }
+
+  def oxygenGeneratorRating(binaries: Seq[Binary]): Binary = filterBitCriteria(binaries, oxygenGeneratorRatingBitCriteria)
+
+  def co2ScrubberRating(binaries: Seq[Binary]): Binary = filterBitCriteria(binaries, co2ScrubberRatingBitCriteria)
+
+  def lifeSupportRating(binaries: Seq[Binary]): Int = {
+    val oxygenGenerator = oxygenGeneratorRating(binaries)
+    val co2Scrubber = co2ScrubberRating(binaries)
+    binary2int(oxygenGenerator) * binary2int(co2Scrubber)
   }
 
 
@@ -27,5 +69,6 @@ object Day3 {
 
   def main(args: Array[String]): Unit = {
     println(powerConsumption(parseBinaries(input)))
+    println(lifeSupportRating(parseBinaries(input)))
   }
 }
