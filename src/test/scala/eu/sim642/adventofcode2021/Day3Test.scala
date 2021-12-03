@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2021
 
-import Day3._
+import Day3.*
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day3Test extends AnyFunSuite {
+class Day3Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleInput =
     """00100
@@ -19,9 +20,23 @@ class Day3Test extends AnyFunSuite {
       |00010
       |01010""".stripMargin
 
+  test("binary2int") {
+    val binaryExpectedInts = Table(
+      ("binary", "expectedInt"),
+      ("10110", 22),
+      ("01001", 9),
+      ("10111", 23),
+      ("01010", 10),
+    )
+
+    forAll(binaryExpectedInts) { (binary, expectedInt) =>
+      assert(binary2int(parseBinary(binary)) == expectedInt)
+    }
+  }
+
   test("Part 1 examples") {
     assert(gammaRate(parseBinaries(exampleInput)) == parseBinary("10110"))
-    // TODO: test epsilon, binary2int
+    // TODO: test epsilon
     assert(powerConsumption(parseBinaries(exampleInput)) == 198)
   }
 
