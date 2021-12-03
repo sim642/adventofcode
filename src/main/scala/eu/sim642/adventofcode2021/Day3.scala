@@ -20,7 +20,7 @@ object Day3 {
 
   def powerConsumption(binaries: Seq[Binary]): Int = {
     val gamma = gammaRate(binaries)
-    val epsilon = gamma.map(!_)
+    val epsilon = gamma.map(!_) // least common bits are the opposite
     binary2int(gamma) * binary2int(epsilon)
   }
 

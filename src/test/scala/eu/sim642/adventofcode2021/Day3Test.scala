@@ -36,7 +36,6 @@ class Day3Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   test("Part 1 examples") {
     assert(gammaRate(parseBinaries(exampleInput)) == parseBinary("10110"))
-    // TODO: test epsilon
     assert(powerConsumption(parseBinaries(exampleInput)) == 198)
   }
 
