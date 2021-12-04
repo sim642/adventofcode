@@ -2,8 +2,11 @@ package eu.sim642.adventofcode2021
 
 import Day4._
 import Day4Test._
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream
 import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
+
+import java.net.URL
 
 class Day4Test extends Suites(
   new SetSolutionTest,
@@ -33,6 +36,8 @@ object Day4Test {
       |22 11 13  6  5
       | 2  0 12  3  7""".stripMargin
 
+  lazy val tkBigInput: String = io.Source.fromInputStream(new XZCompressorInputStream(new URL("https://the-tk.com/files/4-900-15.in.xz").openStream())).mkString.trim
+
   sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
     test("Part 1 examples") {
       assert(solution.firstWinScore(parseInput(exampleInput)) == 4512)
@@ -42,12 +47,20 @@ object Day4Test {
       assert(solution.firstWinScore(parseInput(input)) == 44088)
     }
 
+    test("Part 1 tk big") {
+      assert(solution.firstWinScore(parseInput(tkBigInput)) == 22010880)
+    }
+
     test("Part 2 examples") {
       assert(solution.lastWinScore(parseInput(exampleInput)) == 1924)
     }
 
     test("Part 2 input answer") {
       assert(solution.lastWinScore(parseInput(input)) == 23670)
+    }
+
+    test("Part 2 tk big") {
+      assert(solution.lastWinScore(parseInput(tkBigInput)) == 5371020)
     }
   }
 
