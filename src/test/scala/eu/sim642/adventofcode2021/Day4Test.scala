@@ -1,9 +1,16 @@
 package eu.sim642.adventofcode2021
 
 import Day4._
+import Day4Test._
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day4Test extends AnyFunSuite {
+class Day4Test extends Suites(
+  new SetSolutionTest,
+  new IndexSolutionTest,
+)
+
+object Day4Test {
 
   val exampleInput =
     """7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
@@ -26,19 +33,25 @@ class Day4Test extends AnyFunSuite {
       |22 11 13  6  5
       | 2  0 12  3  7""".stripMargin
 
-  test("Part 1 examples") {
-    assert(Part1.winScore(parseInput(exampleInput)) == 4512)
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
+    test("Part 1 examples") {
+      assert(solution.firstWinScore(parseInput(exampleInput)) == 4512)
+    }
+
+    test("Part 1 input answer") {
+      assert(solution.firstWinScore(parseInput(input)) == 44088)
+    }
+
+    test("Part 2 examples") {
+      assert(solution.lastWinScore(parseInput(exampleInput)) == 1924)
+    }
+
+    test("Part 2 input answer") {
+      assert(solution.lastWinScore(parseInput(input)) == 23670)
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(Part1.winScore(parseInput(input)) == 44088)
-  }
+  class SetSolutionTest extends SolutionTest(SetSolution)
 
-  test("Part 2 examples") {
-    assert(Part2.winScore(parseInput(exampleInput)) == 1924)
-  }
-
-  test("Part 2 input answer") {
-    assert(Part2.winScore(parseInput(input)) == 23670)
-  }
+  class IndexSolutionTest extends SolutionTest(IndexSolution)
 }

@@ -1,54 +1,80 @@
 package eu.sim642.adventofcode2021
 
 import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits._
 
 object Day4 {
 
   case class Input(numbers: Seq[Int], boards: Seq[Grid[Int]])
 
-  case class Bingo(rows: Seq[Set[Int]], cols: Seq[Set[Int]]) {
-    def mark(n: Int): Bingo = {
-      val newRows = rows.map(_ - n)
-      val newCols = cols.map(_ - n)
-      Bingo(newRows, newCols)
-    }
+  sealed trait Solution {
+    protected def makeFindWin(numbers: Seq[Int]): Grid[Int] => (Int, Int)
 
-    def isWon: Boolean = rows.exists(_.isEmpty) || cols.exists(_.isEmpty)
-
-    def sumUnmarked: Int = rows.map(_.sum).sum
-  }
-
-  def board2bingo(board: Grid[Int]): Bingo = {
-    val rows = board.map(_.toSet)
-    val cols = board.transpose.map(_.toSet)
-    Bingo(rows, cols)
-  }
-
-  def findWin(bingo: Bingo, numbers: Seq[Int]): (Int, Bingo) = {
-    val (winBoard, i) = numbers.iterator.scanLeft(bingo)(_.mark(_)).zipWithIndex.find(_._1.isWon).get
-    (i - 1, winBoard) // off by one because scanLeft includes initial
-  }
-
-  sealed trait Part {
-    protected val iOrd: Ordering[Int]
-
-    def findMinWin(input: Input): (Int, Bingo) = {
+    private def winScore(input: Input)(using Ordering[Int]): Int = {
       val Input(numbers, boards) = input
-      boards.map(board2bingo).map(findWin(_, numbers)).minBy(_._1)(iOrd)
+      val findWin = makeFindWin(numbers)
+      val (i, sumUnmarked) = boards.map(findWin).minBy(_._1)
+      sumUnmarked * input.numbers(i)
     }
 
-    def winScore(input: Input): Int = {
-      val (i, bingo) = findMinWin(input)
-      bingo.sumUnmarked * input.numbers(i)
+    def firstWinScore(input: Input): Int = winScore(input)(using Ordering.Int)
+
+    def lastWinScore(input: Input): Int = winScore(input)(using Ordering.Int.reverse)
+  }
+
+  /**
+   * Solution, which does marking by removing from row and column sets.
+   */
+  object SetSolution extends Solution {
+
+    private case class Bingo(rows: Seq[Set[Int]], cols: Seq[Set[Int]]) {
+      def mark(n: Int): Bingo = {
+        val newRows = rows.map(_ - n)
+        val newCols = cols.map(_ - n)
+        Bingo(newRows, newCols)
+      }
+
+      def isWon: Boolean = rows.exists(_.isEmpty) || cols.exists(_.isEmpty)
+
+      def sumUnmarked: Int = rows.map(_.sum).sum
+    }
+
+    private def board2bingo(board: Grid[Int]): Bingo = {
+      val rows = board.map(_.toSet)
+      val cols = board.transpose.map(_.toSet)
+      Bingo(rows, cols)
+    }
+
+    override protected def makeFindWin(numbers: Seq[Int]): Grid[Int] => (Int, Int) = {
+
+      def findWin(board: Grid[Int]): (Int, Int) = {
+        val initialBingo = board2bingo(board)
+        val (winBingo, i) = numbers.iterator.scanLeft(initialBingo)(_.mark(_)).zipWithIndex.find(_._1.isWon).get
+        (i - 1, winBingo.sumUnmarked) // off by one because scanLeft includes initial
+      }
+
+      findWin
     }
   }
 
-  object Part1 extends Part {
-    override protected val iOrd: Ordering[Int] = Ordering.Int
-  }
+  /**
+   * Solution, which finds marking indices for all squares.
+   */
+  object IndexSolution extends Solution {
+    override protected def makeFindWin(numbers: Seq[Int]): Grid[Int] => (Int, Int) = {
+      val number2i = numbers.zipWithIndex.toMap // invert numbers only once
 
-  object Part2 extends Part {
-    override protected val iOrd: Ordering[Int] = Ordering.Int.reverse
+      def findWin(board: Grid[Int]): (Int, Int) = {
+        val iBoard = board.mapGrid(number2i)
+        val iRows = iBoard.map(_.max)
+        val iCols = iBoard.transpose.map(_.max)
+        val i = iRows.min min iCols.min
+        val markedBoard = board.mapGrid(x => if (number2i(x) <= i) 0 else x) // zero out marked numbers
+        (i, markedBoard.sumGrid)
+      }
+
+      findWin
+    }
   }
 
 
@@ -64,7 +90,9 @@ object Day4 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(Part1.winScore(parseInput(input)))
-    println(Part2.winScore(parseInput(input)))
+    import IndexSolution._
+
+    println(firstWinScore(parseInput(input)))
+    println(lastWinScore(parseInput(input)))
   }
 }
