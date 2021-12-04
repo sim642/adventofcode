@@ -26,7 +26,7 @@ object Day4 {
 
   def findWin(bingo: Bingo, numbers: Seq[Int]): (Int, Bingo) = {
     val (winBoard, i) = numbers.iterator.scanLeft(bingo)(_.mark(_)).zipWithIndex.find(_._1.isWon).get
-    (i - 1, winBoard)
+    (i - 1, winBoard) // off by one because scanLeft includes initial
   }
 
   sealed trait Part {
@@ -52,7 +52,7 @@ object Day4 {
   }
 
 
-  def parseBoard(s: String): Grid[Int] = s.linesIterator.map(_.trim.split(" +").toVector.map(_.toInt)).toVector
+  def parseBoard(s: String): Grid[Int] = s.linesIterator.map(_.trim.split(" +").toVector.map(_.toInt)).toVector // trim because split keeps initial empty
 
   def parseInput(input: String): Input = {
     val numbersStr +: boardStrs = input.split("\n\n").toSeq
