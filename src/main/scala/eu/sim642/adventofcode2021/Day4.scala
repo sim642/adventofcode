@@ -39,6 +39,17 @@ object Day4 {
     bingo.sumUnmarked * input.numbers(i)
   }
 
+  // TODO: deduplicate
+  def findLastWin(input: Input): (Int, Bingo) = {
+    val Input(numbers, boards) = input
+    boards.map(board2bingo).map(findWin(_, numbers)).maxBy(_._1)
+  }
+
+  def lastWinScore(input: Input): Int = {
+    val (i, bingo) = findLastWin(input)
+    bingo.sumUnmarked * input.numbers(i)
+  }
+
 
   def parseBoard(s: String): Grid[Int] = s.linesIterator.map(_.trim.split(" +").toVector.map(_.toInt)).toVector
 
@@ -53,5 +64,6 @@ object Day4 {
 
   def main(args: Array[String]): Unit = {
     println(firstWinScore(parseInput(input)))
+    println(lastWinScore(parseInput(input)))
   }
 }

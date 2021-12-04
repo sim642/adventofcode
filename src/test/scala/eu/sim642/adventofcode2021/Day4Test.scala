@@ -33,4 +33,12 @@ class Day4Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(firstWinScore(parseInput(input)) == 44088)
   }
+
+  test("Part 2 examples") {
+    assert(lastWinScore(parseInput(exampleInput)) == 1924)
+  }
+
+  test("Part 2 input answer") {
+    assert(lastWinScore(parseInput(input)) == 23670)
+  }
 }
