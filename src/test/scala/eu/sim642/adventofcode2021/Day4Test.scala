@@ -27,18 +27,18 @@ class Day4Test extends AnyFunSuite {
       | 2  0 12  3  7""".stripMargin
 
   test("Part 1 examples") {
-    assert(firstWinScore(parseInput(exampleInput)) == 4512)
+    assert(Part1.winScore(parseInput(exampleInput)) == 4512)
   }
 
   test("Part 1 input answer") {
-    assert(firstWinScore(parseInput(input)) == 44088)
+    assert(Part1.winScore(parseInput(input)) == 44088)
   }
 
   test("Part 2 examples") {
-    assert(lastWinScore(parseInput(exampleInput)) == 1924)
+    assert(Part2.winScore(parseInput(exampleInput)) == 1924)
   }
 
   test("Part 2 input answer") {
-    assert(lastWinScore(parseInput(input)) == 23670)
+    assert(Part2.winScore(parseInput(input)) == 23670)
   }
 }

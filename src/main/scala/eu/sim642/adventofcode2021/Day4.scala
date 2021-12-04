@@ -29,25 +29,26 @@ object Day4 {
     (i - 1, winBoard)
   }
 
-  def findFirstWin(input: Input): (Int, Bingo) = {
-    val Input(numbers, boards) = input
-    boards.map(board2bingo).map(findWin(_, numbers)).minBy(_._1)
+  sealed trait Part {
+    protected val iOrd: Ordering[Int]
+
+    def findMinWin(input: Input): (Int, Bingo) = {
+      val Input(numbers, boards) = input
+      boards.map(board2bingo).map(findWin(_, numbers)).minBy(_._1)(iOrd)
+    }
+
+    def winScore(input: Input): Int = {
+      val (i, bingo) = findMinWin(input)
+      bingo.sumUnmarked * input.numbers(i)
+    }
   }
 
-  def firstWinScore(input: Input): Int = {
-    val (i, bingo) = findFirstWin(input)
-    bingo.sumUnmarked * input.numbers(i)
+  object Part1 extends Part {
+    override protected val iOrd: Ordering[Int] = Ordering.Int
   }
 
-  // TODO: deduplicate
-  def findLastWin(input: Input): (Int, Bingo) = {
-    val Input(numbers, boards) = input
-    boards.map(board2bingo).map(findWin(_, numbers)).maxBy(_._1)
-  }
-
-  def lastWinScore(input: Input): Int = {
-    val (i, bingo) = findLastWin(input)
-    bingo.sumUnmarked * input.numbers(i)
+  object Part2 extends Part {
+    override protected val iOrd: Ordering[Int] = Ordering.Int.reverse
   }
 
 
@@ -63,7 +64,7 @@ object Day4 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(firstWinScore(parseInput(input)))
-    println(lastWinScore(parseInput(input)))
+    println(Part1.winScore(parseInput(input)))
+    println(Part2.winScore(parseInput(input)))
   }
 }
