@@ -1,9 +1,16 @@
 package eu.sim642.adventofcode2021
 
 import Day5._
+import Day5Test._
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day5Test extends AnyFunSuite {
+class Day5Test extends Suites(
+  new NaiveSolutionTest,
+  new IntersectSolutionTest,
+)
+
+object Day5Test {
 
   val exampleInput =
     """0,9 -> 5,9
@@ -17,19 +24,26 @@ class Day5Test extends AnyFunSuite {
       |0,0 -> 8,8
       |5,5 -> 8,2""".stripMargin
 
-  test("Part 1 examples") {
-    assert(countOverlaps(parseLines(exampleInput)) == 5)
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
+
+    test("Part 1 examples") {
+      assert(solution.countOverlaps(parseLines(exampleInput)) == 5)
+    }
+
+    test("Part 1 input answer") {
+      assert(solution.countOverlaps(parseLines(input)) == 5197)
+    }
+
+    test("Part 2 examples") {
+      assert(solution.countOverlaps(parseLines(exampleInput), true) == 12)
+    }
+
+    test("Part 2 input answer") {
+      assert(solution.countOverlaps(parseLines(input), true) == 18605)
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(countOverlaps(parseLines(input)) == 5197)
-  }
+  class NaiveSolutionTest extends SolutionTest(NaiveSolution)
 
-  test("Part 2 examples") {
-    assert(countOverlaps(parseLines(exampleInput), true) == 12)
-  }
-
-  test("Part 2 input answer") {
-    assert(countOverlaps(parseLines(input), true) == 18605)
-  }
+  class IntersectSolutionTest extends SolutionTest(IntersectSolution)
 }
