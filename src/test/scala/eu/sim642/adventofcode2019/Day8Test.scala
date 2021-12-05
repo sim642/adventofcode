@@ -3,6 +3,8 @@ package eu.sim642.adventofcode2019
 import Day8._
 import org.scalatest.funsuite.AnyFunSuite
 
+import java.io.ByteArrayOutputStream
+
 class Day8Test extends AnyFunSuite {
 
   val exampleInput = "123456789012"
@@ -49,6 +51,16 @@ class Day8Test extends AnyFunSuite {
       )
     )
 
-    printGrid(stacked) // EHRUE
+    val out = new ByteArrayOutputStream()
+    Console.withOut(out) {
+      printGrid(stacked) // EHRUE
+    }
+    assert(out.toString.trim ==
+      """....#.##.#...##.##.#....#
+        |.####.##.#.##.#.##.#.####
+        |...##....#.##.#.##.#...##
+        |.####.##.#...##.##.#.####
+        |.####.##.#.#.##.##.#.####
+        |....#.##.#.##.##..##....#""".stripMargin)
   }
 }

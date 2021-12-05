@@ -5,6 +5,8 @@ import Day10._
 import eu.sim642.adventofcode2018.Day10Test._
 import org.scalatest.funsuite.AnyFunSuite
 
+import java.io.ByteArrayOutputStream
+
 class Day10Test extends Suites(
   new NaiveSolutionTest,
   new BinarySearchSolutionTest
@@ -49,13 +51,39 @@ object Day10Test {
     test("Part 2 examples") {
       val (minPoints, minSecond) = solution.minimizePointsArea(parsePoints(exampleInput))
       assert(minSecond == 3)
-      printPoints(minPoints)
+      val out = new ByteArrayOutputStream()
+      Console.withOut(out) {
+        printPoints(minPoints)
+      }
+      assert(out.toString.trim ==
+        """#...#..###
+          |#...#...#.
+          |#...#...#.
+          |#####...#.
+          |#...#...#.
+          |#...#...#.
+          |#...#...#.
+          |#...#..###""".stripMargin)
     }
 
     test("Part 2 input answer") {
       val (minPoints, minSecond) = solution.minimizePointsArea(parsePoints(input))
       assert(minSecond == 10659)
-      printPoints(minPoints)
+      val out = new ByteArrayOutputStream()
+      Console.withOut(out) {
+        printPoints(minPoints)
+      }
+      assert(out.toString.trim ==
+        """#....#..######..#.......#####...#....#..#....#...####...#....#
+          |#...#...#.......#.......#....#..#....#..#....#..#....#..#...#.
+          |#..#....#.......#.......#....#..#....#...#..#...#.......#..#..
+          |#.#.....#.......#.......#....#..#....#...#..#...#.......#.#...
+          |##......#####...#.......#####...######....##....#.......##....
+          |##......#.......#.......#....#..#....#....##....#..###..##....
+          |#.#.....#.......#.......#....#..#....#...#..#...#....#..#.#...
+          |#..#....#.......#.......#....#..#....#...#..#...#....#..#..#..
+          |#...#...#.......#.......#....#..#....#..#....#..#...##..#...#.
+          |#....#..#.......######..#####...#....#..#....#...###.#..#....#""".stripMargin)
     }
   }
 

@@ -6,6 +6,8 @@ import Day11._
 import eu.sim642.adventofcode2019.Day11Test._
 import org.scalatest.funsuite.AnyFunSuite
 
+import java.io.ByteArrayOutputStream
+
 class Day11Test extends Suites(
   new KnotTyingSolutionTest,
   new OutputLoopSolutionTest,
@@ -27,7 +29,17 @@ object Day11Test {
     }
 
     test("Part 2 input answer") {
-      solution.renderIdentifier(parseProgram(input)) // BLULZJLZ
+      val out = new ByteArrayOutputStream()
+      Console.withOut(out) {
+        solution.renderIdentifier(parseProgram(input)) // BLULZJLZ
+      }
+      assert(out.toString.trim ==
+        """.###..#....#..#.#....####...##.#....####...
+          |.#..#.#....#..#.#.......#....#.#.......#...
+          |.###..#....#..#.#......#.....#.#......#....
+          |.#..#.#....#..#.#.....#......#.#.....#.....
+          |.#..#.#....#..#.#....#....#..#.#....#......
+          |.###..####..##..####.####..##..####.####...""".stripMargin)
     }
   }
 
