@@ -28,7 +28,7 @@ object Day5 {
   def countOverlaps(lines: Seq[Line], diagonal: Boolean = false): Int = {
     lines.iterator
       .flatMap(linePoss(_, diagonal))
-      .groupMapReduce(identity)(_ => 1)(_ + _) // TODO: add groupCount to IteratorImplicits
+      .groupCount(identity)
       .count(_._2 >= 2)
   }
 

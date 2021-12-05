@@ -59,6 +59,11 @@ object IteratorImplicits {
     def groupMapReduce[K, B](key: A => K)(f: A => B)(reduce: (B, B) => B): immutable.Map[K, B] = {
       it.to(LazyList).groupMapReduce(key)(f)(reduce)
     }
+
+    // Copied from IterableImplicits
+    def groupCount[K](key: A => K): Map[K, Int] = {
+      it.groupMapReduce(key)(_ => 1)(_ + _)
+    }
   }
 
   implicit class IteratorUnfoldOps(iterator: Iterator.type) {
