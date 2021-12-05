@@ -1,7 +1,9 @@
 package eu.sim642.adventofcode2021
 
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.IteratorImplicits.*
+
+import scala.collection.immutable.ArraySeq
 
 object Day5 {
 
@@ -92,15 +94,13 @@ object Day5 {
     }
 
     override def countOverlaps(lines: Seq[Line], diagonal: Boolean = false): Int = {
-      val filteredLines = if (!diagonal) lines.filter(lineAxisAligned) else lines
+      val filteredLines = (if (!diagonal) lines.filter(lineAxisAligned) else lines).to(ArraySeq) // ArraySeq for view slicing
 
       val inters: Iterator[Pos] =
         for {
-          //Seq(line1, line2) <- filteredLines.combinations(2)
-          // TODO: manual pairs is faster?
+          // faster than combinations(2)
           (line1, i) <- filteredLines.iterator.zipWithIndex
-          (line2, j) <- filteredLines.iterator.zipWithIndex
-          if i < j
+          line2 <- filteredLines.view.slice(i + 1, filteredLines.size).iterator
           p <- lineIntersect(line1, line2).iterator
         } yield p
 
