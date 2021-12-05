@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2020
 
 import eu.sim642.adventofcodelib.pos.HexPos
 import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.IterableImplicits._
 
 object Day24 {
 
@@ -20,7 +21,7 @@ object Day24 {
     directions
       .view
       .map(applyMoves(HexPos.zero, _))
-      .groupMapReduce(identity)(_ => 1)(_ + _)
+      .groupCount(identity)
       .filter(_._2 % 2 == 1)
       .keySet
   }
@@ -34,7 +35,7 @@ object Day24 {
         neighbors.values.iterator
           .map(pos + _)
       )
-      .groupMapReduce(identity)(_ => 1)(_ + _)
+      .groupCount(identity)
       .collect({
         case (pos, 2) => pos
         case (pos, 1) if blackTiles(pos) => pos
