@@ -7,15 +7,21 @@ object Day5 {
 
   type Line = (Pos, Pos)
 
-  def linePoss(line: Line): IterableOnce[Pos] = line match {
+  def linePoss(line: Line, diagonal: Boolean): IterableOnce[Pos] = line match {
     case (Pos(x1, y1), Pos(x2, y2)) if x1 == x2 => ((y1 min y2) to (y1 max y2)).iterator.map(Pos(x1, _))
     case (Pos(x1, y1), Pos(x2, y2)) if y1 == y2 => ((x1 min x2) to (x1 max x2)).iterator.map(Pos(_, y1))
+    case (Pos(x1, y1), Pos(x2, y2)) if diagonal =>
+      // TODO: refactor
+      if ((x1 <= x2) ^ (y1 <= y2))
+        ((x1 min x2) to (x1 max x2)).iterator.zip(((y1 min y2) to (y1 max y2)).reverseIterator).map(Pos.apply)
+      else
+        ((x1 min x2) to (x1 max x2)).iterator.zip(((y1 min y2) to (y1 max y2)).iterator).map(Pos.apply)
     case _ => Iterable.empty
   }
 
-  def countOverlaps(lines: Seq[Line]): Int = {
+  def countOverlaps(lines: Seq[Line], diagonal: Boolean = false): Int = {
     lines.iterator
-      .flatMap(linePoss)
+      .flatMap(linePoss(_, diagonal))
       .groupMapReduce(identity)(_ => 1)(_ + _)
       .count(_._2 >= 2)
   }
@@ -33,5 +39,6 @@ object Day5 {
 
   def main(args: Array[String]): Unit = {
     println(countOverlaps(parseLines(input)))
+    println(countOverlaps(parseLines(input), true))
   }
 }

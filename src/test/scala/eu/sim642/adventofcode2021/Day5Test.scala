@@ -24,4 +24,12 @@ class Day5Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countOverlaps(parseLines(input)) == 5197)
   }
+
+  test("Part 2 examples") {
+    assert(countOverlaps(parseLines(exampleInput), true) == 12)
+  }
+
+  test("Part 2 input answer") {
+    assert(countOverlaps(parseLines(input), true) == 18605)
+  }
 }
