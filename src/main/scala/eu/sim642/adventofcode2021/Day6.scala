@@ -1,24 +1,20 @@
 package eu.sim642.adventofcode2021
 
-import eu.sim642.adventofcodelib.IterableImplicits._
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day6 {
 
-  type State = Map[Int, Long]
+  type State = Vector[Long] // used as Map, where index is timer and value is count
 
-  def input2state(input: Seq[Int]): State = input.groupCount(identity).view.mapValues(_.toLong).toMap
+  def input2state(input: Seq[Int]): State = Vector.tabulate(9)(i => input.count(_ == i)) // largest value is 8
 
   def stepState(state: State): State = {
-    val stateNonZero = (state - 0).map({ case (timer, count) => (timer - 1) -> count })
-    val zeroCount = state.getOrElse(0, 0L)
-    //val stateZero = Map(6 -> zeroCount, 8 -> zeroCount)
-    // TODO: clean up
-    stateNonZero.updatedWith(6)(countOpt => Some(countOpt.getOrElse(0L) + zeroCount)).updatedWith(8)(countOpt => Some(countOpt.getOrElse(0L) + zeroCount)).filter(_._2 != 0)
+    val zeroCount +: stateNonZero = state
+    stateNonZero.updated(6, stateNonZero(6) + zeroCount) :+ zeroCount
   }
 
   def countLanternfish(input: Seq[Int], after: Int = 80): Long = {
-    Iterator.iterate(input2state(input))(stepState)(after).valuesIterator.sum
+    Iterator.iterate(input2state(input))(stepState)(after).sum
   }
 
 
