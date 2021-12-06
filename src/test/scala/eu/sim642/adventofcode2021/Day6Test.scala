@@ -46,4 +46,12 @@ class Day6Test extends AnyFunSuite with ScalaCheckPropertyChecks {
   test("Part 1 input answer") {
     assert(countLanternfish(parseInput(input)) == 346063)
   }
+
+  test("Part 2 examples") {
+    assert(countLanternfish(parseInput(exampleInput), 256) == 26984457539L)
+  }
+
+  test("Part 2 input answer") {
+    assert(countLanternfish(parseInput(input), 256) == 1572358335990L)
+  }
 }

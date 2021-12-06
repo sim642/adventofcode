@@ -5,19 +5,19 @@ import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day6 {
 
-  type State = Map[Int, Int]
+  type State = Map[Int, Long]
 
-  def input2state(input: Seq[Int]): State = input.groupCount(identity)
+  def input2state(input: Seq[Int]): State = input.groupCount(identity).view.mapValues(_.toLong).toMap
 
   def stepState(state: State): State = {
     val stateNonZero = (state - 0).map({ case (timer, count) => (timer - 1) -> count })
-    val zeroCount = state.getOrElse(0, 0)
+    val zeroCount = state.getOrElse(0, 0L)
     //val stateZero = Map(6 -> zeroCount, 8 -> zeroCount)
     // TODO: clean up
-    stateNonZero.updatedWith(6)(countOpt => Some(countOpt.getOrElse(0) + zeroCount)).updatedWith(8)(countOpt => Some(countOpt.getOrElse(0) + zeroCount)).filter(_._2 != 0)
+    stateNonZero.updatedWith(6)(countOpt => Some(countOpt.getOrElse(0L) + zeroCount)).updatedWith(8)(countOpt => Some(countOpt.getOrElse(0L) + zeroCount)).filter(_._2 != 0)
   }
 
-  def countLanternfish(input: Seq[Int], after: Int = 80): Int = {
+  def countLanternfish(input: Seq[Int], after: Int = 80): Long = {
     Iterator.iterate(input2state(input))(stepState)(after).valuesIterator.sum
   }
 
@@ -28,5 +28,6 @@ object Day6 {
 
   def main(args: Array[String]): Unit = {
     println(countLanternfish(parseInput(input)))
+    println(countLanternfish(parseInput(input), 256))
   }
 }
