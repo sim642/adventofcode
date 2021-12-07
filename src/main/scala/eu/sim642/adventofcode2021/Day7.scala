@@ -2,12 +2,28 @@ package eu.sim642.adventofcode2021
 
 object Day7 {
 
-  def alignPosFuel(crabs: Seq[Int], pos: Int): Int = {
-    crabs.view.map(crab => (crab - pos).abs).sum
+  sealed trait Part {
+
+    def fuel(crab: Int, pos: Int): Int
+
+    def alignPosFuel(crabs: Seq[Int], pos: Int): Int = {
+      crabs.view.map(fuel(_, pos)).sum
+    }
+
+    def minAlignPosFuel(crabs: Seq[Int]): Int = {
+      (crabs.min to crabs.max).iterator.map(alignPosFuel(crabs, _)).min
+    }
   }
 
-  def minAlignPosFuel(crabs: Seq[Int]): Int = {
-    (crabs.min to crabs.max).iterator.map(alignPosFuel(crabs, _)).min
+  object Part1 extends Part {
+    override def fuel(crab: Int, pos: Int): Int = (crab - pos).abs
+  }
+
+  object Part2 extends Part {
+    override def fuel(crab: Int, pos: Int): Int = {
+      val diff = Part1.fuel(crab, pos)
+      (diff * (diff + 1)) / 2
+    }
   }
 
 
@@ -16,6 +32,7 @@ object Day7 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(minAlignPosFuel(parseCrabs(input)))
+    println(Part1.minAlignPosFuel(parseCrabs(input)))
+    println(Part2.minAlignPosFuel(parseCrabs(input)))
   }
 }

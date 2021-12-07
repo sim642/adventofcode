@@ -9,14 +9,25 @@ class Day7Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     val exampleCrabs = parseCrabs(exampleInput)
-    assert(alignPosFuel(exampleCrabs, 2) == 37)
-    assert(alignPosFuel(exampleCrabs, 1) == 41)
-    assert(alignPosFuel(exampleCrabs, 3) == 39)
-    assert(alignPosFuel(exampleCrabs, 10) == 71)
-    assert(minAlignPosFuel(exampleCrabs) == 37)
+    assert(Part1.alignPosFuel(exampleCrabs, 2) == 37)
+    assert(Part1.alignPosFuel(exampleCrabs, 1) == 41)
+    assert(Part1.alignPosFuel(exampleCrabs, 3) == 39)
+    assert(Part1.alignPosFuel(exampleCrabs, 10) == 71)
+    assert(Part1.minAlignPosFuel(exampleCrabs) == 37)
   }
 
   test("Part 1 input answer") {
-    assert(minAlignPosFuel(parseCrabs(input)) == 336721)
+    assert(Part1.minAlignPosFuel(parseCrabs(input)) == 336721)
+  }
+
+  test("Part 2 examples") {
+    val exampleCrabs = parseCrabs(exampleInput)
+    assert(Part2.alignPosFuel(exampleCrabs, 5) == 168)
+    assert(Part2.alignPosFuel(exampleCrabs, 2) == 206)
+    assert(Part2.minAlignPosFuel(exampleCrabs) == 168)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.minAlignPosFuel(parseCrabs(input)) == 91638945)
   }
 }
