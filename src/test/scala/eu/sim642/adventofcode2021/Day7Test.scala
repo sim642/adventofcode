@@ -2,8 +2,11 @@ package eu.sim642.adventofcode2021
 
 import Day7._
 import Day7Test._
+import org.scalacheck.Gen
 import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.prop.Configuration
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class Day7Test extends Suites(
   new BaseTest,
@@ -50,9 +53,27 @@ object Day7Test {
     }
   }
 
+  trait EquivalentTest(solution: Solution) extends AnyFunSuite with ScalaCheckPropertyChecks with Configuration {
+    implicit override val generatorDrivenConfig = PropertyCheckConfiguration(minSuccessful = 100) // default is 10
+
+    val crabsGen = Gen.nonEmptyListOf(Gen.choose(0, 1000)) // TODO: fix solutions for negative arguments
+
+    test("Part 1 equivalent") {
+      forAll(crabsGen) { (crabs: Seq[Int]) =>
+        assert(solution.Part1.minAlignPosFuel(crabs) == LinearSolution.Part1.minAlignPosFuel(crabs))
+      }
+    }
+
+    test("Part 2 equivalent") {
+      forAll(crabsGen) { (crabs: Seq[Int]) =>
+        assert(solution.Part2.minAlignPosFuel(crabs) == LinearSolution.Part2.minAlignPosFuel(crabs))
+      }
+    }
+  }
+
   class LinearSolutionTest extends SolutionTest(LinearSolution)
 
-  class BinarySolutionTest extends SolutionTest(BinarySolution)
+  class BinarySolutionTest extends SolutionTest(BinarySolution) with EquivalentTest(BinarySolution)
 
-  class MathSolutionTest extends SolutionTest(MathSolution)
+  class MathSolutionTest extends SolutionTest(MathSolution) with EquivalentTest(MathSolution)
 }
