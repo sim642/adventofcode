@@ -9,6 +9,7 @@ class Day7Test extends Suites(
   new BaseTest,
   new LinearSolutionTest,
   new BinarySolutionTest,
+  new MathSolutionTest,
 )
 
 object Day7Test {
@@ -52,4 +53,6 @@ object Day7Test {
   class LinearSolutionTest extends SolutionTest(LinearSolution)
 
   class BinarySolutionTest extends SolutionTest(BinarySolution)
+
+  class MathSolutionTest extends SolutionTest(MathSolution)
 }

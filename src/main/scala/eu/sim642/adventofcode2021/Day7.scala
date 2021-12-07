@@ -68,6 +68,29 @@ object Day7 {
     override object Part2 extends BinaryPartSolution with Part2Fuel
   }
 
+  /**
+   * Solution, which uses math to compute the optimum.
+   */
+  object MathSolution extends Solution {
+
+    override object Part1 extends PartSolution with Part1Fuel {
+      override def minAlignPosFuel(crabs: Seq[Int]): Int = {
+        val pos = crabs.sorted.apply(crabs.size / 2) // median
+        alignPosFuel(crabs, pos)
+      }
+    }
+
+    override object Part2 extends PartSolution with Part2Fuel {
+      override def minAlignPosFuel(crabs: Seq[Int]): Int = {
+        // mniip's solution
+        val sum = crabs.sum
+        val n = crabs.size
+        val pos = (sum + crabs.count(n * _ > sum)) / n // mean and extra for above mean
+        alignPosFuel(crabs, pos)
+      }
+    }
+  }
+
 
   def parseCrabs(input: String): Seq[Int] = input.split(",").toSeq.map(_.toInt)
 
