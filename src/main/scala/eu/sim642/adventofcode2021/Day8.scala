@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2021
 
-import scala.collection.immutable.BitSet
+import scala.collection.immutable.{BitSet, SortedSet}
 
 object Day8 {
 
@@ -37,16 +37,21 @@ object Day8 {
   }
 
   def decodeEntry(entry: Entry): Int = {
+    given Ordering[SortedSet[Int]] = Ordering.Implicits.sortedSetOrdering // for sorted
+    val allPatternsSorted = signalsDigits.keys.toSeq.sorted
+
+    def decodeSignals(permutation: IndexedSeq[Int])(signals: Signals): Signals = signals.map(permutation)
+
     // TODO: optimize, something smarter than all permutations
     val permutation = (0 to 6).permutations
       .find(permutation => {
-        val patterns2 = entry.patterns.map(_.map(permutation))
-        patterns2.toSet == digitSignals.values.toSet
+        val decodedPatterns = entry.patterns.map(decodeSignals(permutation))
+        decodedPatterns.sorted == allPatternsSorted // faster than comparing as Sets
       })
       .get
 
-    val outputs2 = entry.outputs.map(_.map(permutation))
-    outputs2.map(signalsDigits).foldLeft(0)((acc, digit) => 10 * acc + digit)
+    val decodedOutputs = entry.outputs.map(decodeSignals(permutation))
+    decodedOutputs.map(signalsDigits).foldLeft(0)((acc, digit) => 10 * acc + digit)
   }
 
   def sumDecodeEntries(entries: Seq[Entry]): Int = entries.map(decodeEntry).sum
