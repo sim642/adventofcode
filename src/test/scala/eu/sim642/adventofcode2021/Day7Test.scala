@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2021
 
 import Day7._
 import Day7Test._
+import eu.sim642.adventofcode2019.intcode
 import org.scalacheck.Gen
 import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
@@ -32,6 +33,12 @@ object Day7Test {
       val exampleCrabs = parseCrabs(exampleInput)
       assert(Part2Fuel.alignPosFuel(exampleCrabs, 5) == 168)
       assert(Part2Fuel.alignPosFuel(exampleCrabs, 2) == 206)
+    }
+
+    test("Input intcode easter egg") {
+      // https://www.reddit.com/r/adventofcode/comments/raysm8/2021_day_7_out_of_curiosity_i_looked_at_my_input/
+      val outputStr = intcode.ProgramState(intcode.parseProgram(input)).outputs.map(_.toChar).mkString
+      assert(outputStr == "Ceci n'est pas une intcode program\n")
     }
   }
 
