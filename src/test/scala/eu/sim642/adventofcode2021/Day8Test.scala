@@ -5,6 +5,8 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class Day8Test extends AnyFunSuite {
 
+  val exampleEntry = "acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf"
+
   val exampleInput =
     """be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
       !edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
@@ -23,5 +25,14 @@ class Day8Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(countUniqueOutputs(parseEntries(input)) == 387)
+  }
+
+  test("Part 2 examples") {
+    assert(decodeEntry(parseEntry(exampleEntry)) == 5353)
+    assert(sumDecodeEntries(parseEntries(exampleInput)) == 61229)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumDecodeEntries(parseEntries(input)) == 986034)
   }
 }
