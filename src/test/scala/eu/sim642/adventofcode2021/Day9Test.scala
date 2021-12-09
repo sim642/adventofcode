@@ -19,4 +19,12 @@ class Day9Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumLowPointRiskLevels(parseGrid(input)) == 532)
   }
+
+  test("Part 2 examples") {
+    assert(multiplyTopBasins(parseGrid(exampleInput)) == 1134)
+  }
+
+  test("Part 2 input answer") {
+    assert(multiplyTopBasins(parseGrid(input)) == 1110780)
+  }
 }
