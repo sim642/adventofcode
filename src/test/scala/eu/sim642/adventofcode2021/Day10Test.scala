@@ -43,4 +43,24 @@ class Day10Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(totalSyntaxErrorScore(parseLines(input)) == 316851)
   }
+
+  test("Part 2 examples") {
+    assert(completeLine("[({(<(())[]>[[{[]{<()<>>") == "}}]])})]")
+    assert(completeLine("[(()[<>])]({[<{<<[]>>(") == ")}>]})")
+    assert(completeLine("(((({<>}<{<{<>}{[]{[]{}") == "}}>}>))))")
+    assert(completeLine("{<[[]]>}<{[{[{[]{()[[[]") == "]]}}]}]}>")
+    assert(completeLine("<{([{{}}[<[[[<>{}]]]>[]]") == "])}>")
+
+    assert(completionScore("}}]])})]") == 288957)
+    assert(completionScore(")}>]})") == 5566)
+    assert(completionScore("}}>}>))))") == 1480781)
+    assert(completionScore("]]}}]}]}>") == 995444)
+    assert(completionScore("])}>") == 294)
+
+    assert(middleCompletionScore(parseLines(exampleInput)) == 288957)
+  }
+
+  test("Part 2 input answer") {
+    assert(middleCompletionScore(parseLines(input)) == 2182912364L)
+  }
 }
