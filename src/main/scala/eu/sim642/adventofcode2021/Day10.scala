@@ -60,10 +60,26 @@ object Day10 extends RegexParsers {
     }
   }
 
-  // TODO: extract expected char solution
-  object ParserCombinatorSolution extends Solution {
-
+  trait ExpectedCharSolution extends Solution {
     override type A = Char
+
+    override def completeLine(line: String, incomplete: Incomplete[Char]): String = {
+
+      @tailrec
+      def helper(line: String, incomplete: Incomplete[Char], acc: String): String = {
+        val newLine = line + incomplete.expected
+        val newAcc = acc + incomplete.expected
+        parseLine(newLine) match {
+          case newIncomplete@Incomplete(_) => helper(newLine, newIncomplete, newAcc)
+          case Legal => newAcc
+        }
+      }
+
+      helper(line, incomplete, "")
+    }
+  }
+
+  object ParserCombinatorSolution extends ExpectedCharSolution {
 
     private val incompleteMsgRegex = """'(.)' expected but end of source found""".r
     private val corruptedMsgRegex = """'.' expected but '.' found""".r
@@ -88,27 +104,15 @@ object Day10 extends RegexParsers {
         // TODO: Error
       }
     }
-
-    override def completeLine(line: String, incomplete: Incomplete[Char]): String = {
-
-      @tailrec
-      def helper(line: String, incomplete: Incomplete[Char], acc: String): String = {
-        val newLine = line + incomplete.expected
-        val newAcc = acc + incomplete.expected
-        parseLine(newLine) match {
-          case newIncomplete@Incomplete(_) => helper(newLine, newIncomplete, newAcc)
-          case Legal => newAcc
-        }
-      }
-
-      helper(line, incomplete, "")
-    }
   }
 
-  // TODO: extract expected string solution
-  object StackSolution extends Solution {
-
+  trait ExpectedStringSolution extends Solution {
     override type A = String
+
+    override def completeLine(line: String, incomplete: Incomplete[String]): String = incomplete.expected
+  }
+
+  object StackSolution extends ExpectedStringSolution {
 
     private val oppositeChar = Map(
       '(' -> ')',
@@ -135,8 +139,6 @@ object Day10 extends RegexParsers {
 
       helper(line.toList, Nil)
     }
-
-    override def completeLine(line: String, incomplete: Incomplete[String]): String = incomplete.expected
   }
 
 
