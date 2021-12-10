@@ -10,6 +10,13 @@ object Day10 extends RegexParsers {
   case class Incomplete[+A](expected: A) extends ParseLineResult[A]
   case class Corrupted(actual: Char) extends ParseLineResult[Nothing]
 
+  private val oppositeChar = Map(
+    '(' -> ')',
+    '[' -> ']',
+    '{' -> '}',
+    '<' -> '>',
+  )
+
   private val charErrorScore: Map[Char, Int] = Map(
     ')' -> 3,
     ']' -> 57,
@@ -36,7 +43,7 @@ object Day10 extends RegexParsers {
     def totalSyntaxErrorScore(lines: Seq[String]): Int = {
       lines.flatMap(line => {
         parseLine(line) match {
-          case Corrupted(actual) => Some(charErrorScore(actual)) // TODO: why doesn't apply work?
+          case Corrupted(actual) => Some(charErrorScore(actual))
           case _ => None
         }
       }).sum
@@ -47,6 +54,7 @@ object Day10 extends RegexParsers {
     // for testing
     def completeLine(line: String): String = parseLine(line) match {
       case incomplete@Incomplete(expected) => completeLine(line, incomplete)
+      case _ => throw IllegalArgumentException("illegal line")
     }
 
     def middleCompletionScore(lines: Seq[String]): Long = {
@@ -72,6 +80,7 @@ object Day10 extends RegexParsers {
         parseLine(newLine) match {
           case newIncomplete@Incomplete(_) => helper(newLine, newIncomplete, newAcc)
           case Legal => newAcc
+          case Corrupted(_) => throw IllegalArgumentException("illegal line and incomplete")
         }
       }
 
@@ -82,7 +91,7 @@ object Day10 extends RegexParsers {
   object ParserCombinatorSolution extends ExpectedCharSolution {
 
     private val incompleteMsgRegex = """'(.)' expected but end of source found""".r
-    private val corruptedMsgRegex = """'.' expected but '.' found""".r
+    private val corruptedMsgRegex = """'.' expected but '(.)' found""".r
 
     override def parseLine(line: String): ParseLineResult[Char] = {
 
@@ -90,18 +99,17 @@ object Day10 extends RegexParsers {
 
       def chunk: Parser[Unit] = (
         "(" ~> chunks <~ ")"
-          | "[" ~> chunks <~ "]"
-          | "{" ~> chunks <~ "}"
-          | "<" ~> chunks <~ ">"
-        )
+      | "[" ~> chunks <~ "]"
+      | "{" ~> chunks <~ "}"
+      | "<" ~> chunks <~ ">"
+      )
 
       parseAll(chunks, line) match {
         case Success(result, next) => Legal
-        case Failure(msg, next) => msg match {
-          case incompleteMsgRegex(c) => Incomplete(c.charAt(0))
-          case corruptedMsgRegex() => Corrupted(line.charAt(next.offset))
+        case noSuccess: NoSuccess => noSuccess.msg match {
+          case incompleteMsgRegex(expected) => Incomplete(expected.head)
+          case corruptedMsgRegex(actual) => Corrupted(actual.head)
         }
-        // TODO: Error
       }
     }
   }
@@ -113,13 +121,6 @@ object Day10 extends RegexParsers {
   }
 
   object StackSolution extends ExpectedStringSolution {
-
-    private val oppositeChar = Map(
-      '(' -> ')',
-      '[' -> ']',
-      '{' -> '}',
-      '<' -> '>',
-    )
 
     override def parseLine(line: String): ParseLineResult[String] = {
 
@@ -142,14 +143,6 @@ object Day10 extends RegexParsers {
   }
 
   object RecursiveDescentSolution extends ExpectedStringSolution {
-
-    // TODO: deduplicate
-    private val oppositeChar = Map(
-      '(' -> ')',
-      '[' -> ']',
-      '{' -> '}',
-      '<' -> '>',
-    )
 
     override def parseLine(line: String): ParseLineResult[String] = {
 
