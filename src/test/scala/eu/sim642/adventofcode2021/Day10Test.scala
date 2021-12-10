@@ -8,6 +8,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class Day10Test extends Suites(
   new ParserCombinatorSolutionTest,
   new StackSolutionTest,
+  new RecursiveDescentSolutionTest,
 )
 
 object Day10Test {
@@ -76,6 +77,8 @@ object Day10Test {
   }
 
   class ParserCombinatorSolutionTest extends SolutionTest(ParserCombinatorSolution)
-  
+
   class StackSolutionTest extends SolutionTest(StackSolution)
+
+  class RecursiveDescentSolutionTest extends SolutionTest(RecursiveDescentSolution)
 }

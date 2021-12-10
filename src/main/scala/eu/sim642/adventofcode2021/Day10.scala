@@ -141,6 +141,50 @@ object Day10 extends RegexParsers {
     }
   }
 
+  object RecursiveDescentSolution extends ExpectedStringSolution {
+
+    // TODO: deduplicate
+    private val oppositeChar = Map(
+      '(' -> ')',
+      '[' -> ']',
+      '{' -> '}',
+      '<' -> '>',
+    )
+
+    override def parseLine(line: String): ParseLineResult[String] = {
+
+      @tailrec
+      def chunks(line: List[Char]): (ParseLineResult[String], List[Char]) = line match {
+        case ('(' | '[' | '{' | '<') :: _ =>
+          val resultLine2@(result, line2) = chunk(line)
+          result match {
+            case Legal => chunks(line2)
+            case _ => resultLine2
+          }
+        case _ => (Legal, line)
+      }
+
+      def chunk(line: List[Char]): (ParseLineResult[String], List[Char]) = line match {
+        case (x@('(' | '[' | '{' | '<')) :: line2 =>
+          val (result, line3) = chunks(line2)
+          val oppositeX = oppositeChar(x)
+          result match {
+            case Legal =>
+              line3 match {
+                case Nil => (Incomplete(oppositeX.toString), Nil)
+                case y :: line4 if y == oppositeX => (Legal, line4)
+                case y :: line4 => (Corrupted(y), line4)
+              }
+            case Incomplete(expected) => (Incomplete(expected + oppositeX), line3)
+            case corrupted@Corrupted(_) => (corrupted, line3)
+          }
+        case _ => (Legal, line)
+      }
+
+      chunks(line.toList)._1
+    }
+  }
+
 
   def parseLines(input: String): Seq[String] = input.linesIterator.toSeq
 
