@@ -5,79 +5,131 @@ import scala.util.parsing.combinator.RegexParsers
 
 object Day10 extends RegexParsers {
 
-  sealed trait ParseLineResult
-  case object Legal extends ParseLineResult
-  case class Incomplete(expected: Char) extends ParseLineResult
-  case class Corrupted(i: Int) extends ParseLineResult
+  sealed trait ParseLineResult[+A]
+  case object Legal extends ParseLineResult[Nothing]
+  case class Incomplete[A](expected: A) extends ParseLineResult[A]
+  case class Corrupted(actual: Char) extends ParseLineResult[Nothing]
 
-  private val incompleteMsgRegex = """'(.)' expected but end of source found""".r
-  private val corruptedMsgRegex = """'.' expected but '.' found""".r
+  sealed trait Solution {
+    type A
 
-  def parseLine(line: String): ParseLineResult = {
+    def parseLine(line: String): ParseLineResult[A]
 
-    def chunks: Parser[Unit] = rep(chunk) ^^^ ()
-
-    def chunk: Parser[Unit] = (
-      "(" ~> chunks <~ ")"
-    | "[" ~> chunks <~ "]"
-    | "{" ~> chunks <~ "}"
-    | "<" ~> chunks <~ ">"
+    private val charErrorScore: Map[Char, Int] = Map(
+      ')' -> 3,
+      ']' -> 57,
+      '}' -> 1197,
+      '>' -> 25137,
     )
 
-    parseAll(chunks, line) match {
-      case Success(result, next) => Legal
-      case Failure(msg, next) => msg match {
-        case incompleteMsgRegex(c) => Incomplete(c.charAt(0))
-        case corruptedMsgRegex() => Corrupted(next.offset)
-      }
-      // TODO: Error
+    def totalSyntaxErrorScore(lines: Seq[String]): Int = {
+      lines.flatMap(line => {
+        parseLine(line) match {
+          case Corrupted(actual) => Some(charErrorScore(actual)) // TODO: why doesn't apply work?
+          case _ => None
+        }
+      }).sum
+    }
+
+    def completeLine(line: String): String
+
+    private val charCompletionScore: Map[Char, Int] = Map(
+      ')' -> 1,
+      ']' -> 2,
+      '}' -> 3,
+      '>' -> 4,
+    )
+
+    def completionScore(completion: String): Long = {
+      completion.foldLeft(0L)((acc, c) => 5 * acc + charCompletionScore(c))
+    }
+
+    def middleCompletionScore(lines: Seq[String]): Long = {
+      val scores = lines.flatMap(line => {
+        parseLine(line) match {
+          case Incomplete(_) => Some(completionScore(completeLine(line)))
+          case _ => None
+        }
+      })
+      scores.sorted.apply(scores.size / 2)
     }
   }
 
+  object ParserCombinatorSolution extends Solution {
 
-  private val charErrorScore: Map[Char, Int] = Map(
-    ')' -> 3,
-    ']' -> 57,
-    '}' -> 1197,
-    '>' -> 25137,
-  )
+    override type A = Char
 
-  def totalSyntaxErrorScore(lines: Seq[String]): Int = {
-    lines.flatMap(line => {
-      parseLine(line) match {
-        case Corrupted(i) => Some(charErrorScore(line.charAt(i))) // TODO: why doesn't apply work?
-        case _ => None
+    private val incompleteMsgRegex = """'(.)' expected but end of source found""".r
+    private val corruptedMsgRegex = """'.' expected but '.' found""".r
+
+    override def parseLine(line: String): ParseLineResult[Char] = {
+
+      def chunks: Parser[Unit] = rep(chunk) ^^^ ()
+
+      def chunk: Parser[Unit] = (
+        "(" ~> chunks <~ ")"
+          | "[" ~> chunks <~ "]"
+          | "{" ~> chunks <~ "}"
+          | "<" ~> chunks <~ ">"
+        )
+
+      parseAll(chunks, line) match {
+        case Success(result, next) => Legal
+        case Failure(msg, next) => msg match {
+          case incompleteMsgRegex(c) => Incomplete(c.charAt(0))
+          case corruptedMsgRegex() => Corrupted(line.charAt(next.offset))
+        }
+        // TODO: Error
       }
-    }).sum
-  }
+    }
 
-  @tailrec
-  def completeLine(line: String, acc: String = ""): String = {
-    parseLine(line) match {
-      case Incomplete(c) => completeLine(line + c, acc + c)
-      case Legal => acc
+    override def completeLine(line: String): String = {
+
+      @tailrec
+      def helper(line: String, acc: String): String = {
+        parseLine(line) match {
+          case Incomplete(c) => helper(line + c, acc + c)
+          case Legal => acc
+        }
+      }
+
+      helper(line, "")
     }
   }
 
-  private val charCompletionScore: Map[Char, Int] = Map(
-    ')' -> 1,
-    ']' -> 2,
-    '}' -> 3,
-    '>' -> 4,
-  )
+  object StackSolution extends Solution {
 
-  def completionScore(completion: String): Long = {
-    completion.foldLeft(0L)((acc, c) => 5 * acc + charCompletionScore(c))
-  }
+    override type A = String
 
-  def middleCompletionScore(lines: Seq[String]): Long = {
-    val scores = lines.flatMap(line => {
-      parseLine(line) match {
-        case Incomplete(_) => Some(completionScore(completeLine(line)))
-        case _ => None
+    private val oppositeChar = Map(
+      '(' -> ')',
+      '[' -> ']',
+      '{' -> '}',
+      '<' -> '>',
+    )
+
+    override def parseLine(line: String): ParseLineResult[String] = {
+
+      @tailrec
+      def helper(line: List[Char], stack: List[Char]): ParseLineResult[String] = line match {
+        case Nil => stack match {
+          case Nil => Legal
+          case _ => Incomplete(stack.mkString)
+        }
+        case (x@('(' | '[' | '{' | '<')) :: xs => helper(xs, oppositeChar(x) :: stack)
+        case x :: xs => stack match {
+          case Nil => Corrupted(x)
+          case y :: ys if x == y => helper(xs, ys)
+          case y :: ys => Corrupted(x)
+        }
       }
-    })
-    scores.sorted.apply(scores.size / 2)
+
+      helper(line.toList, Nil)
+    }
+
+    override def completeLine(line: String): String = parseLine(line) match { // TODO: don't parse again
+      case Incomplete(expected) => expected
+    }
   }
 
 
@@ -86,6 +138,8 @@ object Day10 extends RegexParsers {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import StackSolution._
+
     println(totalSyntaxErrorScore(parseLines(input)))
     println(middleCompletionScore(parseLines(input)))
 
