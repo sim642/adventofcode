@@ -10,17 +10,28 @@ object Day10 extends RegexParsers {
   case class Incomplete[+A](expected: A) extends ParseLineResult[A]
   case class Corrupted(actual: Char) extends ParseLineResult[Nothing]
 
+  private val charErrorScore: Map[Char, Int] = Map(
+    ')' -> 3,
+    ']' -> 57,
+    '}' -> 1197,
+    '>' -> 25137,
+  )
+
+  private val charCompletionScore: Map[Char, Int] = Map(
+    ')' -> 1,
+    ']' -> 2,
+    '}' -> 3,
+    '>' -> 4,
+  )
+
+  def completionScore(completion: String): Long = {
+    completion.foldLeft(0L)((acc, c) => 5 * acc + charCompletionScore(c))
+  }
+
   sealed trait Solution {
     type A
 
     def parseLine(line: String): ParseLineResult[A]
-
-    private val charErrorScore: Map[Char, Int] = Map(
-      ')' -> 3,
-      ']' -> 57,
-      '}' -> 1197,
-      '>' -> 25137,
-    )
 
     def totalSyntaxErrorScore(lines: Seq[String]): Int = {
       lines.flatMap(line => {
@@ -36,17 +47,6 @@ object Day10 extends RegexParsers {
     // for testing
     def completeLine(line: String): String = parseLine(line) match {
       case incomplete@Incomplete(expected) => completeLine(line, incomplete)
-    }
-
-    private val charCompletionScore: Map[Char, Int] = Map(
-      ')' -> 1,
-      ']' -> 2,
-      '}' -> 3,
-      '>' -> 4,
-    )
-
-    def completionScore(completion: String): Long = {
-      completion.foldLeft(0L)((acc, c) => 5 * acc + charCompletionScore(c))
     }
 
     def middleCompletionScore(lines: Seq[String]): Long = {

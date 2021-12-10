@@ -4,8 +4,10 @@ import Day10._
 import Day10Test._
 import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class Day10Test extends Suites(
+  new BaseTest,
   new ParserCombinatorSolutionTest,
   new StackSolutionTest,
   new RecursiveDescentSolutionTest,
@@ -25,54 +27,86 @@ object Day10Test {
       |<{([([[(<>()){}]>(<<{{
       |<{([{{}}[<[[[<>{}]]]>[]]""".stripMargin
 
-  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
-    import solution._
+  class BaseTest extends AnyFunSuite with ScalaCheckPropertyChecks {
+
+    test("Part 2 examples") {
+      val completionExpectedScore = Table(
+        ("completion", "expectedScore"),
+        ("}}]])})]", 288957),
+        (")}>]})", 5566),
+        ("}}>}>))))", 1480781),
+        ("]]}}]}]}>", 995444),
+        ("])}>", 294),
+      )
+
+      forAll(completionExpectedScore) { (completion, expectedScore) =>
+        assert(completionScore(completion) == expectedScore)
+      }
+    }
+  }
+
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite with ScalaCheckPropertyChecks {
 
     test("Part 1 examples") {
-      assert(parseLine("()") == Legal)
-      assert(parseLine("[]") == Legal)
-      assert(parseLine("([])") == Legal)
-      assert(parseLine("{()()()}") == Legal)
-      assert(parseLine("<([{}])>") == Legal)
-      assert(parseLine("[<>({}){}[([])<>]]") == Legal)
-      assert(parseLine("(((((((((())))))))))") == Legal)
+      val legalLines = Table(
+        "line",
+        "()",
+        "[]",
+        "([])",
+        "{()()()}",
+        "<([{}])>",
+        "[<>({}){}[([])<>]]",
+        "(((((((((())))))))))",
+      )
 
-      assert(parseLine("(]").isInstanceOf[Corrupted])
-      assert(parseLine("{()()()>").isInstanceOf[Corrupted])
-      assert(parseLine("(((()))}").isInstanceOf[Corrupted])
-      assert(parseLine("<([]){()}[{}])").isInstanceOf[Corrupted])
+      val corruptedLines = Table(
+        "line",
+        "(]",
+        "{()()()>",
+        "(((()))}",
+        "<([]){()}[{}])",
 
-      assert(parseLine("{([(<{}[<>[]}>{[]{[(<()>").isInstanceOf[Corrupted])
-      assert(parseLine("[[<[([]))<([[{}[[()]]]").isInstanceOf[Corrupted])
-      assert(parseLine("[{[{({}]{}}([{[{{{}}([]").isInstanceOf[Corrupted])
-      assert(parseLine("[<(<(<(<{}))><([]([]()").isInstanceOf[Corrupted])
-      assert(parseLine("<{([([[(<>()){}]>(<<{{").isInstanceOf[Corrupted])
+        "{([(<{}[<>[]}>{[]{[(<()>",
+        "[[<[([]))<([[{}[[()]]]",
+        "[{[{({}]{}}([{[{{{}}([]",
+        "[<(<(<(<{}))><([]([]()",
+        "<{([([[(<>()){}]>(<<{{",
+      )
 
-      assert(totalSyntaxErrorScore(parseLines(exampleInput)) == 26397)
+      forAll(legalLines) { line =>
+        assert(solution.parseLine(line) == Legal)
+      }
+
+      forAll(corruptedLines) { line =>
+        assert(solution.parseLine(line).isInstanceOf[Corrupted])
+      }
+
+      assert(solution.totalSyntaxErrorScore(parseLines(exampleInput)) == 26397)
     }
 
     test("Part 1 input answer") {
-      assert(totalSyntaxErrorScore(parseLines(input)) == 316851)
+      assert(solution.totalSyntaxErrorScore(parseLines(input)) == 316851)
     }
 
     test("Part 2 examples") {
-      assert(completeLine("[({(<(())[]>[[{[]{<()<>>") == "}}]])})]")
-      assert(completeLine("[(()[<>])]({[<{<<[]>>(") == ")}>]})")
-      assert(completeLine("(((({<>}<{<{<>}{[]{[]{}") == "}}>}>))))")
-      assert(completeLine("{<[[]]>}<{[{[{[]{()[[[]") == "]]}}]}]}>")
-      assert(completeLine("<{([{{}}[<[[[<>{}]]]>[]]") == "])}>")
+      val lineExpectedeCompletions = Table(
+        ("line", "expectedCompletion"),
+        ("[({(<(())[]>[[{[]{<()<>>", "}}]])})]"),
+        ("[(()[<>])]({[<{<<[]>>(", ")}>]})"),
+        ("(((({<>}<{<{<>}{[]{[]{}", "}}>}>))))"),
+        ("{<[[]]>}<{[{[{[]{()[[[]", "]]}}]}]}>"),
+        ("<{([{{}}[<[[[<>{}]]]>[]]", "])}>"),
+      )
 
-      assert(completionScore("}}]])})]") == 288957)
-      assert(completionScore(")}>]})") == 5566)
-      assert(completionScore("}}>}>))))") == 1480781)
-      assert(completionScore("]]}}]}]}>") == 995444)
-      assert(completionScore("])}>") == 294)
+      forAll(lineExpectedeCompletions) { (line, expectedCompletion) =>
+        assert(solution.completeLine(line) == expectedCompletion)
+      }
 
-      assert(middleCompletionScore(parseLines(exampleInput)) == 288957)
+      assert(solution.middleCompletionScore(parseLines(exampleInput)) == 288957)
     }
 
     test("Part 2 input answer") {
-      assert(middleCompletionScore(parseLines(input)) == 2182912364L)
+      assert(solution.middleCompletionScore(parseLines(input)) == 2182912364L)
     }
   }
 
