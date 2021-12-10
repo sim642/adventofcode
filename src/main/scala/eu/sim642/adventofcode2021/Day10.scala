@@ -7,7 +7,7 @@ object Day10 extends RegexParsers {
 
   sealed trait ParseLineResult[+A]
   case object Legal extends ParseLineResult[Nothing]
-  case class Incomplete[A](expected: A) extends ParseLineResult[A]
+  case class Incomplete[+A](expected: A) extends ParseLineResult[A]
   case class Corrupted(actual: Char) extends ParseLineResult[Nothing]
 
   sealed trait Solution {
@@ -31,7 +31,12 @@ object Day10 extends RegexParsers {
       }).sum
     }
 
-    def completeLine(line: String): String
+    def completeLine(line: String, incomplete: Incomplete[A]): String
+
+    // for testing
+    def completeLine(line: String): String = parseLine(line) match {
+      case incomplete@Incomplete(expected) => completeLine(line, incomplete)
+    }
 
     private val charCompletionScore: Map[Char, Int] = Map(
       ')' -> 1,
@@ -47,7 +52,7 @@ object Day10 extends RegexParsers {
     def middleCompletionScore(lines: Seq[String]): Long = {
       val scores = lines.flatMap(line => {
         parseLine(line) match {
-          case Incomplete(_) => Some(completionScore(completeLine(line)))
+          case incomplete@Incomplete(_) => Some(completionScore(completeLine(line, incomplete)))
           case _ => None
         }
       })
@@ -55,6 +60,7 @@ object Day10 extends RegexParsers {
     }
   }
 
+  // TODO: extract expected char solution
   object ParserCombinatorSolution extends Solution {
 
     override type A = Char
@@ -83,20 +89,23 @@ object Day10 extends RegexParsers {
       }
     }
 
-    override def completeLine(line: String): String = {
+    override def completeLine(line: String, incomplete: Incomplete[Char]): String = {
 
       @tailrec
-      def helper(line: String, acc: String): String = {
-        parseLine(line) match {
-          case Incomplete(c) => helper(line + c, acc + c)
-          case Legal => acc
+      def helper(line: String, incomplete: Incomplete[Char], acc: String): String = {
+        val newLine = line + incomplete.expected
+        val newAcc = acc + incomplete.expected
+        parseLine(newLine) match {
+          case newIncomplete@Incomplete(_) => helper(newLine, newIncomplete, newAcc)
+          case Legal => newAcc
         }
       }
 
-      helper(line, "")
+      helper(line, incomplete, "")
     }
   }
 
+  // TODO: extract expected string solution
   object StackSolution extends Solution {
 
     override type A = String
@@ -127,9 +136,7 @@ object Day10 extends RegexParsers {
       helper(line.toList, Nil)
     }
 
-    override def completeLine(line: String): String = parseLine(line) match { // TODO: don't parse again
-      case Incomplete(expected) => expected
-    }
+    override def completeLine(line: String, incomplete: Incomplete[String]): String = incomplete.expected
   }
 
 
