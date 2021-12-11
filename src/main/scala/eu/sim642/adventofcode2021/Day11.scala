@@ -48,6 +48,13 @@ object Day11 {
     }).take(steps).sum
   }
 
+  def findSimultaneousFlash(initialGrid: Grid[Int]): Int = {
+    val gridSize = initialGrid.size * initialGrid(0).size
+    Iterator.unfold(initialGrid)(grid => {
+      Some(simulateStep(grid).swap)
+    }).indexOf(gridSize) + 1
+  }
+
 
   def parseGrid(input: String): Grid[Int] = input.linesIterator.map(_.toVector).toVector.mapGrid(_.asDigit)
 
@@ -55,5 +62,6 @@ object Day11 {
 
   def main(args: Array[String]): Unit = {
     println(countFlashes(parseGrid(input), 100))
+    println(findSimultaneousFlash(parseGrid(input)))
   }
 }

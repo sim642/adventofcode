@@ -41,4 +41,12 @@ class Day11Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countFlashes(parseGrid(input), 100) == 1773)
   }
+
+  test("Part 2 examples") {
+    assert(findSimultaneousFlash(parseGrid(exampleInput2)) == 195)
+  }
+
+  test("Part 2 input answer") {
+    assert(findSimultaneousFlash(parseGrid(input)) == 494)
+  }
 }
