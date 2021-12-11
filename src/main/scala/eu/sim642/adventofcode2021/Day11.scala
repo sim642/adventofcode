@@ -12,7 +12,7 @@ object Day11 {
   sealed trait Solution {
     def simulateStep(grid: Grid[Int]): (Grid[Int], Int)
 
-    def countFlashes(initialGrid: Grid[Int], steps: Int): Int = {
+    def countFlashes(initialGrid: Grid[Int], steps: Int = 100): Int = {
       Iterator.unfold(initialGrid)(grid => {
         Some(simulateStep(grid).swap)
       }).take(steps).sum
@@ -116,7 +116,7 @@ object Day11 {
   def main(args: Array[String]): Unit = {
     import DFSSolution._
 
-    println(countFlashes(parseGrid(input), 100))
+    println(countFlashes(parseGrid(input)))
     println(findSimultaneousFlash(parseGrid(input)))
   }
 }

@@ -43,11 +43,11 @@ object Day11Test {
 
       assert(solution.countFlashes(parseGrid(exampleInput1), 1) == 9)
       assert(solution.countFlashes(parseGrid(exampleInput2), 10) == 204)
-      assert(solution.countFlashes(parseGrid(exampleInput2), 100) == 1656)
+      assert(solution.countFlashes(parseGrid(exampleInput2)) == 1656)
     }
 
     test("Part 1 input answer") {
-      assert(solution.countFlashes(parseGrid(input), 100) == 1773)
+      assert(solution.countFlashes(parseGrid(input)) == 1773)
     }
 
     test("Part 2 examples") {
