@@ -5,9 +5,18 @@ import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.pos.Pos
 
 import scala.annotation.tailrec
-import scala.collection.mutable
+import scala.collection.{View, mutable}
 
 object Day11 {
+
+  def flashable(grid: Grid[Int]): View[Pos] = {
+    for {
+      (row, y) <- grid.view.zipWithIndex
+      (cell, x) <- row.view.zipWithIndex
+      if cell > 9
+      pos = Pos(x, y)
+    } yield pos
+  }
 
   sealed trait Solution {
     def simulateStep(grid: Grid[Int]): (Grid[Int], Int)
@@ -35,12 +44,7 @@ object Day11 {
 
       @tailrec
       def helper(grid: Grid[Int]): (Grid[Int], Int) = {
-        val flashes = (for {
-          (row, y) <- grid.view.zipWithIndex
-          (cell, x) <- row.view.zipWithIndex
-          if cell > 9
-          pos = Pos(x, y)
-        } yield pos).toSeq
+        val flashes = flashable(grid).toSeq
 
         if (flashes.isEmpty) {
           val newGrid = grid.mapGrid({
@@ -96,14 +100,7 @@ object Day11 {
         case _ :: xs => dfs(xs)
       }
 
-      val flashes = (for {
-        (row, y) <- grid2.view.zipWithIndex
-        (cell, x) <- row.view.zipWithIndex
-        if cell > 9
-        pos = Pos(x, y)
-      } yield pos).toList
-
-      dfs(flashes)
+      dfs(flashable(grid2).toList)
 
       (newGrid, visited.size)
     }
