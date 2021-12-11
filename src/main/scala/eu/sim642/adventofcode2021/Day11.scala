@@ -12,17 +12,19 @@ object Day11 {
   sealed trait Solution {
     def simulateStep(grid: Grid[Int]): (Grid[Int], Int)
 
-    def countFlashes(initialGrid: Grid[Int], steps: Int = 100): Int = {
+    private def iterateSteps(initialGrid: Grid[Int]) = {
       Iterator.unfold(initialGrid)(grid => {
         Some(simulateStep(grid).swap)
-      }).take(steps).sum
+      })
+    }
+
+    def countFlashes(initialGrid: Grid[Int], steps: Int = 100): Int = {
+      iterateSteps(initialGrid).take(steps).sum
     }
 
     def findSimultaneousFlash(initialGrid: Grid[Int]): Int = {
       val gridSize = initialGrid.size * initialGrid(0).size
-      Iterator.unfold(initialGrid)(grid => {
-        Some(simulateStep(grid).swap)
-      }).indexOf(gridSize) + 1
+      iterateSteps(initialGrid).indexOf(gridSize) + 1
     }
   }
 
