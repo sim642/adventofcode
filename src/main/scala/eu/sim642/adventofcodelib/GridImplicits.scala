@@ -50,5 +50,7 @@ object GridImplicits {
 
     def sumGrid(implicit num: Numeric[A]): A =
       grid.iterator.map(_.sum).sum
+
+    def sizeGrid: Int = grid.size * grid(0).size // assumes rectangular grid!
   }
 }
