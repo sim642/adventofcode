@@ -1,9 +1,16 @@
 package eu.sim642.adventofcode2021
 
 import Day11._
+import Day11Test._
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day11Test extends AnyFunSuite {
+class Day11Test extends Suites(
+  new NaiveSolutionTest,
+  new DFSSolutionTest,
+)
+
+object Day11Test {
 
   val exampleInput1 =
     """11111
@@ -24,29 +31,35 @@ class Day11Test extends AnyFunSuite {
       |4846848554
       |5283751526""".stripMargin
 
-  test("Part 1 examples") {
-    assert(simulateStep(parseGrid(exampleInput1))._1 == parseGrid(
-      """34543
-        |40004
-        |50005
-        |40004
-        |34543""".stripMargin
-    ))
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
+    test("Part 1 examples") {
+      assert(solution.simulateStep(parseGrid(exampleInput1))._1 == parseGrid(
+        """34543
+          |40004
+          |50005
+          |40004
+          |34543""".stripMargin
+      ))
 
-    assert(countFlashes(parseGrid(exampleInput1), 1) == 9)
-    assert(countFlashes(parseGrid(exampleInput2), 10) == 204)
-    assert(countFlashes(parseGrid(exampleInput2), 100) == 1656)
+      assert(solution.countFlashes(parseGrid(exampleInput1), 1) == 9)
+      assert(solution.countFlashes(parseGrid(exampleInput2), 10) == 204)
+      assert(solution.countFlashes(parseGrid(exampleInput2), 100) == 1656)
+    }
+
+    test("Part 1 input answer") {
+      assert(solution.countFlashes(parseGrid(input), 100) == 1773)
+    }
+
+    test("Part 2 examples") {
+      assert(solution.findSimultaneousFlash(parseGrid(exampleInput2)) == 195)
+    }
+
+    test("Part 2 input answer") {
+      assert(solution.findSimultaneousFlash(parseGrid(input)) == 494)
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(countFlashes(parseGrid(input), 100) == 1773)
-  }
+  class NaiveSolutionTest extends SolutionTest(NaiveSolution)
 
-  test("Part 2 examples") {
-    assert(findSimultaneousFlash(parseGrid(exampleInput2)) == 195)
-  }
-
-  test("Part 2 input answer") {
-    assert(findSimultaneousFlash(parseGrid(input)) == 494)
-  }
+  class DFSSolutionTest extends SolutionTest(DFSSolution)
 }
