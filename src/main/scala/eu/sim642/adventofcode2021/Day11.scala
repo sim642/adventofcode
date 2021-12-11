@@ -75,33 +75,22 @@ object Day11 {
    */
   object DFSSolution extends Solution {
     def simulateStep(grid: Grid[Int]): (Grid[Int], Int) = {
-      // TODO: clean up
-      val grid2 = grid.mapGrid(_ + 1)
-      val visited = mutable.Set.empty[Pos]
-      var newGrid = grid2
 
       @tailrec
-      def dfs(todo: List[Pos]): Unit = todo match {
-        case Nil =>
-        case x :: xs if !visited.contains(x) =>
-          visited += x
-          newGrid = newGrid.updatedGrid(x, 0)
-          var newTodo = xs
-          for {
-            newPos <- Pos.allOffsets.map(x + _).filter(newGrid.containsPos)
-            if !visited.contains(newPos)
-          } {
-            val newValue = newGrid(newPos) + 1
-            newGrid = newGrid.updatedGrid(newPos, newValue)
-            if (newValue > 9)
-              newTodo = newPos :: newTodo
-          }
-          dfs(newTodo)
-        case _ :: xs => dfs(xs)
+      def dfs(todo: List[Pos], grid: Grid[Int], visited: Set[Pos]): (Grid[Int], Set[Pos]) = todo match {
+        case Nil => (grid, visited)
+        case pos :: todo if !visited.contains(pos) =>
+          var grid2 = grid.updatedGrid(pos, 0)
+          val newNeighbors = Pos.allOffsets.map(pos + _).filter(grid2.containsPos).filter(!visited.contains(_))
+          val newGrid = newNeighbors.foldLeft(grid2)((grid, pos) => grid.updatedGrid(pos, grid(pos) + 1))
+          val newTodo = newNeighbors.filter(newGrid(_) > 9) ++: todo
+          val newVisited = visited + pos
+          dfs(newTodo, newGrid, newVisited)
+        case _ :: xs => dfs(xs, grid, visited)
       }
 
-      dfs(flashable(grid2).toList)
-
+      val grid2 = grid.mapGrid(_ + 1)
+      val (newGrid, visited) = dfs(flashable(grid2).toList, grid2, Set.empty)
       (newGrid, visited.size)
     }
   }
