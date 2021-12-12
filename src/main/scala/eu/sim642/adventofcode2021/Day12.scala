@@ -23,7 +23,7 @@ object Day12 {
 
         override def unitNeighbors(node: Node): IterableOnce[Node] = {
           for {
-            neighbor <- caveMap(node.path.head)
+            neighbor <- caveMap(node.path.head).iterator
             if neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
           } yield Node(neighbor :: node.path)
         }
@@ -48,7 +48,7 @@ object Day12 {
             Iterator.empty
           else {
             for {
-              neighbor <- caveMap(node.path.head)
+              neighbor <- caveMap(node.path.head).iterator
               if neighbor != "start"
               if node.duplicateSmall || neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
             } yield Node(neighbor :: node.path, if (node.duplicateSmall && neighbor.forall(_.isLower) && node.path.contains(neighbor)) false else node.duplicateSmall) // TODO: simplify duplicateSmall logic
