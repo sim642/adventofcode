@@ -11,15 +11,12 @@ object BFS {
     @tailrec
     def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] = {
       // TODO: use one dist: Int argument instead of all same toVisit values
-      val neighbors = for {
+      val newToVisit = for {
         (node, dist) <- toVisit
         newNode <- graphTraversal.unitNeighbors(node).iterator
+        if !visited.contains(newNode)
       } yield newNode -> (dist + 1)
       val newVisited = visited ++ toVisit
-      //val newToVisit = neighbors -- visited.keys
-      val newToVisit = neighbors.filter({ case (node, _) => !visited.contains(node) }) // more efficient than -- because visited is large
-      // filter instead of filterKeys because filterKeys is lazy and recomputes everything...
-      // TODO: undo in Scala 2.13
       if (newToVisit.isEmpty) {
         new Distances[A] {
           override def distances: collection.Map[A, Int] = newVisited
@@ -38,10 +35,6 @@ object BFS {
     @tailrec
     def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] with Target[A] = {
       // TODO: use one dist: Int argument instead of all same toVisit values
-      val neighbors = for {
-        (node, dist) <- toVisit
-        newNode <- graphSearch.unitNeighbors(node).iterator
-      } yield newNode -> (dist + 1)
       val newVisited = visited ++ toVisit
       toVisit.find((graphSearch.isTargetNode _).tupled) match {
         case targetNodeDist@Some(_) =>
@@ -51,10 +44,11 @@ object BFS {
             override def target: Option[(A, Int)] = targetNodeDist
           }
         case None =>
-          //val newToVisit = neighbors -- visited.keys
-          val newToVisit = neighbors.filter({ case (node, _) => !visited.contains(node) }) // more efficient than -- because visited is large
-          // filter instead of filterKeys because filterKeys is lazy and recomputes everything...
-          // TODO: undo in Scala 2.13
+          val newToVisit = for {
+            (node, dist) <- toVisit
+            newNode <- graphSearch.unitNeighbors(node).iterator
+            if !visited.contains(newNode)
+          } yield newNode -> (dist + 1)
           if (newToVisit.isEmpty) {
             new Distances[A] with Target[A] {
               override def distances: collection.Map[A, Int] = newVisited
