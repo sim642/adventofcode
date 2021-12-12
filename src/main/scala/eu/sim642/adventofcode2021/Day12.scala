@@ -8,57 +8,56 @@ object Day12 {
   type Cave = String
   type CaveMap = Map[Cave, Set[Cave]]
 
+  trait PathNode {
+    val path: List[Cave]
+  }
+
   sealed trait Part {
-    def countPaths(caveMap: CaveMap): Int
+    type Node <: PathNode
+
+    def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] with UnitNeighbors[Node]
+
+    def countPaths(caveMap: CaveMap): Int = {
+      val pathNodes = BFS.traverse(caveTraversal(caveMap)).nodes
+      pathNodes.count(_.path.head == "end")
+    }
   }
 
   object Part1 extends Part {
 
-    override def countPaths(caveMap: CaveMap): Int = {
+    override case class Node(path: List[Cave]) extends PathNode
 
-      case class Node(path: List[Cave])
+    override def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] with UnitNeighbors[Node] = new GraphTraversal[Node] with UnitNeighbors[Node] {
+      override val startNode: Node = Node(List("start"))
 
-      val graphTraversal = new GraphTraversal[Node] with UnitNeighbors[Node] {
-        override val startNode: Node = Node(List("start"))
-
-        override def unitNeighbors(node: Node): IterableOnce[Node] = {
-          for {
-            neighbor <- caveMap(node.path.head).iterator
-            if neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
-          } yield Node(neighbor :: node.path)
-        }
+      override def unitNeighbors(node: Node): IterableOnce[Node] = {
+        for {
+          neighbor <- caveMap(node.path.head).iterator
+          if neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
+        } yield Node(neighbor :: node.path)
       }
-
-      val nodes = BFS.traverse(graphTraversal).nodes
-      nodes.count(_.path.head == "end")
     }
   }
 
   object Part2 extends Part {
 
-    override def countPaths(caveMap: CaveMap): Int = {
+    override case class Node(path: List[Cave])(val canDuplicateSmall: Boolean) extends PathNode
 
-      case class Node(path: List[Cave], canDuplicateSmall: Boolean)
+    override def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] with UnitNeighbors[Node] = new GraphTraversal[Node] with UnitNeighbors[Node] {
+      override val startNode: Node = Node(List("start"))(true)
 
-      val graphTraversal = new GraphTraversal[Node] with UnitNeighbors[Node] {
-        override val startNode: Node = Node(List("start"), true)
-
-        override def unitNeighbors(node: Node): IterableOnce[Node] = {
-          if (node.path.head == "end")
-            Iterator.empty
-          else {
-            for {
-              neighbor <- caveMap(node.path.head).iterator
-              if neighbor != "start"
-              bigOrDuplicate = neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
-              if node.canDuplicateSmall || bigOrDuplicate
-            } yield Node(neighbor :: node.path, node.canDuplicateSmall && bigOrDuplicate)
-          }
+      override def unitNeighbors(node: Node): IterableOnce[Node] = {
+        if (node.path.head == "end")
+          Iterator.empty
+        else {
+          for {
+            neighbor <- caveMap(node.path.head).iterator
+            if neighbor != "start"
+            bigOrDuplicate = neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
+            if node.canDuplicateSmall || bigOrDuplicate
+          } yield Node(neighbor :: node.path)(node.canDuplicateSmall && bigOrDuplicate)
         }
       }
-
-      val nodes = BFS.traverse(graphTraversal).nodes
-      nodes.count(_.path.head == "end")
     }
   }
 
