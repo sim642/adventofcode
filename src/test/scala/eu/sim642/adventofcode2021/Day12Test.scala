@@ -47,22 +47,22 @@ class Day12Test extends AnyFunSuite {
       |start-RW""".stripMargin
 
   test("Part 1 examples") {
-    assert(countPaths(parseCaveMap(exampleInput1)) == 10)
-    assert(countPaths(parseCaveMap(exampleInput2)) == 19)
-    assert(countPaths(parseCaveMap(exampleInput3)) == 226)
+    assert(Part1.countPaths(parseCaveMap(exampleInput1)) == 10)
+    assert(Part1.countPaths(parseCaveMap(exampleInput2)) == 19)
+    assert(Part1.countPaths(parseCaveMap(exampleInput3)) == 226)
   }
 
   test("Part 1 input answer") {
-    assert(countPaths(parseCaveMap(input)) == 4659)
+    assert(Part1.countPaths(parseCaveMap(input)) == 4659)
   }
 
   test("Part 2 examples") {
-    assert(countPaths2(parseCaveMap(exampleInput1)) == 36)
-    assert(countPaths2(parseCaveMap(exampleInput2)) == 103)
-    assert(countPaths2(parseCaveMap(exampleInput3)) == 3509)
+    assert(Part2.countPaths(parseCaveMap(exampleInput1)) == 36)
+    assert(Part2.countPaths(parseCaveMap(exampleInput2)) == 103)
+    assert(Part2.countPaths(parseCaveMap(exampleInput3)) == 3509)
   }
 
   test("Part 2 input answer") {
-    assert(countPaths2(parseCaveMap(input)) == 148962)
+    assert(Part2.countPaths(parseCaveMap(input)) == 148962)
   }
 }
