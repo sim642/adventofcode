@@ -38,7 +38,7 @@ object Day12 {
 
     override def countPaths(caveMap: CaveMap): Int = {
 
-      case class Node(path: List[Cave], duplicateSmall: Boolean)
+      case class Node(path: List[Cave], canDuplicateSmall: Boolean)
 
       val graphTraversal = new GraphTraversal[Node] with UnitNeighbors[Node] {
         override val startNode: Node = Node(List("start"), true)
@@ -50,8 +50,9 @@ object Day12 {
             for {
               neighbor <- caveMap(node.path.head).iterator
               if neighbor != "start"
-              if node.duplicateSmall || neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
-            } yield Node(neighbor :: node.path, if (node.duplicateSmall && neighbor.forall(_.isLower) && node.path.contains(neighbor)) false else node.duplicateSmall) // TODO: simplify duplicateSmall logic
+              bigOrDuplicate = neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
+              if node.canDuplicateSmall || bigOrDuplicate
+            } yield Node(neighbor :: node.path, node.canDuplicateSmall && bigOrDuplicate)
           }
         }
       }
