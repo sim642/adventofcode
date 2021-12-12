@@ -25,7 +25,7 @@ object OrderedSearch {
       if (lo >= hi)
         lo // lower specific
       else {
-        val mid = (lo + hi) / aTwo
+        val mid = (hi - lo) / aTwo + lo // avoid overflow AND work on negative
         if (f(mid) >= x) // lower specific
           helper(lo, mid)
         else
@@ -55,7 +55,7 @@ object OrderedSearch {
       if (lo >= hi)
         lo - aOne // upper specific
       else {
-        val mid = (lo + hi) / aTwo
+        val mid = (hi - lo) / aTwo + lo // avoid overflow AND work on negative
         if (f(mid) > x) // upper specific
           helper(lo, mid)
         else

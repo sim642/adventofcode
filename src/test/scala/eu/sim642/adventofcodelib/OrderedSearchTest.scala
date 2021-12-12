@@ -40,4 +40,36 @@ class OrderedSearchTest extends AnyFunSuite with ScalaCheckPropertyChecks {
       assert(actualUpper == expectedUpper)
     }
   }
+
+  test("binaryLower negative") {
+    forAll ("seq", "x") { (seq: Seq[Int], x: Int) =>
+      val sortedSeq = seq.sorted
+
+      val actualLower = binaryLower((i: Int) => sortedSeq(i + sortedSeq.size), -sortedSeq.size, 0)(x)
+      val expectedLower = {
+        val i = sortedSeq.indexWhere(_ >= x)
+        if (i < 0)
+          0
+        else
+          i - sortedSeq.size
+      }
+      assert(actualLower == expectedLower)
+    }
+  }
+
+  test("binaryUpper negative") {
+    forAll ("seq", "x") { (seq: Seq[Int], x: Int) =>
+      val sortedSeq = seq.sorted
+
+      val actualUpper = binaryUpper((i: Int) => sortedSeq(i + sortedSeq.size), -sortedSeq.size, 0)(x)
+      val expectedUpper = {
+        val i = sortedSeq.lastIndexWhere(_ <= x)
+        if (i < 0)
+          -1 - sortedSeq.size
+        else
+          i - sortedSeq.size
+      }
+      assert(actualUpper == expectedUpper)
+    }
+  }
 }
