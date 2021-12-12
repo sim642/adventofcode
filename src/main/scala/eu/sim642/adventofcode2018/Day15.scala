@@ -2,8 +2,8 @@ package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.GridImplicits._
-import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, UnitNeighbors}
+import eu.sim642.adventofcodelib.GridImplicits.*
+import eu.sim642.adventofcodelib.graph.{SimultaneousBFS, GraphSearch, UnitNeighbors}
 
 import scala.util.Try
 
@@ -60,7 +60,7 @@ object Day15 {
       override def isTargetNode(pos: Pos, dist: Int): Boolean = endPos.contains(pos)
     }
 
-    BFS.search(graphSearch).distances
+    SimultaneousBFS.search(graphSearch).distances
   }
 
   def bfsEndDistances(startPos: Pos, endPos: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {

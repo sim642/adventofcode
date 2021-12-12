@@ -1,67 +1,84 @@
 package eu.sim642.adventofcodelib.graph
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 
 object BFS {
   // TODO: reduce duplication without impacting performance
 
-  // moved from 2018 Day 20
+  // copied from Dijkstra
   def traverse[A](graphTraversal: GraphTraversal[A] with UnitNeighbors[A]): Distances[A] = {
+    val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
+    val toVisit: mutable.Queue[(Int, A)] = mutable.Queue.empty
 
-    @tailrec
-    def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] = {
-      // TODO: use one dist: Int argument instead of all same toVisit values
-      val newToVisit = for {
-        (node, dist) <- toVisit
-        newNode <- graphTraversal.unitNeighbors(node).iterator
-        if !visited.contains(newNode)
-      } yield newNode -> (dist + 1)
-      val newVisited = visited ++ toVisit
-      if (newToVisit.isEmpty) {
-        new Distances[A] {
-          override def distances: collection.Map[A, Int] = newVisited
-        }
-      }
-      else
-        helper(newVisited, newToVisit)
+    def enqueue(node: A, dist: Int): Unit = {
+      toVisit.enqueue((dist, node))
     }
 
-    helper(Map.empty, Map(graphTraversal.startNode -> 0))
+    enqueue(graphTraversal.startNode, 0)
+
+    while (toVisit.nonEmpty) {
+      val (dist, node) = toVisit.dequeue()
+      if (!visitedDistance.contains(node)) {
+        visitedDistance(node) = dist
+
+        def goNeighbor(newNode: A): Unit = {
+          if (!visitedDistance.contains(newNode)) { // avoids some unnecessary queue duplication but not all
+            val newDist = dist + 1
+            enqueue(newNode, newDist)
+          }
+        }
+
+        graphTraversal.unitNeighbors(node).iterator.foreach(goNeighbor)
+      }
+    }
+
+    new Distances[A] {
+      override def distances: collection.Map[A, Int] = visitedDistance
+    }
   }
 
-  // moved from 2018 Day 20
+  // copied from Dijkstra
   def search[A](graphSearch: GraphSearch[A] with UnitNeighbors[A]): Distances[A] with Target[A] = {
+    val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
+    val toVisit: mutable.Queue[(Int, A)] = mutable.Queue.empty
 
-    @tailrec
-    def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] with Target[A] = {
-      // TODO: use one dist: Int argument instead of all same toVisit values
-      val newVisited = visited ++ toVisit
-      toVisit.find((graphSearch.isTargetNode _).tupled) match {
-        case targetNodeDist@Some(_) =>
-          new Distances[A] with Target[A] {
-            override def distances: collection.Map[A, Int] = newVisited
+    def enqueue(node: A, dist: Int): Unit = {
+      toVisit.enqueue((dist, node))
+    }
 
-            override def target: Option[(A, Int)] = targetNodeDist
+    enqueue(graphSearch.startNode, 0)
+
+    while (toVisit.nonEmpty) {
+      val (dist, node) = toVisit.dequeue()
+      if (!visitedDistance.contains(node)) {
+        visitedDistance(node) = dist
+
+        if (graphSearch.isTargetNode(node, dist)) {
+          return new Distances[A] with Target[A] {
+            override def distances: collection.Map[A, Int] = visitedDistance
+
+            override def target: Option[(A, Int)] = Some(node -> dist)
           }
-        case None =>
-          val newToVisit = for {
-            (node, dist) <- toVisit
-            newNode <- graphSearch.unitNeighbors(node).iterator
-            if !visited.contains(newNode)
-          } yield newNode -> (dist + 1)
-          if (newToVisit.isEmpty) {
-            new Distances[A] with Target[A] {
-              override def distances: collection.Map[A, Int] = newVisited
+        }
 
-              override def target: Option[(A, Int)] = None
-            }
+
+        def goNeighbor(newNode: A): Unit = {
+          if (!visitedDistance.contains(newNode)) { // avoids some unnecessary queue duplication but not all
+            val newDist = dist + 1
+            enqueue(newNode, newDist)
           }
-          else
-            helper(newVisited, newToVisit)
+        }
+
+        graphSearch.unitNeighbors(node).iterator.foreach(goNeighbor)
       }
     }
 
-    helper(Map.empty, Map(graphSearch.startNode -> 0))
+    new Distances[A] with Target[A] {
+      override def distances: collection.Map[A, Int] = visitedDistance
+
+      override def target: Option[(A, Int)] = None
+    }
   }
 
   // moved from 2017 Day 14
