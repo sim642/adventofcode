@@ -27,6 +27,31 @@ object Day12 {
     nodes.count(_.path.head == "end")
   }
 
+  // TODO: extract trait
+  def countPaths2(caveMap: CaveMap): Int = {
+
+    case class Node(path: List[Cave], duplicateSmall: Boolean)
+
+    val graphTraversal = new GraphTraversal[Node] with UnitNeighbors[Node] {
+      override val startNode: Node = Node(List("start"), true)
+
+      override def unitNeighbors(node: Node): IterableOnce[Node] = {
+        if (node.path.head == "end")
+          Iterator.empty
+        else {
+          for {
+            neighbor <- caveMap(node.path.head)
+            if neighbor != "start"
+            if node.duplicateSmall || neighbor.forall(_.isUpper) || !node.path.contains(neighbor)
+          } yield Node(neighbor :: node.path, if (node.duplicateSmall && neighbor.forall(_.isLower) && node.path.contains(neighbor)) false else node.duplicateSmall) // TODO: simplify duplicateSmall logic
+        }
+      }
+    }
+
+    val nodes = BFS.traverse(graphTraversal).nodes
+    nodes.count(_.path.head == "end")
+  }
+
 
   def parseCaveMap(input: String): CaveMap = {
     (for {
@@ -40,5 +65,6 @@ object Day12 {
 
   def main(args: Array[String]): Unit = {
     println(countPaths(parseCaveMap(input)))
+    println(countPaths2(parseCaveMap(input)))
   }
 }

@@ -55,4 +55,14 @@ class Day12Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countPaths(parseCaveMap(input)) == 4659)
   }
+
+  test("Part 2 examples") {
+    assert(countPaths2(parseCaveMap(exampleInput1)) == 36)
+    assert(countPaths2(parseCaveMap(exampleInput2)) == 103)
+    assert(countPaths2(parseCaveMap(exampleInput3)) == 3509)
+  }
+
+  test("Part 2 input answer") {
+    assert(countPaths2(parseCaveMap(input)) == 148962)
+  }
 }
