@@ -85,7 +85,7 @@ object Day7 {
         // mniip's solution
         val sum = crabs.sum
         val n = crabs.size
-        val pos = (sum + crabs.count(n * _ > sum)) / n // mean and extra for above mean
+        val pos = ((sum + crabs.count(n * _ > sum)) / n.toFloat).floor.toInt // mean and extra for above mean, floor for negative arguments
         alignPosFuel(crabs, pos)
       }
     }
