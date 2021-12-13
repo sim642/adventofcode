@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2021
 
+import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 
 object Day13 {
@@ -25,6 +26,23 @@ object Day13 {
 
   def countDotsAfter1(input: Input): Int = input.folds.head(input.dots).size
 
+  def printDots(dots: Set[Pos]): Unit = {
+    val Box(min, max) = Box.bounding(dots)
+
+    for (y <- min.y to max.y) {
+      for (x <- min.x to max.x) {
+        val pos = Pos(x, y)
+        print(if (dots.contains(pos)) '#' else '.')
+      }
+      println()
+    }
+  }
+
+  def printFoldedDots(input: Input): Unit = {
+    val foldedDots = input.folds.foldLeft(input.dots)((dots, fold) => fold.apply(dots))
+    printDots(foldedDots)
+  }
+
 
   def parseDot(s: String): Pos = {
     val Seq(x, y) = s.split(",", 2).toSeq
@@ -49,5 +67,6 @@ object Day13 {
 
   def main(args: Array[String]): Unit = {
     println(countDotsAfter1(parseInput(input)))
+    printFoldedDots(parseInput(input)) // RGZLBHFP
   }
 }
