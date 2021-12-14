@@ -5,7 +5,7 @@ import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day14 {
 
-  case class Polymer(elements: Map[Char, Int], pairs: Map[(Char, Char), Int])
+  case class Polymer(elements: Map[Char, Long], pairs: Map[(Char, Char), Long])
 
   type Rules = Map[(Char, Char), Char]
 
@@ -18,22 +18,22 @@ object Day14 {
     }).groupMapReduce(_._1)(_._2)(_ + _)
     val newElements = polymer.pairs.foldLeft(polymer.elements)({ case (elements, (pair, cnt)) =>
       val c = rules(pair)
-      elements + (c -> (elements.getOrElse(c, 0) + cnt))
+      elements + (c -> (elements.getOrElse(c, 0L) + cnt))
     })
     Polymer(newElements, newPairs)
   }
 
-  def elementCountDifference(input: Input): Int = {
+  def elementCountDifference(input: Input, after: Int = 10): Long = {
     val Input(initialPolymer, rules) = input
-    val finalPolymer = Iterator.iterate(initialPolymer)(applyRules(_, rules))(10)
+    val finalPolymer = Iterator.iterate(initialPolymer)(applyRules(_, rules))(after)
     val finalElementCounts = finalPolymer.elements.values
     finalElementCounts.max - finalElementCounts.min
   }
 
 
   def parsePolymer(s: String): Polymer = {
-    val elements = s.iterator.groupCount(identity)
-    val pairs = s.iterator.zipWithTail.groupCount(identity)
+    val elements = s.iterator.groupMapReduce(identity)(_ => 1L)(_ + _)
+    val pairs = s.iterator.zipWithTail.groupMapReduce(identity)(_ => 1L)(_ + _)
     Polymer(elements, pairs)
   }
 
@@ -53,5 +53,6 @@ object Day14 {
 
   def main(args: Array[String]): Unit = {
     println(elementCountDifference(parseInput(input)))
+    println(elementCountDifference(parseInput(input), 40))
   }
 }

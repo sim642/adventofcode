@@ -35,4 +35,12 @@ class Day14Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(elementCountDifference(parseInput(input)) == 3009)
   }
+
+  test("Part 2 examples") {
+    assert(elementCountDifference(parseInput(exampleInput), 40) == 2188189693529L)
+  }
+
+  test("Part 2 input answer") {
+    assert(elementCountDifference(parseInput(input), 40) == 3459822539451L)
+  }
 }
