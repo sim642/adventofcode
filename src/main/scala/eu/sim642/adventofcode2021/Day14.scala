@@ -23,9 +23,13 @@ object Day14 {
     Polymer(newElements, newPairs)
   }
 
+  def iterateRules(initialPolymer: Polymer, rules: Rules): Iterator[Polymer] = {
+    Iterator.iterate(initialPolymer)(applyRules(_, rules))
+  }
+
   def elementCountDifference(input: Input, after: Int = 10): Long = {
     val Input(initialPolymer, rules) = input
-    val finalPolymer = Iterator.iterate(initialPolymer)(applyRules(_, rules))(after)
+    val finalPolymer = iterateRules(initialPolymer, rules)(after)
     val finalElementCounts = finalPolymer.elements.values
     finalElementCounts.max - finalElementCounts.min
   }
