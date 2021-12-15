@@ -26,6 +26,12 @@ object Day15 {
     Dijkstra.search(graphSearch).target.get._2
   }
 
+  def extendGrid(grid: Grid[Int]): Grid[Int] = {
+    Vector.tabulate(5, 5)(_ + _)
+      .mapGrid(i => grid.mapGrid(x => (x + i - 1) % 9 + 1))
+      .flattenGrid
+  }
+
 
   def parseGrid(input: String): Grid[Int] = input.linesIterator.map(_.toVector).toVector.mapGrid(_.asDigit)
 
@@ -33,5 +39,6 @@ object Day15 {
 
   def main(args: Array[String]): Unit = {
     println(lowestRiskPath(parseGrid(input)))
+    println(lowestRiskPath(extendGrid(parseGrid(input))))
   }
 }
