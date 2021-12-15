@@ -18,15 +18,15 @@ class Day15Test extends AnyFunSuite {
       |2311944581""".stripMargin
 
   test("Part 1 examples") {
-    assert(lowestRiskPath(parseGrid(exampleInput)) == 40)
+    assert(Part1.lowestRiskPath(parseGrid(exampleInput)) == 40)
   }
 
   test("Part 1 input answer") {
-    assert(lowestRiskPath(parseGrid(input)) == 811)
+    assert(Part1.lowestRiskPath(parseGrid(input)) == 811)
   }
 
   test("Part 2 examples") {
-    assert(extendGrid(parseGrid(exampleInput)) == parseGrid(
+    assert(Part2.extendGrid(parseGrid(exampleInput)) == parseGrid(
       """11637517422274862853338597396444961841755517295286
         |13813736722492484783351359589446246169155735727126
         |21365113283247622439435873354154698446526571955763
@@ -79,10 +79,10 @@ class Day15Test extends AnyFunSuite {
         |67554889357866599146897761125791887223681299833479""".stripMargin
     ))
 
-    assert(lowestRiskPath(extendGrid(parseGrid(exampleInput))) == 315)
+    assert(Part2.lowestRiskPath(parseGrid(exampleInput)) == 315)
   }
 
   test("Part 2 input answer") {
-    assert(lowestRiskPath(extendGrid(parseGrid(input))) == 3012)
+    assert(Part2.lowestRiskPath(parseGrid(input)) == 3012)
   }
 }
