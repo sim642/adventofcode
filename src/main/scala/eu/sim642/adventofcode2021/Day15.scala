@@ -14,7 +14,7 @@ object Day15 {
 
       override def neighbors(pos: Pos): IterableOnce[(Pos, Int)] = {
         for {
-          offset <- Pos.axisOffsets
+          offset <- Pos.axisOffsets.iterator
           newPos = pos + offset
           if grid.containsPos(newPos)
         } yield newPos -> grid(newPos)
@@ -22,6 +22,7 @@ object Day15 {
 
       override val targetNode: Pos = Pos(grid(0).size - 1, grid.size - 1)
     }
+    // A* with Manhattan distance heuristic is a bit slower (heuristic overhead?)
 
     Dijkstra.search(graphSearch).target.get._2
   }
