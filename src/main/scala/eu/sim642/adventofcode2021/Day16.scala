@@ -10,7 +10,7 @@ object Day16 {
   type Bits = List[Boolean]
 
   def bits2int(bits: Bits): Long = {
-    bits.foldLeft(0L)({ case (acc, bit) => (acc << 1) | (if bit then 1 else 0) })
+    bits.foldLeft(0L)({ case (acc, bit) => (acc << 1) | (if (bit) 1 else 0) })
   }
 
 
@@ -157,29 +157,32 @@ object Day16 {
   }
 
 
+  def parseBinBits(input: String): Bits = input.view.map({
+    case '0' => false
+    case '1' => true
+  }).toList
+
   private val hexBits = Map(
-    '0' -> List(0, 0, 0, 0),
-    '1' -> List(0, 0, 0, 1),
-    '2' -> List(0, 0, 1, 0),
-    '3' -> List(0, 0, 1, 1),
-    '4' -> List(0, 1, 0, 0),
-    '5' -> List(0, 1, 0, 1),
-    '6' -> List(0, 1, 1, 0),
-    '7' -> List(0, 1, 1, 1),
-    '8' -> List(1, 0, 0, 0),
-    '9' -> List(1, 0, 0, 1),
-    'A' -> List(1, 0, 1, 0),
-    'B' -> List(1, 0, 1, 1),
-    'C' -> List(1, 1, 0, 0),
-    'D' -> List(1, 1, 0, 1),
-    'E' -> List(1, 1, 1, 0),
-    'F' -> List(1, 1, 1, 1),
-  ).view.mapValues(_.map({ case 0 => false case 1 => true}))
+    '0' -> "0000",
+    '1' -> "0001",
+    '2' -> "0010",
+    '3' -> "0011",
+    '4' -> "0100",
+    '5' -> "0101",
+    '6' -> "0110",
+    '7' -> "0111",
+    '8' -> "1000",
+    '9' -> "1001",
+    'A' -> "1010",
+    'B' -> "1011",
+    'C' -> "1100",
+    'D' -> "1101",
+    'E' -> "1110",
+    'F' -> "1111",
+  ).view.mapValues(parseBinBits).toMap
 
   def parseHexBits(input: String): Bits = input.view.flatMap(hexBits).toList
 
-  // for testing
-  def parseBinBits(input: String): Bits = input.view.map({ case '0' => false case '1' => true}).toList
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
