@@ -25,4 +25,19 @@ class Day16Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumVersions(parseHexPacket(input)) == 991)
   }
+
+  test("Part 2 examples") {
+    assert(eval(parseHexPacket("C200B40A82")) == 3)
+    assert(eval(parseHexPacket("04005AC33890")) == 54)
+    assert(eval(parseHexPacket("880086C3E88112")) == 7)
+    assert(eval(parseHexPacket("CE00C43D881120")) == 9)
+    assert(eval(parseHexPacket("D8005AC2A8F0")) == 1)
+    assert(eval(parseHexPacket("F600BC2D8F")) == 0)
+    assert(eval(parseHexPacket("9C005AC2F8F0")) == 0)
+    assert(eval(parseHexPacket("9C0141080250320F1802104A08")) == 1)
+  }
+
+  test("Part 2 input answer") {
+    assert(eval(parseHexPacket(input)) == 1264485568252L)
+  }
 }

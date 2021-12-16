@@ -9,15 +9,15 @@ object Day16 {
 
   type Bits = List[Boolean]
 
-  def bits2int(bits: Bits): Int = {
-    bits.foldLeft(0)({ case (acc, bit) => (acc << 1) | (if bit then 1 else 0) })
+  def bits2int(bits: Bits): Long = {
+    bits.foldLeft(0L)({ case (acc, bit) => (acc << 1) | (if bit then 1 else 0) })
   }
 
 
   sealed trait Packet {
     val version: Int
   }
-  case class Literal(version: Int, value: Int) extends Packet
+  case class Literal(version: Int, value: Long) extends Packet
   case class Operator(version: Int, typeId: Int, subpackets: List[Packet]) extends Packet
 
 
@@ -51,9 +51,9 @@ object Day16 {
 
   def parsePacket(bits: Bits): (Packet, Bits) = {
     val (versionBits, bits2) = bits.splitAt(3)
-    val version = bits2int(versionBits)
+    val version = bits2int(versionBits).toInt
     val (typeIdBits, bits3) = bits2.splitAt(3)
-    val typeId = bits2int(typeIdBits)
+    val typeId = bits2int(typeIdBits).toInt
     typeId match {
       case 4 =>
         val (valueBits, bits4) = parseLiteralValue(bits3)
@@ -63,13 +63,13 @@ object Day16 {
         val lengthTypeBit :: bits4 = bits3
         if (lengthTypeBit) {
           val (numberBits, bits5) = bits4.splitAt(11)
-          val number = bits2int(numberBits)
+          val number = bits2int(numberBits).toInt
           val (subpackets, bits6) = parseSubpacketsNumber(bits5, number)
           (Operator(version, typeId, subpackets), bits6)
         }
         else {
           val (lengthBits, bits5) = bits4.splitAt(15)
-          val length = bits2int(lengthBits)
+          val length = bits2int(lengthBits).toInt
           val (subpacketBits, bits6) = bits5.splitAt(length)
           val subpackets = parseSubpacketsLength(subpacketBits)
           (Operator(version, typeId, subpackets), bits6)
@@ -86,6 +86,37 @@ object Day16 {
       version
     case Operator(version, _, subpackets) =>
       version + subpackets.map(sumVersions).sum
+  }
+
+  def eval(packet: Packet): Long = packet match {
+    case Literal(_, value) =>
+      value
+    case Operator(_, typeId, subpackets) =>
+      val subvalues = subpackets.map(eval)
+      typeId match {
+        case 0 => subvalues.sum
+        case 1 => subvalues.product
+        case 2 => subvalues.min
+        case 3 => subvalues.max
+        case 5 =>
+          val Seq(value1, value2) = subvalues
+          if (value1 > value2)
+            1
+          else
+            0
+        case 6 =>
+          val Seq(value1, value2) = subvalues
+          if (value1 < value2)
+            1
+          else
+            0
+        case 7 =>
+          val Seq(value1, value2) = subvalues
+          if (value1 == value2)
+            1
+          else
+            0
+      }
   }
 
 
@@ -119,5 +150,8 @@ object Day16 {
 
   def main(args: Array[String]): Unit = {
     println(sumVersions(parseHexPacket(input)))
+    println(eval(parseHexPacket(input)))
+
+    // part 2: 2904570676 - wrong (need Long for Literal values and eval)
   }
 }
