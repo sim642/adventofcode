@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2021
 
+import eu.sim642.adventofcodelib.parsing.{ExtraParsers, ListParsers}
+
 import scala.util.parsing.combinator.Parsers
 import scala.util.parsing.input.{NoPosition, Position, Reader}
 
@@ -86,36 +88,18 @@ object Day16 {
     override def parse(bits: Bits): Packet = parsePacket(bits)._1
   }
 
-  object ParserCombinatorSolution extends Solution with Parsers {
+  object ParserCombinatorSolution extends Solution with ListParsers[Boolean] with ExtraParsers {
 
-    case class ListReader[A](list: List[A]) extends Reader[A] {
-      override def first: A = list.head
-
-      override def rest: Reader[A] = ListReader(list.tail)
-
-      override def pos: Position = NoPosition // TODO: something better
-
-      override def atEnd: Boolean = list.isEmpty
-    }
-
-    override type Elem = Boolean
-
-    def bit: Parser[Boolean] = (in: Input) => {
-      if (in.atEnd)
-        Failure("bit", in)
-      else
-        Success(in.first, in.rest)
-    }
-
-    def long(n: Int): Parser[Long] = repN(n, bit) ^^ bits2int
+    def long(n: Int): Parser[Long] = repN(n, any) ^^ bits2int
     def int(n: Int): Parser[Int] = long(n) ^^ (_.toInt)
 
     def literalValue: Parser[Long] = rep(true ~> long(4)) ~ (false ~> long(4)) ^^ {
       case xs ~ x => (xs.foldLeft(0L)((acc, x) => (acc << 4) | x) << 4) | x
     }
 
+    // TODO: move to ExtraParsers? must generalize parseAll (Reader creation)
     def lengthed[A](length: Int, p: => Parser[A]): Parser[A] = {
-      repN(length, bit) ^^ (bits => p(ListReader(bits)).get)
+      repN(length, any) ^^ (parseAll(p, _).get)
     }
 
     def subpackets: Parser[List[Packet]] = (
@@ -130,7 +114,7 @@ object Day16 {
         subpackets ^^ (Operator(version, typeId, _))
     }
 
-    override def parse(bits: Bits): Packet = packet(ListReader(bits)).get
+    override def parse(bits: Bits): Packet = parse(packet, bits).get
   }
 
 
