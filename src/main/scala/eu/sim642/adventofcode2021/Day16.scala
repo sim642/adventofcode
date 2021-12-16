@@ -108,33 +108,27 @@ object Day16 {
     }
 
     def long(n: Int): Parser[Long] = repN(n, bit) ^^ bits2int
-
     def int(n: Int): Parser[Int] = long(n) ^^ (_.toInt)
 
-    def valueBlock(b: Boolean): Parser[Long] = elem(b) ~> long(4)
-
-    def literalValue: Parser[Long] = rep(valueBlock(true)) ~ valueBlock(false) ^^ {
+    def literalValue: Parser[Long] = rep(true ~> long(4)) ~ (false ~> long(4)) ^^ {
       case xs ~ x => (xs.foldLeft(0L)((acc, x) => (acc << 4) | x) << 4) | x
     }
 
-    def packet: Parser[Packet] = (int(3) ~ int(3)).flatMap({
+    def lengthed[A](length: Int, p: => Parser[A]): Parser[A] = {
+      repN(length, bit) ^^ (bits => p(ListReader(bits)).get)
+    }
+
+    def subpackets: Parser[List[Packet]] = (
+      true ~> int(11) >> (repN(_, packet))
+    | false ~> int(15) >> (lengthed(_, rep(packet)))
+    )
+
+    def packet: Parser[Packet] = int(3) ~ int(3) >> {
       case version ~ 4 =>
         literalValue ^^ (Literal(version, _))
       case version ~ typeId =>
-        bit.flatMap({
-          case true =>
-            int(11).flatMap(number =>
-              repN(number, packet)
-            ) ^^ (Operator(version, typeId, _))
-          case false =>
-            int(15).flatMap(bits =>
-              repN(bits, bit) ^^ (bits =>
-                  val subpackets = rep(packet)(ListReader(bits)).get
-                  Operator(version, typeId, subpackets)
-                )
-            )
-        })
-    })
+        subpackets ^^ (Operator(version, typeId, _))
+    }
 
     override def parse(bits: Bits): Packet = packet(ListReader(bits)).get
   }
