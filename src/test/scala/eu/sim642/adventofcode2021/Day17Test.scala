@@ -22,4 +22,12 @@ class Day17Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(findHighestY(parseTarget(input)) == 2775)
   }
+
+  test("Part 2 examples") {
+    assert(countHitsTarget(parseTarget(exampleInput)) == 112)
+  }
+
+  test("Part 2 input answer") {
+    assert(countHitsTarget(parseTarget(input)) == 1566)
+  }
 }

@@ -20,6 +20,34 @@ object Day17 {
       .max
   }
 
+  def simulateX(initialXVelocity: Int): Iterator[Int] = {
+    Iterator.iterate((0, initialXVelocity))((x, xVelocity) => (x + xVelocity, xVelocity + (if (xVelocity > 0) -1 else 0))).map(_._1)
+  }
+
+  def hitsTargetX(target: Box, initialXVelocity: Int): Boolean = {
+    simulateY(initialXVelocity).takeWhile(_ <= target.max.x).exists(_ >= target.min.x)
+  }
+
+  def simulate(initialVelocity: Pos): Iterator[Pos] = {
+    (simulateX(initialVelocity.x) zip simulateY(initialVelocity.y)).map(Pos.apply)
+  }
+
+  def hitsTarget(target: Box, initialVelocity: Pos): Boolean = {
+    simulate(initialVelocity).takeWhile(pos => pos.x <= target.max.x && pos.y >= target.min.y).exists(target.contains)
+  }
+
+  def countHitsTarget(target: Box): Int = {
+    val ys = (-100 to 100).filter(hitsTargetY(target, _))
+    val xs = (0 to 1000).filter(hitsTargetX(target, _))
+    val initials = for {
+      x <- xs
+      y <- ys
+      pos = Pos(x, y)
+      if hitsTarget(target, pos)
+    } yield pos
+    initials.size
+  }
+
 
   private val targetRegex = """target area: x=(\d+)..(\d+), y=(-?\d+)..(-?\d+)""".r
 
@@ -32,5 +60,8 @@ object Day17 {
 
   def main(args: Array[String]): Unit = {
     println(findHighestY(parseTarget(input)))
+    println(countHitsTarget(parseTarget(input)))
+
+    // part 2: 369 - wrong (x range -100 to 100 instead of 0 to 1000)
   }
 }
