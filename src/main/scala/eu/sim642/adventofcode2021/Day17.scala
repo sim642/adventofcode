@@ -31,7 +31,7 @@ object Day17 {
   }
 
   def hitsTargetX(target: Box, initialXVelocity: Int): Boolean = {
-    simulateY(initialXVelocity).takeWhile(_ <= target.max.x).exists(_ >= target.min.x)
+    simulateX(initialXVelocity).takeWhile(_ <= target.max.x).exists(_ >= target.min.x)
   }
 
   def simulate(initialVelocity: Pos): Iterator[Pos] = {
@@ -52,7 +52,8 @@ object Day17 {
     override def iterateHitsTarget(target: Box): IterableOnce[Pos] = {
       val bounds = initialVelocityBounds(target)
       val ys = (bounds.min.y to bounds.max.y).filter(hitsTargetY(target, _))
-      val xs = (bounds.min.x to bounds.max.x).filter(hitsTargetX(target, _))
+      //val xs = (bounds.min.x to bounds.max.x).filter(hitsTargetX(target, _))
+      val xs = bounds.min.x to bounds.max.x
       for {
         x <- xs.iterator
         y <- ys.iterator
