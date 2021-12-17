@@ -13,8 +13,13 @@ object Day17 {
     simulateY(initialYVelocity).takeWhile(_ >= target.min.y).exists(_ <= target.max.y)
   }
 
+  def initialVelocityBounds(target: Box): Box = {
+    Box(Pos(0, target.min.y), Pos(target.max.x, target.min.y.abs))
+  }
+
   def findHighestY(target: Box): Int = {
-    (-100 to 100)
+    val bounds = initialVelocityBounds(target)
+    (bounds.min.y to bounds.max.y)
       .filter(hitsTargetY(target, _))
       .map(initialYVelocity => simulateY(initialYVelocity).takeWhile(_ >= target.min.y).max)
       .max
@@ -37,8 +42,9 @@ object Day17 {
   }
 
   def countHitsTarget(target: Box): Int = {
-    val ys = (-100 to 100).filter(hitsTargetY(target, _))
-    val xs = (0 to 1000).filter(hitsTargetX(target, _))
+    val bounds = initialVelocityBounds(target)
+    val ys = (bounds.min.y to bounds.max.y).filter(hitsTargetY(target, _))
+    val xs = (bounds.min.x to bounds.max.x).filter(hitsTargetX(target, _))
     val initials = for {
       x <- xs
       y <- ys
