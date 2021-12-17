@@ -45,13 +45,11 @@ object Day17 {
     val bounds = initialVelocityBounds(target)
     val ys = (bounds.min.y to bounds.max.y).filter(hitsTargetY(target, _))
     val xs = (bounds.min.x to bounds.max.x).filter(hitsTargetX(target, _))
-    val initials = for {
-      x <- xs
-      y <- ys
-      pos = Pos(x, y)
-      if hitsTarget(target, pos)
-    } yield pos
-    initials.size
+    val initialVelocities = for {
+      x <- xs.iterator
+      y <- ys.iterator
+    } yield Pos(x, y)
+    initialVelocities.count(hitsTarget(target, _))
   }
 
 
