@@ -26,7 +26,7 @@ object Day17 {
   }
 
   def simulateX(initialXVelocity: Int): Iterator[Int] = {
-    Iterator.iterate((0, initialXVelocity))((x, xVelocity) => (x + xVelocity, xVelocity + (if (xVelocity > 0) -1 else 0))).map(_._1)
+    Iterator.iterate((0, initialXVelocity))((x, xVelocity) => (x + xVelocity, xVelocity - xVelocity.sign)).map(_._1)
   }
 
   def hitsTargetX(target: Box, initialXVelocity: Int): Boolean = {
