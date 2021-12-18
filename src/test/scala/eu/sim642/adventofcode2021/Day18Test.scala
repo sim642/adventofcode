@@ -61,14 +61,14 @@ class Day18Test extends AnyFunSuite {
 
   test("Part 1 examples") {
     assert(parseNumber("[1,2]") + parseNumber("[[3,4],5]") == parseNumber("[[1,2],[[3,4],5]]"))
-    assert(explode(parseNumber("[[[[[9,8],1],2],3],4]")) == Right(parseNumber("[[[[0,9],2],3],4]")))
-    assert(explode(parseNumber("[7,[6,[5,[4,[3,2]]]]]")) == Right(parseNumber("[7,[6,[5,[7,0]]]]")))
-    assert(explode(parseNumber("[[6,[5,[4,[3,2]]]],1]")) == Right(parseNumber("[[6,[5,[7,0]]],3]")))
-    assert(explode(parseNumber("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]")) == Right(parseNumber("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")))
-    assert(explode(parseNumber("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")) == Right(parseNumber("[[3,[2,[8,0]]],[9,[5,[7,0]]]]")))
-    assert(split(parseNumber("10")) == Right(parseNumber("[5,5]")))
-    assert(split(parseNumber("11")) == Right(parseNumber("[5,6]")))
-    assert(split(parseNumber("12")) == Right(parseNumber("[6,6]")))
+    assert(explode(parseNumber("[[[[[9,8],1],2],3],4]")) == Some(parseNumber("[[[[0,9],2],3],4]")))
+    assert(explode(parseNumber("[7,[6,[5,[4,[3,2]]]]]")) == Some(parseNumber("[7,[6,[5,[7,0]]]]")))
+    assert(explode(parseNumber("[[6,[5,[4,[3,2]]]],1]")) == Some(parseNumber("[[6,[5,[7,0]]],3]")))
+    assert(explode(parseNumber("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]")) == Some(parseNumber("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")))
+    assert(explode(parseNumber("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")) == Some(parseNumber("[[3,[2,[8,0]]],[9,[5,[7,0]]]]")))
+    assert(split(parseNumber("10")) == Some(parseNumber("[5,5]")))
+    assert(split(parseNumber("11")) == Some(parseNumber("[5,6]")))
+    assert(split(parseNumber("12")) == Some(parseNumber("[6,6]")))
 
     assert(parseNumber("[[[[4,3],4],4],[7,[[8,4],9]]]") + parseNumber("[1,1]") == parseNumber("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]"))
 

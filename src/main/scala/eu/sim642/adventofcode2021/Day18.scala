@@ -26,58 +26,39 @@ object Day18 extends RegexParsers {
     case Pair(left, right) => Pair(left, addRight(right, addValue))
   }
 
-  def explode(number: Number, depth: Int): Either[Number, (Option[Int], Number, Option[Int])] = number match {
-    case Regular(_) => Left(number)
+  def explode(number: Number, depth: Int): Option[(Option[Int], Number, Option[Int])] = number match {
+    case Regular(_) =>
+      None
     case Pair(Regular(left), Regular(right)) if depth >= 4 =>
-      Right((Some(left), Regular(0), Some(right)))
+      Some((Some(left), Regular(0), Some(right)))
     case Pair(left, right) =>
-      explode(left, depth + 1) match {
-        case Right((leftAdd, left, Some(rightAdd))) =>
-          Right((leftAdd, Pair(left, addLeft(right, rightAdd)), None))
-        case Right((leftAdd, left, None)) =>
-          Right((leftAdd, Pair(left, right), None))
-        case Left(left) =>
-          explode(right, depth + 1) match {
-            case Right((Some(leftAdd), right, rightAdd)) =>
-              Right((None, Pair(addRight(left, leftAdd), right), rightAdd))
-            case Right((None, right, rightAdd)) =>
-              Right((None, Pair(left, right), rightAdd))
-            case Left(right) =>
-              Left(Pair(left, right))
-          }
-      }
+      explode(left, depth + 1).map((leftAdd, left, rightAdd) =>
+        (leftAdd, Pair(left, rightAdd.map(addLeft(right, _)).getOrElse(right)), None)
+      ) orElse explode(right, depth + 1).map((leftAdd, right, rightAdd) =>
+        (None, Pair(leftAdd.map(addRight(left, _)).getOrElse(left), right), rightAdd)
+      )
   }
 
-  def explode(number: Number): Either[Number, Number] = explode(number, 0) match {
-    case Left(number) => Left(number)
-    case Right((_, number, _)) => Right(number)
-  }
+  def explode(number: Number): Option[Number] = explode(number, 0).map(_._2)
 
-  def split(number: Number): Either[Number, Number] = number match {
-    case Regular(value) if value >= 10 => Right(Pair(Regular((value.toFloat / 2).floor.toInt), Regular((value.toFloat / 2).ceil.toInt)))
-    case Regular(value) => Left(number)
+  def split(number: Number): Option[Number] = number match {
+    case Regular(value) if value >= 10 =>
+      val halfValue = value.toFloat / 2
+      Some(Pair(Regular(halfValue.floor.toInt), Regular(halfValue.ceil.toInt)))
+    case Regular(_) =>
+      None
     case Pair(left, right) =>
-      split(left) match {
-        case Right(left) =>
-          Right(Pair(left, right))
-        case Left(left) =>
-          split(right) match {
-            case Right(right) =>
-              Right(Pair(left, right))
-            case Left(right) =>
-              Left(Pair(left, right))
-          }
-      }
+      split(left).map(Pair(_, right)) orElse split(right).map(Pair(left, _))
   }
 
   @tailrec
   def reduce(number: Number): Number = {
     explode(number) match {
-      case Right(number) => reduce(number)
-      case Left(number) =>
+      case Some(number) => reduce(number)
+      case None =>
         split(number) match {
-          case Right(number) => reduce(number)
-          case Left(number) => number
+          case Some(number) => reduce(number)
+          case None => number
         }
     }
   }
