@@ -86,6 +86,13 @@ object Day18 extends RegexParsers {
 
   def addNumbersMagnitude(numbers: Seq[Number]): Int = addNumbers(numbers).magnitude
 
+  def largestTwoMagnitude(numbers: Seq[Number]): Int = {
+    (for {
+      left <- numbers.iterator
+      right <- numbers.iterator
+    } yield (left + right).magnitude).max
+  }
+
 
   def parseNumber(s: String): Number = {
 
@@ -103,5 +110,6 @@ object Day18 extends RegexParsers {
 
   def main(args: Array[String]): Unit = {
     println(addNumbersMagnitude(parseNumbers(input)))
+    println(largestTwoMagnitude(parseNumbers(input)))
   }
 }

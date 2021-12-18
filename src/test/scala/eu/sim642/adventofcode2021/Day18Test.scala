@@ -106,4 +106,12 @@ class Day18Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(addNumbersMagnitude(parseNumbers(input)) == 4184)
   }
+
+  test("Part 2 examples") {
+    assert(largestTwoMagnitude(parseNumbers(exampleInput6)) == 3993)
+  }
+
+  test("Part 2 input answer") {
+    assert(largestTwoMagnitude(parseNumbers(input)) == 4731)
+  }
 }
