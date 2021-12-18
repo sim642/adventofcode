@@ -7,23 +7,19 @@ object Day18 extends RegexParsers {
 
   sealed trait Number {
     def +(that: Number): Number = reduce(Pair(this, that))
+    def addLeft(addValue: Int): Number
+    def addRight(addValue: Int): Number
     def magnitude: Int
   }
   case class Regular(value: Int) extends Number {
+    override def addLeft(addValue: Int): Number = Regular(value + addValue)
+    override def addRight(addValue: Int): Number = Regular(value + addValue)
     override def magnitude: Int = value
   }
   case class Pair(left: Number, right: Number) extends Number {
+    override def addLeft(addValue: Int): Number = Pair(left.addLeft(addValue), right)
+    override def addRight(addValue: Int): Number = Pair(left, right.addRight(addValue))
     override def magnitude: Int = 3 * left.magnitude + 2 * right.magnitude
-  }
-
-  def addLeft(number: Number, addValue: Int): Number = number match {
-    case Regular(value) => Regular(value + addValue)
-    case Pair(left, right) => Pair(addLeft(left, addValue), right)
-  }
-
-  def addRight(number: Number, addValue: Int): Number = number match {
-    case Regular(value) => Regular(value + addValue)
-    case Pair(left, right) => Pair(left, addRight(right, addValue))
   }
 
   def explode(number: Number, depth: Int): Option[(Option[Int], Number, Option[Int])] = number match {
@@ -33,9 +29,9 @@ object Day18 extends RegexParsers {
       Some((Some(left), Regular(0), Some(right)))
     case Pair(left, right) =>
       explode(left, depth + 1).map((leftAdd, left, rightAdd) =>
-        (leftAdd, Pair(left, rightAdd.map(addLeft(right, _)).getOrElse(right)), None)
+        (leftAdd, Pair(left, rightAdd.map(right.addLeft).getOrElse(right)), None)
       ) orElse explode(right, depth + 1).map((leftAdd, right, rightAdd) =>
-        (None, Pair(leftAdd.map(addRight(left, _)).getOrElse(left), right), rightAdd)
+        (None, Pair(leftAdd.map(left.addRight).getOrElse(left), right), rightAdd)
       )
   }
 
