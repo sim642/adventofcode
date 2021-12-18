@@ -2,8 +2,9 @@ package eu.sim642.adventofcode2021
 
 import Day18._
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day18Test extends AnyFunSuite {
+class Day18Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleInput1 =
     """[1,2]
@@ -59,47 +60,93 @@ class Day18Test extends AnyFunSuite {
       |[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
       |[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]""".stripMargin
 
-  test("Part 1 examples") {
-    assert(parseNumber("[1,2]") + parseNumber("[[3,4],5]") == parseNumber("[[1,2],[[3,4],5]]"))
-    assert(explode(parseNumber("[[[[[9,8],1],2],3],4]")) == Some(parseNumber("[[[[0,9],2],3],4]")))
-    assert(explode(parseNumber("[7,[6,[5,[4,[3,2]]]]]")) == Some(parseNumber("[7,[6,[5,[7,0]]]]")))
-    assert(explode(parseNumber("[[6,[5,[4,[3,2]]]],1]")) == Some(parseNumber("[[6,[5,[7,0]]],3]")))
-    assert(explode(parseNumber("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]")) == Some(parseNumber("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")))
-    assert(explode(parseNumber("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]")) == Some(parseNumber("[[3,[2,[8,0]]],[9,[5,[7,0]]]]")))
-    assert(split(parseNumber("10")) == Some(parseNumber("[5,5]")))
-    assert(split(parseNumber("11")) == Some(parseNumber("[5,6]")))
-    assert(split(parseNumber("12")) == Some(parseNumber("[6,6]")))
+  test("explode") {
+    val numberExpectedExplode = Table(
+      ("number", "expectedExplode"),
+      ("[[[[[9,8],1],2],3],4]", "[[[[0,9],2],3],4]"),
+      ("[7,[6,[5,[4,[3,2]]]]]", "[7,[6,[5,[7,0]]]]"),
+      ("[[6,[5,[4,[3,2]]]],1]", "[[6,[5,[7,0]]],3]"),
+      ("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]", "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]"),
+      ("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]", "[[3,[2,[8,0]]],[9,[5,[7,0]]]]"),
+    )
 
+    forAll(numberExpectedExplode) { (number, expectedExplode) =>
+      assert(explode(parseNumber(number)).contains(parseNumber(expectedExplode)))
+    }
+  }
+
+  test("split") {
+    val numberExpectedSplit = Table(
+      ("number", "expectedSplit"),
+      ("10", "[5,5]"),
+      ("11", "[5,6]"),
+      ("12", "[6,6]"),
+    )
+
+    forAll(numberExpectedSplit) { (number, expectedSplit) =>
+      assert(split(parseNumber(number)).contains(parseNumber(expectedSplit)))
+    }
+  }
+
+  test("magnitude") {
+    val numberExpectedMagnitude = Table(
+      ("number", "expectedMagnitude"),
+      ("[9,1]", 29),
+      ("[1,9]", 21),
+      ("[[9,1],[1,9]]", 129),
+      ("[[1,2],[[3,4],5]]", 143),
+      ("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]", 1384),
+      ("[[[[1,1],[2,2]],[3,3]],[4,4]]", 445),
+      ("[[[[3,0],[5,3]],[4,4]],[5,5]]", 791),
+      ("[[[[5,0],[7,4]],[5,5]],[6,6]]", 1137),
+      ("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]", 3488),
+    )
+
+    forAll(numberExpectedMagnitude) { (number, expectedMagnitude) =>
+      assert(parseNumber(number).magnitude == expectedMagnitude)
+    }
+  }
+
+  test("+") {
+    assert(parseNumber("[1,2]") + parseNumber("[[3,4],5]") == parseNumber("[[1,2],[[3,4],5]]"))
     assert(parseNumber("[[[[4,3],4],4],[7,[[8,4],9]]]") + parseNumber("[1,1]") == parseNumber("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]"))
 
-    assert(addNumbers(parseNumbers(exampleInput2)) == parseNumber("[[[[1,1],[2,2]],[3,3]],[4,4]]"))
-    assert(addNumbers(parseNumbers(exampleInput3)) == parseNumber("[[[[3,0],[5,3]],[4,4]],[5,5]]"))
-    assert(addNumbers(parseNumbers(exampleInput4)) == parseNumber("[[[[5,0],[7,4]],[5,5]],[6,6]]"))
+    val addNumberExpectedSum = Table(
+      ("addNumber", "expectedSum"),
+      ("[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]", "[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]"),
+      ("[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]", "[[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]]"),
+      ("[[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]", "[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]]"),
+      ("[7,[5,[[3,8],[1,4]]]]", "[[[[7,7],[7,8]],[[9,5],[8,7]]],[[[6,8],[0,8]],[[9,9],[9,0]]]]"),
+      ("[[2,[2,2]],[8,[8,1]]]", "[[[[6,6],[6,6]],[[6,0],[6,7]]],[[[7,7],[8,9]],[8,[8,1]]]]"),
+      ("[2,9]", "[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]]"),
+      ("[1,[[[9,3],9],[[9,0],[0,7]]]]", "[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]]"),
+      ("[[[5,[7,4]],7],1]", "[[[[7,7],[7,7]],[[8,7],[8,7]]],[[[7,0],[7,7]],9]]"),
+      ("[[[[4,2],2],6],[8,7]]", "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"),
+    )
 
+    var sum = parseNumber("[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]")
+    forAll(addNumberExpectedSum) { (addNumber, expectedSum) =>
+      sum += parseNumber(addNumber)
+      assert(sum == parseNumber(expectedSum))
+    }
+  }
 
-    assert(parseNumber("[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]") + parseNumber("[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]") == parseNumber("[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]"))
-    assert(parseNumber("[[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]") + parseNumber("[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]") == parseNumber("[[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]]"))
-    assert(parseNumber("[[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]]") + parseNumber("[[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]") == parseNumber("[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]]"))
-    assert(parseNumber("[[[[7,0],[7,7]],[[7,7],[7,8]]],[[[7,7],[8,8]],[[7,7],[8,7]]]]") + parseNumber("[7,[5,[[3,8],[1,4]]]]") == parseNumber("[[[[7,7],[7,8]],[[9,5],[8,7]]],[[[6,8],[0,8]],[[9,9],[9,0]]]]"))
-    assert(parseNumber("[[[[7,7],[7,8]],[[9,5],[8,7]]],[[[6,8],[0,8]],[[9,9],[9,0]]]]") + parseNumber("[[2,[2,2]],[8,[8,1]]]") == parseNumber("[[[[6,6],[6,6]],[[6,0],[6,7]]],[[[7,7],[8,9]],[8,[8,1]]]]"))
-    assert(parseNumber("[[[[6,6],[6,6]],[[6,0],[6,7]]],[[[7,7],[8,9]],[8,[8,1]]]]") + parseNumber("[2,9]") == parseNumber("[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]]"))
-    assert(parseNumber("[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]]") + parseNumber("[1,[[[9,3],9],[[9,0],[0,7]]]]") == parseNumber("[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]]"))
-    assert(parseNumber("[[[[7,8],[6,7]],[[6,8],[0,8]]],[[[7,7],[5,0]],[[5,5],[5,6]]]]") + parseNumber("[[[5,[7,4]],7],1]") == parseNumber("[[[[7,7],[7,7]],[[8,7],[8,7]]],[[[7,0],[7,7]],9]]"))
-    assert(parseNumber("[[[[7,7],[7,7]],[[8,7],[8,7]]],[[[7,0],[7,7]],9]]") + parseNumber("[[[[4,2],2],6],[8,7]]") == parseNumber("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"))
+  test("addNumbers") {
+    val inputExpectedSum = Table(
+      ("input", "expectedSum"),
+      (exampleInput2, "[[[[1,1],[2,2]],[3,3]],[4,4]]"),
+      (exampleInput3, "[[[[3,0],[5,3]],[4,4]],[5,5]]"),
+      (exampleInput4, "[[[[5,0],[7,4]],[5,5]],[6,6]]"),
+      (exampleInput5, "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"),
+      (exampleInput6, "[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]"),
+    )
 
-    assert(addNumbers(parseNumbers(exampleInput5)) == parseNumber("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]"))
+    forAll(inputExpectedSum) { (input, expectedSum) =>
+      assert(addNumbers(parseNumbers(input)) == parseNumber(expectedSum))
+    }
+  }
 
-    assert(parseNumber("[9,1]").magnitude == 29)
-    assert(parseNumber("[1,9]").magnitude == 21)
-    assert(parseNumber("[[9,1],[1,9]]").magnitude == 129)
-    assert(parseNumber("[[1,2],[[3,4],5]]").magnitude == 143)
-    assert(parseNumber("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]").magnitude == 1384)
-    assert(parseNumber("[[[[1,1],[2,2]],[3,3]],[4,4]]").magnitude == 445)
-    assert(parseNumber("[[[[3,0],[5,3]],[4,4]],[5,5]]").magnitude == 791)
-    assert(parseNumber("[[[[5,0],[7,4]],[5,5]],[6,6]]").magnitude == 1137)
-    assert(parseNumber("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]").magnitude == 3488)
-
-    assert(addNumbers(parseNumbers(exampleInput6)) == parseNumber("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]"))
+  test("Part 1 examples") {
     assert(addNumbersMagnitude(parseNumbers(exampleInput6)) == 4140)
   }
 
