@@ -52,11 +52,8 @@ object Day19 {
       p1 <- scanner1.iterator
       p2 <- scanner2.iterator
       d = p1 - p2 // this way fits with examples
-      //intersect2 = scanner2 & scanner1.map(_ - d)
-      intersect2 = scanner2.map(_ + d) & scanner1 // faster this way because & filters left and looks up right
-      //() = println(intersect2.size)
-      if intersect2.size >= 12
-    } yield (scanner2, intersect2, d)).headOption
+      if scanner2.view.map(_ + d).filter(scanner1).sizeIs >= 12 // iterate over smaller scanner2, avoid any intermediate collections
+    } yield (scanner2, Set.empty, d)).headOption
   }
 
   def solve(scanners: Seq[Set[Pos3]]): (Set[Pos3], Map[Int, Pos3]) = {
