@@ -54,6 +54,17 @@ object Day19 {
       d = p1 - p2 // this way fits with examples
       if scanner2.view.map(_ + d).filter(scanner1).sizeIs >= 12 // iterate over smaller scanner2, avoid any intermediate collections
     } yield (scanner2, Set.empty, d)).headOption
+    // TODO: is this guaranteed to be correct?
+    /*(for {
+      scanner2 <- scannerOrientations(scanner2).iterator
+      ds = (for {
+        p1 <- scanner1.iterator
+        p2 <- scanner2.iterator
+        d = p1 - p2 // this way fits with examples
+      } yield d).groupCount(identity)
+      (d, cnt) <- ds.iterator
+      if cnt >= 12
+    } yield (scanner2, Set.empty, d)).headOption*/
   }
 
   def solve(scanners: Seq[Set[Pos3]]): (Set[Pos3], Map[Int, Pos3]) = {
