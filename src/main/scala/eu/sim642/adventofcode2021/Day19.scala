@@ -108,12 +108,12 @@ object Day19 {
     } yield (scanner2, intersect2, d)).headOption
   }
 
-  def solve(scanners: Seq[Set[Pos3]]): Set[Pos3] = {
+  def solve(scanners: Seq[Set[Pos3]]): (Set[Pos3], Map[Int, Pos3]) = {
 
     @tailrec
-    def helper(scanners: Seq[(Set[Pos3], Int)], beacons: Set[Pos3]): Set[Pos3] = {
+    def helper(scanners: Seq[(Set[Pos3], Int)], beacons: Set[Pos3], poss: Map[Int, Pos3]): (Set[Pos3], Map[Int, Pos3]) = {
       if (scanners.isEmpty)
-        beacons
+        (beacons, poss)
       else {
         val ((scanner, i), (scanner2, _, d)) = (for {
           (scanner, i) <- scanners.iterator
@@ -122,15 +122,24 @@ object Day19 {
         println(s"match $i")
         val newBeacons = beacons ++ scanner2.map(_ + d)
         val newScanners = scanners.filterNot(_ == (scanner, i))
-        helper(newScanners, newBeacons)
+        val newPoss = poss + (i -> d)
+        helper(newScanners, newBeacons, newPoss)
       }
     }
 
     val (scanner0, _) +: rest = scanners.zipWithIndex
-    helper(rest, scanner0)
+    helper(rest, scanner0, Map(0 -> Pos3.zero))
   }
 
-  def countBeacons(scanners: Seq[Set[Pos3]]): Int = solve(scanners).size
+  def countBeacons(scanners: Seq[Set[Pos3]]): Int = solve(scanners)._1.size
+
+  def largestScannerDistance(scanners: Seq[Set[Pos3]]): Int = {
+    val (_, poss) = solve(scanners)
+    (for {
+      (_, p1) <- poss.iterator
+      (_, p2) <- poss.iterator
+    } yield p1 manhattanDistance p2).max
+  }
 
 
   def parseScanner(s: String): Set[Pos3] = {
@@ -149,5 +158,6 @@ object Day19 {
 
   def main(args: Array[String]): Unit = {
     println(countBeacons(parseScanners(input)))
+    println(largestScannerDistance(parseScanners(input)))
   }
 }
