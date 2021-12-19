@@ -217,7 +217,7 @@ class Day19Test extends AnyFunSuite {
     assert(countBeacons(parseScanners(exampleInput)) == 79)
   }
 
-  ignore("Part 1 input answer") {
+  test("Part 1 input answer") {
     assert(countBeacons(parseScanners(input)) == 449)
   }
 
@@ -225,7 +225,7 @@ class Day19Test extends AnyFunSuite {
     assert(largestScannerDistance(parseScanners(exampleInput)) == 3621)
   }
 
-  ignore("Part 2 input answer") {
+  test("Part 2 input answer") {
     assert(largestScannerDistance(parseScanners(input)) == 13128)
   }
 }

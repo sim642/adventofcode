@@ -76,13 +76,13 @@ object Day19 {
       if (scanners.isEmpty)
         (beacons, poss)
       else {
-        val (scanner, (scanner2, d)) = (for {
-          scanner <- scanners.iterator
+        val scannerMatches = for {
+          scanner <- scanners
           m <- matchScanner(beacons, scanner)
-        } yield (scanner, m)).head
-        val newBeacons = beacons ++ scanner2.map(_ + d)
-        val newScanners = scanners.filterNot(_ == scanner)
-        val newPoss = poss + d
+        } yield (scanner, m)
+        val newBeacons = beacons ++ scannerMatches.map(p => p._2._1.map(_ + p._2._2)).reduce(_ ++ _)
+        val newScanners = scanners.filterNot(s => scannerMatches.exists(_._1 == s))
+        val newPoss = poss ++ scannerMatches.map(p => p._2._2)
         helper(newScanners, newBeacons, newPoss)
       }
     }
