@@ -49,15 +49,15 @@ object Day19 {
   }
 
   def matchScanner(beacons: Scanner, scanner: Scanner): Option[(Scanner, Pos3)] = {
-    (for {
+    /*(for {
       orientedScanner <- scannerOrientations(scanner).iterator
       p1 <- beacons.iterator
       p2 <- orientedScanner.iterator
       d = p1 - p2 // this way fits with examples
       if orientedScanner.view.map(_ + d).filter(beacons).sizeIs >= 12 // iterate over smaller scanner2, avoid any intermediate collections
-    } yield (orientedScanner.map(_ + d), d)).headOption
-    // TODO: is this guaranteed to be correct?
-    /*(for {
+    } yield (orientedScanner.map(_ + d), d)).headOption*/
+    // TODO: is this guaranteed to be correct? could differences corresponding to different translations combine to >= 12 without neither being?
+    (for {
       orientedScanner <- scannerOrientations(scanner).iterator
       ds = (for {
         p1 <- beacons.iterator
@@ -66,7 +66,7 @@ object Day19 {
       } yield d).groupCount(identity)
       (d, cnt) <- ds.iterator
       if cnt >= 12
-    } yield (orientedScanner.map(_ + d), d)).headOption*/
+    } yield (orientedScanner.map(_ + d), d)).headOption
   }
 
   def solve(scanners: Seq[Scanner]): (Scanner, Set[Pos3]) = {
