@@ -42,55 +42,6 @@ object Day19 {
     )
   }
 
-  //private val angles = Seq(Pos(0, 1), Pos(1, 0), Pos(0, -1), Pos(-1, 0)) // sin, cos at 0, 90, 180, 270 degrees
-
-  /* def iterateScannerOrientations(scanner: Set[Pos3]): Iterator[Set[Pos3]] = {
-    val mats = (for {
-      p@Pos3(x, y, z) <- Seq(
-        Pos3(1, 0, 0),
-        //Pos3(-1, 0, 0),
-        Pos3(0, 1, 0),
-        //Pos3(0, -1, 0),
-        Pos3(0, 0, 1),
-        //Pos3(0, 0, -1),
-      ).iterator
-      a@Pos(s, c) <- angles.iterator
-    } yield {
-      val C = 1 - c
-      val Q = Seq(
-        Seq(x * x * C + c    , x * y * C - z * s, x * z * C + y * s),
-        Seq(y * x * C + z * s, y * y * C + c    , y * z * C - x * s),
-        Seq(z * x * C - y * s, z * y * C + x * s, z * z * C + c    ),
-      )
-      println((p, a, Q))
-      Q
-    }).toSet
-    println("---------")
-    mats.foreach(println)
-    println(mats.size)
-
-    for {
-      Pos3(x, y, z) <- Pos3.axisOffsets.iterator
-      Pos(s, c) <- angles.iterator
-    } yield {
-      val C = 1 - c
-      val Q = Seq(
-        Seq(x * x * C + c    , x * y * C - z * s, x * z * C + y * s),
-        Seq(y * x * C + z * s, y * y * C + c    , y * z * C - x * s),
-        Seq(z * x * C - y * s, z * y * C + x * s, z * z * C + c    ),
-      )
-      println(Q)
-      val q = { (p: Pos3) =>
-        Pos3(
-          p.x * Q(0)(0) + p.y * Q(0)(1) + p.z * Q(0)(2),
-          p.x * Q(1)(0) + p.y * Q(1)(1) + p.z * Q(1)(2),
-          p.x * Q(2)(0) + p.y * Q(2)(1) + p.z * Q(2)(2),
-        )
-      }
-      scanner.map(q)
-    }
-  } */
-
   def scannerOrientations(scanner: Set[Pos3]): Seq[Set[Pos3]] = {
     scanner.toSeq.map(posOrientations).transpose.map(_.toSet)
   }
