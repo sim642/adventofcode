@@ -48,56 +48,58 @@ object Day19 {
     scanner.toSeq.map(posOrientations).transpose.map(_.toSet)
   }
 
-  def matchScanner(scanner1: Scanner, scanner2: Scanner): Option[(Scanner, Pos3)] = {
+  def matchScanner(beacons: Scanner, scanner: Scanner): Option[(Scanner, Pos3)] = {
     (for {
-      scanner2 <- scannerOrientations(scanner2).iterator
-      p1 <- scanner1.iterator
-      p2 <- scanner2.iterator
+      orientedScanner <- scannerOrientations(scanner).iterator
+      p1 <- beacons.iterator
+      p2 <- orientedScanner.iterator
       d = p1 - p2 // this way fits with examples
-      if scanner2.view.map(_ + d).filter(scanner1).sizeIs >= 12 // iterate over smaller scanner2, avoid any intermediate collections
-    } yield (scanner2, d)).headOption
+      if orientedScanner.view.map(_ + d).filter(beacons).sizeIs >= 12 // iterate over smaller scanner2, avoid any intermediate collections
+    } yield (orientedScanner.map(_ + d), d)).headOption
     // TODO: is this guaranteed to be correct?
     /*(for {
-      scanner2 <- scannerOrientations(scanner2).iterator
+      orientedScanner <- scannerOrientations(scanner).iterator
       ds = (for {
-        p1 <- scanner1.iterator
-        p2 <- scanner2.iterator
+        p1 <- beacons.iterator
+        p2 <- orientedScanner.iterator
         d = p1 - p2 // this way fits with examples
       } yield d).groupCount(identity)
       (d, cnt) <- ds.iterator
       if cnt >= 12
-    } yield (scanner2, d)).headOption*/
+    } yield (orientedScanner.map(_ + d), d)).headOption*/
   }
 
   def solve(scanners: Seq[Scanner]): (Scanner, Set[Pos3]) = {
 
+    // on each iteration, add scanners that match the frontier (new beacons discovered by previous iteration)
     @tailrec
-    def helper(scanners: Seq[Scanner], beacons: Scanner, poss: Set[Pos3]): (Scanner, Set[Pos3]) = {
+    def helper(scanners: Seq[Scanner], beacons: Scanner, frontier: Scanner, scannerPoss: Set[Pos3]): (Scanner, Set[Pos3]) = {
+      val newBeacons = beacons ++ frontier
       if (scanners.isEmpty)
-        (beacons, poss)
+        (newBeacons, scannerPoss)
       else {
-        val scannerMatches = for {
+        val (matchedScanners, orientedScanners, matchedScannerPoss) = (for {
           scanner <- scanners
-          m <- matchScanner(beacons, scanner)
-        } yield (scanner, m)
-        val newBeacons = beacons ++ scannerMatches.map(p => p._2._1.map(_ + p._2._2)).reduce(_ ++ _)
-        val newScanners = scanners.filterNot(s => scannerMatches.exists(_._1 == s))
-        val newPoss = poss ++ scannerMatches.map(p => p._2._2)
-        helper(newScanners, newBeacons, newPoss)
+          (orientedScanner, scannerPos) <- matchScanner(frontier, scanner)
+        } yield (scanner, orientedScanner, scannerPos)).unzip3
+        val newScanners = scanners.filterNot(matchedScanners.contains)
+        val newFrontier = orientedScanners.reduce(_ ++ _)
+        val newScannerPoss = scannerPoss ++ matchedScannerPoss
+        helper(newScanners, newBeacons, newFrontier, newScannerPoss)
       }
     }
 
-    val scanner0 +: rest = scanners
-    helper(rest, scanner0, Set(Pos3.zero))
+    val scanner0 +: scannersTail = scanners
+    helper(scannersTail, Set.empty, scanner0, Set(Pos3.zero)) // start with scanner 0 fixed
   }
 
   def countBeacons(scanners: Seq[Scanner]): Int = solve(scanners)._1.size
 
   def largestScannerDistance(scanners: Seq[Scanner]): Int = {
-    val (_, poss) = solve(scanners)
+    val (_, scannerPoss) = solve(scanners)
     (for {
-      p1 <- poss.iterator
-      p2 <- poss.iterator
+      p1 <- scannerPoss.iterator
+      p2 <- scannerPoss.iterator
     } yield p1 manhattanDistance p2).max
   }
 

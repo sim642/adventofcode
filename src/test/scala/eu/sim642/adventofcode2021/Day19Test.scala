@@ -204,7 +204,7 @@ class Day19Test extends AnyFunSuite {
     assert(d01 == Pos3(68,-1246,-43))
 
     val (_, d14) = matchScanner(scanner1, scanners(4)).get
-    assert(d01 + d14 == Pos3(-20,-1133,1061))
+    assert(d14 == Pos3(-20,-1133,1061))
 
     //val (_, d02) = matchScanner(scanners(0), scanners(2)).get
     //assert(d02 == Pos3(1105,-1205,1229))
