@@ -200,16 +200,16 @@ class Day19Test extends AnyFunSuite {
 
   test("matchScanner") {
     val scanners = parseScanners(exampleInput)
-    val (scanner1, _, d01) = matchScanner(scanners(0), scanners(1)).get
+    val (scanner1, d01) = matchScanner(scanners(0), scanners(1)).get
     assert(d01 == Pos3(68,-1246,-43))
 
-    val (_, _, d14) = matchScanner(scanner1, scanners(4)).get
+    val (_, d14) = matchScanner(scanner1, scanners(4)).get
     assert(d01 + d14 == Pos3(-20,-1133,1061))
 
-    //val (_, _, d02) = matchScanner(scanners(0), scanners(2)).get
+    //val (_, d02) = matchScanner(scanners(0), scanners(2)).get
     //assert(d02 == Pos3(1105,-1205,1229))
 
-    //val (_, _, d03) = matchScanner(scanners(0), scanners(3)).get
+    //val (_, d03) = matchScanner(scanners(0), scanners(3)).get
     //assert(d03 == Pos3(-92,-2380,-20))
   }
 
