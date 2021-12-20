@@ -52,7 +52,7 @@ object Day20 {
         print(if (cell) '#' else '.')
       println()
     }
-    println(s"outer: $outer\n")
+    println(s"outer: ${if (outer) '#' else '.'}\n")
   }
 
 
