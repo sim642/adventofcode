@@ -21,4 +21,12 @@ class Day20Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countEnhanced(parseInput(input)) == 5680)
   }
+
+  test("Part 2 examples") {
+    assert(countEnhanced(parseInput(exampleInput), 50) == 3351)
+  }
+
+  test("Part 2 input answer") {
+    assert(countEnhanced(parseInput(input), 50) == 19766)
+  }
 }

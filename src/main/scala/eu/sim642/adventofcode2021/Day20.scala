@@ -3,6 +3,7 @@ package eu.sim642.adventofcode2021
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day20 {
 
@@ -16,7 +17,8 @@ object Day20 {
 
   def enhance(algorithm: Vector[Boolean], image: Image): Image = {
     val Image(grid, outer) = image
-    val extendedGrid = Vector.fill(grid(0).size + 2)(outer) +: grid.map(outer +: _ :+ outer) :+ Vector.fill(grid(0).size + 2)(outer)
+    val extendRow = Vector.fill(grid(0).size + 2)(outer)
+    val extendedGrid = extendRow +: grid.map(outer +: _ :+ outer) :+ extendRow
     val enhancedGrid =
       for ((row, y) <- extendedGrid.zipWithIndex)
         yield for ((cell, x) <- row.zipWithIndex)
@@ -32,18 +34,25 @@ object Day20 {
             val i = Day3.binary2int(values)
             algorithm(i)
           }
-    val enhancedOuter = outer match {
-      case false if algorithm(0) => true
-      case true if !algorithm(255) => false
-      case _ => outer
-    }
+    val enhancedOuter = algorithm(if (outer) 511 else 0)
     Image(enhancedGrid, enhancedOuter)
   }
 
-  def countEnhanced(input: Input): Int = {
+  def countEnhanced(input: Input, after: Int = 2): Int = {
     val Input(algorithm, image) = input
-    val image2 = enhance(algorithm, enhance(algorithm, image))
-    image2.grid.countGrid(identity)
+    val finalImage = Iterator.iterate(image)(enhance(algorithm, _))(after)
+    finalImage.grid.countGrid(identity)
+  }
+
+
+  def printImage(image: Image): Unit = {
+    val Image(grid, outer) = image
+    for (row <- grid) {
+      for (cell <- row)
+        print(if (cell) '#' else '.')
+      println()
+    }
+    println(s"outer: $outer\n")
   }
 
 
@@ -62,5 +71,8 @@ object Day20 {
 
   def main(args: Array[String]): Unit = {
     println(countEnhanced(parseInput(input)))
+    println(countEnhanced(parseInput(input), 50))
+
+    // part 2: 20511 - too high (255 in blink instead of 511)
   }
 }
