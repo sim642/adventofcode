@@ -49,27 +49,21 @@ object Day21 {
 
   def diracPlay(players: Players): (Long, Long) = {
 
-    val cache = mutable.Map.empty[Players, (Long, Long)]
+    val memo = mutable.Map.empty[Players, (Long, Long)]
 
     def helper(p1: Player, p2: Player): (Long, Long) = {
-      val ps = (p1, p2)
-      cache.get(ps) match {
-        case Some(cnts) =>
-          cnts
-        case None =>
-          val rollsIt = for {
-            (roll, rollCount) <- diracRollCounts.iterator
-            newP1 = p1.move(roll)
-            (newP1Cnt, p2Cnt) =
-              if (newP1.score >= 21)
-                (1L, 0L)
-              else
-                helper(p2, newP1).swap
-          } yield (rollCount * newP1Cnt, rollCount * p2Cnt)
-          val cnts = rollsIt.reduce({ case ((a, b), (c, d)) => (a + c, b + d) })
-          cache += ps -> cnts
-          cnts
-      }
+      memo.getOrElseUpdate((p1, p2), {
+        val rollsIt = for {
+          (roll, rollCount) <- diracRollCounts.iterator
+          newP1 = p1.move(roll)
+          (newP1Cnt, p2Cnt) =
+            if (newP1.score >= 21)
+              (1L, 0L)
+            else
+              helper(p2, newP1).swap
+        } yield (rollCount * newP1Cnt, rollCount * p2Cnt)
+        rollsIt.reduce({ case ((a, b), (c, d)) => (a + c, b + d) })
+      })
     }
 
     helper(players._1, players._2)
