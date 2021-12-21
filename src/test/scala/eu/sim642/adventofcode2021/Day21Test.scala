@@ -21,4 +21,13 @@ class Day21Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(loserScoreRolls(parsePlayers(input)) == 679329)
   }
+
+  test("Part 2 examples") {
+    assert(diracPlay(parsePlayers(exampleInput)) == (444356092776315L, 341960390180808L))
+    assert(winnerDiracUniverses(parsePlayers(exampleInput)) == 444356092776315L)
+  }
+
+  test("Part 2 input answer") {
+    assert(winnerDiracUniverses(parsePlayers(input)) == 433315766324816L)
+  }
 }
