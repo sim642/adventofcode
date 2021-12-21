@@ -1,7 +1,9 @@
 package eu.sim642.adventofcode2021
 
 import scala.annotation.tailrec
-import eu.sim642.adventofcodelib.IterableImplicits._
+import eu.sim642.adventofcodelib.IterableImplicits.*
+
+import scala.collection.mutable
 
 
 object Day21 {
@@ -47,20 +49,27 @@ object Day21 {
 
   def diracPlay(players: Players): (Long, Long) = {
 
-    def helper2(p1: Player, p2: Player): (Long, Long) = {
-      if (p1.score >= 21)
-        (1, 0)
-      else
-        helper(p2, p1).swap
-    }
+    val cache = mutable.Map.empty[Players, (Long, Long)]
 
     def helper(p1: Player, p2: Player): (Long, Long) = {
-      val rollsIt = for {
-        (roll, rollCount) <- diracRollCounts.iterator
-        newP1 = p1.move(roll)
-        (newP1Cnt, p2Cnt) = helper2(newP1, p2)
-      } yield (rollCount * newP1Cnt, rollCount * p2Cnt)
-      rollsIt.reduce({ case ((a, b), (c, d)) => (a + c, b + d) })
+      val ps = (p1, p2)
+      cache.get(ps) match {
+        case Some(cnts) =>
+          cnts
+        case None =>
+          val rollsIt = for {
+            (roll, rollCount) <- diracRollCounts.iterator
+            newP1 = p1.move(roll)
+            (newP1Cnt, p2Cnt) =
+              if (newP1.score >= 21)
+                (1L, 0L)
+              else
+                helper(p2, newP1).swap
+          } yield (rollCount * newP1Cnt, rollCount * p2Cnt)
+          val cnts = rollsIt.reduce({ case ((a, b), (c, d)) => (a + c, b + d) })
+          cache += ps -> cnts
+          cnts
+      }
     }
 
     helper(players._1, players._2)
