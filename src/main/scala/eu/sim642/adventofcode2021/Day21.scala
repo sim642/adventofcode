@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2021
 
 import scala.annotation.tailrec
+import eu.sim642.adventofcodelib.LazyListImplicits.*
 import eu.sim642.adventofcodelib.IterableImplicits.*
 
 import scala.collection.mutable
@@ -30,7 +31,7 @@ object Day21 {
         helper(p2, newP1, newRolls, newDice)
     }
 
-    val dice = LazyList.continually(LazyList.from(1).take(100)).flatten // TODO: LazyListImplicits
+    val dice = LazyList.from(1).take(100).cycle
     helper(players._1, players._2, 0, dice)
   }
 
