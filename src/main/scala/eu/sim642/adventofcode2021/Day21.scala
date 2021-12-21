@@ -18,17 +18,17 @@ object Day21 {
   def play(players: Players): (Players, Int) = {
 
     @tailrec
-    def helper(p1: Player, p2: Player, i: Int, dice: LazyList[Int]): (Players, Int) = {
+    def helper(p1: Player, p2: Player, rolls: Int, dice: LazyList[Int]): (Players, Int) = {
       val (roll, newDice) = dice.splitAt(3)
-      val newI = i + 3
+      val newRolls = rolls + 3
       val newP1 = p1.move(roll.sum)
       if (newP1.score >= 1000)
-        ((newP1, p2), newI)
+        ((newP1, p2), newRolls)
       else
-        helper(p2, newP1, newI, newDice)
+        helper(p2, newP1, newRolls, newDice)
     }
 
-    val dice = LazyList.continually(LazyList.from(1).take(100)).flatten
+    val dice = LazyList.continually(LazyList.from(1).take(100)).flatten // TODO: LazyListImplicits
     helper(players._1, players._2, 0, dice)
   }
 
@@ -55,20 +55,20 @@ object Day21 {
     }
 
     def helper(p1: Player, p2: Player): (Long, Long) = {
-      val foo = for {
-        (roll, rollCount) <- diracRollCounts
+      val rollsIt = for {
+        (roll, rollCount) <- diracRollCounts.iterator
         newP1 = p1.move(roll)
-        (a, b) = helper2(newP1, p2)
-      } yield (rollCount * a, rollCount * b)
-      foo.reduce({ case ((a, b), (c, d)) => (a + c, b + d) })
+        (newP1Cnt, p2Cnt) = helper2(newP1, p2)
+      } yield (rollCount * newP1Cnt, rollCount * p2Cnt)
+      rollsIt.reduce({ case ((a, b), (c, d)) => (a + c, b + d) })
     }
 
     helper(players._1, players._2)
   }
 
   def winnerDiracUniverses(players: Players): Long = {
-    val (a, b) = diracPlay(players)
-    a max b
+    val (p1Cnt, p2Cnt) = diracPlay(players)
+    p1Cnt max p2Cnt
   }
 
 
