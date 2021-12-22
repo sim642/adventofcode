@@ -1,9 +1,16 @@
 package eu.sim642.adventofcode2021
 
-import Day22._
+import Day22.*
+import Day22Test.*
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day22Test extends AnyFunSuite {
+class Day22Test extends Suites(
+  new NaiveSolutionTest,
+  new InclusionExclusionSolutionTest,
+)
+
+object Day22Test {
 
   val exampleInput1 =
     """on x=10..12,y=10..12,z=10..12
@@ -97,36 +104,51 @@ class Day22Test extends AnyFunSuite {
       |on x=-53470..21291,y=-120233..-33476,z=-44150..38147
       |off x=-93533..-4276,y=-16170..68771,z=-104985..-24507""".stripMargin
 
-  test("Part 1 examples") {
-    assert(countRebootSmall(parseSteps(exampleInput1)) == 39)
-    assert(countRebootSmall(parseSteps(exampleInput2)) == 590784)
-    assert(countRebootSmall(parseSteps(exampleInput3)) == 474140)
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
+    import solution._
+
+    test("Part 1 examples") {
+      assert(countRebootSmall(parseSteps(exampleInput1)) == 39)
+      assert(countRebootSmall(parseSteps(exampleInput2)) == 590784)
+      assert(countRebootSmall(parseSteps(exampleInput3)) == 474140)
+    }
+
+    test("Part 1 input answer") {
+      assert(countRebootSmall(parseSteps(input)) == 655005)
+    }
+
+    protected val testPart2: Boolean = false
+
+    if (testPart2) {
+      test("Part 2 examples") {
+        assert(countReboot(parseSteps(exampleInput3)) == 2758514936282235L)
+      }
+
+      test("Part 2 input answer") {
+        assert(countReboot(parseSteps(input)) == 1125649856443608L)
+      }
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(countRebootSmall(parseSteps(input)) == 655005)
+  class NaiveSolutionTest extends SolutionTest(NaiveSolution) {
+    override protected val testPart2: Boolean = false
   }
 
-  test("Part 2 examples") {
-    assert(countReboot(parseSteps(
-      """on x=10..12,y=10..12,z=10..12
-        |on x=11..13,y=11..13,z=11..13
-        |on x=10..10,y=10..10,z=10..10""".stripMargin
-    )) == 27 + 19 + 0)
-    assert(countReboot(parseSteps(
-      """on x=10..12,y=10..12,z=10..12
-        |on x=11..13,y=11..13,z=11..13
-        |off x=9..11,y=9..11,z=9..11""".stripMargin
-    )) == 27 + 19 - 8)
-    assert(countReboot(parseSteps(exampleInput1)) == 39)
-    //assert(countReboot(parseSteps(exampleInput2)) == 590784)
-    //assert(countReboot(parseSteps(exampleInput3)) == 474140)
-    //assert(countReboot(parseSteps(input)) == 655005)
-    //
-    assert(countReboot(parseSteps(exampleInput3)) == 2758514936282235L)
-  }
+  class InclusionExclusionSolutionTest extends SolutionTest(InclusionExclusionSolution) {
+    import InclusionExclusionSolution._
 
-  test("Part 2 input answer") {
-    assert(countReboot(parseSteps(input)) == 1125649856443608L)
+    test("Inclusion-exclusion") {
+      // simplified exampleInput1-s for even more basic inclusion-exclusion
+      assert(countReboot(parseSteps(
+        """on x=10..12,y=10..12,z=10..12
+          |on x=11..13,y=11..13,z=11..13
+          |on x=10..10,y=10..10,z=10..10""".stripMargin
+      )) == 27 + 19 + 0)
+      assert(countReboot(parseSteps(
+        """on x=10..12,y=10..12,z=10..12
+          |on x=11..13,y=11..13,z=11..13
+          |off x=9..11,y=9..11,z=9..11""".stripMargin
+      )) == 27 + 19 - 8)
+    }
   }
 }
