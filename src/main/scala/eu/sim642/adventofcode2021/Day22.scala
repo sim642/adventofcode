@@ -52,31 +52,28 @@ object Day22 {
   object InclusionExclusionSolution extends Solution {
 
     override def countReboot(steps: Seq[Step]): Long = {
-      type Section = (Step, Int)
+      type Section = (Box3, Int)
 
       @tailrec
       def helper(sections: Seq[Section], sign: Int, acc: BigInt): Long = {
         if (sections.isEmpty)
           acc.toLong
         else {
-          val onSectionsSize =
-            sections.view
-              .collect({
-                case ((true, box), _) => box.size
-              })
-              .sum
-          val newAcc = acc + sign * onSectionsSize
+          val sectionsSize = sections.view.map(_._1.size).sum
+          val newAcc = acc + sign * sectionsSize
           val newSections = for {
-            ((sectionOn, sectionBox), sectionI) <- sections
-            ((stepOn, stepBox), stepI) <- steps.view.zipWithIndex.drop(sectionI + 1) // only add steps to intersection in order
-            if !(!sectionOn && stepOn) // no need to exclude active step from inactive section (intersection of all off)
+            (sectionBox, sectionI) <- sections
+            ((_, stepBox), stepI) <- steps.view.zipWithIndex.drop(sectionI + 1) // only add steps to intersection in order
             intersection <- sectionBox intersect stepBox
-          } yield ((sectionOn || stepOn, intersection), stepI)
+          } yield (intersection, stepI)
           helper(newSections, -sign, newAcc)
         }
       }
 
-      helper(steps.zipWithIndex, +1, 0L)
+      val initialSections = steps.zipWithIndex.collect({
+        case ((true, box), i) => (box, i) // start with only on sections
+      })
+      helper(initialSections, +1, 0L)
     }
   }
 
