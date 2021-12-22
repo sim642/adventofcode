@@ -117,7 +117,7 @@ object Day22Test {
       assert(countRebootSmall(parseSteps(input)) == 655005)
     }
 
-    protected val testPart2: Boolean = false
+    protected val testPart2: Boolean = true
 
     if (testPart2) {
       test("Part 2 examples") {
