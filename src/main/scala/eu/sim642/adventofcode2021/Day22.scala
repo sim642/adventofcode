@@ -3,6 +3,8 @@ package eu.sim642.adventofcode2021
 import eu.sim642.adventofcodelib.box.Box3
 import eu.sim642.adventofcodelib.pos.Pos3
 
+import scala.annotation.tailrec
+
 object Day22 {
 
   type Step = (Boolean, Box3)
@@ -40,35 +42,36 @@ object Day22 {
   object InclusionExclusionSolution extends Solution {
 
     override def countReboot(steps: Seq[Step]): Long = {
-      type Section = (Step, Set[Int])
+      type Section = (Step, Int)
 
       def box3Size(box: Box3): BigInt = {
         val Box3(min, max) = box
-        val r = BigInt(max.x - min.x + 1) * BigInt(max.y - min.y + 1) * BigInt(max.z - min.z + 1)
-        r
+        BigInt(max.x - min.x + 1) * BigInt(max.y - min.y + 1) * BigInt(max.z - min.z + 1)
       }
 
-      def helper(sections: Set[Section], sign: Int, acc: BigInt): Long = {
-        val thing = sign * sections.view.map({ case ((on, box), _) =>
-          if (on) box3Size(box) else BigInt(0)
-        }).sum
-        val newAcc = acc + thing
-        if (sections.isEmpty) {
-          newAcc.toLong
-        }
+      @tailrec
+      def helper(sections: Seq[Section], sign: Int, acc: BigInt): Long = {
+        if (sections.isEmpty)
+          acc.toLong
         else {
+          val onSectionsSize =
+            sections.view
+              .collect({
+                case ((true, box), _) => box3Size(box)
+              })
+              .sum
+          val newAcc = acc + sign * onSectionsSize
           val newSections = for {
-            ((sectionOn, sectionBox), combinedSteps) <- sections
-            ((stepOn, stepBox), i) <- steps.zipWithIndex
-            if i > combinedSteps.max
-            if !(!sectionOn && stepOn)
-            interBox <- sectionBox intersect stepBox
-          } yield ((stepOn || sectionOn, interBox), combinedSteps + i)
+            ((sectionOn, sectionBox), sectionI) <- sections
+            ((stepOn, stepBox), stepI) <- steps.view.zipWithIndex.drop(sectionI + 1) // only add steps to intersection in order
+            if !(!sectionOn && stepOn) // no need to exclude active step from inactive section (intersection of all off)
+            intersection <- sectionBox intersect stepBox
+          } yield ((sectionOn || stepOn, intersection), stepI)
           helper(newSections, -sign, newAcc)
         }
       }
 
-      helper(steps.zipWithIndex.map((step, i) => (step, Set(i))).toSet, +1, 0L)
+      helper(steps.zipWithIndex, +1, 0L)
     }
   }
 
