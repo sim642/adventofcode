@@ -108,13 +108,13 @@ object Day22Test {
     import solution._
 
     test("Part 1 examples") {
-      assert(countRebootSmall(parseSteps(exampleInput1)) == 39)
-      assert(countRebootSmall(parseSteps(exampleInput2)) == 590784)
-      assert(countRebootSmall(parseSteps(exampleInput3)) == 474140)
+      assert(countInitialization(parseSteps(exampleInput1)) == 39)
+      assert(countInitialization(parseSteps(exampleInput2)) == 590784)
+      assert(countInitialization(parseSteps(exampleInput3)) == 474140)
     }
 
     test("Part 1 input answer") {
-      assert(countRebootSmall(parseSteps(input)) == 655005)
+      assert(countInitialization(parseSteps(input)) == 655005)
     }
 
     protected val testPart2: Boolean = true

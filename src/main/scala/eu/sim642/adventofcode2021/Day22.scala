@@ -7,15 +7,25 @@ import scala.annotation.tailrec
 
 object Day22 {
 
+  // TODO: move to library?
+  extension (box3: Box3) {
+    def contains(otherBox3: Box3): Boolean = (otherBox3 union box3) == box3
+
+    def size: BigInt = {
+      val Box3(min, max) = box3
+      BigInt(max.x - min.x + 1) * BigInt(max.y - min.y + 1) * BigInt(max.z - min.z + 1)
+    }
+  }
+
   type Step = (Boolean, Box3)
 
-  private val smallRegion = Box3(Pos3(-50, -50, -50), Pos3(50, 50, 50))
+  private val initializationBox = Box3(Pos3(-50, -50, -50), Pos3(50, 50, 50))
 
   sealed trait Solution {
     def countReboot(steps: Seq[Step]): Long
 
-    def countRebootSmall(steps: Seq[Step]): Int = {
-      val smallSteps = steps.filter(step => (step._2 union smallRegion) == smallRegion)
+    def countInitialization(steps: Seq[Step]): Int = {
+      val smallSteps = steps.filter(step => initializationBox.contains(step._2))
       countReboot(smallSteps).toInt
     }
   }
@@ -44,11 +54,6 @@ object Day22 {
     override def countReboot(steps: Seq[Step]): Long = {
       type Section = (Step, Int)
 
-      def box3Size(box: Box3): BigInt = {
-        val Box3(min, max) = box
-        BigInt(max.x - min.x + 1) * BigInt(max.y - min.y + 1) * BigInt(max.z - min.z + 1)
-      }
-
       @tailrec
       def helper(sections: Seq[Section], sign: Int, acc: BigInt): Long = {
         if (sections.isEmpty)
@@ -57,7 +62,7 @@ object Day22 {
           val onSectionsSize =
             sections.view
               .collect({
-                case ((true, box), _) => box3Size(box)
+                case ((true, box), _) => box.size
               })
               .sum
           val newAcc = acc + sign * onSectionsSize
@@ -90,7 +95,7 @@ object Day22 {
   def main(args: Array[String]): Unit = {
     import InclusionExclusionSolution._
 
-    println(countRebootSmall(parseSteps(input)))
+    println(countInitialization(parseSteps(input)))
     println(countReboot(parseSteps(input)))
   }
 }
