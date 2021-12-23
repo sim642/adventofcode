@@ -65,7 +65,7 @@ object Day23 {
       }).toMap
     }
 
-    
+
     protected type State = Map[Pos, Amphipod]
 
     protected def minimumOrganizeEnergy(initialState: State): Int = {
@@ -80,24 +80,27 @@ object Day23 {
 
           val occupied = state.keySet
 
-          def freeNeighbors(fromPos: Pos, toPoss: Set[Pos]): Set[(Pos, Int)] = {
-            (for {
-              toPos <- toPoss.view // slower without view for some reason
-              PathData(length, pathPoss) = posNeighbors(fromPos)(toPos)
-              if !pathPoss.exists(occupied.contains)
-            } yield toPos -> length).toSet
-          }
-
           def room2hallway(fromPos: Pos, amphipod: Amphipod): Set[(Pos, Int)] = {
             if (room2amphipod(fromPos) == amphipod && amphipodRoomUniform(amphipod)) // forbid useless move out of final (correct) room
               Set.empty
-            else
-              freeNeighbors(fromPos, hallways)
+            else {
+              (for {
+                toPos <- hallways.view // slower without view for some reason
+                PathData(length, pathPoss) = posNeighbors(fromPos)(toPos)
+                if !pathPoss.exists(occupied.contains)
+              } yield toPos -> length).toSet
+            }
           }
 
           def hallway2room(fromPos: Pos, amphipod: Amphipod): Set[(Pos, Int)] = {
-            if (amphipodRoomUniform(amphipod))
-              freeNeighbors(fromPos, amphipod2rooms(amphipod))
+            if (amphipodRoomUniform(amphipod)) {
+              val toPos = amphipod2rooms(amphipod).filterNot(occupied).maxBy(_.y) // only try furthest down unoccupied, others would uselessly block
+              val PathData(length, pathPoss) = posNeighbors(fromPos)(toPos)
+              if (!pathPoss.exists(occupied.contains))
+                Set(toPos -> length)
+              else
+                Set.empty
+            }
             else
               Set.empty
           }
