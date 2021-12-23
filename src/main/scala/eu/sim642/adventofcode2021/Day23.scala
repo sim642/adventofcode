@@ -7,6 +7,8 @@ import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, TargetNode, 
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits.*
 
+import scala.collection.mutable
+
 object Day23 {
 
   enum Amphipod(val energy: Int) {
@@ -54,24 +56,28 @@ object Day23 {
 
   private val mapGrid: Grid[Boolean] = map.linesIterator.map(_.toVector).toVector.mapGrid(_ == '#')
 
+  val freePathLengthMemo = mutable.Map.empty[(Set[Pos], Loc, Loc), Option[Int]]
+
   def freePathLength(occupied: Set[Pos], fromLoc: Loc, toLoc: Loc): Option[Int] = {
 
-    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
-      override val startNode: Pos = fromLoc.pos
+    freePathLengthMemo.getOrElseUpdate((occupied, fromLoc, toLoc), {
+      val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
+        override val startNode: Pos = fromLoc.pos
 
-      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
-        for {
-          offset <- Pos.axisOffsets.iterator
-          newPos = pos + offset
-          if !mapGrid(newPos)
-          if !occupied.contains(newPos)
-        } yield newPos
+        override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
+          for {
+            offset <- Pos.axisOffsets.iterator
+            newPos = pos + offset
+            if !mapGrid(newPos)
+            if !occupied.contains(newPos)
+          } yield newPos
+        }
+
+        override val targetNode: Pos = toLoc.pos
       }
 
-      override val targetNode: Pos = toLoc.pos
-    }
-
-    BFS.search(graphSearch).target.map(_._2)
+      BFS.search(graphSearch).target.map(_._2)
+    })
   }
 
   def minimumOrganizeEnergy(initialState: State): Int = {
