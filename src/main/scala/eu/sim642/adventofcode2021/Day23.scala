@@ -3,7 +3,7 @@ package eu.sim642.adventofcode2021
 import eu.sim642.adventofcode2021.Day23.Amphipod.*
 import eu.sim642.adventofcode2021.Day23.Loc.*
 import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, TargetNode, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, GraphTraversal, TargetNode, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits.*
 
@@ -73,28 +73,44 @@ object Day23 {
 
   private val mapGrid: Grid[Boolean] = map.linesIterator.map(_.toVector).toVector.mapGrid(_ == '#')
 
-  val freePathLengthMemo = mutable.Map.empty[(Set[Pos], Loc, Loc), Option[Int]]
+  case class FreePathData(length: Int, blockers: Set[Loc])
+  private val freePathMap: collection.Map[Loc, collection.Map[Loc, FreePathData]] = {
+    Loc.values.view.map({ fromLoc =>
 
-  def freePathLength(occupied: Set[Pos], fromLoc: Loc, toLoc: Loc): Option[Int] = {
+      case class PathPos(pos: Pos)(val blockers: Set[Loc])
 
-    freePathLengthMemo.getOrElseUpdate((occupied, fromLoc, toLoc), {
-      val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
-        override val startNode: Pos = fromLoc.pos
+      val graphTraversal = new GraphTraversal[PathPos] with UnitNeighbors[PathPos] {
+        override val startNode: PathPos = PathPos(fromLoc.pos)(Set.empty)
 
-        override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
+        override def unitNeighbors(pathPos: PathPos): IterableOnce[PathPos] = {
+          val PathPos(pos) = pathPos
+          val blockers = pathPos.blockers
+
           for {
             offset <- Pos.axisOffsets.iterator
             newPos = pos + offset
             if !mapGrid(newPos)
-            if !occupied.contains(newPos)
-          } yield newPos
+            newBlockers = Loc.values.find(_.pos == newPos).map(blockers + _).getOrElse(blockers)
+          } yield PathPos(newPos)(newBlockers)
         }
-
-        override val targetNode: Pos = toLoc.pos
       }
 
-      BFS.search(graphSearch).target.map(_._2)
-    })
+      val distances = BFS.traverse(graphTraversal).distances
+      val distances2 =
+        for {
+          (pathPos@PathPos(pos), length) <- distances
+          loc <- Loc.values.find(_.pos == pos)
+        } yield loc -> FreePathData(length, pathPos.blockers)
+      fromLoc -> distances2
+    }).toMap
+  }
+
+  def freePathLength(occupied: Set[Pos], fromLoc: Loc, toLoc: Loc): Option[Int] = {
+    val FreePathData(length, blockers) = freePathMap(fromLoc)(toLoc)
+    if (blockers.exists(b => occupied.contains(b.pos)))
+      None
+    else
+      Some(length)
   }
 
   def minimumOrganizeEnergy(initialState: State): Int = {
