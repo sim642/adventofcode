@@ -18,13 +18,24 @@ object Day23 {
     case Desert extends Amphipod(1000)
   }
 
+  // TODO: restore part 1
+  // TODO: optimize part 2
+
   enum Loc(val pos: Pos) {
+    case AL2 extends Loc(Pos(3, 5))
+    case AL1 extends Loc(Pos(3, 4))
     case AL extends Loc(Pos(3, 3))
     case AH extends Loc(Pos(3, 2))
+    case BL2 extends Loc(Pos(5, 5))
+    case BL1 extends Loc(Pos(5, 4))
     case BL extends Loc(Pos(5, 3))
     case BH extends Loc(Pos(5, 2))
+    case CL2 extends Loc(Pos(7, 5))
+    case CL1 extends Loc(Pos(7, 4))
     case CL extends Loc(Pos(7, 3))
     case CH extends Loc(Pos(7, 2))
+    case DL2 extends Loc(Pos(9, 5))
+    case DL1 extends Loc(Pos(9, 4))
     case DL extends Loc(Pos(9, 3))
     case DH extends Loc(Pos(9, 2))
 
@@ -39,10 +50,10 @@ object Day23 {
 
   val hallwayLocs = Seq(HLL, HL, HAB, HBC, HCD, HR, HRR)
   val roomLocs = Map(
-    Amber -> Seq(AL, AH),
-    Bronze -> Seq(BL, BH),
-    Copper -> Seq(CL, CH),
-    Desert -> Seq(DL, DH),
+    Amber -> Seq(AL2, AL1, AL, AH),
+    Bronze -> Seq(BL2, BL1, BL, BH),
+    Copper -> Seq(CL2, CL1, CL, CH),
+    Desert -> Seq(DL2, DL1, DL, DH),
   )
 
   type State = Map[Loc, Amphipod]
@@ -51,6 +62,8 @@ object Day23 {
     """#############
       |#...........#
       |###.#.#.#.###
+      |  #.#.#.#.#
+      |  #.#.#.#.#
       |  #.#.#.#.#
       |  #########""".stripMargin
 
@@ -117,12 +130,20 @@ object Day23 {
       override val targetNode: State = Map(
         AH -> Amber,
         AL -> Amber,
+        AL1 -> Amber,
+        AL2 -> Amber,
         BH -> Bronze,
         BL -> Bronze,
+        BL1 -> Bronze,
+        BL2 -> Bronze,
         CH -> Copper,
         CL -> Copper,
+        CL1 -> Copper,
+        CL2 -> Copper,
         DH -> Desert,
         DL -> Desert,
+        DL1 -> Desert,
+        DL2 -> Desert,
       )
     }
 
@@ -148,13 +169,21 @@ object Day23 {
     case stateRegex(ah, bh, ch, dh, al, bl, cl, dl) =>
       Map(
         AH -> parseAmphipod(ah),
-        AL -> parseAmphipod(al),
+        AL -> Desert,
+        AL1 -> Desert,
+        AL2 -> parseAmphipod(al),
         BH -> parseAmphipod(bh),
-        BL -> parseAmphipod(bl),
+        BL -> Copper,
+        BL1 -> Bronze,
+        BL2 -> parseAmphipod(bl),
         CH -> parseAmphipod(ch),
-        CL -> parseAmphipod(cl),
+        CL -> Bronze,
+        CL1 -> Amber,
+        CL2 -> parseAmphipod(cl),
         DH -> parseAmphipod(dh),
-        DL -> parseAmphipod(dl),
+        DL -> Amber,
+        DL1 -> Copper,
+        DL2 -> parseAmphipod(dl),
       )
   }
 
