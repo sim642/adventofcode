@@ -54,9 +54,7 @@ object Day23 {
 
   private val mapGrid: Grid[Boolean] = map.linesIterator.map(_.toVector).toVector.mapGrid(_ == '#')
 
-  def freePathLength(state: State, fromLoc: Loc, toLoc: Loc): Option[Int] = {
-
-    val occupied = state.keys.map(_.pos).toSet
+  def freePathLength(occupied: Set[Pos], fromLoc: Loc, toLoc: Loc): Option[Int] = {
 
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
       override val startNode: Pos = fromLoc.pos
@@ -83,10 +81,12 @@ object Day23 {
 
       override def neighbors(state: State): IterableOnce[(State, Int)] = {
 
+        val occupied = state.keys.map(_.pos).toSet
+
         def room2hallway(fromLoc: Loc): Seq[(Loc, Int)] = {
           for {
             toLoc <- hallwayLocs
-            length <- freePathLength(state, fromLoc, toLoc)
+            length <- freePathLength(occupied, fromLoc, toLoc)
           } yield toLoc -> length
         }
 
@@ -94,7 +94,7 @@ object Day23 {
           if (roomLocs(amphipod).flatMap(state.get).forall(_ == amphipod)) {
             for {
               toLoc <- roomLocs(amphipod)
-              length <- freePathLength(state, fromLoc, toLoc)
+              length <- freePathLength(occupied, fromLoc, toLoc)
             } yield toLoc -> length
           }
           else
