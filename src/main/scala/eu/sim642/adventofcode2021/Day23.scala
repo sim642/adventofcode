@@ -15,158 +15,130 @@ object Day23 {
     case Desert extends Amphipod(1000)
   }
 
-  def parseAmphipod(s: String): Amphipod = s match {
-    case "A" => Amber
-    case "B" => Bronze
-    case "C" => Copper
-    case "D" => Desert
-  }
+  sealed trait Part {
+    protected lazy val template: String // lazy val to avoid trait initialization order problems
 
-  sealed abstract class Part {
-    protected lazy val map: String // lazy val to avoid trait initialization order problems
+    private val templateGrid = parseGrid(template)
 
-    val mapGrid = map.linesIterator.map(_.toVector).toVector
-
-    val hallwayPoss: Set[Pos] = (for {
-      (row, y) <- mapGrid.view.zipWithIndex
+    private val hallways: Set[Pos] = (for {
+      (row, y) <- templateGrid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
       if cell == 'H'
     } yield Pos(x, y)).toSet
 
-    val roomPoss: Map[Amphipod, Set[Pos]] = (for {
-      (row, y) <- mapGrid.view.zipWithIndex
-      (cell, x) <- row.view.zipWithIndex
-      if "ABCD".contains(cell)
-    } yield parseAmphipod(cell.toString) -> Pos(x, y)).toSet.groupMap(_._1)(_._2)
+    private val room2amphipod: Map[Pos, Amphipod] = grid2state(templateGrid)
 
-    val posRooms: Map[Pos, Amphipod] = for {
-      (amphipod, poss) <- roomPoss
-      pos <- poss
-    } yield pos -> amphipod
+    private val amphipod2rooms: Map[Amphipod, Set[Pos]] = room2amphipod.toSet.groupMap(_._2)(_._1)
 
-    val allPoss: Set[Pos] = hallwayPoss ++ roomPoss.values.flatten
 
-    type State = Map[Pos, Amphipod]
+    private case class PathData(length: Int, pathPoss: Set[Pos])
 
-    case class FreePathData(length: Int, blockers: Set[Pos])
+    private val posNeighbors: collection.Map[Pos, collection.Map[Pos, PathData]] = {
+      val allPoss: Set[Pos] = hallways ++ room2amphipod.keySet
 
-    private val freePathMap: collection.Map[Pos, collection.Map[Pos, FreePathData]] = {
       allPoss.view.map({ fromPos =>
 
-        case class PathPos(pos: Pos)(val blockers: Set[Pos])
+        case class PathPos(pos: Pos)(val pathPoss: Set[Pos])
 
         val graphTraversal = new GraphTraversal[PathPos] with UnitNeighbors[PathPos] {
           override val startNode: PathPos = PathPos(fromPos)(Set.empty)
 
           override def unitNeighbors(pathPos: PathPos): IterableOnce[PathPos] = {
             val PathPos(pos) = pathPos
-            val blockers = pathPos.blockers
-
+            val pathPoss = pathPos.pathPoss
             for {
               offset <- Pos.axisOffsets.iterator
               newPos = pos + offset
-              if mapGrid(newPos) != '#'
-              newBlockers = if (allPoss.contains(newPos)) blockers + newPos else blockers
-            } yield PathPos(newPos)(newBlockers)
+              if templateGrid(newPos) != '#'
+              newPathPoss = if (allPoss.contains(newPos)) pathPoss + newPos else pathPoss
+            } yield PathPos(newPos)(newPathPoss)
           }
         }
 
         val distances = BFS.traverse(graphTraversal).distances
-        val distances2 =
+        val allPosDistances =
           for {
-            (pathPos@PathPos(pos), length) <- distances
-            if allPoss.contains(pos)
-          } yield pos -> FreePathData(length, pathPos.blockers)
-        fromPos -> distances2
+            (pathPos@PathPos(toPos), length) <- distances
+            if allPoss.contains(toPos)
+          } yield toPos -> PathData(length, pathPos.pathPoss)
+        fromPos -> allPosDistances
       }).toMap
     }
 
-    def freePathLength(occupied: Set[Pos], fromPos: Pos, toPos: Pos): Option[Int] = {
-      val FreePathData(length, blockers) = freePathMap(fromPos)(toPos)
-      if (blockers.exists(occupied.contains))
-        None
-      else
-        Some(length)
-    }
+    
+    protected type State = Map[Pos, Amphipod]
 
-    def minimumOrganizeEnergy(initialState: State): Int = {
+    protected def minimumOrganizeEnergy(initialState: State): Int = {
 
       val graphSearch = new GraphSearch[State] with TargetNode[State] {
         override val startNode: State = initialState
 
         override def neighbors(state: State): IterableOnce[(State, Int)] = {
+          val amphipodRoomUniform: Map[Amphipod, Boolean] = amphipod2rooms.transform((amphipod, rooms) =>
+            rooms.flatMap(state.get).forall(_ == amphipod)
+          )
 
           val occupied = state.keySet
 
+          def freeNeighbors(fromPos: Pos, toPoss: Set[Pos]): Set[(Pos, Int)] = {
+            (for {
+              toPos <- toPoss.view // slower without view for some reason
+              PathData(length, pathPoss) = posNeighbors(fromPos)(toPos)
+              if !pathPoss.exists(occupied.contains)
+            } yield toPos -> length).toSet
+          }
+
           def room2hallway(fromPos: Pos, amphipod: Amphipod): Set[(Pos, Int)] = {
-            if (posRooms(fromPos) == amphipod && roomPoss(amphipod).flatMap(state.get).forall(_ == amphipod)) // forbid useless move out of final (correct) room
+            if (room2amphipod(fromPos) == amphipod && amphipodRoomUniform(amphipod)) // forbid useless move out of final (correct) room
               Set.empty
-            else {
-              for {
-                toPos <- hallwayPoss
-                length <- freePathLength(occupied, fromPos, toPos)
-              } yield toPos -> length
-            }
+            else
+              freeNeighbors(fromPos, hallways)
           }
 
           def hallway2room(fromPos: Pos, amphipod: Amphipod): Set[(Pos, Int)] = {
-            if (roomPoss(amphipod).flatMap(state.get).forall(_ == amphipod)) {
-              for {
-                toPos <- roomPoss(amphipod)
-                length <- freePathLength(occupied, fromPos, toPos)
-              } yield toPos -> length
-            }
+            if (amphipodRoomUniform(amphipod))
+              freeNeighbors(fromPos, amphipod2rooms(amphipod))
             else
               Set.empty
           }
 
           for {
             (fromPos, amphipod) <- state.iterator
-            (toLoc, length) <- if (hallwayPoss.contains(fromPos)) hallway2room(fromPos, amphipod) else room2hallway(fromPos, amphipod)
-            newState = state - fromPos + (toLoc -> amphipod)
+            (toPos, length) <- (if (hallways.contains(fromPos)) hallway2room else room2hallway)(fromPos, amphipod)
+            newState = state - fromPos + (toPos -> amphipod)
           } yield newState -> amphipod.energy * length
         }
 
-        override val targetNode: State = {
-          (for {
-            (row, y) <- mapGrid.view.zipWithIndex
-            (cell, x) <- row.view.zipWithIndex
-            if "ABCD".contains(cell)
-          } yield Pos(x, y) -> parseAmphipod(cell.toString)).toMap
-        }
+        override val targetNode: State = grid2state(templateGrid)
       }
 
       Dijkstra.search(graphSearch).target.get._2
     }
 
-    def parseState(grid1: Grid[Char]): State = {
-      val lines = grid1
-      val grid = lines.map(_.toVector)
+    protected def grid2state(grid: Grid[Char]): State = {
       (for {
         (row, y) <- grid.view.zipWithIndex
         (cell, x) <- row.view.zipWithIndex
-        if "ABCD".contains(cell)
-      } yield Pos(x, y) -> parseAmphipod(cell.toString)).toMap
+        amphipod <- parseAmphipod(cell)
+      } yield Pos(x, y) -> amphipod).toMap
     }
 
-    def minimumOrganizeEnergy(grid: Grid[Char]): Int
+    def minimumOrganizeEnergy(grid: Grid[Char]): Int = {
+      minimumOrganizeEnergy(grid2state(grid))
+    }
   }
 
   object Part1 extends Part {
-    override protected lazy val map: String =
+    override protected lazy val template: String =
       """#############
         |#HH.H.H.H.HH#
         |###A#B#C#D###
         |  #A#B#C#D#
         |  #########""".stripMargin
-
-    override def minimumOrganizeEnergy(grid: Grid[Char]): Int = {
-      minimumOrganizeEnergy(parseState(grid))
-    }
   }
 
   object Part2 extends Part {
-    override protected lazy val map: String =
+    override protected lazy val template: String =
       """#############
         |#HH.H.H.H.HH#
         |###A#B#C#D###
@@ -175,16 +147,27 @@ object Day23 {
         |  #A#B#C#D#
         |  #########""".stripMargin
 
-    private val part2Lines =
+    private val extraLines =
       """  #D#C#B#A#
         |  #D#B#A#C#""".stripMargin
 
+    private val extraGrid = parseGrid(extraLines)
+
     override def minimumOrganizeEnergy(grid: Grid[Char]): Int = {
-      val grid2 = grid.take(3) ++ parseGrid(part2Lines) ++ grid.drop(3)
-      minimumOrganizeEnergy(parseState(grid2))
+      val (gridInit, gridTail) = grid.splitAt(3)
+      val grid2 = gridInit ++ extraGrid ++ gridTail
+      super.minimumOrganizeEnergy(grid2)
     }
   }
 
+
+  def parseAmphipod(c: Char): Option[Amphipod] = c match {
+    case 'A' => Some(Amber)
+    case 'B' => Some(Bronze)
+    case 'C' => Some(Copper)
+    case 'D' => Some(Desert)
+    case _ => None
+  }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
