@@ -55,6 +55,10 @@ object Day23 {
     Copper -> Seq(CL2, CL1, CL, CH),
     Desert -> Seq(DL2, DL1, DL, DH),
   )
+  val locRooms = for {
+    (amphipod, locs) <- roomLocs
+    loc <- locs
+  } yield loc -> amphipod
 
   type State = Map[Loc, Amphipod]
 
@@ -102,11 +106,15 @@ object Day23 {
 
         val occupied = state.keys.map(_.pos).toSet
 
-        def room2hallway(fromLoc: Loc): Seq[(Loc, Int)] = {
-          for {
-            toLoc <- hallwayLocs
-            length <- freePathLength(occupied, fromLoc, toLoc)
-          } yield toLoc -> length
+        def room2hallway(fromLoc: Loc, amphipod: Amphipod): Seq[(Loc, Int)] = {
+          if (locRooms(fromLoc) == amphipod && roomLocs(amphipod).flatMap(state.get).forall(_ == amphipod)) // forbid useless move out of final (correct) room
+            Seq.empty
+          else {
+            for {
+              toLoc <- hallwayLocs
+              length <- freePathLength(occupied, fromLoc, toLoc)
+            } yield toLoc -> length
+          }
         }
 
         def hallway2room(fromLoc: Loc, amphipod: Amphipod): Seq[(Loc, Int)] = {
@@ -122,7 +130,7 @@ object Day23 {
 
         for {
           (fromLoc, amphipod) <- state.iterator
-          (toLoc, length) <- if (hallwayLocs.contains(fromLoc)) hallway2room(fromLoc, amphipod) else room2hallway(fromLoc)
+          (toLoc, length) <- if (hallwayLocs.contains(fromLoc)) hallway2room(fromLoc, amphipod) else room2hallway(fromLoc, amphipod)
           newState = state - fromLoc + (toLoc -> amphipod)
         } yield newState -> amphipod.energy * length
       }
