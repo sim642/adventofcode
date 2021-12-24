@@ -7,40 +7,55 @@ object Day24 {
 
   case class Step(a: Int, b: Int, d: Int)
 
-  def solve(steps: Seq[Step]): Seq[Range] = {
+  /**
+   * Digit constraint of the form: digits[j] = digits[i] + diff.
+   */
+  case class Constraint(diff: Int, i: Int, j: Int) {
+    /**
+     * Normalize constraint, such that diff >= 0.
+     */
+    def normalized: Constraint = {
+      if (diff >= 0)
+        this
+      else
+        Constraint(-diff, j, i)
+    }
+  }
+
+  def generateConstraints(steps: Seq[Step]): Seq[Constraint] = {
+
+    case class HalfConstraint(diff: Int, i: Int)
 
     @tailrec
-    def helper(steps: List[Step], i: Int, stack: List[(Int, Int)], acc: List[(Int, Int, Int)]): List[(Int, Int, Int)] = steps match {
+    def helper(steps: List[Step], i: Int, stack: List[HalfConstraint], acc: List[Constraint]): List[Constraint] = steps match {
       case Nil =>
         acc
       case Step(a, b, d) :: newSteps =>
         stack match {
-          case (popB, popI) :: newStack =>
-            if ((0 to 9).contains((popB + a).abs)) {
-              helper(newSteps, i + 1, newStack, (popB + a, popI, i) :: acc)
-            }
-            else {
-              helper(newSteps, i + 1, (b, i) :: stack, acc)
-            }
-          case Nil =>
-            helper(newSteps, i + 1, (b, i) :: stack, acc)
+          case HalfConstraint(popB, popI) :: newStack if (0 to 9).contains((popB + a).abs) =>
+            helper(newSteps, i + 1, newStack, Constraint(popB + a, popI, i) :: acc)
+          case _ =>
+            helper(newSteps, i + 1, HalfConstraint(b, i) :: stack, acc)
         }
     }
 
-    val constraints = helper(steps.toList, 0, Nil, Nil)
-    val digits = mutable.IndexedSeq.fill(steps.size)(1 to 9)
-    for ((diff, i, j) <- constraints) {
-      if (diff > 0) {
-        digits(i) = digits(i).min to (9 - diff)
-        digits(j) = (1 + diff) to digits(j).max
-      }
-      else if (diff < 0) {
-        digits(i) = (1 - diff) to digits(i).max
-        digits(j) = digits(j).min to (9 + diff)
-      }
-    }
+    helper(steps.toList, 0, Nil, Nil)
+  }
 
+  def solveConstraints(n: Int, constraints: Seq[Constraint]): Seq[Range.Inclusive] = {
+    val digits = mutable.IndexedSeq.fill(n)(1 to 9) // easier with mutable
+    // assume single-pass solvability (every digit only in at most one constraint)
+    for (Constraint(diff, i, j) <- constraints.map(_.normalized)) {
+      // assume normalized to reduce duplication
+      digits(i) = digits(i).min to (9 - diff)
+      digits(j) = (1 + diff) to digits(j).max
+    }
     digits.toSeq
+  }
+
+  def solve(steps: Seq[Step]): Seq[Range] = {
+    val constraints = generateConstraints(steps)
+    solveConstraints(steps.size, constraints)
   }
 
   def maxModelNumber(steps: Seq[Step]): String = {
