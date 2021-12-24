@@ -1,0 +1,18 @@
+inp w
+mul x 0
+add x z
+mod x 26
+div z (?<d>1|26)
+add x (?<a>-?\d+)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y (?<b>\d+)
+mul y x
+add z y

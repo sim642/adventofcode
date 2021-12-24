@@ -71,29 +71,11 @@ object Day24 {
   }
 
 
-  private val stepRegex =
-    """inp w
-      |mul x 0
-      |add x z
-      |mod x 26
-      |div z (1|26)
-      |add x (-?\d+)
-      |eql x w
-      |eql x 0
-      |mul y 0
-      |add y 25
-      |mul y x
-      |add y 1
-      |mul z y
-      |mul y 0
-      |add y w
-      |add y (\d+)
-      |mul y x
-      |add z y""".stripMargin.r
+  private lazy val stepRegex = io.Source.fromInputStream(getClass.getResourceAsStream("day24/step_regex.txt")).mkString.trim.r
 
   def parseSteps(input: String): Seq[Step] = {
     stepRegex.findAllMatchIn(input).map(m =>
-      Step(m.group(2).toInt, m.group(3).toInt, m.group(1).toInt)
+      Step(m.group("a").toInt, m.group("b").toInt, m.group("d").toInt)
     ).toSeq
   }
 
