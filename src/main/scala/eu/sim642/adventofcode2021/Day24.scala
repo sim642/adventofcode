@@ -33,8 +33,12 @@ object Day24 {
       case Step(a, b, d) :: newSteps =>
         stack match {
           case HalfConstraint(popB, popI) :: newStack if (0 to 9).contains((popB + a).abs) =>
+            assert(d == 26)
+            assert(a < 0)
             helper(newSteps, i + 1, newStack, Constraint(popB + a, popI, i) :: acc)
           case _ =>
+            assert(d == 1)
+            assert(a > 0)
             helper(newSteps, i + 1, HalfConstraint(b, i) :: stack, acc)
         }
     }
