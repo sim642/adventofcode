@@ -13,6 +13,9 @@ trait BoxOps[A <: BoxPosOps[A], B <: BoxOps[A, B]] {
   def contains(pos: A): Boolean =
     min <= pos && pos <= max
 
+  def contains(that: B): Boolean =
+    (this union that) == this // TODO: direct implementation
+
   def union(that: B): B = {
     val unionMin = min min that.min
     val unionMax = max max that.max

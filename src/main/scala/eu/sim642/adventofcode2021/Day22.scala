@@ -9,8 +9,6 @@ object Day22 {
 
   // TODO: move to library?
   extension (box3: Box3) {
-    def contains(otherBox3: Box3): Boolean = (otherBox3 union box3) == box3
-
     def size: BigInt = {
       val Box3(min, max) = box3
       BigInt(max.x - min.x + 1) * BigInt(max.y - min.y + 1) * BigInt(max.z - min.z + 1)
