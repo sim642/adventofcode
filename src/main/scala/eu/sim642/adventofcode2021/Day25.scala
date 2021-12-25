@@ -7,34 +7,34 @@ import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day25 {
 
-  case class Input(max: Pos, easts: Set[Pos], souths: Set[Pos])
+  extension (pos: Pos) {
+    def %(other: Pos): Pos = Pos(pos.x % other.x, pos.y % other.y)
+  }
 
-  // TODO: deduplicate
-  def stepEast(input: Input): Input = {
+  case class Input(max: Pos, easts: Set[Pos], souths: Set[Pos]) {
+    def contains(pos: Pos): Boolean = easts.contains(pos) || souths.contains(pos)
+  }
+
+  def stepOffset(input: Input, poss: Set[Pos], offset: Pos): Set[Pos] = {
     val Input(max, easts, souths) = input
-    val newEasts = for {
-      pos@Pos(x, y) <- easts
-      newPos = Pos((x + 1) % max.x, y)
+    for {
+      pos <- poss
+      newPos = (pos + offset) % max
       newPos2 =
-        if (!easts.contains(newPos) && !souths.contains(newPos))
+        if (!input.contains(newPos))
           newPos
         else
           pos
     } yield newPos2
+  }
+
+  def stepEast(input: Input): Input = {
+    val newEasts = stepOffset(input, input.easts, Pos(1, 0))
     input.copy(easts = newEasts)
   }
 
   def stepSouth(input: Input): Input = {
-    val Input(max, easts, souths) = input
-    val newSouths = for {
-      pos@Pos(x, y) <- souths
-      newPos = Pos(x, (y + 1) % max.y)
-      newPos2 =
-        if (!easts.contains(newPos) && !souths.contains(newPos))
-          newPos
-        else
-          pos
-    } yield newPos2
+    val newSouths = stepOffset(input, input.souths, Pos(0, 1))
     input.copy(souths = newSouths)
   }
 
