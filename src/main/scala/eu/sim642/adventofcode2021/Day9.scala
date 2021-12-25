@@ -14,7 +14,7 @@ object Day9 {
       pos = Pos(x, y)
       neighbors = Pos.axisOffsets.map(pos + _).filter(grid.containsPos)
       if neighbors.forall(grid(_) > cell)
-    } yield pos).toSeq // TODO: why Set doesn't work?
+    } yield pos).toSeq
   }
 
   def sumLowPointRiskLevels(grid: Grid[Int]): Int = {
