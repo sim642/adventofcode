@@ -3,6 +3,7 @@ package eu.sim642.adventofcode2021
 import Day25._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 class Day25Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
@@ -74,7 +75,7 @@ class Day25Test extends AnyFunSuite with ScalaCheckPropertyChecks {
         |v......""".stripMargin
     )
 
-    val it = Iterator.iterate(parseInput(exampleInput1))(step).drop(1) // TODO: .tail
+    val it = Iterator.iterate(parseInput(exampleInput1))(step).tail
     forAll(expecteds) { expected =>
       assert(it.next() == parseInput(expected))
     }

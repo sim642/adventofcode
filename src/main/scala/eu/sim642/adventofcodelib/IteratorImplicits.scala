@@ -12,6 +12,8 @@ object IteratorImplicits {
     def last: A = lastOption.get
 
     def apply(i: Int): A = it.drop(i).head
+
+    def tail: Iterator[A] = it.drop(1)
   }
 
   implicit class ZipIteratorOps[A](it: Iterator[A]) {
