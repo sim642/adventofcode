@@ -97,11 +97,6 @@ object Day16 {
       case xs ~ x => (xs.foldLeft(0L)((acc, x) => (acc << 4) | x) << 4) | x
     }
 
-    // TODO: move to ExtraParsers? must generalize parseAll (Reader creation)
-    def lengthed[A](length: Int, p: => Parser[A]): Parser[A] = {
-      repN(length, any) ^^ (parseAll(p, _).get)
-    }
-
     def subpackets: Parser[List[Packet]] = (
       true ~> int(11) >> (repN(_, packet))
     | false ~> int(15) >> (lengthed(_, rep(packet)))
