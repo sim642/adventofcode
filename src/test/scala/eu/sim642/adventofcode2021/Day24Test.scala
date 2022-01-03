@@ -47,42 +47,42 @@ class Day24Test extends AnyFunSuite {
   }
 
   test("Part 1 aimor") {
-    assert(maxModelNumber(parseSteps(aimorInput)) == "92915979999498") // unconfirmed answer
+    assert(maxModelNumber(parseSteps(aimorInput)) == "92915979999498") // unconfirmed officially, confirmed by glguy, yitz
   }
 
   test("Part 2 aimor") {
-    assert(minModelNumber(parseSteps(aimorInput)) == "21611513911181") // unconfirmed answer
+    assert(minModelNumber(parseSteps(aimorInput)) == "21611513911181") // unconfirmed officially, confirmed by glguy, yitz
   }
 
   test("Part 1 alexander-yu") {
-    assert(maxModelNumber(parseSteps(alexanderYuInput)) == "79197919993985") // unconfirmed answer
+    assert(maxModelNumber(parseSteps(alexanderYuInput)) == "79197919993985") // unconfirmed officially, confirmed by glguy, yitz
   }
 
   test("Part 2 alexander-yu") {
-    assert(minModelNumber(parseSteps(alexanderYuInput)) == "13191913571211") // unconfirmed answer
+    assert(minModelNumber(parseSteps(alexanderYuInput)) == "13191913571211") // unconfirmed officially, confirmed by glguy, yitz
   }
 
   test("Part 1 fireduck64") {
-    assert(maxModelNumber(parseSteps(fireduck64Input)) == "99598963999971") // unconfirmed answer
+    assert(maxModelNumber(parseSteps(fireduck64Input)) == "99598963999971") // unconfirmed officially, confirmed by glguy, yitz
   }
 
   test("Part 2 fireduck64") {
-    assert(minModelNumber(parseSteps(fireduck64Input)) == "93151411711211") // unconfirmed answer
+    assert(minModelNumber(parseSteps(fireduck64Input)) == "93151411711211") // unconfirmed officially, confirmed by glguy, yitz
   }
 
   test("Part 1 firetech") {
-    assert(maxModelNumber(parseSteps(firetechInput)) == "39494195799979") // unconfirmed answer
+    assert(maxModelNumber(parseSteps(firetechInput)) == "39494195799979") // unconfirmed officially, confirmed by glguy
   }
 
   test("Part 2 firetech") {
-    assert(minModelNumber(parseSteps(firetechInput)) == "13161151139617") // unconfirmed answer
+    assert(minModelNumber(parseSteps(firetechInput)) == "13161151139617") // unconfirmed officially, confirmed by glguy
   }
 
   test("Part 1 mebeim") {
-    assert(maxModelNumber(parseSteps(mebeimInput)) == "92928914999991") // unconfirmed answer
+    assert(maxModelNumber(parseSteps(mebeimInput)) == "92928914999991") // unconfirmed officially, confirmed by glguy, yitz
   }
 
   test("Part 2 mebeim") {
-    assert(minModelNumber(parseSteps(mebeimInput)) == "91811211611981") // unconfirmed answer
+    assert(minModelNumber(parseSteps(mebeimInput)) == "91811211611981") // unconfirmed officially, confirmed by glguy, yitz
   }
 }
