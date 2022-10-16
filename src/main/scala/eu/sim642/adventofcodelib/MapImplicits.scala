@@ -2,7 +2,6 @@ package eu.sim642.adventofcodelib
 
 import scala.collection.generic.IsMap
 import scala.collection.{BuildFrom, MapOps}
-import scala.language.implicitConversions
 
 object MapImplicits {
 

@@ -4,7 +4,6 @@ import eu.sim642.adventofcodelib.IntegralImplicits._
 
 import scala.collection.BuildFrom
 import scala.collection.generic.IsSeq
-import scala.language.implicitConversions
 
 object SeqImplicits {
 

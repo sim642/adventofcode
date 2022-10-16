@@ -8,7 +8,7 @@ object Day2 {
 
   def letterCounts(id: String): Map[Char, Int] = id.toSeq.groupCount(identity)
 
-  implicit def bool2Int(b: Boolean): Int = if (b) 1 else 0
+  given Conversion[Boolean, Int] = if (_) 1 else 0
 
   def checksum(ids: Seq[String]): Int = {
     val (cnt2, cnt3) = ids.foldLeft((0, 0)) { case ((cnt2, cnt3), id) =>

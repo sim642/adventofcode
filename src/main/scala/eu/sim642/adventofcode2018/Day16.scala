@@ -9,7 +9,7 @@ object Day16 {
   case class Instruction(opcode: String, a: Int, b: Int, c: Int) {
     def apply(registers: Registers): Registers = {
 
-      implicit def boolean2Int(b: Boolean): Int = if (b) 1 else 0
+      given Conversion[Boolean, Int] = if (_) 1 else 0
 
       val value: Int = opcode match {
         case "addr" => registers(a) + registers(b)
