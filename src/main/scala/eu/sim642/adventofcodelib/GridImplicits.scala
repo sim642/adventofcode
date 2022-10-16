@@ -2,6 +2,8 @@ package eu.sim642.adventofcodelib
 
 import eu.sim642.adventofcodelib.pos.Pos
 
+import scala.util.control.NonLocalReturns._
+
 object GridImplicits {
 
   implicit class PosGridOps[A](grid: Grid[A]) {
@@ -15,12 +17,12 @@ object GridImplicits {
       0 <= pos.x && 0 <= pos.y && pos.y < grid.size && pos.x < grid(pos.y).size
     }
 
-    def posOf(elem: A): Pos = {
+    def posOf(elem: A): Pos = returning {
       for {
         (row, y) <- grid.view.zipWithIndex
         (cell, x) <- row.view.zipWithIndex
         if cell == elem
-      } return Pos(x, y)
+      } throwReturn(Pos(x, y))
 
       Pos(-1, -1)
     }

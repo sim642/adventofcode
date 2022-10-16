@@ -7,6 +7,7 @@ import eu.sim642.adventofcodelib.IntegralImplicits._
 
 import scala.collection.mutable
 import scala.util.control.Breaks._
+import scala.util.control.NonLocalReturns._
 
 object Day23 {
 
@@ -180,21 +181,21 @@ object Day23 {
       val initialOctahedron = getInitialOctahedron(nanobots)
       enqueue(initialOctahedron)
 
-      breakable {
+      returning {
         while (queue.nonEmpty) {
           val (octahedron, (lower, upper), originDist) = queue.dequeue()
           if (!done.contains(octahedron)) {
             done += octahedron
 
             if (lower == upper)
-              return originDist
+              throwReturn(originDist)
 
             for (splitOctahedron <- getSplits(octahedron))
               enqueue(splitOctahedron)
           }
         }
+        ???
       }
-      ???
     }
   }
 
