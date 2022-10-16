@@ -6,7 +6,7 @@ object Day9 {
 
   def shortestRoute(input: String): Int = NaiveTSP.pathLength(parseDistMatrix(input))
 
-  def longestRoute(input: String): Int = NaiveTSP.pathLength(parseDistMatrix(input))(Ordering.Int.reverse)
+  def longestRoute(input: String): Int = NaiveTSP.pathLength(parseDistMatrix(input))(using Ordering.Int.reverse)
 
 
   private val edgeRegex = """(\w+) to (\w+) = (\d+)""".r

@@ -10,7 +10,7 @@ object Day13 {
   trait Part {
     def getDistMatrix(input: String): DistanceMatrix[String]
 
-    def optimalHappiness(input: String): Int = NaiveTSP.cycleLength(getDistMatrix(input))(Ordering.Int.reverse)
+    def optimalHappiness(input: String): Int = NaiveTSP.cycleLength(getDistMatrix(input))(using Ordering.Int.reverse)
   }
 
   object Part1 extends Part {

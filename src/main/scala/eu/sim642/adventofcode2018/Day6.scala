@@ -9,7 +9,7 @@ object Day6 {
 
   def largestFiniteArea(coords: Seq[Pos]): Int = {
     def closestCoord(pos: Pos): Option[Pos] = {
-      coords.minStrict(Ordering.by(_ manhattanDistance pos))
+      coords.minStrict(using Ordering.by(_ manhattanDistance pos))
     }
 
     val box@Box(min, max) = Box.bounding(coords)
