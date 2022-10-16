@@ -61,7 +61,7 @@ object Day7Test {
   }
 
   trait EquivalentTest(solution: Solution) extends AnyFunSuite with ScalaCheckPropertyChecks with Configuration {
-    implicit override val generatorDrivenConfig = PropertyCheckConfiguration(minSuccessful = 100) // default is 10
+    given PropertyCheckConfiguration = PropertyCheckConfiguration(minSuccessful = 100) // default is 10
 
     val crabsGen = Gen.nonEmptyListOf(Gen.choose(-1000, 1000))
 

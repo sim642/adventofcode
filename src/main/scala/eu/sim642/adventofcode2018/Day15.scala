@@ -23,11 +23,11 @@ object Day15 {
 
   case class CombatUnit(unitType: UnitType, pos: Pos, hp: Int = 200, attackPower: Int = 3)
 
-  implicit val posReadingOrdering: Ordering[Pos] = Ordering.fromLessThan({ (pos1, pos2) =>
+  given posReadingOrdering: Ordering[Pos] = Ordering.fromLessThan({ (pos1, pos2) =>
     pos1.y < pos2.y || (pos1.y == pos2.y && pos1.x < pos2.x)
   })
 
-  implicit val combatUnitReadingOrdering: Ordering[CombatUnit] = Ordering.by(_.pos)
+  given combatUnitReadingOrdering: Ordering[CombatUnit] = Ordering.by(_.pos)
 
   def getTargets(unit: CombatUnit)(using units: List[CombatUnit]): Set[CombatUnit] = units.filter(_.unitType == unit.unitType.target).toSet
 
@@ -94,8 +94,8 @@ object Day15 {
       def turn(init: List[CombatUnit], tail: List[CombatUnit], done: Boolean): (List[CombatUnit], Boolean) = tail match {
         case Nil => (init, done)
         case unit :: tl =>
-          implicit val otherUnits: List[CombatUnit] = init ++ tl
-          implicit val implicitGrid: Grid[Char] = grid
+          given otherUnits: List[CombatUnit] = init ++ tl
+          given Grid[Char] = grid
           val targets = getTargets(unit)
           val done2 = done || targets.isEmpty
           val inRange = getInRange(targets)

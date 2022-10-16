@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2018
 
-import Day15._
+import Day15.*
+import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.pos.Pos
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -14,7 +15,9 @@ class Day15Test extends AnyFunSuite {
         |#.G.#G#
         |#######""".stripMargin
 
-    implicit val (grid, units) = parseInput(moveInput)
+    val (grid, units) = parseInput(moveInput)
+    given Grid[Char] = grid
+    given List[CombatUnit] = units
 
     val unit = CombatUnit(Elf, Pos(1, 1))
     val targets = getTargets(unit)
@@ -58,7 +61,9 @@ class Day15Test extends AnyFunSuite {
         |#...G.#
         |#######""".stripMargin
 
-    implicit val (grid, units) = parseInput(moveInput)
+    val (grid, units) = parseInput(moveInput)
+    given Grid[Char] = grid
+    given List[CombatUnit] = units
 
     val unit = CombatUnit(Elf, Pos(2, 1))
     val targets = getTargets(unit)
