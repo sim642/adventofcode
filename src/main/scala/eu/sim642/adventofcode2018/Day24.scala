@@ -127,7 +127,7 @@ object Day24 {
   def smallestBoostedCombat(initialGroups: Seq[Group]): Int = {
     (for {
       boost <- Iterator.from(0)
-      (ImmuneSystem, immuneUnits) <- combat(boostGroups(initialGroups, boost))
+      case (ImmuneSystem, immuneUnits) <- combat(boostGroups(initialGroups, boost))
     } yield immuneUnits).head
   }
 
