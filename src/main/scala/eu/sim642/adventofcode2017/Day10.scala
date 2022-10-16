@@ -39,7 +39,7 @@ object Day10 {
     sparse2dense(simulate64(KnotState(), asciiLengths(input)).elems)
   }
 
-  def mkHexString(dense: Seq[Int]): String = dense.map(_.formatted("%02x")).mkString
+  def mkHexString(dense: Seq[Int]): String = dense.map("%02x".format(_)).mkString
 
   def knotHashHex(input: String): String = mkHexString(knotHash(input))
 
