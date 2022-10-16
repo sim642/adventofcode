@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2017
 
 import Day25._
+import Day25.Move._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
 

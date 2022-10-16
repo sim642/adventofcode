@@ -1,13 +1,15 @@
 package eu.sim642.adventofcode2017
 
+import Day25.Move._
+
 object Day25 {
 
   type State = Char
   type Symbol = Int
 
-  sealed trait Move
-  case object Left extends Move
-  case object Right extends Move
+  enum Move {
+    case Left, Right
+  }
 
   type Transitions = Map[(State, Symbol), (State, Symbol, Move)]
 

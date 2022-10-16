@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2018
 
+import Day22.Tool._
+import Day22.CaveType._
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
@@ -9,27 +11,15 @@ import scala.collection.mutable
 
 object Day22 {
 
-  sealed trait CaveType {
-    def riskLevel: Int
-    def allowedTools: Set[Tool]
-  }
-  case object Rocky extends CaveType {
-    override def riskLevel: Int = 0
-    override def allowedTools: Set[Tool] = Set(ClimbingGear, Torch)
-  }
-  case object Wet extends CaveType {
-    override def riskLevel: Int = 1
-    override def allowedTools: Set[Tool] = Set(ClimbingGear, Neither)
-  }
-  case object Narrow extends CaveType {
-    override def riskLevel: Int = 2
-    override def allowedTools: Set[Tool] = Set(Torch, Neither)
+  enum Tool {
+    case Torch, ClimbingGear, Neither
   }
 
-  sealed trait Tool
-  case object Torch extends Tool
-  case object ClimbingGear extends Tool
-  case object Neither extends Tool
+  enum CaveType(val riskLevel: Int, val allowedTools: Set[Tool]) {
+    case Rocky extends CaveType(0, Set(ClimbingGear, Torch))
+    case Wet extends CaveType(1, Set(ClimbingGear, Neither))
+    case Narrow extends CaveType(2, Set(Torch, Neither))
+  }
 
   def calculateErosionLevel(depth: Int, target: Pos, max: Pos): Grid[Int] = {
     val erosionLevel = mutable.Seq.fill(max.y + 1, max.x + 1)(-1)

@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2016
 
+import Day22.DiskType._
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph.{AStar, BFS, GraphSearch, Heuristic, UnitNeighbors}
 
@@ -33,17 +34,10 @@ object Day22 {
     }
   }
 
-  sealed trait DiskType {
-    val gridChar: Char
-  }
-  case object Empty extends DiskType {
-    override val gridChar: Char = '_'
-  }
-  case object Normal extends DiskType {
-    override val gridChar: Char = '.'
-  }
-  case object Oversize extends DiskType {
-    override val gridChar: Char = '#'
+  enum DiskType(val gridChar: Char) {
+    case Empty extends DiskType('_')
+    case Normal extends DiskType('.')
+    case Oversize extends DiskType('#')
   }
 
   private val originPos = Pos.zero

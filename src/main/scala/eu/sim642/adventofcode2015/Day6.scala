@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2015
 
+import Day6.Operation._
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits._
@@ -8,10 +9,9 @@ import scala.collection.mutable
 
 object Day6 {
 
-  sealed trait Operation
-  case object TurnOn extends Operation
-  case object TurnOff extends Operation
-  case object Toggle extends Operation
+  enum Operation {
+    case TurnOn, TurnOff, Toggle
+  }
 
   case class Instruction(operation: Operation, box: Box)
 
