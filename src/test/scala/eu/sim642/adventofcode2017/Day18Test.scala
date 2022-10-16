@@ -1,6 +1,8 @@
 package eu.sim642.adventofcode2017
 
 import Day18._
+import Day18.Value._
+import Day18.Instruction._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.collection.immutable.Queue

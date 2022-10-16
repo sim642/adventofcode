@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2020
 
+import Day19.Rule._
 import eu.sim642.adventofcodelib.grammar._
 
 import scala.collection.mutable
@@ -7,11 +8,12 @@ import scala.util.parsing.combinator.RegexParsers
 
 object Day19 {
 
-  sealed trait Rule
-  case class Literal(char: Char) extends Rule
-  case class Sub(i: Int) extends Rule
-  case class Concat(left: Rule, right: Rule) extends Rule
-  case class Choice(left: Rule, right: Rule) extends Rule
+  enum Rule {
+    case Literal(char: Char)
+    case Sub(i: Int)
+    case Concat(left: Rule, right: Rule)
+    case Choice(left: Rule, right: Rule)
+  }
 
   type Rules = Map[Int, Rule]
 

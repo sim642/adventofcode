@@ -1,14 +1,16 @@
 package eu.sim642.adventofcode2020
 
+import Day8.Instruction._
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 import eu.sim642.adventofcodelib.LazyListImplicits._
 
 object Day8 {
 
-  sealed trait Instruction
-  case class Acc(arg: Int) extends Instruction
-  case class Jmp(arg: Int) extends Instruction
-  case class Nop(arg: Int) extends Instruction
+  enum Instruction {
+    case Acc(arg: Int)
+    case Jmp(arg: Int)
+    case Nop(arg: Int)
+  }
 
   type Instructions = Vector[Instruction]
 

@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import Day23.SimulateSolution.Value._
+import Day23.SimulateSolution.Instruction._
 import scala.util.matching.Regex
 
 object Day23 {
@@ -17,18 +19,19 @@ object Day23 {
 
   object SimulateSolution extends Solution {
 
-    sealed trait Value
-    case class RegisterValue(register: Register) extends Value
-    case class ConstValue(const: Integer) extends Value
+    enum Value {
+      case RegisterValue(register: Register)
+      case ConstValue(const: Integer)
+    }
 
-    sealed trait Instruction
-    case class Set(x: Register, y: Value) extends Instruction
-    case class Sub(x: Register, y: Value) extends Instruction
-    case class Mul(x: Register, y: Value) extends Instruction
-    case class Jnz(x: Value, y: Value) extends Instruction
-
-    case class IsPrime(x: Register, y: Value) extends Instruction
-    case object Nop extends Instruction
+    enum Instruction {
+      case Set(x: Register, y: Value)
+      case Sub(x: Register, y: Value)
+      case Mul(x: Register, y: Value)
+      case Jnz(x: Value, y: Value)
+      case IsPrime(x: Register, y: Value)
+      case Nop
+    }
 
     type Instructions = Vector[Instruction]
     type Registers = Map[Register, Integer]

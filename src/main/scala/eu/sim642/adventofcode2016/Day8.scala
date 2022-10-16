@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2016
 
+import Day8.Operation._
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
@@ -7,10 +8,11 @@ import eu.sim642.adventofcodelib.box.Box
 
 object Day8 {
 
-  sealed trait Operation
-  case class Rect(a: Int, b: Int) extends Operation
-  case class RotateRow(y: Int, by: Int) extends Operation
-  case class RotateColumn(x: Int, by: Int) extends Operation
+  enum Operation {
+    case Rect(a: Int, b: Int)
+    case RotateRow(y: Int, by: Int)
+    case RotateColumn(x: Int, by: Int)
+  }
 
   def litPixels(operations: Seq[Operation]): Int = {
     // assumes no pixel is overdrawn

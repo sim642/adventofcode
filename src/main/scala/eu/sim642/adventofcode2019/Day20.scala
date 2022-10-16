@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2019
 
+import Day20.Tile._
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
 import eu.sim642.adventofcodelib.box.Box
@@ -8,10 +9,11 @@ import eu.sim642.adventofcodelib.pos.Pos
 
 object Day20 {
 
-  sealed trait Tile
-  case object Wall extends Tile
-  case object Open extends Tile
-  case class Portal(label: String) extends Tile
+  enum Tile {
+    case Wall
+    case Open
+    case Portal(label: String)
+  }
 
   private val startPortal = Portal("AA")
   private val targetPortal = Portal("ZZ")
@@ -141,7 +143,7 @@ object Day20 {
       if cell2.isLetter
 
       label = if (pos1 <= pos2) s"$cell1$cell2" else s"$cell2$cell1"
-    } yield pos -> Portal(label)).toMap
+    } yield pos -> (Portal(label): Portal)).toMap
 
     val grid = posPortal.foldLeft(wallGrid)({ case (grid, (pos, portal)) =>
       grid.updatedGrid(pos, portal)

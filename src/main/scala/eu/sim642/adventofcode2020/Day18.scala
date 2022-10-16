@@ -1,13 +1,15 @@
 package eu.sim642.adventofcode2020
 
+import Day18.Expr._
 import scala.util.parsing.combinator.RegexParsers
 
 object Day18 extends RegexParsers {
 
-  sealed trait Expr
-  case class Num(value: Int) extends Expr
-  case class Add(left: Expr, right: Expr) extends Expr
-  case class Mul(left: Expr, right: Expr) extends Expr
+  enum Expr {
+    case Num(value: Int)
+    case Add(left: Expr, right: Expr)
+    case Mul(left: Expr, right: Expr)
+  }
 
   def eval(expr: Expr): Long = expr match {
     case Num(value) => value

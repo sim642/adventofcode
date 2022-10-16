@@ -1,13 +1,15 @@
 package eu.sim642.adventofcode2021
 
+import Day2.Command._
 import eu.sim642.adventofcodelib.pos.Pos
 
 object Day2 {
 
-  sealed trait Command
-  case class Forward(amount: Int) extends Command
-  case class Down(amount: Int) extends Command
-  case class Up(amount: Int) extends Command
+  enum Command {
+    case Forward(amount: Int)
+    case Down(amount: Int)
+    case Up(amount: Int)
+  }
 
   sealed trait Part {
     type Submarine

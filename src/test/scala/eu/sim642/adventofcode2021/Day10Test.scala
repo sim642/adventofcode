@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2021
 
 import Day10._
+import Day10.ParseLineResult._
 import Day10Test._
 import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite

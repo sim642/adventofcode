@@ -1,18 +1,20 @@
 package eu.sim642.adventofcode2020
 
+import Day12.Move._
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcode2018.Day13.DirectionPos
 
 object Day12 {
 
-  sealed trait Move
-  case class North(amount: Int) extends Move
-  case class South(amount: Int) extends Move
-  case class East(amount: Int) extends Move
-  case class West(amount: Int) extends Move
-  case class Left(degrees: Int) extends Move
-  case class Right(degrees: Int) extends Move
-  case class Forward(amount: Int) extends Move
+  enum Move {
+    case North(amount: Int)
+    case South(amount: Int)
+    case East(amount: Int)
+    case West(amount: Int)
+    case Left(degrees: Int)
+    case Right(degrees: Int)
+    case Forward(amount: Int)
+  }
 
   case class Ship(pos: Pos, direction: Pos)
 

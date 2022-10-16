@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2019
 
+import Day17.Move._
 import intcode._
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.pos.Pos
@@ -22,15 +23,10 @@ object Day17 {
 
   def sumAlignmentParameters(program: Memory): Int = sumAlignmentParameters(parseInputGrid(program))
 
-  sealed trait Move
-  case object Left extends Move {
-    override def toString: String = "L"
-  }
-  case object Right extends Move {
-    override def toString: String = "R"
-  }
-  case class Forward(n: Int) extends Move {
-    override def toString: String = n.toString
+  enum Move(override val toString: String) {
+    case Left extends Move("L")
+    case Right extends Move("R")
+    case Forward(n: Int) extends Move(n.toString)
   }
 
   type Path = List[Move]

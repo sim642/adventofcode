@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2016
 
 import Day21._
+import Day21.Operation._
 import org.scalatest.funsuite.AnyFunSuite
 
 class Day21Test extends AnyFunSuite {

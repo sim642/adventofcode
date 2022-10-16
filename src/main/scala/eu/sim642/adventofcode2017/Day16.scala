@@ -1,15 +1,18 @@
 package eu.sim642.adventofcode2017
 
+import Day16.DanceMove._
 import eu.sim642.adventofcodelib.cycle.NaiverCycleFinder
 
 object Day16 {
 
   type Name = Char
 
-  sealed trait DanceMove
-  case class Spin(n: Int) extends DanceMove
-  case class Exchange(a: Int, b: Int) extends DanceMove
-  case class Partner(a: Name, b: Name) extends DanceMove
+  enum DanceMove {
+    case Spin(n: Int)
+    case Exchange(a: Int, b: Int)
+    case Partner(a: Name, b: Name)
+  }
+
 
   private val spinRegex = """s(\d+)""".r
   private val exchangeRegex = """x(\d+)/(\d+)""".r

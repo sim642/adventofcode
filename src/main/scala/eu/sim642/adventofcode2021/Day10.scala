@@ -1,14 +1,17 @@
 package eu.sim642.adventofcode2021
 
+import Day10.ParseLineResult._
+
 import scala.annotation.tailrec
 import scala.util.parsing.combinator.RegexParsers
 
 object Day10 extends RegexParsers {
 
-  sealed trait ParseLineResult[+A]
-  case object Legal extends ParseLineResult[Nothing]
-  case class Incomplete[+A](expected: A) extends ParseLineResult[A]
-  case class Corrupted(actual: Char) extends ParseLineResult[Nothing]
+  enum ParseLineResult[+A] {
+    case Legal extends ParseLineResult[Nothing]
+    case Incomplete(expected: A)
+    case Corrupted(actual: Char) extends ParseLineResult[Nothing]
+  }
 
   private val oppositeChar = Map(
     '(' -> ')',

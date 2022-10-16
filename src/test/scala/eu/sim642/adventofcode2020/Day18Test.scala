@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2020
 
 import Day18._
+import Day18.Expr._
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 

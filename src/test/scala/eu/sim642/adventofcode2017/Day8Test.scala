@@ -1,6 +1,8 @@
 package eu.sim642.adventofcode2017
 
 import Day8._
+import Day8.Comparison._
+import Day8.Operation._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
 

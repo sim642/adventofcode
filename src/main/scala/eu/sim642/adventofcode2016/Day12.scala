@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2016
 
+import Day12.Value._
+import Day12.Instruction._
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day12 {
@@ -8,15 +10,17 @@ object Day12 {
   type Register = Char
   type Integer = Int
 
-  sealed trait Value
-  case class ConstValue(const: Integer) extends Value
-  case class RegisterValue(register: Register) extends Value
+  enum Value {
+    case ConstValue(const: Integer)
+    case RegisterValue(register: Register)
+  }
 
-  sealed trait Instruction
-  case class Cpy(x: Value, y: Register) extends Instruction
-  case class Inc(x: Register) extends Instruction
-  case class Dec(x: Register) extends Instruction
-  case class Jnz(x: Value, y: Value) extends Instruction
+  enum Instruction {
+    case Cpy(x: Value, y: Register)
+    case Inc(x: Register)
+    case Dec(x: Register)
+    case Jnz(x: Value, y: Value)
+  }
 
   type Instructions = Vector[Instruction]
   type Registers = Map[Register, Integer]

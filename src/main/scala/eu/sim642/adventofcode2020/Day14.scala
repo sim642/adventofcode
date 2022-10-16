@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2020
 
+import Day14.Instruction._
 import eu.sim642.adventofcodelib.StringImplicits._
 import eu.sim642.adventofcodelib.LazyListImplicits._
 
@@ -8,9 +9,10 @@ object Day14 {
   type Address = Long
   type Integer = Long
 
-  sealed trait Instruction
-  case class Mask(mask: String) extends Instruction
-  case class Mem(address: Address, value: Integer) extends Instruction
+  enum Instruction {
+    case Mask(mask: String)
+    case Mem(address: Address, value: Integer)
+  }
 
   type Instructions = List[Instruction]
 

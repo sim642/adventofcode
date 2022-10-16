@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2019
 
+import Day22.Technique._
 import eu.sim642.adventofcodelib.NumberTheory
 import eu.sim642.adventofcodelib.SeqImplicits._
 import eu.sim642.adventofcodelib.IntegralImplicits._
@@ -7,10 +8,11 @@ import Integral.Implicits._
 
 object Day22 {
 
-  sealed trait Technique
-  case object DealIntoNewStack extends Technique
-  case class Cut(n: Int) extends Technique
-  case class DealWithIncrement(n: Int) extends Technique
+  enum Technique {
+    case DealIntoNewStack
+    case Cut(n: Int)
+    case DealWithIncrement(n: Int)
+  }
 
   type Techniques = Seq[Technique]
 

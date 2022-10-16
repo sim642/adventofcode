@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2018
 
+import Day20.RegexNode._
 import scala.util.parsing.combinator._
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, GraphTraversal, UnitNeighbors}
@@ -8,10 +9,11 @@ import scala.collection.mutable
 
 object Day20 extends RegexParsers {
 
-  sealed trait RegexNode
-  case class StringNode(s: String) extends RegexNode
-  case class ChoiceNode(choices: Seq[RegexNode]) extends RegexNode
-  case class ConcatNode(concats: Seq[RegexNode]) extends RegexNode
+  enum RegexNode {
+    case StringNode(s: String)
+    case ChoiceNode(choices: Seq[RegexNode])
+    case ConcatNode(concats: Seq[RegexNode])
+  }
 
   def allStrings(regexNode: RegexNode): Iterator[String] = regexNode match {
     case StringNode(s) => Iterator(s)

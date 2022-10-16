@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2016
 
+import Day10.Instruction._
 import scala.collection.mutable
 
 object Day10 {
@@ -10,9 +11,10 @@ object Day10 {
   case class Bot(i: Int) extends Target
   case class Output(i: Int) extends Target
 
-  sealed trait Instruction
-  case class ValueInstruction(bot: Bot, value: Int) extends Instruction
-  case class CompareInstruction(bot: Bot, lowTarget: Target, highTarget: Target) extends Instruction
+  enum Instruction {
+    case ValueInstruction(bot: Bot, value: Int)
+    case CompareInstruction(bot: Bot, lowTarget: Target, highTarget: Target)
+  }
 
   private def execute(instructions: Seq[Instruction]) = {
     // TODO: fix all imperativeness

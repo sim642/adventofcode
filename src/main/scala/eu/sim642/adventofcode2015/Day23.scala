@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2015
 
+import Day23.Instruction._
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day23 {
@@ -9,13 +10,14 @@ object Day23 {
   type Integer = Int
   type Offset = Int
 
-  sealed trait Instruction
-  case class Hlf(r: Register) extends Instruction
-  case class Tpl(r: Register) extends Instruction
-  case class Inc(r: Register) extends Instruction
-  case class Jmp(offset: Offset) extends Instruction
-  case class Jie(r: Register, offset: Offset) extends Instruction
-  case class Jio(r: Register, offset: Offset) extends Instruction
+  enum Instruction {
+    case Hlf(r: Register)
+    case Tpl(r: Register)
+    case Inc(r: Register)
+    case Jmp(offset: Offset)
+    case Jie(r: Register, offset: Offset)
+    case Jio(r: Register, offset: Offset)
+  }
 
   type Instructions = Vector[Instruction]
   type Registers = Map[Register, Integer]

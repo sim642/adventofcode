@@ -1,13 +1,15 @@
 package eu.sim642.adventofcode2018
 
+import Day4.Event._
 import eu.sim642.adventofcodelib.IterableImplicits._
 
 object Day4 {
 
-  sealed trait Event
-  case class BeginShift(guard: Int) extends Event
-  case object FallAsleep extends Event
-  case object WakeUp extends Event
+  enum Event {
+    case BeginShift(guard: Int)
+    case FallAsleep
+    case WakeUp
+  }
 
   private val minuteRegex = """\d{4}-\d{2}-\d{2} \d{2}:(\d{2})""".r
 

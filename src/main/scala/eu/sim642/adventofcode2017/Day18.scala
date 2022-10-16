@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2017
 
+import Day18.Value._
+import Day18.Instruction._
 import scala.collection.immutable.Queue
 
 object Day18 {
@@ -7,18 +9,20 @@ object Day18 {
   type Register = Char
   type Integer = Long
 
-  sealed trait Value
-  case class RegisterValue(register: Register) extends Value
-  case class ConstValue(const: Integer) extends Value
+  enum Value {
+    case RegisterValue(register: Register)
+    case ConstValue(const: Integer)
+  }
 
-  sealed trait Instruction
-  case class Snd(x: Value) extends Instruction
-  case class Set(x: Register, y: Value) extends Instruction
-  case class Add(x: Register, y: Value) extends Instruction
-  case class Mul(x: Register, y: Value) extends Instruction
-  case class Mod(x: Register, y: Value) extends Instruction
-  case class Rcv(x: Register) extends Instruction
-  case class Jgz(x: Value, y: Value) extends Instruction
+  enum Instruction {
+    case Snd(x: Value)
+    case Set(x: Register, y: Value)
+    case Add(x: Register, y: Value)
+    case Mul(x: Register, y: Value)
+    case Mod(x: Register, y: Value)
+    case Rcv(x: Register)
+    case Jgz(x: Value, y: Value)
+  }
 
   type Instructions = Vector[Instruction]
   type Registers = Map[Register, Integer]

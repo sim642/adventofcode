@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2017
 
+import Day8.Operation._
 import Day8.Comparison._
 import eu.sim642.adventofcodelib.IteratorImplicits._
 
@@ -7,9 +8,10 @@ object Day8 {
 
   type Register = String
 
-  sealed trait Operation
-  case class Inc(amount: Int) extends Operation
-  case class Dec(amount: Int) extends Operation
+  enum Operation {
+    case Inc(amount: Int)
+    case Dec(amount: Int)
+  }
 
   enum Comparison {
     case Eq, NotEq, Less, LessEq, Greater, GreaterEq

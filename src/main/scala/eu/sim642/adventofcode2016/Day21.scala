@@ -1,16 +1,18 @@
 package eu.sim642.adventofcode2016
 
+import Day21.Operation._
 import eu.sim642.adventofcodelib.SeqImplicits._
 
 object Day21 {
 
-  sealed trait Operation
-  case class SwapPosition(x: Int, y: Int) extends Operation
-  case class SwapLetter(x: Char, y: Char) extends Operation
-  case class RotateSteps(x: Int) extends Operation
-  case class RotateLetter(x: Char) extends Operation
-  case class Reverse(x: Int, y: Int) extends Operation
-  case class Move(x: Int, y: Int) extends Operation
+  enum Operation {
+    case SwapPosition(x: Int, y: Int)
+    case SwapLetter(x: Char, y: Char)
+    case RotateSteps(x: Int)
+    case RotateLetter(x: Char)
+    case Reverse(x: Int, y: Int)
+    case Move(x: Int, y: Int)
+  }
 
   def applyOperation(s: String, operation: Operation): String = operation match {
     case SwapPosition(x, y) =>
