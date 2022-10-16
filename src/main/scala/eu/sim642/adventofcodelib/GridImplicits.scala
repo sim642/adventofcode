@@ -33,7 +33,7 @@ object GridImplicits {
 
     def mapGrid[B](f: A => B): Grid[B] = grid.map(_.map(f))
 
-    def flattenGrid[B](implicit asGrid: A => Grid[B]): Grid[B] =
+    def flattenGrid[B](using asGrid: A => Grid[B]): Grid[B] =
       grid.mapGrid(asGrid).flatMap(_.transpose.map(_.flatten))
 
     def groupedGrid(groupSize: Int): Grid[Grid[A]] =
@@ -50,7 +50,7 @@ object GridImplicits {
     def correspondsGrid[B](otherGrid: Grid[B])(p: (A, B) => Boolean): Boolean =
       grid.corresponds(otherGrid)(_.corresponds(_)(p))
 
-    def sumGrid(implicit num: Numeric[A]): A =
+    def sumGrid(using Numeric[A]): A =
       grid.iterator.map(_.sum).sum
 
     def sizeGrid: Int = grid.size * grid(0).size // assumes rectangular grid!

@@ -14,7 +14,7 @@ object NaiveTSP {
   }
 
   // moved & modified from 2016 Day 24 via 2015 Day 9
-  def pathLength[A](distanceMatrix: DistanceMatrix[A])(implicit lengthOrdering: Ordering[Int]): Int = {
+  def pathLength[A](distanceMatrix: DistanceMatrix[A])(using lengthOrdering: Ordering[Int]): Int = {
     distanceMatrix.keySet.toVector
       .permutations
       .map({ path =>
@@ -23,7 +23,7 @@ object NaiveTSP {
   }
 
   // moved from 2016 Day 24
-  def startPathLength[A](distanceMatrix: DistanceMatrix[A], start: A)(implicit lengthOrdering: Ordering[Int]): Int = {
+  def startPathLength[A](distanceMatrix: DistanceMatrix[A], start: A)(using lengthOrdering: Ordering[Int]): Int = {
     (distanceMatrix.keySet - start).toVector
       .permutations
       .map({ path =>
@@ -33,7 +33,7 @@ object NaiveTSP {
   }
 
   // moved from 2016 Day 24
-  def cycleLength[A](distanceMatrix: DistanceMatrix[A], start: A)(implicit lengthOrdering: Ordering[Int]): Int = {
+  def cycleLength[A](distanceMatrix: DistanceMatrix[A], start: A)(using lengthOrdering: Ordering[Int]): Int = {
     (distanceMatrix.keySet - start).toVector
       .permutations
       .map({ path =>
@@ -43,7 +43,7 @@ object NaiveTSP {
       }).min(lengthOrdering)
   }
 
-  def cycleLength[A](distanceMatrix: DistanceMatrix[A])(implicit lengthOrdering: Ordering[Int]): Int = {
-    cycleLength(distanceMatrix, distanceMatrix.keys.head)(lengthOrdering)
+  def cycleLength[A](distanceMatrix: DistanceMatrix[A])(using lengthOrdering: Ordering[Int]): Int = {
+    cycleLength(distanceMatrix, distanceMatrix.keys.head)(using lengthOrdering)
   }
 }

@@ -11,7 +11,7 @@ object IntegralImplicits {
     def /!(d: A): Option[A] = if (n % d == 0) Some(n / d) else None // /% returns both at once but calculates still separately...
   }
 
-  implicit class ModPowIntegralOps[A](a: A)(implicit aIntegral: Integral[A]) {
+  implicit class ModPowIntegralOps[A](a: A)(using aIntegral: Integral[A]) {
     def modPow(n: A, m: A): A = {
       // vals for reused constants instead of using Integral defs
       val zero = aIntegral.zero

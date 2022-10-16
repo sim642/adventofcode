@@ -6,7 +6,7 @@ import eu.sim642.adventofcodelib.IntegralImplicits._
 
 object NumberTheory {
 
-  def extendedGcd[A](a: A, b: A)(implicit aIntegral: Integral[A]): ((A, A), A, (A, A)) = {
+  def extendedGcd[A](a: A, b: A)(using aIntegral: Integral[A]): ((A, A), A, (A, A)) = {
 
     @tailrec
     def helper(s: A, oldS: A, t: A, oldT: A, r: A, oldR: A): ((A, A), A, (A, A)) = {
@@ -69,7 +69,7 @@ object NumberTheory {
     (x, N)
   }
 
-  def sieveCrt[A](ans: Seq[(A, A)])(implicit aIntegral: Integral[A]): (A, A) = {
+  def sieveCrt[A](ans: Seq[(A, A)])(using aIntegral: Integral[A]): (A, A) = {
     ans.sortBy(_._2)(aIntegral.reverse)
       .reduceLeft(sieveCrt2(_, _))
   }

@@ -8,7 +8,7 @@ object MapImplicits {
   extension [Repr](coll: Repr)(using map: IsMap[Repr]) {
     // TODO: is BuildFrom even necessary?
     // TODO: generalize that Map
-    def intersect[That](thatColl: Repr)(f: (map.V, map.V) => map.V)(implicit bf: BuildFrom[Repr, (map.K, map.V), That]): That = {
+    def intersect[That](thatColl: Repr)(f: (map.V, map.V) => map.V)(using bf: BuildFrom[Repr, (map.K, map.V), That]): That = {
       val thisOps = map(coll)
       val thatOps = map(thatColl)
       bf.fromSpecific(coll)(

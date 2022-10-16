@@ -8,14 +8,14 @@ import scala.collection.generic.IsSeq
 object SeqImplicits {
 
   extension [Repr](coll: Repr)(using seq: IsSeq[Repr]) {
-    def rotateLeft[That](n: Int)(implicit bf: BuildFrom[Repr, seq.A, That]): That = {
+    def rotateLeft[That](n: Int)(using bf: BuildFrom[Repr, seq.A, That]): That = {
       val seqOps = seq(coll)
       val realN = n %+ seqOps.length
       val (init, tail) = seqOps.view.splitAt(realN)
       bf.fromSpecific(coll)(tail ++ init)
     }
 
-    def rotateRight[That](n: Int)(implicit bf: BuildFrom[Repr, seq.A, That]): That =
+    def rotateRight[That](n: Int)(using BuildFrom[Repr, seq.A, That]): That =
       rotateLeft(-n)
   }
 

@@ -29,13 +29,13 @@ object Day15 {
 
   implicit val combatUnitReadingOrdering: Ordering[CombatUnit] = Ordering.by(_.pos)
 
-  def getTargets(unit: CombatUnit)(implicit units: List[CombatUnit]): Set[CombatUnit] = units.filter(_.unitType == unit.unitType.target).toSet
+  def getTargets(unit: CombatUnit)(using units: List[CombatUnit]): Set[CombatUnit] = units.filter(_.unitType == unit.unitType.target).toSet
 
-  def isFree(pos: Pos)(implicit grid: Grid[Char], units: List[CombatUnit]): Boolean = {
+  def isFree(pos: Pos)(using grid: Grid[Char], units: List[CombatUnit]): Boolean = {
     grid(pos) == '.' && !units.exists(_.pos == pos)
   }
 
-  def getInRange(targets: Set[CombatUnit])(implicit grid: Grid[Char], units: List[CombatUnit]): Set[Pos] = {
+  def getInRange(targets: Set[CombatUnit])(using Grid[Char], List[CombatUnit]): Set[Pos] = {
     for {
       target <- targets
       offset <- Pos.axisOffsets
@@ -44,7 +44,7 @@ object Day15 {
     } yield pos
   }
 
-  def bfs(startPos: Pos, endPos: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): collection.Map[Pos, Int] = {
+  def bfs(startPos: Pos, endPos: Set[Pos])(using Grid[Char], List[CombatUnit]): collection.Map[Pos, Int] = {
 
     val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = startPos
@@ -63,11 +63,11 @@ object Day15 {
     SimultaneousBFS.search(graphSearch).distances
   }
 
-  def bfsEndDistances(startPos: Pos, endPos: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
+  def bfsEndDistances(startPos: Pos, endPos: Set[Pos])(using Grid[Char], List[CombatUnit]): Map[Pos, Int] = {
     bfs(startPos, endPos).view.filterKeys(endPos).toMap
   }
 
-  def getReachable(unit: CombatUnit, inRange: Set[Pos])(implicit grid: Grid[Char], units: List[CombatUnit]): Map[Pos, Int] = {
+  def getReachable(unit: CombatUnit, inRange: Set[Pos])(using Grid[Char], List[CombatUnit]): Map[Pos, Int] = {
     bfsEndDistances(unit.pos, inRange)
   }
 
@@ -78,7 +78,7 @@ object Day15 {
 
   def getChosen(nearest: Set[Pos]): Pos = nearest.min
 
-  def getStep(chosen: Pos, unit: CombatUnit)(implicit grid: Grid[Char], units: List[CombatUnit]): Pos = {
+  def getStep(chosen: Pos, unit: CombatUnit)(using Grid[Char], List[CombatUnit]): Pos = {
     val unitNeighbors = Pos.axisOffsets.map(unit.pos + _).toSet
     val neighborDists = bfsEndDistances(chosen, unitNeighbors)
     val minDist = neighborDists.values.min

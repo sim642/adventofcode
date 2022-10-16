@@ -16,7 +16,7 @@ object OrderedSearch {
     * @see [[https://en.wikipedia.org/wiki/Binary_search_algorithm#Procedure_for_finding_the_leftmost_element]]
     * @see [[https://en.cppreference.com/w/cpp/algorithm/lower_bound]]
     */
-  def binaryLower[A, B](f: A => B, min: A, max: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): A = {
+  def binaryLower[A, B](f: A => B, min: A, max: A)(x: B)(using aIntegral: Integral[A], bOrdering: Ordering[B]): A = {
     val aOne = aIntegral.one
     val aTwo = aIntegral.fromInt(2)
 
@@ -46,7 +46,7 @@ object OrderedSearch {
     * @see [[https://en.wikipedia.org/wiki/Binary_search_algorithm#Procedure_for_finding_the_rightmost_element]]
     * @see [[https://en.cppreference.com/w/cpp/algorithm/upper_bound]] (offset by 1)
     */
-  def binaryUpper[A, B](f: A => B, min: A, max: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): A = {
+  def binaryUpper[A, B](f: A => B, min: A, max: A)(x: B)(using aIntegral: Integral[A], bOrdering: Ordering[B]): A = {
     val aOne = aIntegral.one
     val aTwo = aIntegral.fromInt(2)
 
@@ -75,7 +75,7 @@ object OrderedSearch {
     * @see [[binaryLower]]
     * @see [[https://en.wikipedia.org/wiki/Exponential_search]]
     */
-  def exponentialLower[A, B](f: A => B, min: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): (A, A) = {
+  def exponentialLower[A, B](f: A => B, min: A)(x: B)(using aIntegral: Integral[A], bOrdering: Ordering[B]): (A, A) = {
     val aZero = aIntegral.zero
     val aOne = aIntegral.one
     val aTwo = aIntegral.fromInt(2)
@@ -104,7 +104,7 @@ object OrderedSearch {
     * @see [[binaryUpper]]
     * @see [[https://en.wikipedia.org/wiki/Exponential_search]]
     */
-  def exponentialUpper[A, B](f: A => B, min: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): (A, A) = {
+  def exponentialUpper[A, B](f: A => B, min: A)(x: B)(using aIntegral: Integral[A], bOrdering: Ordering[B]): (A, A) = {
     val aZero = aIntegral.zero
     val aOne = aIntegral.one
     val aTwo = aIntegral.fromInt(2)
@@ -130,7 +130,7 @@ object OrderedSearch {
     * @see [[exponentialLower]]
     * @see [[binaryLower]]
     */
-  def exponentialBinaryLower[A, B](f: A => B, min: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): A = {
+  def exponentialBinaryLower[A, B](f: A => B, min: A)(x: B)(using Integral[A], Ordering[B]): A = {
     val (min2, max) = exponentialLower(f, min)(x)
     binaryLower(f, min2, max)(x)
   }
@@ -144,7 +144,7 @@ object OrderedSearch {
     * @see [[exponentialUpper]]
     * @see [[binaryUpper]]
     */
-  def exponentialBinaryUpper[A, B](f: A => B, min: A)(x: B)(implicit aIntegral: Integral[A], bOrdering: Ordering[B]): A = {
+  def exponentialBinaryUpper[A, B](f: A => B, min: A)(x: B)(using Integral[A], Ordering[B]): A = {
     val (min2, max) = exponentialUpper(f, min)(x)
     binaryUpper(f, min2, max)(x)
   }
