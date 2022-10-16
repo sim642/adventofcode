@@ -4,7 +4,7 @@ object Day15 {
 
   implicit class RepeatCombinationsSeqOps[A](s: Seq[A]) {
     def repeatCombinations(total: Int): Iterator[Seq[(A, Int)]] = {
-      val hd +: tl = s
+      val hd +: tl = s: @unchecked
       if (tl.isEmpty)
         Iterator.single(Seq((hd, total)))
       else {

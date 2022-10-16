@@ -9,7 +9,7 @@ object Day6 {
   def input2state(input: Seq[Int]): State = Vector.tabulate(9)(i => input.count(_ == i)) // largest value is 8
 
   def stepState(state: State): State = {
-    val zeroCount +: stateNonZero = state
+    val zeroCount +: stateNonZero = state: @unchecked
     stateNonZero.updated(6, stateNonZero(6) + zeroCount) :+ zeroCount
   }
 

@@ -22,7 +22,7 @@ object Day9 {
       if (rangeSum == sum && range.lengthIs > 1)
         range
       else if (rangeSum < sum) {
-        val x :: newSuffix = suffix
+        val x :: newSuffix = suffix: @unchecked
         helper(range.enqueue(x), rangeSum + x, newSuffix)
       }
       else {

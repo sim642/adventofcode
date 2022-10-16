@@ -81,7 +81,7 @@ object Day4 {
   def parseBoard(s: String): Grid[Int] = s.linesIterator.map(_.trim.split(" +").toVector.map(_.toInt)).toVector // trim because split keeps initial empty
 
   def parseInput(input: String): Input = {
-    val numbersStr +: boardStrs = input.split("\n\n").toSeq
+    val numbersStr +: boardStrs = input.split("\n\n").toSeq: @unchecked
     val numbers = numbersStr.split(",").toSeq.map(_.toInt)
     val boards = boardStrs.map(parseBoard)
     Input(numbers, boards)

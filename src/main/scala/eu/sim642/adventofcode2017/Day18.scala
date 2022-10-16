@@ -95,7 +95,7 @@ object Day18 {
   object Part1 extends Part {
     override protected def execRcvSmallStep(state: AsmState): AsmState = {
       val AsmState(instructions, pc, registers, snds, rcvs) = state
-      val Rcv(x) = state.instruction
+      val Rcv(x) = state.instruction: @unchecked
 
       if (registers(x) != 0)
         state.copy(registers = registers + (x -> snds.last), pc = pc + 1)
@@ -114,7 +114,7 @@ object Day18 {
   object Part2 extends Part {
     override protected def execRcvSmallStep(state: AsmState): AsmState = {
       val AsmState(instructions, pc, registers, snds, rcvs) = state
-      val Rcv(x) = state.instruction
+      val Rcv(x) = state.instruction: @unchecked
 
       rcvs.dequeueOption match {
         case Some((rcv, newRcvs)) =>

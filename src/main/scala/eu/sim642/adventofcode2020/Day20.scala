@@ -167,7 +167,7 @@ object Day20 {
   private val tileIdRegex = """Tile (\d+):""".r
 
   def parseTile(s: String): Tile = {
-    val tileIdLine +: gridLines = s.linesIterator.toVector
+    val tileIdLine +: gridLines = s.linesIterator.toVector: @unchecked
     val grid = gridLines.map(_.toVector).mapGrid(_ == '#')
     tileIdLine match {
       case tileIdRegex(id) => Tile(id.toInt, grid)

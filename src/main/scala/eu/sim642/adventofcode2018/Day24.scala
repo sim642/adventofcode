@@ -160,7 +160,7 @@ object Day24 {
   }
 
   def parseInput(input: String): Seq[Group] = {
-    val Seq("Immune System:" +: immuneLines, "Infection:" +: infectionLines) = input.split("""\n\n""").map(_.linesIterator.toList).toList
+    val Seq("Immune System:" +: immuneLines, "Infection:" +: infectionLines) = input.split("""\n\n""").map(_.linesIterator.toList).toList: @unchecked
 
     immuneLines.zipWithIndex.map({ case (line, i) => parseGroup(line, i + 1, ImmuneSystem) }) ++
       infectionLines.zipWithIndex.map({case (line, i) => parseGroup(line, i + 1, Infection) })

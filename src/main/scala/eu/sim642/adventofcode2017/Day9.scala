@@ -29,7 +29,7 @@ object Day9 {
           case '}' => (depth - 1, score)
           case ',' => (depth, score)
         }
-    }
+    }: @unchecked
     score
   }
 

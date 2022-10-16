@@ -30,7 +30,7 @@ object Day16 {
   object RecursiveDescentSolution extends Solution {
 
     def parseLiteralValue(bits: Bits): (Bits, Bits) = {
-      val (prefixBit :: groupBits, bits2) = bits.splitAt(5)
+      val (prefixBit :: groupBits, bits2) = bits.splitAt(5): @unchecked
       if (prefixBit) {
         val (tailBits, bits3) = parseLiteralValue(bits2)
         (groupBits ++ tailBits, bits3)
@@ -68,7 +68,7 @@ object Day16 {
           val value = bits2int(valueBits)
           (Literal(version, value), bits4)
         case _ =>
-          val lengthTypeBit :: bits4 = bits3
+          val lengthTypeBit :: bits4 = bits3: @unchecked
           if (lengthTypeBit) {
             val (numberBits, bits5) = bits4.splitAt(11)
             val number = bits2int(numberBits).toInt

@@ -63,7 +63,7 @@ object Day12 {
   }
 
   def parseInput(input: String): (String, Map[String, Char]) = {
-    val initialLine +: _ +: noteLines = input.linesIterator.toSeq
+    val initialLine +: _ +: noteLines = input.linesIterator.toSeq: @unchecked
     initialLine match {
       case initialStateRegex(initial) =>
         (initial, noteLines.map(parseNote).toMap.withDefaultValue('.')) // default value for example, where missing

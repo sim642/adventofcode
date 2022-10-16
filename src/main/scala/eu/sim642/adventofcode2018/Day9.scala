@@ -41,7 +41,7 @@ object Day9 {
     def removed: (A, CircularZipper[A]) = tail match {
       case hd :: tl => (current, CircularZipper(init, hd, tl))
       case Nil =>
-        val hd :: it = init
+        val hd :: it = init: @unchecked
         (current, CircularZipper(it, hd, tail)) // TODO: fix new current coming from different size?
     }
     /*def removed: (A, CircularZipper[A]) = {

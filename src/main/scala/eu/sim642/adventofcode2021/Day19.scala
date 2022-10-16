@@ -89,7 +89,7 @@ object Day19 {
       }
     }
 
-    val scanner0 +: scannersTail = scanners
+    val scanner0 +: scannersTail = scanners: @unchecked
     helper(scannersTail, Set.empty, scanner0, Set(Pos3.zero)) // start with scanner 0 fixed
   }
 
