@@ -4,7 +4,7 @@ object Day7 {
 
   case class Program(name: String, weight: Int, children: Seq[String])
 
-  private val programRegex = """(\w+) \((\d+)\)(?: -> (\w+(?:, \w+)*))?""".r("name", "weight", "children") // IDEA doesn't seem to support raw string interpolator
+  private val programRegex = """(?<name>\w+) \((?<weight>\d+)\)(?: -> (?<children>\w+(?:, \w+)*))?""".r
 
   def parseProgram(programStr: String): Program = programStr match {
     case programRegex(name, weight, childrenStr) =>
