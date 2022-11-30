@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2021
 
 import eu.sim642.adventofcode2021.Day23.Amphipod.*
 import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, GraphTraversal, TargetNode, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{AStar, BFS, Dijkstra, GraphSearch, GraphTraversal, Heuristic, TargetNode, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits.*
 
@@ -70,7 +70,7 @@ object Day23 {
 
     protected def minimumOrganizeEnergy(initialState: State): Int = {
 
-      val graphSearch = new GraphSearch[State] with TargetNode[State] {
+      val graphSearch = new GraphSearch[State] with TargetNode[State] with Heuristic[State] {
         override val startNode: State = initialState
 
         override def neighbors(state: State): IterableOnce[(State, Int)] = {
@@ -113,9 +113,24 @@ object Day23 {
         }
 
         override val targetNode: State = grid2state(templateGrid)
+
+        override def heuristic(state: State): Int = {
+          (for {
+            (pos, amphipod) <- state.iterator
+            target = amphipod2rooms(amphipod).head
+            steps =
+              if (hallways.contains(pos))
+                (pos.x - target.x).abs + 1
+              else if (room2amphipod(pos) == amphipod)
+                0
+              else
+                (pos.y - hallways.head.y).abs + (pos.x - target.x).abs + 1
+          } yield amphipod.energy * steps).sum
+        }
       }
 
-      Dijkstra.search(graphSearch).target.get._2
+      //Dijkstra.search(graphSearch).target.get._2
+      AStar.search(graphSearch).target.get._2
     }
 
     protected def grid2state(grid: Grid[Char]): State = {
