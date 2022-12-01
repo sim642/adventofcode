@@ -6,6 +6,8 @@ object Day1 {
 
   def maxElfTotal(elves: Seq[Elf]): Int = elves.map(_.sum).max
 
+  def top3ElvesTotal(elves: Seq[Elf]): Int = elves.map(_.sum).sorted(using Ordering.Int.reverse).take(3).sum
+
   def parseElf(s: String): Elf = s.linesIterator.map(_.toInt).toSeq
 
   def parseElves(input: String): Seq[Elf] = input.split("\n\n").toSeq.map(parseElf)
@@ -14,5 +16,6 @@ object Day1 {
 
   def main(args: Array[String]): Unit = {
     println(maxElfTotal(parseElves(input)))
+    println(top3ElvesTotal(parseElves(input)))
   }
 }

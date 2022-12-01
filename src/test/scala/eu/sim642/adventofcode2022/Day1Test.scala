@@ -38,4 +38,12 @@ class Day1Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(maxElfTotal(parseElves(input)) == 72017)
   }
+
+  test("Part 2 examples") {
+    assert(top3ElvesTotal(parseElves(exampleInput)) == 45000)
+  }
+
+  test("Part 2 input answer") {
+    assert(top3ElvesTotal(parseElves(input)) == 212520)
+  }
 }
