@@ -11,10 +11,18 @@ class Day2Test extends AnyFunSuite {
       |C Z""".stripMargin
 
   test("Part 1 examples") {
-    assert(strategyScore(parseStrategy(exampleInput)) == 15)
+    assert(Part1.strategyScore(parseStrategy(exampleInput)) == 15)
   }
 
   test("Part 1 input answer") {
-    assert(strategyScore(parseStrategy(input)) == 12458)
+    assert(Part1.strategyScore(parseStrategy(input)) == 12458)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.strategyScore(parseStrategy(exampleInput)) == 12)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.strategyScore(parseStrategy(input)) == 12683)
   }
 }
