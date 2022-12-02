@@ -1,13 +1,29 @@
 package eu.sim642.adventofcode2022
 
-import Day2.Hand._
-
 object Day2 {
 
-  enum Hand(val score: Int) {
-    case Rock extends Hand(1)
-    case Paper extends Hand(2)
-    case Scissors extends Hand(3)
+  sealed trait Hand {
+    val wins: Hand
+    val loses: Hand
+    val score: Int
+  }
+
+  object Rock extends Hand {
+    override val wins: Hand = Scissors
+    override val loses: Hand = Paper
+    override val score: Int = 1
+  }
+
+  object Paper extends Hand {
+    override val wins: Hand = Rock
+    override val loses: Hand = Scissors
+    override val score: Int = 2
+  }
+
+  object Scissors extends Hand {
+    override val wins: Hand = Paper
+    override val loses: Hand = Rock
+    override val score: Int = 3
   }
 
   type MyChar = 'X' | 'Y' | 'Z'
@@ -18,10 +34,15 @@ object Day2 {
 
     def roundScore(other: Hand, myChar: MyChar): Int = {
       val my = myHand(other, myChar)
-      val outcomeScore = (other, my) match {
-        case (Rock, Rock) | (Paper, Paper) | (Scissors, Scissors) => 3 // tie
-        case (Rock, Paper) | (Paper, Scissors) | (Scissors, Rock) => 6 // my win
-        case (Paper, Rock) | (Scissors, Paper) | (Rock, Scissors) => 0 // my loss
+      val outcomeScore = {
+        if (other == my) // draw
+          3
+        else if (other == my.wins) // my win
+          6
+        else if (other == my.loses) // my loss
+          0
+        else
+          throw new IllegalStateException("impossible hand combination")
       }
       outcomeScore + my.score
     }
@@ -41,14 +62,10 @@ object Day2 {
 
   object Part2 extends Part {
     override def myHand(other: Hand, myChar: MyChar): Hand = {
-      (other, myChar) match {
-        case (Rock, 'X') => Scissors // my loss
-        case (Paper, 'X') => Rock // my loss
-        case (Scissors, 'X') => Paper // my loss
-        case (other, 'Y') => other // tie
-        case (Rock, 'Z') => Paper // my win
-        case (Paper, 'Z') => Scissors // my win
-        case (Scissors, 'Z') => Rock // my win
+      myChar match {
+        case 'X' => other.wins // my loss
+        case 'Y' => other // draw
+        case 'Z' => other.loses // my win
       }
     }
   }
@@ -60,10 +77,8 @@ object Day2 {
       case 'B' => Paper
       case 'C' => Scissors
     }
-    val my: MyChar = myStr.charAt(0) match { // TODO: simplify
-      case 'X' => 'X'
-      case 'Y' => 'Y'
-      case 'Z' => 'Z'
+    val my: MyChar = myStr.charAt(0) match {
+      case myChar@('X' | 'Y' | 'Z') => myChar
     }
     (other, my)
   }
