@@ -20,4 +20,12 @@ class Day3Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(commonItemPrioritySum(parseRucksacks(input)) == 7742)
   }
+
+  test("Part 2 examples") {
+    assert(groupBadgePrioritySum(parseRucksacks(exampleInput)) == 70)
+  }
+
+  test("Part 2 input answer") {
+    assert(groupBadgePrioritySum(parseRucksacks(input)) == 2276)
+  }
 }

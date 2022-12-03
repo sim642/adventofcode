@@ -3,7 +3,10 @@ package eu.sim642.adventofcode2022
 object Day3 {
 
   type Item = Char
-  type Rucksack = (Set[Item], Set[Item])
+
+  case class Rucksack(_1: Set[Item], _2: Set[Item]) {
+    def all: Set[Item] = _1 ++ _2
+  }
 
   def itemPriority(item: Item): Int = {
     if (('a' to 'z').contains(item))
@@ -21,9 +24,17 @@ object Day3 {
       .sum
   }
 
+  def groupBadgePrioritySum(rucksacks: Seq[Rucksack]): Int = {
+    rucksacks
+      .view
+      .grouped(3)
+      .map(group => itemPriority(group.map(_.all).reduce(_ & _).head))
+      .sum
+  }
+
   def parseRucksack(s: String): Rucksack = {
     val (x, y) = s.splitAt(s.length / 2)
-    (x.toSet, y.toSet)
+    Rucksack(x.toSet, y.toSet)
   }
 
   def parseRucksacks(input: String): Seq[Rucksack] = input.linesIterator.map(parseRucksack).toSeq
@@ -32,5 +43,6 @@ object Day3 {
 
   def main(args: Array[String]): Unit = {
     println(commonItemPrioritySum(parseRucksacks(input)))
+    println(groupBadgePrioritySum(parseRucksacks(input)))
   }
 }
