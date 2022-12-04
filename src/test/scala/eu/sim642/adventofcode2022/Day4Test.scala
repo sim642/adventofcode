@@ -20,4 +20,12 @@ class Day4Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countFullyContained(parsePairs(input)) == 441)
   }
+
+  test("Part 2 examples") {
+    assert(countOverlapping(parsePairs(exampleInput)) == 4)
+  }
+
+  test("Part 2 input answer") {
+    assert(countOverlapping(parsePairs(input)) == 861)
+  }
 }

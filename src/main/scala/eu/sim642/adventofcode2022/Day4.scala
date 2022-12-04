@@ -3,7 +3,9 @@ package eu.sim642.adventofcode2022
 object Day4 {
 
   case class Interval(min: Int, max: Int) {
+    def contains(value: Int): Boolean = min <= value && value <= max
     def contains(that: Interval): Boolean = this.min <= that.min && that.max <= this.max
+    def overlaps(that: Interval): Boolean = this.contains(that.min) || this.contains(that.max) || that.contains(this.min) || that.contains(this.max)
   }
 
   type Pair = (Interval, Interval)
@@ -11,6 +13,12 @@ object Day4 {
   def countFullyContained(pairs: Seq[Pair]): Int = {
     pairs.count({ case (a, b) =>
       a.contains(b) || b.contains(a)
+    })
+  }
+
+  def countOverlapping(pairs: Seq[Pair]): Int = {
+    pairs.count({ case (a, b) =>
+      a.overlaps(b)
     })
   }
 
@@ -28,5 +36,6 @@ object Day4 {
 
   def main(args: Array[String]): Unit = {
     println(countFullyContained(parsePairs(input)))
+    println(countOverlapping(parsePairs(input)))
   }
 }
