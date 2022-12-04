@@ -2,10 +2,10 @@ package eu.sim642.adventofcode2022
 
 object Day4 {
 
+  // TODO: move Interval to library (1D Box)
   case class Interval(min: Int, max: Int) {
-    def contains(value: Int): Boolean = min <= value && value <= max
     def contains(that: Interval): Boolean = this.min <= that.min && that.max <= this.max
-    def overlaps(that: Interval): Boolean = this.contains(that.min) || this.contains(that.max) || that.contains(this.min) || that.contains(this.max)
+    def overlaps(that: Interval): Boolean = this.min <= that.max && that.min <= this.max
   }
 
   type Pair = (Interval, Interval)
