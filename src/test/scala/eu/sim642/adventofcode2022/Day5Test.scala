@@ -18,18 +18,18 @@ class Day5Test extends AnyFunSuite {
       |""".stripMargin
 
   test("Part 1 examples") {
-    assert(Part1.topMessage.tupled(parseInput(exampleInput)) == "CMZ")
+    assert(Part1.topMessage(parseInput(exampleInput)) == "CMZ")
   }
 
   test("Part 1 input answer") {
-    assert(Part1.topMessage.tupled(parseInput(input)) == "TLNGFGMFN")
+    assert(Part1.topMessage(parseInput(input)) == "TLNGFGMFN")
   }
 
   test("Part 2 examples") {
-    assert(Part2.topMessage.tupled(parseInput(exampleInput)) == "MCD")
+    assert(Part2.topMessage(parseInput(exampleInput)) == "MCD")
   }
 
   test("Part 2 input answer") {
-    assert(Part2.topMessage.tupled(parseInput(input)) == "FGLQJCMBD")
+    assert(Part2.topMessage(parseInput(input)) == "FGLQJCMBD")
   }
 }
