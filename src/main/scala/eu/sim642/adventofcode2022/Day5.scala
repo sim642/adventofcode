@@ -7,22 +7,40 @@ object Day5 {
 
   case class Move(count: Int, from: Int, to: Int)
 
-  def applyMove(crates: Seq[Stack], move: Move): Seq[Stack] = {
-    val Move(count, from, to) = move
-    val (moveCrates, newFromCrates) = crates(from).splitAt(count)
-    crates
-      .updated(from, newFromCrates)
-      .updated(to, moveCrates.reverse ++ crates(to))
+  trait Part {
+    def applyMove(crates: Seq[Stack], move: Move): Seq[Stack]
+
+    def applyMoves(crates: Seq[Stack], moves: Seq[Move]): Seq[Stack] = {
+      moves.foldLeft(crates)(applyMove)
+    }
+
+    def topMessage(crates: Seq[Stack], moves: Seq[Move]): String = {
+      applyMoves(crates, moves)
+        .map(_.head)
+        .mkString
+    }
   }
 
-  def applyMoves(crates: Seq[Stack], moves: Seq[Move]): Seq[Stack] = {
-    moves.foldLeft(crates)(applyMove)
+  object Part1 extends Part {
+
+    override def applyMove(crates: Seq[Stack], move: Move): Seq[Stack] = {
+      val Move(count, from, to) = move
+      val (moveCrates, newFromCrates) = crates(from).splitAt(count)
+      crates
+        .updated(from, newFromCrates)
+        .updated(to, moveCrates.reverse ++ crates(to)) // reverse moved crates
+    }
   }
 
-  def topMessage(crates: Seq[Stack], moves: Seq[Move]): String = {
-    applyMoves(crates, moves)
-      .map(_.head)
-      .mkString
+  object Part2 extends Part {
+
+    override def applyMove(crates: Seq[Stack], move: Move): Seq[Stack] = {
+      val Move(count, from, to) = move
+      val (moveCrates, newFromCrates) = crates(from).splitAt(count)
+      crates
+        .updated(from, newFromCrates)
+        .updated(to, moveCrates ++ crates(to)) // don't reverse moved crates
+    }
   }
 
 
@@ -53,6 +71,7 @@ object Day5 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.stripLineEnd
 
   def main(args: Array[String]): Unit = {
-    println(topMessage.tupled(parseInput(input)))
+    println(Part1.topMessage.tupled(parseInput(input)))
+    println(Part2.topMessage.tupled(parseInput(input)))
   }
 }
