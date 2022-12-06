@@ -2,16 +2,17 @@ package eu.sim642.adventofcode2022
 
 object Day6 {
 
-  def startOfPacketIndex(datastream: String): Int = {
+  def startOfPacketIndex(datastream: String, length: Int): Int = {
     datastream
       .view
-      .sliding(4)
-      .indexWhere(group => group.toSet.size == 4) + 4
+      .sliding(length)
+      .indexWhere(group => group.toSet.size == length) + length
   }
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(startOfPacketIndex(input))
+    println(startOfPacketIndex(input, 4))
+    println(startOfPacketIndex(input, 14))
   }
 }

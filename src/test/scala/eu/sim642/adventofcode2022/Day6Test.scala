@@ -18,11 +18,31 @@ class Day6Test extends AnyFunSuite with ScalaCheckPropertyChecks {
     )
 
     forAll (datastreamIndex) { (datastream, expectedIndex) =>
-      assert(startOfPacketIndex(datastream) == expectedIndex)
+      assert(startOfPacketIndex(datastream, 4) == expectedIndex)
     }
   }
 
   test("Part 1 input answer") {
-    assert(startOfPacketIndex(input) == 1848)
+    assert(startOfPacketIndex(input, 4) == 1848)
+  }
+
+  test("Part 2 examples") {
+    val datastreamIndex = Table(
+      ("datastream", "index"),
+
+      ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19),
+      ("bvwbjplbgvbhsrlpgdmjqwftvncz", 23),
+      ("nppdvjthqldpwncqszvftbrmjlhg", 23),
+      ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29),
+      ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26),
+    )
+
+    forAll (datastreamIndex) { (datastream, expectedIndex) =>
+      assert(startOfPacketIndex(datastream, 14) == expectedIndex)
+    }
+  }
+
+  test("Part 2 input answer") {
+    assert(startOfPacketIndex(input, 14) == 2308)
   }
 }
