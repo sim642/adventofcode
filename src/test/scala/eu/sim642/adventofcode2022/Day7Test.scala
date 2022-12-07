@@ -37,4 +37,12 @@ class Day7Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(totalSmallDirSizes(parseCommands(input)) == 1077191)
   }
+
+  test("Part 2 examples") {
+    assert(findDeleteDirSize(parseCommands(exampleInput)) == 24933642)
+  }
+
+  test("Part 2 input answer") {
+    assert(findDeleteDirSize(parseCommands(input)) == 5649896)
+  }
 }

@@ -110,6 +110,42 @@ object Day7 {
     helper(interpretCommands(commands))._2
   }
 
+  def findDeleteDirSize(commands: Seq[Command]): Int = {
+    // TODO: deduplicate
+    def helper(fs: Fs): (Int, Int) = fs match {
+      case Fs.File(size) => (size, 0)
+      case Fs.Dir(items) =>
+        val helperItems = items.values.map(helper)
+        val size = helperItems.map(_._1).sum
+        val totalSmallSize = helperItems.map(_._2).sum + (if (size <= 100_000) size else 0)
+        (size, totalSmallSize)
+    }
+
+    val fs = interpretCommands(commands)
+    val totalSize = helper(fs)._1
+    val unusedSize = 70000000 - totalSize
+
+    def helper2(fs: Fs): (Int, Option[Int]) = fs match {
+      case Fs.File(size) => (size, None)
+      case Fs.Dir(items) =>
+        val helperItems = items.values.map(helper2)
+        val size = helperItems.map(_._1).sum
+        val smallestDeleteSize = helperItems.flatMap(_._2).minOption
+        val newSmallestDeleteSize =
+          if (unusedSize + size >= 30000000) {
+            smallestDeleteSize match {
+              case None => Some(size)
+              case Some(smallest) => Some(smallest min size)
+            }
+          }
+          else
+            None
+        (size, newSmallestDeleteSize)
+    }
+
+    helper2(fs)._2.get
+  }
+
   def parseCommands(input: String): Seq[Command] = {
     input.linesIterator.foldLeft(List.empty[Command])({ (acc, line) =>
       line match {
@@ -138,6 +174,7 @@ object Day7 {
 
   def main(args: Array[String]): Unit = {
     println(totalSmallDirSizes(parseCommands(input)))
+    println(findDeleteDirSize(parseCommands(input)))
 
     // part 1: 756542 - too low (hacky solution)
   }
