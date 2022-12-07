@@ -14,40 +14,23 @@ object Day7 {
     case Ls(results: Seq[LsResult])
   }
 
-  // Hacky solution that assumes unique names
-  /*def dirSizes(commands: Seq[Command]): Map[String, Int] = {
-
-    @tailrec
-    def helper(commands: List[Command], acc: Map[String, Int]): Map[String, Int] = commands match {
-      case Nil => acc
-      case Command.Ls(results) :: Command.Cd(dir) :: newCommands =>
-        val size =
-          results
-            .map({
-              case LsResult.File(_, size) => size
-              case LsResult.Dir(name) => acc(name)
-            })
-            .sum
-        println(dir)
-        assert(!acc.contains(dir))
-        val newAcc = acc + (dir -> size)
-        helper(newCommands, newAcc)
-      case Command.Cd(".." | "/") :: newCommands =>
-        helper(newCommands, acc)
-    }
-
-    helper(commands.reverse.toList, Map.empty)
-  }*/
-
-  enum Fs {
-    case File(size: Int)
-    case Dir(items: Map[String, Fs])
+  sealed trait Fs {
+    lazy val totalSize: Int
+  }
+  case class File(size: Int) extends Fs {
+    override lazy val totalSize: Int = size
+  }
+  case class Dir(items: Map[String, Fs]) extends Fs {
+    override lazy val totalSize: Int = items.values.map(_.totalSize).sum
   }
 
+  /**
+   * Zipper for Fs.
+   */
   case class FsZipper(current: Map[String, Fs], context: Option[FsZipperContext]) {
     def up: FsZipper = {
       val FsZipperContext(name, siblings, parent) = context.get
-      val newCurrent = siblings + (name -> Fs.Dir(current))
+      val newCurrent = siblings + (name -> Dir(current))
       FsZipper(newCurrent, parent)
     }
 
@@ -59,8 +42,8 @@ object Day7 {
 
     def down(name: String): FsZipper = {
       val newCurrent = current(name) match {
-        case Fs.Dir(items) => items
-        case Fs.File(_) => throw new IllegalArgumentException("invalid cd to file")
+        case Dir(items) => items
+        case File(_) => throw new IllegalArgumentException("invalid cd to file")
       }
       val newContext = FsZipperContext(name, current - name, context)
       FsZipper(newCurrent, Some(newContext))
@@ -80,71 +63,42 @@ object Day7 {
               results
                 .map({
                   case LsResult.File(name, size) =>
-                    name -> Fs.File(size)
+                    name -> File(size)
                   case LsResult.Dir(name) =>
-                    name -> Fs.Dir(Map.empty)
+                    name -> Dir(Map.empty)
                 })
                 .toMap
             acc.copy(current = newCurrent)
         }
       })
-    Fs.Dir(finalZipper.top.current)
+    Dir(finalZipper.top.current)
+  }
+
+  def iterateDirs(fs: Fs): Iterator[Dir] = fs match {
+    case File(_) =>
+      Iterator.empty
+    case dir@Dir(items) =>
+      Iterator.single(dir) ++ items.values.iterator.flatMap(iterateDirs)
   }
 
   def totalSmallDirSizes(commands: Seq[Command]): Int = {
-    // Hacky solution
-    /*dirSizes(commands)
-      .filter(_._2 <= 100_000)
-      .values
-      .sum*/
-
-    def helper(fs: Fs): (Int, Int) = fs match {
-      case Fs.File(size) => (size, 0)
-      case Fs.Dir(items) =>
-        val helperItems = items.values.map(helper)
-        val size = helperItems.map(_._1).sum
-        val totalSmallSize = helperItems.map(_._2).sum + (if (size <= 100_000) size else 0)
-        (size, totalSmallSize)
-    }
-
-    helper(interpretCommands(commands))._2
+    val fs = interpretCommands(commands)
+    iterateDirs(fs)
+      .map(_.totalSize)
+      .filter(_ <= 100_000)
+      .sum
   }
 
   def findDeleteDirSize(commands: Seq[Command]): Int = {
-    // TODO: deduplicate
-    def helper(fs: Fs): (Int, Int) = fs match {
-      case Fs.File(size) => (size, 0)
-      case Fs.Dir(items) =>
-        val helperItems = items.values.map(helper)
-        val size = helperItems.map(_._1).sum
-        val totalSmallSize = helperItems.map(_._2).sum + (if (size <= 100_000) size else 0)
-        (size, totalSmallSize)
-    }
-
     val fs = interpretCommands(commands)
-    val totalSize = helper(fs)._1
-    val unusedSize = 70000000 - totalSize
-
-    def helper2(fs: Fs): (Int, Option[Int]) = fs match {
-      case Fs.File(size) => (size, None)
-      case Fs.Dir(items) =>
-        val helperItems = items.values.map(helper2)
-        val size = helperItems.map(_._1).sum
-        val smallestDeleteSize = helperItems.flatMap(_._2).minOption
-        val newSmallestDeleteSize =
-          if (unusedSize + size >= 30000000) {
-            smallestDeleteSize match {
-              case None => Some(size)
-              case Some(smallest) => Some(smallest min size)
-            }
-          }
-          else
-            None
-        (size, newSmallestDeleteSize)
-    }
-
-    helper2(fs)._2.get
+    val unusedSize = 70_000_000 - fs.totalSize
+    val missingSize = 30_000_000 - unusedSize
+    iterateDirs(fs)
+      .map(_.totalSize)
+      .filter(_ >= missingSize)
+      .min
   }
+
 
   def parseCommands(input: String): Seq[Command] = {
     input.linesIterator.foldLeft(List.empty[Command])({ (acc, line) =>
@@ -176,6 +130,6 @@ object Day7 {
     println(totalSmallDirSizes(parseCommands(input)))
     println(findDeleteDirSize(parseCommands(input)))
 
-    // part 1: 756542 - too low (hacky solution)
+    // part 1: 756542 - too low (hacky solution, assuming unique subdir names)
   }
 }
