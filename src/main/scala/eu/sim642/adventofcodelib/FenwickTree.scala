@@ -1,33 +1,36 @@
 package eu.sim642.adventofcodelib
 
+import scala.annotation.tailrec
 import scala.collection.immutable.ArraySeq
 import scala.reflect.ClassTag
 
 case class FenwickTree[A](arr: ArraySeq[A])(using op: (A, A) => A) {
   def apply(i: Int): A = {
-    var j = i
-    var r = arr(0)
-    while (j != 0) {
-      r = op(r, arr(j))
-      j -= Integer.lowestOneBit(j)
+
+    @tailrec
+    def helper(i: Int, acc: A): A = {
+      if (i == 0)
+        acc
+      else
+        helper(i - Integer.lowestOneBit(i), op(acc, arr(i)))
     }
-    r
+
+    helper(i, arr(0))
   }
 
   def updated(i: Int, delta: A): FenwickTree[A] = {
-    var a = arr
-    if (i == 0) {
-      a = a.updated(0, op(a(0), delta))
-      FenwickTree(a)
+
+    @tailrec
+    def helper(i: Int, arr: ArraySeq[A]): ArraySeq[A] = {
+      if (i == 0)
+        arr.updated(0, op(arr(0), delta))
+      else if (i >= arr.size)
+        arr
+      else
+        helper(i + Integer.lowestOneBit(i), arr.updated(i, op(arr(i), delta)))
     }
-    else {
-      var j = i
-      while (j < arr.size) {
-        a = a.updated(j, op(a(j), delta))
-        j += Integer.lowestOneBit(j)
-      }
-      FenwickTree(a)
-    }
+
+    FenwickTree(helper(i, arr))
   }
 }
 
