@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2022
 
-import Day8._
+import Day8.*
+import eu.sim642.adventofcodelib.pos.Pos
 import org.scalatest.funsuite.AnyFunSuite
 
 class Day8Test extends AnyFunSuite {
@@ -18,5 +19,18 @@ class Day8Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(countVisibleTrees(parseGrid(input)) == 1713)
+  }
+
+  test("Part 2 examples") {
+    val exampleGrid = parseGrid(exampleInput)
+    val exampleGridTranspose = exampleGrid.transpose
+    assert(scenicScore(exampleGrid, exampleGridTranspose, Pos(2, 1)) == 4)
+    assert(scenicScore(exampleGrid, exampleGridTranspose, Pos(2, 3)) == 8)
+
+    assert(maxScenicScore(parseGrid(exampleInput)) == 8)
+  }
+
+  test("Part 2 input answer") {
+    assert(maxScenicScore(parseGrid(input)) == 268464)
   }
 }

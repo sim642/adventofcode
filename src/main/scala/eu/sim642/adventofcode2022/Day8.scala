@@ -20,6 +20,28 @@ object Day8 {
     } yield ()).size
   }
 
+  def scenicScore(grid: Grid[Int], gridTranspose: Grid[Int], pos: Pos): Int = {
+    // TODO: clean up
+    val cell = grid(pos)
+    val left = grid(pos.y).lastIndexWhere(_ >= cell, pos.x - 1)
+    val left2 = if (left < 0) then pos.x else pos.x - left
+    val right = grid(pos.y).indexWhere(_ >= cell, pos.x + 1)
+    val right2 = if (right < 0) then grid(pos.y).size - 1 - pos.x else right - pos.x
+    val top = gridTranspose(pos.x).lastIndexWhere(_ >= cell, pos.y - 1)
+    val top2 = if (top < 0) then pos.y else pos.y - top
+    val bottom = gridTranspose(pos.x).indexWhere(_ >= cell, pos.y + 1)
+    val bottom2 = if (bottom < 0) then grid.size - 1 - pos.y else bottom - pos.y
+    left2 * right2 * top2 * bottom2
+  }
+
+  def maxScenicScore(grid: Grid[Int]): Int = {
+    val gridTranspose = grid.transpose
+    (for {
+      (row, y) <- grid.view.zipWithIndex
+      (cell, x) <- row.view.zipWithIndex
+    } yield scenicScore(grid, gridTranspose, Pos(x, y))).max
+  }
+
 
   def parseGrid(input: String): Grid[Int] = input.linesIterator.map(_.toVector).toVector.mapGrid(_.asDigit)
 
@@ -27,5 +49,6 @@ object Day8 {
 
   def main(args: Array[String]): Unit = {
     println(countVisibleTrees(parseGrid(input)))
+    println(maxScenicScore(parseGrid(input)))
   }
 }
