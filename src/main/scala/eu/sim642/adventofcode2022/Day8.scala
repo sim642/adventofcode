@@ -9,10 +9,12 @@ import scala.annotation.tailrec
 object Day8 {
 
   def countVisibleTrees(grid: Grid[Int]): Int = {
+    val gridTranspose = grid.transpose
+    // prefix maximums from edges
     val left = grid.map(_.scanLeft(-1)(_ max _))
     val right = grid.map(_.scanRight(-1)(_ max _))
-    val top = grid.transpose.map(_.scanLeft(-1)(_ max _))
-    val bottom = grid.transpose.map(_.scanRight(-1)(_ max _))
+    val top = gridTranspose.map(_.scanLeft(-1)(_ max _))
+    val bottom = gridTranspose.map(_.scanRight(-1)(_ max _))
     (for {
       (row, y) <- grid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
@@ -20,18 +22,19 @@ object Day8 {
     } yield ()).size
   }
 
+  extension (i: Int) {
+    def orNotFound(x: => Int): Int = if (i < 0) x else i
+  }
+
   def scenicScore(grid: Grid[Int], gridTranspose: Grid[Int], pos: Pos): Int = {
-    // TODO: clean up
-    val cell = grid(pos)
-    val left = grid(pos.y).lastIndexWhere(_ >= cell, pos.x - 1)
-    val left2 = if (left < 0) then pos.x else pos.x - left
-    val right = grid(pos.y).indexWhere(_ >= cell, pos.x + 1)
-    val right2 = if (right < 0) then grid(pos.y).size - 1 - pos.x else right - pos.x
-    val top = gridTranspose(pos.x).lastIndexWhere(_ >= cell, pos.y - 1)
-    val top2 = if (top < 0) then pos.y else pos.y - top
-    val bottom = gridTranspose(pos.x).indexWhere(_ >= cell, pos.y + 1)
-    val bottom2 = if (bottom < 0) then grid.size - 1 - pos.y else bottom - pos.y
-    left2 * right2 * top2 * bottom2
+    val row = grid(pos.y)
+    val col = gridTranspose(pos.x)
+    val cell = row(pos.x)
+    val left = pos.x - row.lastIndexWhere(_ >= cell, pos.x - 1).orNotFound(0)
+    val right = row.indexWhere(_ >= cell, pos.x + 1).orNotFound(row.size - 1) - pos.x
+    val top = pos.y - col.lastIndexWhere(_ >= cell, pos.y - 1).orNotFound(0)
+    val bottom = col.indexWhere(_ >= cell, pos.y + 1).orNotFound(grid.size - 1) - pos.y
+    left * right * top * bottom
   }
 
   def maxScenicScore(grid: Grid[Int]): Int = {
