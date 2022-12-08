@@ -5,6 +5,8 @@ import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.pos.Pos
 
 import scala.annotation.tailrec
+import scala.collection.SeqView
+import scala.collection.immutable.ArraySeq
 
 object Day8 {
 
@@ -81,24 +83,29 @@ object Day8 {
     override def maxScenicScore(grid: Grid[Int]): Int = {
       val gridTranspose = grid.transpose
       // prefix height -> index maps from edges
-      val init = Map.empty[Int, Int]
+      val init = Vector.fill(10)(0)
 
-      def op(acc: Map[Int, Int], p: (Int, Int)): Map[Int, Int] = {
+      def op(acc: Seq[Int], p: (Int, Int)): Seq[Int] = {
         val (cell, i) = p
-        acc ++ (0 to cell).map(_ -> i)
+        //ArraySeq.fill(cell + 1)(i) ++ acc.drop(cell + 1)
+        //(Iterator.fill(cell + 1)(i) ++ acc.view.drop(cell + 1)).to(acc.iterableFactory)
+        acc.iterableFactory.fill(cell + 1)(i) ++ acc.drop(cell + 1)
       }
 
-      val left = grid.map(_.zipWithIndex.scanLeft(init)(op))
-      val right = grid.map(_.reverse.zipWithIndex.scanLeft(init)(op).reverse)
-      val top = gridTranspose.map(_.zipWithIndex.scanLeft(init)(op))
-      val bottom = gridTranspose.map(_.reverse.zipWithIndex.scanLeft(init)(op).reverse)
+      def op2(p: (Int, Int), acc: Seq[Int]): Seq[Int] = op(acc, p)
+
+      val left = grid.map(_.view.zipWithIndex.scanLeft(init)(op).toVector)
+      val right = grid.map(_.view.zipWithIndex.scanRight(Vector.fill(10)(grid(0).size - 1))(op2).toVector)
+      val top = gridTranspose.map(_.view.zipWithIndex.scanLeft(init)(op).toVector)
+      val bottom = gridTranspose.map(_.view.zipWithIndex.scanRight(Vector.fill(10)(grid.size - 1))(op2).toVector)
       (for {
         (row, y) <- grid.view.zipWithIndex
         (cell, x) <- row.view.zipWithIndex
-        l = x - left(y)(x).getOrElse(cell, 0)
-        r = row.size - 1 - right(y)(x + 1).getOrElse(cell, 0) - x
-        t = y - top(x)(y).getOrElse(cell, 0)
-        b = grid.size - 1 - bottom(x)(y + 1).getOrElse(cell, 0) - y
+        l = x - left(y)(x)(cell)
+        r = right(y)(x + 1)(cell) - x
+        t = y - top(x)(y)(cell)
+        b = bottom(x)(y + 1)(cell) - y
+        //() = println(s"$x $y: $l $r $t $b")
       } yield l * r * t * b).max
     }
   }
