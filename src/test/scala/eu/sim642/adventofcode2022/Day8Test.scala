@@ -9,6 +9,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class Day8Test extends Suites(
   new NaiveSolutionTest,
   new PrefixSolutionTest,
+  new FenwickPrefixSolutionTest,
   new OptimizedPrefixSolutionTest,
 )
 
@@ -61,6 +62,8 @@ object Day8Test {
   class NaiveSolutionTest extends SolutionTest(NaiveSolution) with VisibleIndicesSolutionTest(NaiveSolution)
 
   class PrefixSolutionTest extends SolutionTest(PrefixSolution) with VisibleIndicesSolutionTest(PrefixSolution)
+
+  class FenwickPrefixSolutionTest extends SolutionTest(FenwickPrefixSolution) with VisibleIndicesSolutionTest(FenwickPrefixSolution)
 
   class OptimizedPrefixSolutionTest extends SolutionTest(OptimizedPrefixSolution)
 }

@@ -143,6 +143,110 @@ object Day8 {
 
   object PrefixSolution extends PrefixSolution
 
+  object FenwickPrefixSolution extends Solution with VisibleIndicesSolution {
+
+    case class Fenwick(arr: ArraySeq[Int]) {
+      def apply(i: Int): Int = {
+        var j = i
+        var r = arr(0)
+        while (j != 0) {
+          r = r max arr(j)
+          j -= Integer.lowestOneBit(j)
+        }
+        r
+      }
+
+      def updated(i: Int, delta: Int): Fenwick = {
+        var a = arr
+        if (i == 0) {
+          a = a.updated(0, a(0) max delta)
+          Fenwick(a)
+        }
+        else {
+          var j = i
+          while (j < arr.size) {
+            a = a.updated(j, a(j) max delta)
+            j += Integer.lowestOneBit(j)
+          }
+          Fenwick(a)
+        }
+      }
+    }
+
+    object Fenwick {
+      def fill(n: Int)(elem: Int): Fenwick =
+        Fenwick(ArraySeq.fill(n)(elem))
+    }
+
+    case class Fenwick2(arr: ArraySeq[Int]) {
+      def apply(i: Int): Int = {
+        var j = i
+        var r = arr(0)
+        while (j != 0) {
+          r = r min arr(j)
+          j -= Integer.lowestOneBit(j)
+        }
+        r
+      }
+
+      def updated(i: Int, delta: Int): Fenwick2 = {
+        var a = arr
+        if (i == 0) {
+          a = a.updated(0, a(0) min delta)
+          Fenwick2(a)
+        }
+        else {
+          var j = i
+          while (j < arr.size) {
+            a = a.updated(j, a(j) min delta)
+            j += Integer.lowestOneBit(j)
+          }
+          Fenwick2(a)
+        }
+      }
+    }
+
+    object Fenwick2 {
+      def fill(n: Int)(elem: Int): Fenwick2 =
+        Fenwick2(ArraySeq.fill(n)(elem))
+    }
+
+    override def makeVisibleIndices(grid: Grid[Int]): Pos => VisibleIndices = {
+      val gridTranspose = grid.transpose
+      val width = gridTranspose.size
+      val height = grid.size
+
+      def opLeft(acc: Fenwick, cellIndex: (Int, Int)): Fenwick = {
+        val (cell, i) = cellIndex
+        acc.updated(9 - cell, i)
+      }
+
+      def opRight(cellIndex: (Int, Int), acc: Fenwick2): Fenwick2 = {
+        val (cell, i) = cellIndex
+        acc.updated(9 - cell, i)
+      }
+
+      //def opRight(cellIndex: (Int, Int), acc: Fenwick): Fenwick = opLeft(acc, cellIndex)
+
+      val lefts = grid.map(_.view.zipWithIndex.scanLeft(Fenwick.fill(10)(-1))(opLeft).toVector)
+      val rights = grid.map(_.view.zipWithIndex.scanRight(Fenwick2.fill(10)(width))(opRight).toVector)
+      val tops = gridTranspose.map(_.view.zipWithIndex.scanLeft(Fenwick.fill(10)(-1))(opLeft).toVector)
+      val bottoms = gridTranspose.map(_.view.zipWithIndex.scanRight(Fenwick2.fill(10)(height))(opRight).toVector)
+
+      def visibleIndices(pos: Pos): VisibleIndices = {
+        val Pos(x, y) = pos
+        val cell = grid(pos)
+        val left = lefts(y)(x)(9 - cell)
+        val right = rights(y)(x + 1)(9 - cell)
+        val top = tops(x)(y)(9 - cell)
+        val bottom = bottoms(x)(y + 1)(9 - cell)
+        VisibleIndices(left, right, top, bottom)
+      }
+
+      visibleIndices
+    }
+  }
+
   /**
    * Solution, which optimizes part 1 by only computing maximum heights for direction prefixes.
    */
