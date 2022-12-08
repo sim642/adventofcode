@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2022
 
-import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.{FenwickTree, Grid}
 import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.pos.Pos
 
@@ -143,95 +143,28 @@ object Day8 {
 
   object PrefixSolution extends PrefixSolution
 
+  /**
+   * Solution, which precomputes furthest visible indices for prefixes in each direction.
+   * Prefix direction elements are mappings from tree height, using Fenwick trees.
+   */
   object FenwickPrefixSolution extends Solution with VisibleIndicesSolution {
-
-    case class Fenwick(arr: ArraySeq[Int]) {
-      def apply(i: Int): Int = {
-        var j = i
-        var r = arr(0)
-        while (j != 0) {
-          r = r max arr(j)
-          j -= Integer.lowestOneBit(j)
-        }
-        r
-      }
-
-      def updated(i: Int, delta: Int): Fenwick = {
-        var a = arr
-        if (i == 0) {
-          a = a.updated(0, a(0) max delta)
-          Fenwick(a)
-        }
-        else {
-          var j = i
-          while (j < arr.size) {
-            a = a.updated(j, a(j) max delta)
-            j += Integer.lowestOneBit(j)
-          }
-          Fenwick(a)
-        }
-      }
-    }
-
-    object Fenwick {
-      def fill(n: Int)(elem: Int): Fenwick =
-        Fenwick(ArraySeq.fill(n)(elem))
-    }
-
-    case class Fenwick2(arr: ArraySeq[Int]) {
-      def apply(i: Int): Int = {
-        var j = i
-        var r = arr(0)
-        while (j != 0) {
-          r = r min arr(j)
-          j -= Integer.lowestOneBit(j)
-        }
-        r
-      }
-
-      def updated(i: Int, delta: Int): Fenwick2 = {
-        var a = arr
-        if (i == 0) {
-          a = a.updated(0, a(0) min delta)
-          Fenwick2(a)
-        }
-        else {
-          var j = i
-          while (j < arr.size) {
-            a = a.updated(j, a(j) min delta)
-            j += Integer.lowestOneBit(j)
-          }
-          Fenwick2(a)
-        }
-      }
-    }
-
-    object Fenwick2 {
-      def fill(n: Int)(elem: Int): Fenwick2 =
-        Fenwick2(ArraySeq.fill(n)(elem))
-    }
 
     override def makeVisibleIndices(grid: Grid[Int]): Pos => VisibleIndices = {
       val gridTranspose = grid.transpose
       val width = gridTranspose.size
       val height = grid.size
 
-      def opLeft(acc: Fenwick, cellIndex: (Int, Int)): Fenwick = {
+      def opLeft(acc: FenwickTree[Int], cellIndex: (Int, Int)): FenwickTree[Int] = {
         val (cell, i) = cellIndex
         acc.updated(9 - cell, i)
       }
 
-      def opRight(cellIndex: (Int, Int), acc: Fenwick2): Fenwick2 = {
-        val (cell, i) = cellIndex
-        acc.updated(9 - cell, i)
-      }
+      def opRight(cellIndex: (Int, Int), acc: FenwickTree[Int]): FenwickTree[Int] = opLeft(acc, cellIndex)
 
-      //def opRight(cellIndex: (Int, Int), acc: Fenwick): Fenwick = opLeft(acc, cellIndex)
-
-      val lefts = grid.map(_.view.zipWithIndex.scanLeft(Fenwick.fill(10)(-1))(opLeft).toVector)
-      val rights = grid.map(_.view.zipWithIndex.scanRight(Fenwick2.fill(10)(width))(opRight).toVector)
-      val tops = gridTranspose.map(_.view.zipWithIndex.scanLeft(Fenwick.fill(10)(-1))(opLeft).toVector)
-      val bottoms = gridTranspose.map(_.view.zipWithIndex.scanRight(Fenwick2.fill(10)(height))(opRight).toVector)
+      val lefts = grid.map(_.view.zipWithIndex.scanLeft(FenwickTree.fill(10)(-1)(using Integer.max))(opLeft).toVector)
+      val rights = grid.map(_.view.zipWithIndex.scanRight(FenwickTree.fill(10)(width)(using Integer.min))(opRight).toVector)
+      val tops = gridTranspose.map(_.view.zipWithIndex.scanLeft(FenwickTree.fill(10)(-1)(using Integer.max))(opLeft).toVector)
+      val bottoms = gridTranspose.map(_.view.zipWithIndex.scanRight(FenwickTree.fill(10)(height)(using Integer.min))(opRight).toVector)
 
       def visibleIndices(pos: Pos): VisibleIndices = {
         val Pos(x, y) = pos
