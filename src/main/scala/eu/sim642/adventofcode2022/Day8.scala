@@ -16,59 +16,140 @@ object Day8 {
     def maxScenicScore(grid: Grid[Int]): Int
   }
 
+  /**
+   * Solution, which is based on furthest visible indices for a position.
+   */
+  trait VisibleIndicesSolution extends Solution {
+
+    /**
+     * Furthest visible indices.
+     * @param left x coordinate, <0 if non-existent
+     * @param right x coordinate, >=width if non-existent
+     * @param top y coordinate, <0 if non-existent
+     * @param bottom y coordinate, >=height if non-existent
+     */
+    case class VisibleIndices(left: Int, right: Int, top: Int, bottom: Int) {
+      def clamp(width: Int, height: Int): VisibleIndices = {
+        VisibleIndices(
+          left = left max 0,
+          right = right min (width - 1),
+          top = top max 0,
+          bottom = bottom min (height - 1)
+        )
+      }
+    }
+
+    /**
+     * Makes a visible indices function for a grid.
+     */
+    def makeVisibleIndices(grid: Grid[Int]): Pos => VisibleIndices
+
+    override def countVisibleTrees(grid: Grid[Int]): Int = {
+      val width = grid(0).size
+      val height = grid.size
+      val visibleIndices = makeVisibleIndices(grid)
+
+      (for {
+        (row, y) <- grid.view.zipWithIndex
+        (cell, x) <- row.view.zipWithIndex
+        VisibleIndices(left, right, top, bottom) = visibleIndices(Pos(x, y))
+        if left < 0 || right >= width || top < 0 || bottom >= height
+      } yield ()).size // TODO: countGridWithPos
+    }
+
+    override def maxScenicScore(grid: Grid[Int]): Int = {
+      val width = grid(0).size
+      val height = grid.size
+      val visibleIndices = makeVisibleIndices(grid)
+
+      (for {
+        (row, y) <- grid.view.zipWithIndex
+        (cell, x) <- row.view.zipWithIndex
+      } yield {
+        val VisibleIndices(left, right, top, bottom) = visibleIndices(Pos(x, y)).clamp(width, height)
+        (x - left) * (right - x) * (y - top) * (bottom - y)
+      }).max // TODO: mapGridWithPos, maxGrid
+    }
+  }
+
   extension (i: Int) {
     def orNotFound(x: => Int): Int = if (i < 0) x else i
   }
 
-  object NaiveSolution extends Solution {
+  /**
+   * Solution, which finds furthest visible indices naively each time.
+   */
+  object NaiveSolution extends Solution with VisibleIndicesSolution {
 
-    // TODO: extract common
-    def isVisible(grid: Grid[Int], gridTranspose: Grid[Int], pos: Pos): Boolean = {
-      val row = grid(pos.y)
-      val col = gridTranspose(pos.x)
-      val cell = row(pos.x)
-      val left = row.lastIndexWhere(_ >= cell, pos.x - 1)
-      val right = row.indexWhere(_ >= cell, pos.x + 1)
-      val top = col.lastIndexWhere(_ >= cell, pos.y - 1)
-      val bottom = col.indexWhere(_ >= cell, pos.y + 1)
-      left < 0 || right < 0 || top < 0 || bottom < 0
-    }
-
-    override def countVisibleTrees(grid: Grid[Int]): Int = {
+    override def makeVisibleIndices(grid: Grid[Int]): Pos => VisibleIndices = {
       val gridTranspose = grid.transpose
-      (for {
-        (row, y) <- grid.view.zipWithIndex
-        (cell, x) <- row.view.zipWithIndex
-        if isVisible(grid, gridTranspose, Pos(x, y))
-      } yield ()).size
-    }
+      val width = gridTranspose.size
+      val height = grid.size
 
-    def scenicScore(grid: Grid[Int], gridTranspose: Grid[Int], pos: Pos): Int = {
-      val row = grid(pos.y)
-      val col = gridTranspose(pos.x)
-      val cell = row(pos.x)
-      val left = pos.x - row.lastIndexWhere(_ >= cell, pos.x - 1).orNotFound(0)
-      val right = row.indexWhere(_ >= cell, pos.x + 1).orNotFound(row.size - 1) - pos.x
-      val top = pos.y - col.lastIndexWhere(_ >= cell, pos.y - 1).orNotFound(0)
-      val bottom = col.indexWhere(_ >= cell, pos.y + 1).orNotFound(grid.size - 1) - pos.y
-      left * right * top * bottom
-    }
+      def visibleIndices(pos: Pos): VisibleIndices = {
+        val Pos(x, y) = pos
+        val row = grid(y)
+        val col = gridTranspose(x)
+        val cell = row(x)
+        val left = row.lastIndexWhere(_ >= cell, x - 1)
+        val right = row.indexWhere(_ >= cell, x + 1).orNotFound(width)
+        val top = col.lastIndexWhere(_ >= cell, y - 1)
+        val bottom = col.indexWhere(_ >= cell, y + 1).orNotFound(height)
+        VisibleIndices(left, right, top, bottom)
+      }
 
-    override def maxScenicScore(grid: Grid[Int]): Int = {
-      val gridTranspose = grid.transpose
-      (for {
-        (row, y) <- grid.view.zipWithIndex
-        (cell, x) <- row.view.zipWithIndex
-      } yield scenicScore(grid, gridTranspose, Pos(x, y))).max
+      visibleIndices
     }
   }
 
-  object PrefixSolution extends Solution {
+  /**
+   * Solution, which precomputes furthest visible indices for prefixes in each direction.
+   * Prefix direction elements are mappings from tree height, also prefix-expanded for >=cell lookup.
+   */
+  trait PrefixSolution extends Solution with VisibleIndicesSolution {
 
-    // TODO: extract common
+    override def makeVisibleIndices(grid: Grid[Int]): Pos => VisibleIndices = {
+      val gridTranspose = grid.transpose
+      val width = gridTranspose.size
+      val height = grid.size
+
+      def opLeft(acc: Seq[Int], cellIndex: (Int, Int)): Seq[Int] = {
+        val (cell, i) = cellIndex
+        //ArraySeq.fill(cell + 1)(i) ++ acc.drop(cell + 1)
+        //(Iterator.fill(cell + 1)(i) ++ acc.view.drop(cell + 1)).to(acc.iterableFactory)
+        acc.iterableFactory.fill(cell + 1)(i) ++ acc.drop(cell + 1)
+      }
+
+      def opRight(cellIndex: (Int, Int), acc: Seq[Int]): Seq[Int] = opLeft(acc, cellIndex)
+
+      val lefts = grid.map(_.view.zipWithIndex.scanLeft(Vector.fill(10)(-1))(opLeft).toVector)
+      val rights = grid.map(_.view.zipWithIndex.scanRight(Vector.fill(10)(width))(opRight).toVector)
+      val tops = gridTranspose.map(_.view.zipWithIndex.scanLeft(Vector.fill(10)(-1))(opLeft).toVector)
+      val bottoms = gridTranspose.map(_.view.zipWithIndex.scanRight(Vector.fill(10)(height))(opRight).toVector)
+
+      def visibleIndices(pos: Pos): VisibleIndices = {
+        val Pos(x, y) = pos
+        val cell = grid(pos)
+        val left = lefts(y)(x)(cell)
+        val right = rights(y)(x + 1)(cell)
+        val top = tops(x)(y)(cell)
+        val bottom = bottoms(x)(y + 1)(cell)
+        VisibleIndices(left, right, top, bottom)
+      }
+
+      visibleIndices
+    }
+  }
+
+  object PrefixSolution extends PrefixSolution
+
+  /**
+   * Solution, which optimizes part 1 by only computing maximum heights for direction prefixes.
+   */
+  object OptimizedPrefixSolution extends PrefixSolution {
+
     override def countVisibleTrees(grid: Grid[Int]): Int = {
       val gridTranspose = grid.transpose
-      // prefix maximums from edges
       val left = grid.map(_.scanLeft(-1)(_ max _))
       val right = grid.map(_.scanRight(-1)(_ max _))
       val top = gridTranspose.map(_.scanLeft(-1)(_ max _))
@@ -79,35 +160,6 @@ object Day8 {
         if cell > left(y)(x) || cell > right(y)(x + 1) || cell > top(x)(y) || cell > bottom(x)(y + 1)
       } yield ()).size
     }
-
-    override def maxScenicScore(grid: Grid[Int]): Int = {
-      val gridTranspose = grid.transpose
-      // prefix height -> index maps from edges
-      val init = Vector.fill(10)(0)
-
-      def op(acc: Seq[Int], p: (Int, Int)): Seq[Int] = {
-        val (cell, i) = p
-        //ArraySeq.fill(cell + 1)(i) ++ acc.drop(cell + 1)
-        //(Iterator.fill(cell + 1)(i) ++ acc.view.drop(cell + 1)).to(acc.iterableFactory)
-        acc.iterableFactory.fill(cell + 1)(i) ++ acc.drop(cell + 1)
-      }
-
-      def op2(p: (Int, Int), acc: Seq[Int]): Seq[Int] = op(acc, p)
-
-      val left = grid.map(_.view.zipWithIndex.scanLeft(init)(op).toVector)
-      val right = grid.map(_.view.zipWithIndex.scanRight(Vector.fill(10)(grid(0).size - 1))(op2).toVector)
-      val top = gridTranspose.map(_.view.zipWithIndex.scanLeft(init)(op).toVector)
-      val bottom = gridTranspose.map(_.view.zipWithIndex.scanRight(Vector.fill(10)(grid.size - 1))(op2).toVector)
-      (for {
-        (row, y) <- grid.view.zipWithIndex
-        (cell, x) <- row.view.zipWithIndex
-        l = x - left(y)(x)(cell)
-        r = right(y)(x + 1)(cell) - x
-        t = y - top(x)(y)(cell)
-        b = bottom(x)(y + 1)(cell) - y
-        //() = println(s"$x $y: $l $r $t $b")
-      } yield l * r * t * b).max
-    }
   }
 
 
@@ -116,7 +168,9 @@ object Day8 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(PrefixSolution.countVisibleTrees(parseGrid(input)))
-    println(NaiveSolution.maxScenicScore(parseGrid(input)))
+    import OptimizedPrefixSolution._
+
+    println(countVisibleTrees(parseGrid(input)))
+    println(maxScenicScore(parseGrid(input)))
   }
 }

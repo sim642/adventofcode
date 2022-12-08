@@ -9,17 +9,19 @@ import org.scalatest.funsuite.AnyFunSuite
 class Day8Test extends Suites(
   new NaiveSolutionTest,
   new PrefixSolutionTest,
+  new OptimizedPrefixSolutionTest,
 )
 
 object Day8Test {
-  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
 
-    val exampleInput =
-      """30373
-        |25512
-        |65332
-        |33549
-        |35390""".stripMargin
+  val exampleInput =
+    """30373
+      |25512
+      |65332
+      |33549
+      |35390""".stripMargin
+
+  sealed abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
 
     test("Part 1 examples") {
       assert(solution.countVisibleTrees(parseGrid(exampleInput)) == 21)
@@ -43,7 +45,22 @@ object Day8Test {
     }
   }
 
-  class NaiveSolutionTest extends SolutionTest(NaiveSolution)
+  trait VisibleIndicesSolutionTest(solution: VisibleIndicesSolution) extends AnyFunSuite {
 
-  class PrefixSolutionTest extends SolutionTest(PrefixSolution)
+    test("visibleIndices") {
+      import solution.VisibleIndices
+
+      val exampleGrid = parseGrid(exampleInput)
+      val visibleIndices = solution.makeVisibleIndices(exampleGrid)
+
+      assert(visibleIndices(Pos(2, 1)) == VisibleIndices(top = -1, left = 1, right = 5, bottom = 3))
+      assert(visibleIndices(Pos(2, 3)) == VisibleIndices(top = 1, left = -1, bottom = 5, right = 4))
+    }
+  }
+
+  class NaiveSolutionTest extends SolutionTest(NaiveSolution) with VisibleIndicesSolutionTest(NaiveSolution)
+
+  class PrefixSolutionTest extends SolutionTest(PrefixSolution) with VisibleIndicesSolutionTest(PrefixSolution)
+
+  class OptimizedPrefixSolutionTest extends SolutionTest(OptimizedPrefixSolution)
 }
