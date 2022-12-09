@@ -18,7 +18,7 @@ object Day9 {
       else value
     }
 
-    private def moveTail: Rope = {
+    def moveTail: Rope = {
       val d = head - tail
       if (d.x.abs <= 1 && d.y.abs <= 1)
         this
@@ -27,7 +27,8 @@ object Day9 {
       else if (d.x.abs == 1 && d.y.abs == 2 || d.y.abs == 1 && d.x.abs == 2)
         copy(tail = tail + Pos(clamp(-1, 1)(d.x), (clamp(-1, 1)(d.y))))
       else
-        throw new IllegalStateException("invalid tail position")
+        //throw new IllegalStateException("invalid tail position")
+        copy(tail = tail + Pos(clamp(-1, 1)(d.x), (clamp(-1, 1)(d.y))))
     }
 
     def applyHeadOffset(offset: Pos): Rope = {
@@ -43,6 +44,41 @@ object Day9 {
     val initialRope = Rope(Pos.zero, Pos.zero)
     // TODO: silly scanLeft+flatMap from 2016 day 9 again
     val ropeIt = moves.foldLeft[(Rope, Iterator[Rope])]((initialRope, Iterator.single(initialRope)))({ case ((accRope: Rope, accIt: Iterator[Rope]), move: Move) =>
+      (accRope.iterateMove(move).last, accIt ++ accRope.iterateMove(move))
+    })._2
+
+    ropeIt.map(_.tail).toSet.size
+  }
+
+  case class LongRope(knots: Seq[Pos]) {
+
+    def applyHeadOffset(offset: Pos): LongRope = {
+      //println(this)
+
+      // moves all tails
+      def helper(knots: List[Pos]): List[Pos] = knots match {
+        case Nil => ???
+        case List(head) => List(head)
+        case head :: tail :: longTail =>
+          val newTail = Rope(head, tail).moveTail.tail
+          head :: helper(newTail :: longTail)
+      }
+
+      val knots2 = knots.updated(0, knots.head + offset)
+      LongRope(helper(knots2.toList))
+    }
+
+    def iterateMove(move: Move): Iterator[LongRope] = {
+      (1 to move.n).iterator.scanLeft(this)({ case (acc, _) => acc.applyHeadOffset(move.offset) }).tail
+    }
+
+    def tail: Pos = knots.last
+  }
+
+  def countLongTailPoss(moves: Seq[Move]): Int = {
+    val initialRope = LongRope(Seq.fill(10)(Pos.zero))
+    // TODO: silly scanLeft+flatMap from 2016 day 9 again
+    val ropeIt = moves.foldLeft[(LongRope, Iterator[LongRope])]((initialRope, Iterator.single(initialRope)))({ case ((accRope: LongRope, accIt: Iterator[LongRope]), move: Move) =>
       (accRope.iterateMove(move).last, accIt ++ accRope.iterateMove(move))
     })._2
 
@@ -67,5 +103,6 @@ object Day9 {
 
   def main(args: Array[String]): Unit = {
     println(countTailPoss(parseMoves(input)))
+    println(countLongTailPoss(parseMoves(input)))
   }
 }

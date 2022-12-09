@@ -15,11 +15,30 @@ class Day9Test extends AnyFunSuite {
       |L 5
       |R 2""".stripMargin
 
+  val exampleInput2 =
+    """R 5
+      |U 8
+      |L 8
+      |D 3
+      |R 17
+      |D 10
+      |L 25
+      |U 20""".stripMargin
+
   test("Part 1 examples") {
     assert(countTailPoss(parseMoves(exampleInput)) == 13)
   }
 
   test("Part 1 input answer") {
     assert(countTailPoss(parseMoves(input)) == 5695)
+  }
+
+  test("Part 2 examples") {
+    assert(countLongTailPoss(parseMoves(exampleInput)) == 1)
+    assert(countLongTailPoss(parseMoves(exampleInput2)) == 36)
+  }
+
+  test("Part 2 input answer") {
+    assert(countLongTailPoss(parseMoves(input)) == 2434)
   }
 }
