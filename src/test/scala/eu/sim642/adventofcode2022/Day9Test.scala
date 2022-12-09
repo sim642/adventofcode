@@ -26,19 +26,19 @@ class Day9Test extends AnyFunSuite {
       |U 20""".stripMargin
 
   test("Part 1 examples") {
-    assert(countTailPoss(parseMoves(exampleInput)) == 13)
+    assert(countTailPoss(parseMoves(exampleInput), 2) == 13)
   }
 
   test("Part 1 input answer") {
-    assert(countTailPoss(parseMoves(input)) == 5695)
+    assert(countTailPoss(parseMoves(input), 2) == 5695)
   }
 
   test("Part 2 examples") {
-    assert(countLongTailPoss(parseMoves(exampleInput)) == 1)
-    assert(countLongTailPoss(parseMoves(exampleInput2)) == 36)
+    assert(countTailPoss(parseMoves(exampleInput), 10) == 1)
+    assert(countTailPoss(parseMoves(exampleInput2), 10) == 36)
   }
 
   test("Part 2 input answer") {
-    assert(countLongTailPoss(parseMoves(input)) == 2434)
+    assert(countTailPoss(parseMoves(input), 10) == 2434)
   }
 }
