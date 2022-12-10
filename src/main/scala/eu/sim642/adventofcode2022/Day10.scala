@@ -31,6 +31,22 @@ object Day10 {
     (20 to 220 by 40).map(i => i * cpus(i - 1).x).sum
   }
 
+  def render(instructions: Seq[Instruction]): Unit = {
+    val cpus = CPU(instructions).run().take(240)
+    for ((cpu, i) <- cpus.zipWithIndex) {
+      val x = i % 40
+      //val y = i / 40
+      if ((x - cpu.x).abs <= 1)
+        print('#')
+      else
+        print('.')
+      Console.flush()
+
+      if (x == 39)
+        println()
+    }
+  }
+
 
   def parseInstruction(s: String): Instruction = s match {
     case s"addx $v" => Instruction.Addx(v.toInt)
@@ -44,5 +60,6 @@ object Day10 {
 
   def main(args: Array[String]): Unit = {
     println(sumSignalStrengths(parseInstructions(input)))
+    render(parseInstructions(input)) // EJCFPGLH
   }
 }

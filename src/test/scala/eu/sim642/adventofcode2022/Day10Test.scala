@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2022
 
-import Day10._
+import Day10.*
+import org.apache.commons.io.output.ByteArrayOutputStream
 import org.scalatest.funsuite.AnyFunSuite
 
 class Day10Test extends AnyFunSuite {
@@ -165,5 +166,33 @@ class Day10Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(sumSignalStrengths(parseInstructions(input)) == 11960)
+  }
+
+  test("Part 2 examples") {
+    val out = new ByteArrayOutputStream()
+    Console.withOut(out) {
+      render(parseInstructions(exampleInput2))
+    }
+    assert(out.toString.trim ==
+      """##..##..##..##..##..##..##..##..##..##..
+        |###...###...###...###...###...###...###.
+        |####....####....####....####....####....
+        |#####.....#####.....#####.....#####.....
+        |######......######......######......####
+        |#######.......#######.......#######.....""".stripMargin)
+  }
+
+  test("Part 2 input answer") {
+    val out = new ByteArrayOutputStream()
+    Console.withOut(out) {
+      render(parseInstructions(input)) // EJCFPGLH
+    }
+    assert(out.toString.trim ==
+      """####...##..##..####.###...##..#....#..#.
+        |#.......#.#..#.#....#..#.#..#.#....#..#.
+        |###.....#.#....###..#..#.#....#....####.
+        |#.......#.#....#....###..#.##.#....#..#.
+        |#....#..#.#..#.#....#....#..#.#....#..#.
+        |####..##...##..#....#.....###.####.#..#.""".stripMargin)
   }
 }
