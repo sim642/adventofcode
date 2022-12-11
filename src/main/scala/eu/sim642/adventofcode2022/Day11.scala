@@ -15,59 +15,46 @@ object Day11 {
                     items: Queue[Item])
 
   trait Part {
-    def monkeyBusiness(initialMonkeys: Vector[Monkey]): Item
+    protected val rounds: Int
+    protected def makePostOperation(monkeys: Vector[Monkey]): Item => Item
+
+    def runTurn(monkeys: Vector[Monkey], current: Int, postOperation: Item => Item): Vector[Monkey] = {
+      val currentMonkey = monkeys(current)
+
+      currentMonkey.items.foldLeft(monkeys)({ (monkeys, item) =>
+        val test = postOperation(currentMonkey.operation(item))
+        val throwIndex = if (test % currentMonkey.testDivisible == 0) currentMonkey.testTrue else currentMonkey.testFalse
+        val throwMonkey = monkeys(throwIndex)
+        monkeys.updated(throwIndex, throwMonkey.copy(items = throwMonkey.items.appended(test)))
+      }).updated(current, currentMonkey.copy(items = Queue.empty))
+    }
+
+    def monkeyBusiness(initialMonkeys: Vector[Monkey]): Long = {
+      val postOperation = makePostOperation(initialMonkeys)
+
+      val finalInspectCounts = (1 to rounds).foldLeft((initialMonkeys, Vector.fill(initialMonkeys.size)(0)))({ case ((monkeys, inspectCounts), round) =>
+        monkeys.indices.foldLeft((monkeys, inspectCounts))({ case ((monkeys, inspectCounts), current) =>
+          (runTurn(monkeys, current, postOperation), inspectCounts.updated(current, inspectCounts(current) + monkeys(current).items.size))
+        })
+      })._2
+
+      finalInspectCounts.sorted.takeRight(2).map(_.toLong).product
+    }
   }
 
   object Part1 extends Part {
+    override protected val rounds: Int = 20
 
-    def runTurn(monkeys: Vector[Monkey], current: Int): Vector[Monkey] = {
-      val currentMonkey = monkeys(current)
-
-      currentMonkey.items.foldLeft(monkeys)({ (monkeys, item) =>
-        val test = currentMonkey.operation(item) / 3
-        val throwIndex = if (test % currentMonkey.testDivisible == 0) currentMonkey.testTrue else currentMonkey.testFalse
-        val throwMonkey = monkeys(throwIndex)
-        monkeys.updated(throwIndex, throwMonkey.copy(items = throwMonkey.items.appended(test)))
-      }).updated(current, currentMonkey.copy(items = Queue.empty))
-    }
-
-    override def monkeyBusiness(initialMonkeys: Vector[Monkey]): Item = {
-
-      val finalInspectCounts = (1 to 20).foldLeft((initialMonkeys, Vector.fill(initialMonkeys.size)(0)))({ case ((monkeys, inspectCounts), round) =>
-        monkeys.indices.foldLeft((monkeys, inspectCounts))({ case ((monkeys, inspectCounts), current) =>
-          (runTurn(monkeys, current), inspectCounts.updated(current, inspectCounts(current) + monkeys(current).items.size))
-        })
-      })._2
-
-      finalInspectCounts.sorted.takeRight(2).product
-    }
+    override protected def makePostOperation(monkeys: Vector[Monkey]): Item => Item =
+      x => x / 3
   }
 
   object Part2 extends Part {
+    override protected val rounds: Int = 10000
 
-    // TODO: deduplicate
-    def runTurn(monkeys: Vector[Monkey], current: Int, lcm: Long): Vector[Monkey] = {
-      val currentMonkey = monkeys(current)
-
-      currentMonkey.items.foldLeft(monkeys)({ (monkeys, item) =>
-        val test = currentMonkey.operation(item) % lcm
-        val throwIndex = if (test % currentMonkey.testDivisible == 0) currentMonkey.testTrue else currentMonkey.testFalse
-        val throwMonkey = monkeys(throwIndex)
-        monkeys.updated(throwIndex, throwMonkey.copy(items = throwMonkey.items.appended(test)))
-      }).updated(current, currentMonkey.copy(items = Queue.empty))
-    }
-
-    override def monkeyBusiness(initialMonkeys: Vector[Monkey]): Item = {
-
-      val lcm = NumberTheory.lcm(initialMonkeys.map(_.testDivisible))
-
-      val finalInspectCounts = (1 to 10000).foldLeft((initialMonkeys, Vector.fill(initialMonkeys.size)(0L)))({ case ((monkeys, inspectCounts), round) =>
-        monkeys.indices.foldLeft((monkeys, inspectCounts))({ case ((monkeys, inspectCounts), current) =>
-          (runTurn(monkeys, current, lcm), inspectCounts.updated(current, inspectCounts(current) + monkeys(current).items.size))
-        })
-      })._2
-
-      finalInspectCounts.sorted.takeRight(2).product
+    override protected def makePostOperation(monkeys: Vector[Monkey]): Item => Item = {
+      val lcm = NumberTheory.lcm(monkeys.map(_.testDivisible))
+      x => x % lcm
     }
   }
 
