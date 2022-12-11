@@ -1,8 +1,10 @@
 package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcodelib.NumberTheory
+import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
 import scala.collection.immutable.Queue
+import scala.math.Integral.Implicits._
 
 object Day11 {
 
@@ -15,7 +17,7 @@ object Day11 {
                     items: Queue[Item])
 
   trait Part {
-    protected val rounds: Int
+    protected val rounds: Long
     protected def makePostOperation(monkeys: Vector[Monkey]): Item => Item
 
     def runTurn(monkeys: Vector[Monkey], current: Int, postOperation: Item => Item): Vector[Monkey] = {
@@ -29,32 +31,63 @@ object Day11 {
       }).updated(current, currentMonkey.copy(items = Queue.empty))
     }
 
+    protected def runRounds(initialMonkeys: Vector[Monkey], operation: Item => Item, rounds: Int): (Vector[Monkey], Vector[Int]) = {
+      (1 to rounds).foldLeft((initialMonkeys, Vector.fill(initialMonkeys.size)(0)))({ case ((monkeys, inspectCounts), round) =>
+        monkeys.indices.foldLeft((monkeys, inspectCounts))({ case ((monkeys, inspectCounts), current) =>
+          (runTurn(monkeys, current, operation), inspectCounts.updated(current, inspectCounts(current) + monkeys(current).items.size))
+        })
+      })
+    }
+
     def monkeyBusiness(initialMonkeys: Vector[Monkey]): Long = {
       val postOperation = makePostOperation(initialMonkeys)
-
-      val finalInspectCounts = (1 to rounds).foldLeft((initialMonkeys, Vector.fill(initialMonkeys.size)(0)))({ case ((monkeys, inspectCounts), round) =>
-        monkeys.indices.foldLeft((monkeys, inspectCounts))({ case ((monkeys, inspectCounts), current) =>
-          (runTurn(monkeys, current, postOperation), inspectCounts.updated(current, inspectCounts(current) + monkeys(current).items.size))
-        })
-      })._2
-
+      val (_, finalInspectCounts) = runRounds(initialMonkeys, postOperation, rounds.toInt)
       finalInspectCounts.sorted.takeRight(2).map(_.toLong).product
     }
   }
 
   object Part1 extends Part {
-    override protected val rounds: Int = 20
+    override protected val rounds: Long = 20
 
     override protected def makePostOperation(monkeys: Vector[Monkey]): Item => Item =
       x => x / 3
   }
 
-  object Part2 extends Part {
-    override protected val rounds: Int = 10000
+  trait Part2 extends Part {
+    override protected val rounds: Long = 10000
 
     override protected def makePostOperation(monkeys: Vector[Monkey]): Item => Item = {
       val lcm = NumberTheory.lcm(monkeys.map(_.testDivisible))
       x => x % lcm
+    }
+  }
+
+  object Part2 extends Part2
+
+  /**
+   * https://www.reddit.com/r/adventofcode/comments/zinjei/2022_day_11_unofficial_part_3_nanomonkeys/
+   */
+  object Part3 extends Part2 {
+    override protected val rounds: Long = 86400000000000L
+
+    override def monkeyBusiness(initialMonkeys: Vector[Monkey]): Long = {
+      val postOperation = makePostOperation(initialMonkeys)
+
+      val cycle = NaiveCycleFinder.find(initialMonkeys, monkeys =>
+        monkeys.indices.foldLeft(monkeys)({ case (monkeys, current) =>
+          runTurn(monkeys, current, postOperation)
+        })
+      )
+
+      val (stemMonkeys, stemInspectCounts) = runRounds(initialMonkeys, postOperation, cycle.stemLength)
+      val (_, cycleInspectCounts) = runRounds(stemMonkeys, postOperation, cycle.cycleLength)
+      val (cycleRepeat, tailLength) = (rounds - cycle.stemLength) /% cycle.cycleLength
+      val (_, tailInspectCounts) = runRounds(stemMonkeys, postOperation, tailLength.toInt)
+
+      val finalInspectCounts = stemInspectCounts.lazyZip(cycleInspectCounts).lazyZip(tailInspectCounts).map({ case (stem, cycle, tail) =>
+        stem + cycleRepeat * cycle + tail
+      })
+      finalInspectCounts.sorted.takeRight(2).sum
     }
   }
 

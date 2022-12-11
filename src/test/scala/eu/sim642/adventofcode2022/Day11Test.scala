@@ -49,4 +49,12 @@ class Day11Test extends AnyFunSuite {
   test("Part 2 input answer") {
     assert(Part2.monkeyBusiness(parseMonkeys(input)) == 19573408701L)
   }
+
+  test("Part 3 examples") {
+    assert(Part3.monkeyBusiness(parseMonkeys(exampleInput)) == 900260526315763L)
+  }
+
+  test("Part 3 input answer") {
+    assert(Part3.monkeyBusiness(parseMonkeys(input)) == 2419199999999810L)
+  }
 }
