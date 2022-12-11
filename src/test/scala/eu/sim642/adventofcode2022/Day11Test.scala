@@ -35,10 +35,18 @@ class Day11Test extends AnyFunSuite {
       |    If false: throw to monkey 1""".stripMargin
 
   test("Part 1 examples") {
-    assert(monkeyBusiness(parseMonkeys(exampleInput)) == 10605)
+    assert(Part1.monkeyBusiness(parseMonkeys(exampleInput)) == 10605)
   }
 
   test("Part 1 input answer") {
-    assert(monkeyBusiness(parseMonkeys(input)) == 69918)
+    assert(Part1.monkeyBusiness(parseMonkeys(input)) == 69918)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.monkeyBusiness(parseMonkeys(exampleInput)) == 2713310158L)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.monkeyBusiness(parseMonkeys(input)) == 19573408701L)
   }
 }
