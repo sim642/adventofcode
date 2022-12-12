@@ -19,4 +19,12 @@ class Day12Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(fewestStepsToBestSignal(parseGrid(input)) == 423)
   }
+
+  test("Part 2 examples") {
+    assert(fewestStepsToBestSignal2(parseGrid(exampleInput)) == 29)
+  }
+
+  test("Part 2 input answer") {
+    assert(fewestStepsToBestSignal2(parseGrid(input)) == 416)
+  }
 }

@@ -34,11 +34,33 @@ object Day12 {
     Dijkstra.search(graphSearch).target.get._2
   }
 
+  def fewestStepsToBestSignal2(grid: Grid[Char]): Int = {
+
+    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
+
+      override val startNode: Pos = grid.posOf('E')
+
+      override def unitNeighbors(node: Pos): IterableOnce[Pos] = {
+        for {
+          offset <- Pos.axisOffsets.iterator
+          newPos = node + offset
+          if grid.containsPos(newPos)
+          if height(grid(node)) <= height(grid(newPos)) + 1
+        } yield newPos
+      }
+
+      override def isTargetNode(node: Pos, dist: Int): Boolean = height(grid(node)) == 'a'
+    }
+
+    Dijkstra.search(graphSearch).target.get._2
+  }
+
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(fewestStepsToBestSignal(parseGrid(input)))
+    println(fewestStepsToBestSignal2(parseGrid(input)))
   }
 }
