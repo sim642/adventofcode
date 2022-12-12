@@ -13,18 +13,18 @@ class Day12Test extends AnyFunSuite {
       |abdefghi""".stripMargin
 
   test("Part 1 examples") {
-    assert(fewestStepsToBestSignal(parseGrid(exampleInput)) == 31)
+    assert(Part1.fewestStepsToBestSignal(parseGrid(exampleInput)) == 31)
   }
 
   test("Part 1 input answer") {
-    assert(fewestStepsToBestSignal(parseGrid(input)) == 423)
+    assert(Part1.fewestStepsToBestSignal(parseGrid(input)) == 423)
   }
 
   test("Part 2 examples") {
-    assert(fewestStepsToBestSignal2(parseGrid(exampleInput)) == 29)
+    assert(Part2.fewestStepsToBestSignal(parseGrid(exampleInput)) == 29)
   }
 
   test("Part 2 input answer") {
-    assert(fewestStepsToBestSignal2(parseGrid(input)) == 416)
+    assert(Part2.fewestStepsToBestSignal(parseGrid(input)) == 416)
   }
 }

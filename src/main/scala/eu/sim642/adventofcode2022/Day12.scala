@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits.*
-import eu.sim642.adventofcodelib.graph.{Dijkstra, GraphSearch, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 
 object Day12 {
@@ -13,54 +13,46 @@ object Day12 {
     case c => c
   }
 
-  def fewestStepsToBestSignal(grid: Grid[Char]): Int = {
+  trait Part {
+    def isTargetPos(grid: Grid[Char], pos: Pos): Boolean
 
-    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
+    def fewestStepsToBestSignal(grid: Grid[Char]): Int = {
 
-      override val startNode: Pos = grid.posOf('S')
+      val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
 
-      override def unitNeighbors(node: Pos): IterableOnce[Pos] = {
-        for {
-          offset <- Pos.axisOffsets.iterator
-          newPos = node + offset
-          if grid.containsPos(newPos)
-          if height(grid(newPos)) <= height(grid(node)) + 1
-        } yield newPos
+        override val startNode: Pos = grid.posOf('E')
+
+        override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
+          for {
+            offset <- Pos.axisOffsets.iterator
+            newPos = pos + offset
+            if grid.containsPos(newPos)
+            if height(grid(pos)) <= height(grid(newPos)) + 1
+          } yield newPos
+        }
+
+        override def isTargetNode(pos: Pos, dist: Int): Boolean = isTargetPos(grid, pos)
       }
 
-      override def isTargetNode(node: Pos, dist: Int): Boolean = grid(node) == 'E'
+      BFS.search(graphSearch).target.get._2
     }
-
-    Dijkstra.search(graphSearch).target.get._2
   }
 
-  def fewestStepsToBestSignal2(grid: Grid[Char]): Int = {
-
-    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
-
-      override val startNode: Pos = grid.posOf('E')
-
-      override def unitNeighbors(node: Pos): IterableOnce[Pos] = {
-        for {
-          offset <- Pos.axisOffsets.iterator
-          newPos = node + offset
-          if grid.containsPos(newPos)
-          if height(grid(node)) <= height(grid(newPos)) + 1
-        } yield newPos
-      }
-
-      override def isTargetNode(node: Pos, dist: Int): Boolean = height(grid(node)) == 'a'
-    }
-
-    Dijkstra.search(graphSearch).target.get._2
+  object Part1 extends Part {
+    override def isTargetPos(grid: Grid[Char], pos: Pos): Boolean = grid(pos) == 'S'
   }
+
+  object Part2 extends Part {
+    override def isTargetPos(grid: Grid[Char], pos: Pos): Boolean = height(grid(pos)) == 'a'
+  }
+
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(fewestStepsToBestSignal(parseGrid(input)))
-    println(fewestStepsToBestSignal2(parseGrid(input)))
+    println(Part1.fewestStepsToBestSignal(parseGrid(input)))
+    println(Part2.fewestStepsToBestSignal(parseGrid(input)))
   }
 }
