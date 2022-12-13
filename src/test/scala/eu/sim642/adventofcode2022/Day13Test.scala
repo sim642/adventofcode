@@ -31,18 +31,18 @@ class Day13Test extends AnyFunSuite {
       |[1,[2,[3,[4,[5,6,0]]]],8,9]""".stripMargin
 
   test("Part 1 examples") {
-    assert(sumOrderedIndices(parsePacketPairs(exampleInput)) == 13)
+    assert(sumPairOrderedIndices(parsePackets(exampleInput)) == 13)
   }
 
   test("Part 1 input answer") {
-    assert(sumOrderedIndices(parsePacketPairs(input)) == 5808)
+    assert(sumPairOrderedIndices(parsePackets(input)) == 5808)
   }
 
   test("Part 2 examples") {
-    assert(decoderKey(parsePacketPairs(exampleInput)) == 140)
+    assert(decoderKey(parsePackets(exampleInput)) == 140)
   }
 
   test("Part 2 input answer") {
-    assert(decoderKey(parsePacketPairs(input)) == 22713)
+    assert(decoderKey(parsePackets(input)) == 22713)
   }
 }

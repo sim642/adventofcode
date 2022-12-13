@@ -3,7 +3,7 @@ package eu.sim642.adventofcode2022
 import Day13.PacketNode.*
 
 import scala.util.parsing.combinator.*
-import math.Ordering.Implicits.infixOrderingOps
+import math.Ordering.Implicits._
 import scala.annotation.tailrec
 
 object Day13 extends RegexParsers {
@@ -26,20 +26,22 @@ object Day13 extends RegexParsers {
     }
   }
 
-  def sumOrderedIndices(packetPairs: Seq[(PacketNode, PacketNode)]): Int = {
+  def sumPairOrderedIndices(packets: Seq[PacketNode]): Int = {
     (for {
-      ((packet1, packet2), i) <- packetPairs.zipWithIndex
+      (Seq(packet1, packet2), i) <- packets.grouped(2).zipWithIndex
       if packet1 <= packet2
     } yield i + 1).sum
   }
 
-  def decoderKey(packetPairs: Seq[(PacketNode, PacketNode)]): Int = {
-    val divider2 = ListNode(Seq(ListNode(Seq(IntNode(2)))))
-    val divider6 = ListNode(Seq(ListNode(Seq(IntNode(6)))))
-    val packets = packetPairs.flatMap(p => Seq(p._1, p._2)) ++ Seq(divider2, divider6)
-    val sortedPackets = packets.sorted
-    (sortedPackets.indexOf(divider2) + 1) * ((sortedPackets.indexOf(divider6) + 1))
+  private val divider2 = ListNode(Seq(ListNode(Seq(IntNode(2)))))
+  private val divider6 = ListNode(Seq(ListNode(Seq(IntNode(6)))))
+
+  def decoderKey(packets: Seq[PacketNode]): Int = {
+    val allPackets = packets ++ Seq(divider2, divider6)
+    val sortedPackets = allPackets.sorted
+    (sortedPackets.indexOf(divider2) + 1) * (sortedPackets.indexOf(divider6) + 1)
   }
+
 
   def parsePacket(s: String): PacketNode = {
 
@@ -51,18 +53,12 @@ object Day13 extends RegexParsers {
     parseAll(packetNode, s).get
   }
 
-  def parsePacketPairs(input: String): Seq[(PacketNode, PacketNode)] = {
-    input.split("\n\n").map({ pair =>
-      val Array(packet1, packet2) = pair.split("\n", 2)
-      (parsePacket(packet1), parsePacket(packet2))
-    }).toSeq
-  }
-
+  def parsePackets(input: String): Seq[PacketNode] = input.linesIterator.filterNot(_.isEmpty).map(parsePacket).toSeq
 
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(sumOrderedIndices(parsePacketPairs(input)))
-    println(decoderKey(parsePacketPairs(input)))
+    println(sumPairOrderedIndices(parsePackets(input)))
+    println(decoderKey(parsePackets(input)))
   }
 }
