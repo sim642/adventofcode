@@ -33,6 +33,14 @@ object Day13 extends RegexParsers {
     } yield i + 1).sum
   }
 
+  def decoderKey(packetPairs: Seq[(PacketNode, PacketNode)]): Int = {
+    val divider2 = ListNode(Seq(ListNode(Seq(IntNode(2)))))
+    val divider6 = ListNode(Seq(ListNode(Seq(IntNode(6)))))
+    val packets = packetPairs.flatMap(p => Seq(p._1, p._2)) ++ Seq(divider2, divider6)
+    val sortedPackets = packets.sorted
+    (sortedPackets.indexOf(divider2) + 1) * ((sortedPackets.indexOf(divider6) + 1))
+  }
+
   def parsePacket(s: String): PacketNode = {
 
     def packetNode: Parser[PacketNode] = (
@@ -55,5 +63,6 @@ object Day13 extends RegexParsers {
 
   def main(args: Array[String]): Unit = {
     println(sumOrderedIndices(parsePacketPairs(input)))
+    println(decoderKey(parsePacketPairs(input)))
   }
 }

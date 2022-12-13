@@ -37,4 +37,12 @@ class Day13Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumOrderedIndices(parsePacketPairs(input)) == 5808)
   }
+
+  test("Part 2 examples") {
+    assert(decoderKey(parsePacketPairs(exampleInput)) == 140)
+  }
+
+  test("Part 2 input answer") {
+    assert(decoderKey(parsePacketPairs(input)) == 22713)
+  }
 }
