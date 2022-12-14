@@ -12,35 +12,44 @@ object Day14 {
   // Based on 2018 day 17
 
   enum Tile(override val toString: String) {
+    case Air extends Tile(".")
     case Rock extends Tile("#")
     case Sand extends Tile("o")
   }
 
   type Tiles = Map[Pos, Tile]
   
-  private val pourOffsets = Seq(
+  private val pourOffsets = List(
     Pos(0, 1),
     Pos(-1, 1),
     Pos(1, 1)
   )
 
-  def pour(tiles: Tiles, maxY: Int, sourcePos: Pos): Tiles = {
+  def pour(tiles: Tiles, maxY: Int, pos: Pos): Tiles = {
+    //printTiles(tiles)
+    //println()
+    if (pos.y > maxY)
+      tiles
+    else {
+      tiles(pos) match {
+        case Sand | Rock => tiles
+        case Air =>
 
-    @tailrec
-    def pourOne(tiles: Tiles, pos: Pos): Tiles = {
-      if (tiles.contains(pos))
-        tiles
-      else {
-        val newPos = pourOffsets.map(pos + _).find(!tiles.contains(_))
-        newPos match {
-          case None => pourOne(tiles + (pos -> Sand), sourcePos)
-          case Some(newPos) if newPos.y > maxY => tiles
-          case Some(newPos) => pourOne(tiles, newPos)
-        }
+          @tailrec
+          def helper(tiles: Tiles, offsets: List[Pos]): Tiles = offsets match {
+            case Nil => tiles + (pos -> Sand)
+            case offset :: newOffsets =>
+              val newPos = pos + offset
+              val newTiles = pour(tiles, maxY, newPos)
+              newTiles(newPos) match {
+                case Air => newTiles
+                case Sand | Rock => helper(newTiles, newOffsets)
+              }
+          }
+
+          helper(tiles, pourOffsets)
       }
     }
-
-    pourOne(tiles, sourcePos)
   }
 
   trait Part {
@@ -92,15 +101,14 @@ object Day14 {
       .reduce(_ ++ _)
   }
 
-  def parseTiles(input: String): Tiles = input.linesIterator.map(parsePath).reduce(_ ++ _)
+  def parseTiles(input: String): Tiles =
+    input.linesIterator.map(parsePath).reduce(_ ++ _).withDefaultValue(Air)
 
   def printTiles(tiles: Tiles): Unit = {
     val Box(min, max) = Box.bounding(tiles.keys)
     for (y <- min.y to max.y) {
-      for (x <- min.x to max.x) {
-        val pos = Pos(x, y)
-        print(if (tiles.contains(pos)) tiles(pos).toString else ".")
-      }
+      for (x <- min.x to max.x)
+        print(tiles(Pos(x, y)))
       println()
     }
   }
