@@ -28,22 +28,45 @@ object Day14 {
 
     @tailrec
     def pourOne(tiles: Tiles, pos: Pos): Tiles = {
-      val newPos = pourOffsets.map(pos + _).find(!tiles.contains(_))
-      newPos match {
-        case None => pourOne(tiles + (pos -> Sand), sourcePos)
-        case Some(newPos) if newPos.y > maxY => tiles
-        case Some(newPos) => pourOne(tiles, newPos)
+      if (tiles.contains(pos))
+        tiles
+      else {
+        val newPos = pourOffsets.map(pos + _).find(!tiles.contains(_))
+        newPos match {
+          case None => pourOne(tiles + (pos -> Sand), sourcePos)
+          case Some(newPos) if newPos.y > maxY => tiles
+          case Some(newPos) => pourOne(tiles, newPos)
+        }
       }
     }
 
     pourOne(tiles, sourcePos)
   }
 
-  def countRestingSand(tiles: Tiles): Int = {
-    val Box(min, max) = Box.bounding(tiles.keys)
-    val poured = pour(tiles, max.y, Pos(500, 0))
-    //printTiles(poured)
-    poured.count({ case (pos, tile) => tile == Sand })
+  trait Part {
+    def countRestingSand(tiles: Tiles): Int
+  }
+
+  object Part1 extends Part {
+    override def countRestingSand(tiles: Tiles): Int = {
+      val Box(min, max) = Box.bounding(tiles.keys)
+      val poured = pour(tiles, max.y, Pos(500, 0))
+      //printTiles(poured)
+      poured.count({ case (pos, tile) => tile == Sand })
+    }
+  }
+
+  object Part2 extends Part {
+    override def countRestingSand(tiles: Tiles): Int = {
+      val Box(min, max) = Box.bounding(tiles.keys)
+      val maxY = max.y + 2
+      val pos1 = Pos(500 - maxY, maxY)
+      val pos2 = Pos(500 + maxY, maxY)
+      val newTiles = tiles ++ makeLine(pos1, pos2)
+      val poured = pour(newTiles, maxY, Pos(500, 0))
+      //printTiles(poured)
+      poured.count({ case (pos, tile) => tile == Sand })
+    }
   }
 
 
@@ -85,6 +108,7 @@ object Day14 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day14.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countRestingSand(parseTiles(input)))
+    println(Part1.countRestingSand(parseTiles(input)))
+    println(Part2.countRestingSand(parseTiles(input)))
   }
 }
