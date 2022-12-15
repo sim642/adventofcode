@@ -4,6 +4,8 @@ import eu.sim642.adventofcode2022.Day4.Interval
 import eu.sim642.adventofcodelib.pos.Pos
 
 import scala.annotation.tailrec
+import scala.util.control.NonLocalReturns._
+
 
 object Day15 {
 
@@ -54,6 +56,32 @@ object Day15 {
     mergedIntervals.map(_.size).sum
   }
 
+  def findDistressBeacon(sensorBeacons: Seq[SensorBeacon], maxCoord: Int = 4000000): Pos = returning {
+    val beacons = sensorBeacons.map(_.beacon).toSet
+
+    // TODO: optimize
+    for (y <- 0 to maxCoord) {
+      val intervals = sensorBeacons.flatMap(_.projectY(y))
+      val mergedIntervals = mergeIntervals(intervals)
+      mergedIntervals match {
+        case Seq(_) =>
+        case Seq(right, left) =>
+          val x = left.max + 1
+          val pos = Pos(x, y)
+          if (0 <= x && x <= maxCoord && !beacons.contains(pos))
+            throwReturn(pos)
+        case _ => ???
+      }
+    }
+
+    ???
+  }
+
+  def tuningFrequency(sensorBeacons: Seq[SensorBeacon], maxCoord: Int = 4000000): Long = {
+    val distressBeacon = findDistressBeacon(sensorBeacons, maxCoord)
+    distressBeacon.x * 4000000L + distressBeacon.y
+  }
+
 
   def parseSensorBeacon(s: String): SensorBeacon = s match {
     case s"Sensor at x=$sensorX, y=$sensorY: closest beacon is at x=$beaconX, y=$beaconY" =>
@@ -66,5 +94,6 @@ object Day15 {
 
   def main(args: Array[String]): Unit = {
     println(countNoBeaconY(parseSensorBeacons(input)))
+    println(tuningFrequency(parseSensorBeacons(input)))
   }
 }

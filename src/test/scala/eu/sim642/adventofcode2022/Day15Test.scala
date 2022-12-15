@@ -28,4 +28,12 @@ class Day15Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countNoBeaconY(parseSensorBeacons(input)) == 4748135)
   }
+
+  test("Part 2 examples") {
+    assert(tuningFrequency(parseSensorBeacons(exampleInput), 20) == 56000011)
+  }
+
+  test("Part 2 input answer") {
+    assert(tuningFrequency(parseSensorBeacons(input)) == 13743542639657L) // TODO: optimize, 2s
+  }
 }
