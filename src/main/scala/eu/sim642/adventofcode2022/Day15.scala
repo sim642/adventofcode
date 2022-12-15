@@ -1,11 +1,11 @@
 package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcode2022.Day4.Interval
+import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 
 import scala.annotation.tailrec
-import scala.util.control.NonLocalReturns._
-
+import scala.util.control.NonLocalReturns.*
 
 object Day15 {
 
@@ -56,30 +56,66 @@ object Day15 {
     mergedIntervals.map(_.size).sum
   }
 
-  def findDistressBeacon(sensorBeacons: Seq[SensorBeacon], maxCoord: Int = 4000000): Pos = returning {
-    val beacons = sensorBeacons.map(_.beacon).toSet
+  trait Part2Solution {
+    def findDistressBeacon(sensorBeacons: Seq[SensorBeacon], maxCoord: Int): Pos
 
-    // TODO: optimize
-    for (y <- 0 to maxCoord) {
-      val intervals = sensorBeacons.flatMap(_.projectY(y))
-      val mergedIntervals = mergeIntervals(intervals)
-      mergedIntervals match {
-        case Seq(_) =>
-        case Seq(right, left) =>
-          val x = left.max + 1
-          val pos = Pos(x, y)
-          if (0 <= x && x <= maxCoord && !beacons.contains(pos))
-            throwReturn(pos)
-        case _ => ???
-      }
+    def tuningFrequency(sensorBeacons: Seq[SensorBeacon], maxCoord: Int = 4000000): Long = {
+      val distressBeacon = findDistressBeacon(sensorBeacons, maxCoord)
+      distressBeacon.x * 4000000L + distressBeacon.y
     }
-
-    ???
   }
 
-  def tuningFrequency(sensorBeacons: Seq[SensorBeacon], maxCoord: Int = 4000000): Long = {
-    val distressBeacon = findDistressBeacon(sensorBeacons, maxCoord)
-    distressBeacon.x * 4000000L + distressBeacon.y
+  /**
+   * Solution, which applies efficient part 1 to all y coordinates.
+   * Runs in ~2s.
+   */
+  object SeminaivePart2Solution extends Part2Solution {
+    override def findDistressBeacon(sensorBeacons: Seq[SensorBeacon], maxCoord: Int): Pos = returning {
+      val beacons = sensorBeacons.map(_.beacon).toSet
+
+      for (y <- 0 to maxCoord) {
+        val intervals = sensorBeacons.flatMap(_.projectY(y))
+        val mergedIntervals = mergeIntervals(intervals)
+        mergedIntervals match {
+          case Seq(_) =>
+          case Seq(right, left) =>
+            val x = left.max + 1
+            val pos = Pos(x, y)
+            if (0 <= x && x <= maxCoord && !beacons.contains(pos))
+              throwReturn(pos)
+          case _ => ???
+        }
+      }
+
+      ???
+    }
+  }
+
+  /**
+   * Solution, which transforms sensor diamonds to boxes, subtracts them and transforms remaining coordinate back.
+   */
+  object BoxPart2Solution extends Part2Solution {
+    override def findDistressBeacon(sensorBeacons: Seq[SensorBeacon], maxCoord: Int): Pos = {
+
+      def diag2box(pos: Pos): Pos = Pos(pos.x - pos.y, pos.x + pos.y)
+      def box2diag(pos: Pos): Pos = Pos((pos.x + pos.y) / 2, (pos.y - pos.x) / 2)
+
+      def diamond2box(center: Pos, radius: Int): Box =
+        Box(diag2box(center - Pos(radius, 0)), diag2box(center + Pos(radius, 0)))
+
+      val initialBox = diamond2box(Pos(maxCoord / 2, maxCoord / 2), maxCoord)
+      val finalBoxes = sensorBeacons.foldLeft(Seq(initialBox))({ (acc, sb) =>
+        val sensorBox = diamond2box(sb.sensor, sb.distance)
+        acc.flatMap(_.diffSplit(sensorBox))
+      })
+
+      val diagBounds = Box(Pos.zero, Pos(maxCoord, maxCoord))
+
+      finalBoxes
+        .map(box => box2diag(box.min)) // unique answer, so min == max
+        .find(diagBounds.contains)
+        .get
+    }
   }
 
 
@@ -93,6 +129,8 @@ object Day15 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import BoxPart2Solution._
+
     println(countNoBeaconY(parseSensorBeacons(input)))
     println(tuningFrequency(parseSensorBeacons(input)))
   }

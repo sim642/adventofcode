@@ -11,6 +11,27 @@ case class Box(min: Pos, max: Pos) extends BoxOps[Pos, Box] {
       y <- (min.y to max.y).iterator
     } yield Pos(x, y)
   }
+
+  def diffSplit(that: Box): Seq[Box] = {
+    this intersect that match {
+      case None => Seq(this)
+      case Some(inter) =>
+
+        def make(a: Pos, b: Pos): Option[Box] = {
+          if (a <= b)
+            Some(Box(a, b))
+          else
+            None
+        }
+
+        Seq(
+          (Pos(min.x, min.y), Pos(inter.min.x - 1, max.y)),
+          (Pos(inter.max.x + 1, min.y), Pos(max.x, max.y)),
+          (Pos(inter.min.x, min.y), Pos(inter.max.x, inter.min.y - 1)),
+          (Pos(inter.min.x, inter.max.y + 1), Pos(inter.max.x, max.y)),
+        ).flatMap(make)
+    }
+  }
 }
 
 object Box extends BoxFactory[Pos, Box] {
