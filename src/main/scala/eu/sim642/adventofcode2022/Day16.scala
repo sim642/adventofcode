@@ -3,7 +3,7 @@ package eu.sim642.adventofcode2022
 import eu.sim642.adventofcodelib.IteratorImplicits.GroupIteratorOps
 
 import scala.annotation.tailrec
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 
 object Day16 {
 
@@ -27,25 +27,29 @@ object Day16 {
     dists
   }
 
-  def valvesMaxPressure(valves: Map[Valve, ValveData], minutes: Int): Map[Set[Valve], Int] = {
-    val goodValves = valves.filter(_._2.flowRate > 0).keySet
+  def valvesMaxPressure(valves: Map[Valve, ValveData], minutes: Int): Map[immutable.BitSet, Int] = {
     val dists = valveDists(valves) // precompute pairwise distances between valves for direct moves to good valves
 
-    case class State(valve: Valve, open: Set[Valve])
+    // fix valve order to use BitSet, which is much faster for part 2
+    val orderedValves = valves.keys.toVector
+    val goodValveIndices = valves.filter(_._2.flowRate > 0).keySet.map(orderedValves.indexOf)
+
+    case class State(valve: Valve, open: immutable.BitSet)
 
     @tailrec
-    def helper(minute: Int, states: Map[Int, Map[State, Int]]): Map[Set[Valve], Int] = {
+    def helper(minute: Int, states: Map[Int, Map[State, Int]]): Map[immutable.BitSet, Int] = {
       if (minute < minutes) {
         val moveOpenStates = for {
           (State(valve, open), pressure) <- states.getOrElse(minute, Map.empty).iterator
-          newValve <- goodValves // only go to good valves
-          if !open.contains(newValve)
+          newValveIndex <- goodValveIndices // only go to good valves
+          if !open.contains(newValveIndex)
+          newValve = orderedValves(newValveIndex)
           dist = dists(valve)(newValve)
           flowRate = valves(newValve).flowRate // also open good valve, otherwise pointless move
           doneMinute = minute + dist + 1
           if doneMinute < minutes // avoid move, which won't finish in time
           extraPressure = flowRate * (minutes - doneMinute)
-        } yield doneMinute -> (State(newValve, open + newValve) -> (pressure + extraPressure))
+        } yield doneMinute -> (State(newValve, open + newValveIndex) -> (pressure + extraPressure))
 
         // TODO: better nested merging
         val newStates = moveOpenStates.foldLeft(states)({ case (acc, (minute, (state, pressure))) =>
@@ -65,7 +69,7 @@ object Day16 {
       }
     }
 
-    helper(0, Map(0 -> Map(State("AA", Set.empty) -> 0)))
+    helper(0, Map(0 -> Map(State("AA", immutable.BitSet.empty) -> 0)))
   }
 
   trait Part {
@@ -80,13 +84,11 @@ object Day16 {
 
   object Part2 extends Part {
     override def mostPressure(valves: Map[Valve, ValveData]): Int = {
-      val goodValves = valves.filter(_._2.flowRate > 0).keySet
-      val valvesPressure = valvesMaxPressure(valves, 26)
+      val valvesPressure = valvesMaxPressure(valves, 26).toVector
       (for {
-        (valves1, pressure1) <- valvesPressure.iterator
-        otherValves = goodValves.diff(valves1)
-        valves2 <- otherValves.subsets() // faster than checking all pairs for disjoint
-        pressure2 <- valvesPressure.get(valves2)
+        ((valves1, pressure1), i) <- valvesPressure.iterator.zipWithIndex
+        (valves2, pressure2) <- valvesPressure.view.drop(i + 1).iterator
+        if (valves1 intersect valves2).isEmpty
       } yield pressure1 + pressure2).max
     }
   }
