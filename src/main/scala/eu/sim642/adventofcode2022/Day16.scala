@@ -1,14 +1,10 @@
 package eu.sim642.adventofcode2022
 
-import eu.sim642.adventofcode2022.Day4.Interval
-import eu.sim642.adventofcodelib.box.Box
-import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.IteratorImplicits.GroupIteratorOps
 import eu.sim642.adventofcode2019.Day18.DisjointSetOps
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.util.control.NonLocalReturns.*
 
 object Day16 {
 
@@ -16,44 +12,10 @@ object Day16 {
 
   case class ValveData(flowRate: Int, tunnels: Seq[Valve])
 
-  def mostPressure(valves: Map[Valve, ValveData]): Int = {
-
-    /*case class State(valve: Valve, open: Set[Valve], remainingFlowRate: Int)
-
-    @tailrec
-    def helper(minute: Int, states: Map[State, Int]): Int = {
-      println(s"$minute: ${states.size}")
-      if (minute < 30) {
-        val moveStates = for {
-          (state, pressure) <- states.iterator
-          newValve <- valves(state.valve).tunnels
-        } yield state.copy(valve = newValve) -> pressure
-
-        val openStates = for {
-          (state, pressure) <- states.iterator
-          flowRate = valves(state.valve).flowRate
-          if flowRate >= 0
-          if !state.open.contains(state.valve)
-          extraPressure = flowRate * (30 - minute - 1)
-        } yield state.copy(open = state.open + state.valve, remainingFlowRate = state.remainingFlowRate - flowRate) -> (pressure + extraPressure)
-
-        val newStates = (moveStates ++ openStates).groupMapReduce(_._1)(_._2)(_ max _)
-        //println(newStates)
-        val maxPressure = newStates.values.max
-        //println(maxPressure)
-        val newStates2 = newStates.filter(p => p._2 + p._1.remainingFlowRate * (30 - minute - 2) >= maxPressure)
-        //println(newStates2)
-        helper(minute + 1, newStates2)
-      }
-      else
-        states.values.max
-    }
-
-    helper(0, Map(State("AA", Set.empty, valves.values.map(_.flowRate).sum) -> 0))*/
-
-
+  def valveDists(valves: Map[Valve, ValveData]): collection.Map[Valve, collection.Map[Valve, Int]] = {
     val dists: mutable.Map[Valve, mutable.Map[Valve, Int]] = valves.view.mapValues(_.tunnels.map(_ -> 1).to(mutable.Map)).to(mutable.Map)
     // Floyd-Warshall
+    // TODO: extract Floyd-Warshall to library
     for {
       midValve <- valves.keys
       fromValve <- valves.keys
@@ -63,108 +25,69 @@ object Day16 {
       newDist = fromDist + toDist
       if dists(fromValve).get(toValve).forall(_ > newDist)
     } dists(fromValve)(toValve) = newDist
-
-    val goodValves = valves.filter(_._2.flowRate > 0).keySet
-
-    case class State(valve: Valve, open: Set[Valve], remainingFlowRate: Int)
-
-    @tailrec
-    def helper(minute: Int, states2: Map[Int, Map[State, Int]]): Int = {
-      val states = states2.getOrElse(minute, Map.empty)
-      println(s"$minute: ${states.size}")
-      if (minute < 30) {
-        val moveOpenStates = for {
-          (state, pressure) <- states.iterator
-          newValve <- goodValves
-          if !state.open.contains(newValve)
-          dist = dists(state.valve)(newValve)
-          flowRate = valves(newValve).flowRate
-          extraPressure = flowRate * (30 - minute - dist - 1)
-        } yield (minute + dist + 1) -> (state.copy(valve = newValve, open = state.open + newValve, remainingFlowRate = state.remainingFlowRate - flowRate) -> (pressure + extraPressure))
-
-        //val s2 = moveOpenStates.groupMapReduce(_._1)(p => Set(p._2))(_ ++ _)
-        //val s3 = s2.view.mapValues(_.groupMapReduce(_._1)(_._2)(_ max _)).toMap
-        val s4 = moveOpenStates.foldLeft(states2)({ case (acc, (min, (st, dist))) =>
-          val m1 = acc.getOrElse(min, Map.empty)
-          val d1 = m1.getOrElse(st, 0)
-          val d2 = d1 max dist
-          val m2 = m1.updated(st, d2)
-          acc.updated(min, m2)
-        })
-
-        helper(minute + 1, s4)
-      }
-      else
-        states2.flatMap(_._2.values.maxOption).max
-    }
-
-    helper(0, Map(0 -> Map(State("AA", Set.empty, valves.values.map(_.flowRate).sum) -> 0)))
+    dists
   }
 
-  def mostPressure2(valves: Map[Valve, ValveData]): Int = {
-
-    // TODO: optimize, ~14s
-
-    val dists: mutable.Map[Valve, mutable.Map[Valve, Int]] = valves.view.mapValues(_.tunnels.map(_ -> 1).to(mutable.Map)).to(mutable.Map)
-    // Floyd-Warshall
-    for {
-      midValve <- valves.keys
-      fromValve <- valves.keys
-      fromDist <- dists(fromValve).get(midValve)
-      toValve <- valves.keys
-      toDist <- dists(midValve).get(toValve)
-      newDist = fromDist + toDist
-      if dists(fromValve).get(toValve).forall(_ > newDist)
-    } dists(fromValve)(toValve) = newDist
-
+  def valvesMaxPressure(valves: Map[Valve, ValveData], minutes: Int): Map[Set[Valve], Int] = {
     val goodValves = valves.filter(_._2.flowRate > 0).keySet
+    val dists = valveDists(valves) // precompute pairwise distances between valves for direct moves to good valves
 
-    case class State(valve: Valve, open: Set[Valve], remainingFlowRate: Int)
+    case class State(valve: Valve, open: Set[Valve])
 
     @tailrec
-    def helper(minute: Int, states2: Map[Int, Map[State, Int]]): Map[Set[Valve], Int] = {
-      val states = states2.getOrElse(minute, Map.empty)
-      println(s"$minute: ${states.size}")
-      if (minute < 26) {
+    def helper(minute: Int, states: Map[Int, Map[State, Int]]): Map[Set[Valve], Int] = {
+      if (minute < minutes) {
         val moveOpenStates = for {
-          (state, pressure) <- states.iterator
-          newValve <- goodValves
-          if !state.open.contains(newValve)
-          dist = dists(state.valve)(newValve)
-          flowRate = valves(newValve).flowRate
-          extraPressure = flowRate * (26 - minute - dist - 1)
-        } yield (minute + dist + 1) -> (state.copy(valve = newValve, open = state.open + newValve, remainingFlowRate = state.remainingFlowRate - flowRate) -> (pressure + extraPressure))
+          (State(valve, open), pressure) <- states.getOrElse(minute, Map.empty).iterator
+          newValve <- goodValves // only go to good valves
+          if !open.contains(newValve)
+          dist = dists(valve)(newValve)
+          flowRate = valves(newValve).flowRate // also open good valve, otherwise pointless move
+          doneMinute = minute + dist + 1
+          extraPressure = flowRate * (minutes - doneMinute)
+        } yield doneMinute -> (State(newValve, open + newValve) -> (pressure + extraPressure))
 
-        //val s2 = moveOpenStates.groupMapReduce(_._1)(p => Set(p._2))(_ ++ _)
-        //val s3 = s2.view.mapValues(_.groupMapReduce(_._1)(_._2)(_ max _)).toMap
-        val s4 = moveOpenStates.foldLeft(states2)({ case (acc, (min, (st, dist))) =>
-          val m1 = acc.getOrElse(min, Map.empty)
-          val d1 = m1.getOrElse(st, 0)
-          val d2 = d1 max dist
-          val m2 = m1.updated(st, d2)
-          acc.updated(min, m2)
+        // TODO: better nested merging
+        val newStates = moveOpenStates.foldLeft(states)({ case (acc, (minute, (state, pressure))) =>
+          val minuteStates = acc.getOrElse(minute, Map.empty)
+          val newPressure = minuteStates.getOrElse(state, 0) max pressure
+          val newMinuteStates = minuteStates.updated(state, newPressure)
+          acc.updated(minute, newMinuteStates)
         })
 
-        helper(minute + 1, s4)
+        helper(minute + 1, newStates)
       }
       else {
         (for {
-          (min, m) <- states2.iterator
-          (st, dist) <- m.iterator
-        } yield st.open -> dist).groupMapReduce(_._1)(_._2)(_ max _)
+          minuteStates <- states.valuesIterator
+          (state, pressure) <- minuteStates.iterator
+        } yield state.open -> pressure).groupMapReduce(_._1)(_._2)(_ max _)
       }
     }
 
-    val r = helper(0, Map(0 -> Map(State("AA", Set.empty, valves.values.map(_.flowRate).sum) -> 0)))
-    println(r)
+    helper(0, Map(0 -> Map(State("AA", Set.empty) -> 0)))
+  }
 
-    val r2 = r.toVector
+  trait Part {
+    def mostPressure(valves: Map[Valve, ValveData]): Int
+  }
 
-    (for {
-      ((vs1, d1), i) <- r.iterator.zipWithIndex
-      (vs2, d2) <- r.view.drop(i + 1).iterator
-      if vs1.disjoint(vs2)
-    } yield d1 + d2).max
+  object Part1 extends Part {
+    override def mostPressure(valves: Map[Valve, ValveData]): Int = {
+      valvesMaxPressure(valves, 30).values.max
+    }
+  }
+
+  object Part2 extends Part {
+    override def mostPressure(valves: Map[Valve, ValveData]): Int = {
+      // TODO: optimize, ~12s
+      val valvesPressure = valvesMaxPressure(valves, 26).toVector
+      (for {
+        ((valves1, pressure1), i) <- valvesPressure.iterator.zipWithIndex
+        (valves2, pressure2) <- valvesPressure.view.drop(i + 1).iterator
+        if valves1.disjoint(valves2)
+      } yield pressure1 + pressure2).max
+    }
   }
 
 
@@ -179,7 +102,7 @@ object Day16 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(mostPressure(parseValves(input)))
-    println(mostPressure2(parseValves(input)))
+    println(Part1.mostPressure(parseValves(input)))
+    println(Part2.mostPressure(parseValves(input)))
   }
 }

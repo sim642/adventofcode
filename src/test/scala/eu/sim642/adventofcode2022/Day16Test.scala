@@ -18,18 +18,18 @@ class Day16Test extends AnyFunSuite {
       |Valve JJ has flow rate=21; tunnel leads to valve II""".stripMargin
 
   test("Part 1 examples") {
-    assert(mostPressure(parseValves(exampleInput)) == 1651)
+    assert(Part1.mostPressure(parseValves(exampleInput)) == 1651)
   }
 
   test("Part 1 input answer") {
-    assert(mostPressure(parseValves(input)) == 2265)
+    assert(Part1.mostPressure(parseValves(input)) == 2265)
   }
 
   test("Part 2 examples") {
-    assert(mostPressure2(parseValves(exampleInput)) == 1707)
+    assert(Part2.mostPressure(parseValves(exampleInput)) == 1707)
   }
 
-  ignore("Part 2 input answer") { // TODO: optimize, ~14s
-    assert(mostPressure2(parseValves(input)) == 2811)
+  ignore("Part 2 input answer") { // TODO: optimize, ~12s
+    assert(Part2.mostPressure(parseValves(input)) == 2811)
   }
 }
