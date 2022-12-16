@@ -1,7 +1,6 @@
 package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcodelib.IteratorImplicits.GroupIteratorOps
-import eu.sim642.adventofcode2019.Day18.DisjointSetOps
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -80,12 +79,14 @@ object Day16 {
 
   object Part2 extends Part {
     override def mostPressure(valves: Map[Valve, ValveData]): Int = {
-      // TODO: optimize, ~12s
-      val valvesPressure = valvesMaxPressure(valves, 26).toVector
+      val goodValves = valves.filter(_._2.flowRate > 0).keySet
+      // TODO: optimize? ~7s
+      val valvesPressure = valvesMaxPressure(valves, 26)
       (for {
-        ((valves1, pressure1), i) <- valvesPressure.iterator.zipWithIndex
-        (valves2, pressure2) <- valvesPressure.view.drop(i + 1).iterator
-        if valves1.disjoint(valves2)
+        (valves1, pressure1) <- valvesPressure.iterator
+        otherValves = goodValves.diff(valves1)
+        valves2 <- otherValves.subsets() // faster than checking all pairs for disjoint
+        pressure2 <- valvesPressure.get(valves2)
       } yield pressure1 + pressure2).max
     }
   }

@@ -29,7 +29,7 @@ class Day16Test extends AnyFunSuite {
     assert(Part2.mostPressure(parseValves(exampleInput)) == 1707)
   }
 
-  ignore("Part 2 input answer") { // TODO: optimize, ~12s
+  test("Part 2 input answer") { // TODO: optimize? ~7s
     assert(Part2.mostPressure(parseValves(input)) == 2811)
   }
 }
