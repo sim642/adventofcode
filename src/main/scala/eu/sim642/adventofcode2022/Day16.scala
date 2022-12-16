@@ -3,7 +3,8 @@ package eu.sim642.adventofcode2022
 import eu.sim642.adventofcodelib.IteratorImplicits.GroupIteratorOps
 
 import scala.annotation.tailrec
-import scala.collection.{immutable, mutable}
+import scala.collection.immutable.BitSet
+import scala.collection.mutable
 
 object Day16 {
 
@@ -27,17 +28,17 @@ object Day16 {
     dists
   }
 
-  def valvesMaxPressure(valves: Map[Valve, ValveData], minutes: Int): Map[immutable.BitSet, Int] = {
+  def valvesMaxPressure(valves: Map[Valve, ValveData], minutes: Int): Map[BitSet, Int] = {
     val dists = valveDists(valves) // precompute pairwise distances between valves for direct moves to good valves
 
     // fix valve order to use BitSet, which is much faster for part 2
     val orderedValves = valves.keys.toVector
     val goodValveIndices = valves.filter(_._2.flowRate > 0).keySet.map(orderedValves.indexOf)
 
-    case class State(valve: Valve, open: immutable.BitSet)
+    case class State(valve: Valve, open: BitSet)
 
     @tailrec
-    def helper(minute: Int, states: Map[Int, Map[State, Int]]): Map[immutable.BitSet, Int] = {
+    def helper(minute: Int, states: Map[Int, Map[State, Int]]): Map[BitSet, Int] = {
       if (minute < minutes) {
         val moveOpenStates = for {
           (State(valve, open), pressure) <- states.getOrElse(minute, Map.empty).iterator
@@ -69,7 +70,7 @@ object Day16 {
       }
     }
 
-    helper(0, Map(0 -> Map(State("AA", immutable.BitSet.empty) -> 0)))
+    helper(0, Map(0 -> Map(State("AA", BitSet.empty) -> 0)))
   }
 
   trait Part {
