@@ -4,6 +4,7 @@ import eu.sim642.adventofcode2022.Day4.Interval
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.IteratorImplicits.GroupIteratorOps
+import eu.sim642.adventofcode2019.Day18.DisjointSetOps
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -100,6 +101,72 @@ object Day16 {
     helper(0, Map(0 -> Map(State("AA", Set.empty, valves.values.map(_.flowRate).sum) -> 0)))
   }
 
+  def mostPressure2(valves: Map[Valve, ValveData]): Int = {
+
+    // TODO: optimize, ~14s
+
+    val dists: mutable.Map[Valve, mutable.Map[Valve, Int]] = valves.view.mapValues(_.tunnels.map(_ -> 1).to(mutable.Map)).to(mutable.Map)
+    // Floyd-Warshall
+    for {
+      midValve <- valves.keys
+      fromValve <- valves.keys
+      fromDist <- dists(fromValve).get(midValve)
+      toValve <- valves.keys
+      toDist <- dists(midValve).get(toValve)
+      newDist = fromDist + toDist
+      if dists(fromValve).get(toValve).forall(_ > newDist)
+    } dists(fromValve)(toValve) = newDist
+
+    val goodValves = valves.filter(_._2.flowRate > 0).keySet
+
+    case class State(valve: Valve, open: Set[Valve], remainingFlowRate: Int)
+
+    @tailrec
+    def helper(minute: Int, states2: Map[Int, Map[State, Int]]): Map[Set[Valve], Int] = {
+      val states = states2.getOrElse(minute, Map.empty)
+      println(s"$minute: ${states.size}")
+      if (minute < 26) {
+        val moveOpenStates = for {
+          (state, pressure) <- states.iterator
+          newValve <- goodValves
+          if !state.open.contains(newValve)
+          dist = dists(state.valve)(newValve)
+          flowRate = valves(newValve).flowRate
+          extraPressure = flowRate * (26 - minute - dist - 1)
+        } yield (minute + dist + 1) -> (state.copy(valve = newValve, open = state.open + newValve, remainingFlowRate = state.remainingFlowRate - flowRate) -> (pressure + extraPressure))
+
+        //val s2 = moveOpenStates.groupMapReduce(_._1)(p => Set(p._2))(_ ++ _)
+        //val s3 = s2.view.mapValues(_.groupMapReduce(_._1)(_._2)(_ max _)).toMap
+        val s4 = moveOpenStates.foldLeft(states2)({ case (acc, (min, (st, dist))) =>
+          val m1 = acc.getOrElse(min, Map.empty)
+          val d1 = m1.getOrElse(st, 0)
+          val d2 = d1 max dist
+          val m2 = m1.updated(st, d2)
+          acc.updated(min, m2)
+        })
+
+        helper(minute + 1, s4)
+      }
+      else {
+        (for {
+          (min, m) <- states2.iterator
+          (st, dist) <- m.iterator
+        } yield st.open -> dist).groupMapReduce(_._1)(_._2)(_ max _)
+      }
+    }
+
+    val r = helper(0, Map(0 -> Map(State("AA", Set.empty, valves.values.map(_.flowRate).sum) -> 0)))
+    println(r)
+
+    val r2 = r.toVector
+
+    (for {
+      ((vs1, d1), i) <- r.iterator.zipWithIndex
+      (vs2, d2) <- r.view.drop(i + 1).iterator
+      if vs1.disjoint(vs2)
+    } yield d1 + d2).max
+  }
+
 
   def parseValve(s: String): (Valve, ValveData) = s match {
     case s"Valve $valve has flow rate=$flowRate; tunnel$_ lead$_ to valve$_ $tunnels" =>
@@ -113,5 +180,6 @@ object Day16 {
 
   def main(args: Array[String]): Unit = {
     println(mostPressure(parseValves(input)))
+    println(mostPressure2(parseValves(input)))
   }
 }
