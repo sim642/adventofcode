@@ -17,7 +17,7 @@ object Day15 {
 
     val distance: Int = sensor manhattanDistance beacon
 
-    def projectY(y: Int): Option[Interval] = {
+    def sliceY(y: Int): Option[Interval] = {
       val dy = (y - sensor.y).abs
       val dx = distance - dy
       if (dx >= 0) {
@@ -51,7 +51,7 @@ object Day15 {
   }
 
   def countNoBeaconY(sensorBeacons: Seq[SensorBeacon], y: Int = 2000000): Int = {
-    val intervals = sensorBeacons.flatMap(_.projectY(y))
+    val intervals = sensorBeacons.flatMap(_.sliceY(y))
     val mergedIntervals = mergeIntervals(intervals)
     mergedIntervals.map(_.size).sum
   }
@@ -74,7 +74,7 @@ object Day15 {
       val beacons = sensorBeacons.map(_.beacon).toSet
 
       for (y <- 0 to maxCoord) {
-        val intervals = sensorBeacons.flatMap(_.projectY(y))
+        val intervals = sensorBeacons.flatMap(_.sliceY(y))
         val mergedIntervals = mergeIntervals(intervals)
         mergedIntervals match {
           case Seq(_) =>
@@ -83,11 +83,11 @@ object Day15 {
             val pos = Pos(x, y)
             if (0 <= x && x <= maxCoord && !beacons.contains(pos))
               throwReturn(pos)
-          case _ => ???
+          case _ => throw new IllegalArgumentException("ambiguous distress beacon found")
         }
       }
 
-      ???
+      throw new NoSuchElementException("no distress beacon found")
     }
   }
 
