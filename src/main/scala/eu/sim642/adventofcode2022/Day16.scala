@@ -43,6 +43,7 @@ object Day16 {
           dist = dists(valve)(newValve)
           flowRate = valves(newValve).flowRate // also open good valve, otherwise pointless move
           doneMinute = minute + dist + 1
+          if doneMinute < minutes // avoid move, which won't finish in time
           extraPressure = flowRate * (minutes - doneMinute)
         } yield doneMinute -> (State(newValve, open + newValve) -> (pressure + extraPressure))
 
@@ -80,7 +81,6 @@ object Day16 {
   object Part2 extends Part {
     override def mostPressure(valves: Map[Valve, ValveData]): Int = {
       val goodValves = valves.filter(_._2.flowRate > 0).keySet
-      // TODO: optimize? ~7s
       val valvesPressure = valvesMaxPressure(valves, 26)
       (for {
         (valves1, pressure1) <- valvesPressure.iterator
