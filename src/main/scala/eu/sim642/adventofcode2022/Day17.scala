@@ -25,6 +25,12 @@ object Day17 {
     Pos(2, maxY + 4)
   }
 
+  /**
+   * Number of top rows to keep during simulation, lower ones are removed.
+   * Constant determined after the fact to still get correct answers.
+   */
+  private val keepTopRows = 40
+
   case class State(jetI: Int, nextShapeI: Int, currentShape: Set[Pos], stopped: Set[Pos], maxY: Int = -1, stoppedCount: Int = 0)(jets: Seq[Jet]) {
 
     def next: State = {
@@ -42,8 +48,8 @@ object Day17 {
       }
       else { // cannot move
         val newStopped = stopped ++ currentShapeJet2
-        val newStopped2 = newStopped
         val newMaxY = maxY max currentShapeJet2.view.map(_.y).max
+        val newStopped2 = newStopped.filter(_.y >= newMaxY - keepTopRows) // optimize by keeping stopped set small
         val newOffset = newShapePos(newMaxY)
         State(newJetI, (nextShapeI + 1) % shapes.size, shapes(nextShapeI).map(_ + newOffset), newStopped2, newMaxY, stoppedCount + 1)(jets)
       }
@@ -51,10 +57,9 @@ object Day17 {
 
     def height: Int = maxY + 1
 
-    def pruneTop(amount: Int): State = {
-      val yBound = maxY - amount
-      val pos = Pos(0, yBound + 1)
-      val newStopped = stopped.view.filter(_.y > yBound).map(_ - pos).toSet
+    def cycleInvariant: State = {
+      val pos = Pos(0, maxY - keepTopRows)
+      val newStopped = stopped.map(_ - pos)
       val newShape = currentShape.map(_ - pos)
       copy(currentShape = newShape, stopped = newStopped, maxY = -1, stoppedCount = -1)(jets)
     }
@@ -88,7 +93,7 @@ object Day17 {
 
     override def towerHeight(jets: Seq[Jet], finalStoppedCount: Long): Long = {
       val initialState = State(jets)
-      val cycle = NaiveCycleFinder.findBy(initialState, _.next)(_.pruneTop(1))
+      val cycle = NaiveCycleFinder.findBy(initialState, _.next)(_.cycleInvariant)
 
       val states = Vector.iterate(initialState, cycle.stemCycleLength + 1)(_.next)
       val stemState = states(cycle.stemLength)
