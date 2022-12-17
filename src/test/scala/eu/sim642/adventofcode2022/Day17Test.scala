@@ -15,4 +15,12 @@ class Day17Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(towerHeight(parseJets(input)) == 3111)
   }
+
+  test("Part 2 examples") {
+    assert(towerHeight2(parseJets(exampleInput)) == 1514285714288L)
+  }
+
+  test("Part 2 input answer") {
+    assert(towerHeight2(parseJets(input)) == 1526744186042L)
+  }
 }
