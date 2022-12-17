@@ -10,13 +10,34 @@ import scala.math.Integral.Implicits.*
 
 object Day17 {
 
-  private val shapes = Seq(
-    Set(Pos(0, 0), Pos(1, 0), Pos(2, 0), Pos(3, 0)),
-    Set(Pos(1, 0), Pos(0, 1), Pos(1, 1), Pos(2, 1), Pos(1, 2)),
-    Set(Pos(0, 0), Pos(1, 0), Pos(2, 0), Pos(2, 1), Pos(2, 2)),
-    Set(Pos(0, 0), Pos(0, 1), Pos(0, 2), Pos(0, 3)),
-    Set(Pos(0, 0), Pos(1, 0), Pos(0, 1), Pos(1, 1)),
-  )
+  def parseShape(s: String): Set[Pos] = {
+    (for {
+      (row, y) <- s.linesIterator.toList.reverseIterator.zipWithIndex
+      (cell, x) <- row.iterator.zipWithIndex
+      if cell == '#'
+    } yield Pos(x, y)).toSet
+  }
+
+  private val shapesStr =
+    """####
+      |
+      |.#.
+      |###
+      |.#.
+      |
+      |..#
+      |..#
+      |###
+      |
+      |#
+      |#
+      |#
+      |#
+      |
+      |##
+      |##""".stripMargin
+
+  private val shapes = shapesStr.split("\n\n").map(parseShape).toVector
 
   enum Jet(val offset: Pos) {
     case Left extends Jet(Pos(-1, 0))
