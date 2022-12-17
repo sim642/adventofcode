@@ -21,11 +21,12 @@ object Day17 {
     case Right extends Jet(Pos(1, 0))
   }
 
-  def newShapePos(stopped: Set[Pos]): Pos = {
-    Pos(2, stopped.view.map(_.y).maxOption.getOrElse(-1) + 4)
+  def newShapePos(maxY: Int): Pos = {
+    Pos(2, maxY + 4)
   }
 
-  case class State(jetI: Int, nextShapeI: Int, currentShape: Set[Pos], stopped: Set[Pos], stoppedCount: Int = 0)(jets: Seq[Jet]) {
+  case class State(jetI: Int, nextShapeI: Int, currentShape: Set[Pos], stopped: Set[Pos], maxY: Int = -1, stoppedCount: Int = 0)(jets: Seq[Jet]) {
+
     def next: State = {
       val jet = jets(jetI)
       val newJetI = (jetI + 1) % jets.size
@@ -37,30 +38,31 @@ object Day17 {
           currentShape
       val currentShapeDown = currentShapeJet2.map(_ + Pos(0, -1))
       if (currentShapeDown.forall(p => p.y >= 0 && !stopped.contains(p))) { // can move
-        State(newJetI, nextShapeI, currentShapeDown, stopped, stoppedCount)(jets)
+        State(newJetI, nextShapeI, currentShapeDown, stopped, maxY, stoppedCount)(jets)
       }
       else { // cannot move
         val newStopped = stopped ++ currentShapeJet2
         val newStopped2 = newStopped
-        val newOffset = newShapePos(newStopped2)
-        State(newJetI, (nextShapeI + 1) % shapes.size, shapes(nextShapeI).map(_ + newOffset), newStopped2, stoppedCount + 1)(jets)
+        val newMaxY = maxY max currentShapeJet2.view.map(_.y).max
+        val newOffset = newShapePos(newMaxY)
+        State(newJetI, (nextShapeI + 1) % shapes.size, shapes(nextShapeI).map(_ + newOffset), newStopped2, newMaxY, stoppedCount + 1)(jets)
       }
     }
 
-    def height: Int = stopped.view.map(_.y).max + 1
+    def height: Int = maxY + 1
 
     def pruneTop(amount: Int): State = {
-      val yBound = stopped.view.map(_.y).maxOption.getOrElse(amount - 1) - amount
+      val yBound = maxY - amount
       val pos = Pos(0, yBound + 1)
-      val newStopped = stopped.filter(_.y > yBound).map(_ - pos)
+      val newStopped = stopped.view.filter(_.y > yBound).map(_ - pos).toSet
       val newShape = currentShape.map(_ - pos)
-      copy(currentShape = newShape, stopped = newStopped, stoppedCount = -1)(jets)
+      copy(currentShape = newShape, stopped = newStopped, maxY = -1, stoppedCount = -1)(jets)
     }
   }
 
   object State {
     def apply(jets: Seq[Jet]): State = {
-      val newOffset = newShapePos(Set.empty)
+      val newOffset = newShapePos(-1)
       State(0, 1, shapes.head.map(_ + newOffset), Set.empty)(jets)
     }
   }
