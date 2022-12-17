@@ -9,18 +9,19 @@ class Day17Test extends AnyFunSuite {
     """>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>"""
 
   test("Part 1 examples") {
-    assert(towerHeight(parseJets(exampleInput)) == 3068)
+    assert(Part1.towerHeight(parseJets(exampleInput)) == 3068)
   }
 
   test("Part 1 input answer") {
-    assert(towerHeight(parseJets(input)) == 3111)
+    assert(Part1.towerHeight(parseJets(input)) == 3111)
   }
 
   test("Part 2 examples") {
-    assert(towerHeight2(parseJets(exampleInput)) == 1514285714288L)
+    assert(Part2.towerHeight(parseJets(exampleInput), 2022) == 3068)
+    assert(Part2.towerHeight(parseJets(exampleInput)) == 1514285714288L)
   }
 
   test("Part 2 input answer") {
-    assert(towerHeight2(parseJets(input)) == 1526744186042L)
+    assert(Part2.towerHeight(parseJets(input)) == 1526744186042L)
   }
 }
