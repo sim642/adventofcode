@@ -3,7 +3,9 @@ package eu.sim642.adventofcode2022
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
+import eu.sim642.adventofcodelib.IteratorImplicits.IndexIteratorOps
 
+import scala.annotation.tailrec
 import scala.math.Integral.Implicits.*
 
 object Day17 {
@@ -21,38 +23,39 @@ object Day17 {
     case Right extends Jet(Pos(1, 0))
   }
 
-  def newShapePos(maxY: Int): Pos = {
-    Pos(2, maxY + 4)
-  }
-
   /**
    * Number of top rows to keep during simulation, lower ones are removed.
    * Constant determined after the fact to still get correct answers.
    */
   private val keepTopRows = 40
 
-  case class State(jetI: Int, nextShapeI: Int, currentShape: Set[Pos], stopped: Set[Pos], maxY: Int = -1, stoppedCount: Int = 0)(jets: Seq[Jet]) {
+  case class State(jetI: Int, shapeI: Int, stopped: Set[Pos] = Set.empty, maxY: Int = -1)(jets: Seq[Jet]) {
 
     def next: State = {
-      val jet = jets(jetI)
-      val newJetI = (jetI + 1) % jets.size
-      val currentShapeJet = currentShape.map(_ + jet.offset)
-      val currentShapeJet2 =
-        if (currentShapeJet.forall(p => p.x >= 0 && p.x < 7 && !stopped.contains(p))) // can move
-          currentShapeJet
-        else // cannot move
-          currentShape
-      val currentShapeDown = currentShapeJet2.map(_ + Pos(0, -1))
-      if (currentShapeDown.forall(p => p.y >= 0 && !stopped.contains(p))) { // can move
-        State(newJetI, nextShapeI, currentShapeDown, stopped, maxY, stoppedCount)(jets)
+
+      @tailrec
+      def helper(jetI: Int, currentShape: Set[Pos]): State = {
+        val jet = jets(jetI)
+        val newJetI = (jetI + 1) % jets.size
+        val currentShapeJet = currentShape.map(_ + jet.offset)
+        val currentShapeJet2 =
+          if (currentShapeJet.forall(p => p.x >= 0 && p.x < 7 && !stopped.contains(p))) // can move
+            currentShapeJet
+          else // cannot move
+            currentShape
+        val currentShapeDown = currentShapeJet2.map(_ + Pos(0, -1))
+        if (currentShapeDown.forall(p => p.y >= 0 && !stopped.contains(p))) // can move
+          helper(newJetI, currentShapeDown)
+        else { // cannot move
+          val newStopped = stopped ++ currentShapeJet2
+          val newMaxY = maxY max currentShapeJet2.view.map(_.y).max
+          val newStopped2 = newStopped.filter(_.y >= newMaxY - keepTopRows) // optimize by keeping stopped set small
+          State(newJetI, (shapeI + 1) % shapes.size, newStopped2, newMaxY)(jets)
+        }
       }
-      else { // cannot move
-        val newStopped = stopped ++ currentShapeJet2
-        val newMaxY = maxY max currentShapeJet2.view.map(_.y).max
-        val newStopped2 = newStopped.filter(_.y >= newMaxY - keepTopRows) // optimize by keeping stopped set small
-        val newOffset = newShapePos(newMaxY)
-        State(newJetI, (nextShapeI + 1) % shapes.size, shapes(nextShapeI).map(_ + newOffset), newStopped2, newMaxY, stoppedCount + 1)(jets)
-      }
+
+      val newOffset = Pos(2, maxY + 4)
+      helper(jetI, shapes(shapeI).map(_ + newOffset))
     }
 
     def height: Int = maxY + 1
@@ -60,16 +63,12 @@ object Day17 {
     def cycleInvariant: State = {
       val pos = Pos(0, maxY - keepTopRows)
       val newStopped = stopped.map(_ - pos)
-      val newShape = currentShape.map(_ - pos)
-      copy(currentShape = newShape, stopped = newStopped, maxY = -1, stoppedCount = -1)(jets)
+      copy(stopped = newStopped, maxY = -1)(jets)
     }
   }
 
   object State {
-    def apply(jets: Seq[Jet]): State = {
-      val newOffset = newShapePos(-1)
-      State(0, 1, shapes.head.map(_ + newOffset), Set.empty)(jets)
-    }
+    def apply(jets: Seq[Jet]): State = State(0, 0)(jets)
   }
 
   trait Part {
@@ -83,7 +82,7 @@ object Day17 {
 
     override def towerHeight(jets: Seq[Jet], finalStoppedCount: Long): Long = {
       val initialState = State(jets)
-      val finalState = Iterator.iterate(initialState)(_.next).find(_.stoppedCount == finalStoppedCount).get
+      val finalState = Iterator.iterate(initialState)(_.next)(finalStoppedCount.toInt)
       finalState.height
     }
   }
@@ -93,19 +92,13 @@ object Day17 {
 
     override def towerHeight(jets: Seq[Jet], finalStoppedCount: Long): Long = {
       val initialState = State(jets)
-      val cycle = NaiveCycleFinder.findBy(initialState, _.next)(_.cycleInvariant)
+      val cycle = NaiveCycleFinder.findBy(initialState, _.next)(_.cycleInvariant) // TODO: findBy returns Indexing
 
-      val states = Vector.iterate(initialState, cycle.stemCycleLength + 1)(_.next)
-      val stemState = states(cycle.stemLength)
-      val stemCycleState = states(cycle.stemCycleLength)
+      val (cycleRepeat, tailLength) = (finalStoppedCount - cycle.stemLength) /% cycle.cycleLength
+      val tailState = Iterator.iterate(cycle.cycleHead)(_.next)(tailLength.toInt)
 
-      val stemCount = stemState.stoppedCount
-      val cycleCount = stemCycleState.stoppedCount - stemCount
-      val (cycleRepeat, tailCount) = (finalStoppedCount - stemCount) /% cycleCount
-      val tailState = states.view.find(_.stoppedCount == stemCount + tailCount.toInt).get
-
-      val stemHeight = stemState.height
-      val cycleHeight = stemCycleState.height - stemHeight
+      val stemHeight = cycle.cycleHead.height
+      val cycleHeight = cycle.cycleHeadRepeat.height - stemHeight
       val tailHeight = tailState.height - stemHeight
       stemHeight + cycleRepeat * cycleHeight + tailHeight
     }
