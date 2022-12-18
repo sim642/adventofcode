@@ -7,6 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class Day22Test extends Suites(
   new NaiveSolutionTest,
+  new BoxSolutionTest,
   new InclusionExclusionSolutionTest,
 )
 
@@ -133,6 +134,8 @@ object Day22Test {
   class NaiveSolutionTest extends SolutionTest(NaiveSolution) {
     override protected val testPart2: Boolean = false
   }
+
+  class BoxSolutionTest extends SolutionTest(BoxSolution)
 
   class InclusionExclusionSolutionTest extends SolutionTest(InclusionExclusionSolution) {
     import InclusionExclusionSolution._

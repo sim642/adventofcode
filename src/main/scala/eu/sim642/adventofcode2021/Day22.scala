@@ -47,6 +47,26 @@ object Day22 {
     }
   }
 
+  object BoxSolution extends Solution {
+
+    def simulateStep(boxs: Seq[Box3], step: Step): Seq[Box3] = {
+      val (on, box) = step
+      if (on) {
+        box +: boxs.flatMap(_.diffSplit(box))
+      }
+      else
+        boxs.flatMap(_.diffSplit(box))
+    }
+
+    def simulateReboot(steps: Seq[Step]): Seq[Box3] = {
+      steps.foldLeft(Seq.empty[Box3])(simulateStep)
+    }
+
+    override def countReboot(steps: Seq[(Boolean, Box3)]): Long = {
+      simulateReboot(steps).map(_.size).sum.toLong
+    }
+  }
+
   object InclusionExclusionSolution extends Solution {
 
     override def countReboot(steps: Seq[Step]): Long = {
@@ -88,7 +108,7 @@ object Day22 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    import InclusionExclusionSolution._
+    import BoxSolution._
 
     println(countInitialization(parseSteps(input)))
     println(countReboot(parseSteps(input)))
