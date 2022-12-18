@@ -23,6 +23,15 @@ case class Pos3(x: Int, y: Int, z: Int) extends BoxPosOps[Pos3] {
 object Pos3 extends PosFactory[Pos3] {
   override val zero: Pos3 = Pos3(0, 0, 0)
 
+  val axisOffsets: Seq[Pos3] = Seq(
+    Pos3(1, 0, 0),
+    Pos3(-1, 0, 0),
+    Pos3(0, 1, 0),
+    Pos3(0, -1, 0),
+    Pos3(0, 0, 1),
+    Pos3(0, 0, -1),
+  )
+
   val allOffsets: Seq[Pos3] =
     for {
       z <- -1 to 1
