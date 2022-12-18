@@ -1,13 +1,8 @@
 package eu.sim642.adventofcode2022
 
-import eu.sim642.adventofcodelib.IteratorImplicits.IndexIteratorOps
 import eu.sim642.adventofcodelib.box.Box3
-import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
-import eu.sim642.adventofcodelib.pos.{Pos, Pos3}
-
-import scala.annotation.tailrec
-import scala.math.Integral.Implicits.*
+import eu.sim642.adventofcodelib.pos.Pos3
 
 object Day18 {
 
