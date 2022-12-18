@@ -42,7 +42,6 @@ object Day18 {
         Pos3.axisOffsets
           .view
           .map(droplet + _)
-          .filter(!droplets.contains(_))
           .count(exterior.contains)
       )
       .sum
