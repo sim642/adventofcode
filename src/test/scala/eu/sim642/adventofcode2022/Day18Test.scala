@@ -27,4 +27,12 @@ class Day18Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(surfaceArea(parseDroplets(input)) == 4302)
   }
+
+  test("Part 2 examples") {
+    assert(exteriorSurfaceArea(parseDroplets(exampleInput)) == 58)
+  }
+
+  test("Part 2 input answer") {
+    assert(exteriorSurfaceArea(parseDroplets(input)) == 2492)
+  }
 }

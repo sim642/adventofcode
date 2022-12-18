@@ -1,8 +1,9 @@
 package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcodelib.IteratorImplicits.IndexIteratorOps
-import eu.sim642.adventofcodelib.box.Box
+import eu.sim642.adventofcodelib.box.Box3
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
+import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.{Pos, Pos3}
 
 import scala.annotation.tailrec
@@ -14,7 +15,40 @@ object Day18 {
     droplets
       .view
       .map(droplet =>
-        Pos3.axisOffsets.view.map(droplet + _).count(!droplets.contains(_))
+        Pos3.axisOffsets
+          .view
+          .map(droplet + _)
+          .count(!droplets.contains(_))
+      )
+      .sum
+  }
+
+  def exteriorSurfaceArea(droplets: Set[Pos3]): Int = {
+    val box = Box3.bounding(droplets)
+    val paddedBox = Box3(box.min + Pos3(-1, -1, -1), box.max + Pos3(1, 1, 1)) // pad bounding box to allow traversal around
+
+    val graphTraversal = new GraphTraversal[Pos3] with UnitNeighbors[Pos3] {
+      override val startNode: Pos3 = paddedBox.min
+
+      override def unitNeighbors(pos: Pos3): IterableOnce[Pos3] = {
+        for {
+          offset <- Pos3.axisOffsets
+          newPos = pos + offset
+          if paddedBox.contains(newPos) && !droplets.contains(newPos)
+        } yield newPos
+      }
+    }
+
+    val exterior = BFS.traverse(graphTraversal).nodes
+
+    droplets
+      .view
+      .map(droplet =>
+        Pos3.axisOffsets
+          .view
+          .map(droplet + _)
+          .filter(!droplets.contains(_))
+          .count(exterior.contains)
       )
       .sum
   }
@@ -29,5 +63,6 @@ object Day18 {
 
   def main(args: Array[String]): Unit = {
     println(surfaceArea(parseDroplets(input)))
+    println(exteriorSurfaceArea(parseDroplets(input)))
   }
 }
