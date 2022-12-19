@@ -29,7 +29,7 @@ object Day19 extends RegexParsers {
     case class State(robots: ArraySeq[Int],
                      resources: ArraySeq[Int]) {
 
-      def nexts: IterableOnce[State] = {
+      def nexts(minute: Int): IterableOnce[State] = {
         val newRobotStates = for {
           //(robot, costs) <- blueprint.robotCosts.iterator
           robot <- (0 to 3).reverseIterator
@@ -46,7 +46,8 @@ object Day19 extends RegexParsers {
         def collectResources(state: State): State = {
           //val newResources = robots.zipWithIndex.foldLeft(state.resources)({ case (acc, (amount, robot)) => acc.updated(robot, acc(robot) + amount) })
           val newResources = state.resources.lazyZip(robots).map(_ + _)
-          state.copy(resources = newResources)
+          val newResources2 = newResources.lazyZip(maxResourceCosts).map(_ min (maxMinutes - minute) * _).updated(3, newResources(3))
+          state.copy(resources = newResources2)
         }
 
         /*if (newRobotStates.size == 4)
@@ -63,7 +64,7 @@ object Day19 extends RegexParsers {
       if (minute >= maxMinutes)
         states
       else {
-        val newStates = states.flatMap(_.nexts)
+        val newStates = states.flatMap(_.nexts(minute))
         helper(minute + 1, newStates)
       }
     }
