@@ -26,7 +26,7 @@ class Day19Test extends AnyFunSuite {
     assert(sumQualityLevel(parseBlueprints(input)) == 1487)
   }
 
-  ignore("Part 2 examples") { // TODO: optimize
+  test("Part 2 examples") {
     val exampleBlueprints = parseBlueprints(exampleInput)
 
     assert(maxGeodes(exampleBlueprints.head, 32) == 56)
