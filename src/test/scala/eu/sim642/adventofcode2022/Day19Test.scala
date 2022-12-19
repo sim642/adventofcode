@@ -14,11 +14,15 @@ class Day19Test extends AnyFunSuite {
     parseBlueprints(input)
   }
 
-  test("Part 1 examples") {
+  ignore("Part 1 examples") { // TODO: optimize
     val exampleBlueprints = parseBlueprints(exampleInput)
 
     assert(maxGeodes(exampleBlueprints.head) == 9)
-    //assert(maxGeodes(exampleBlueprints(1)) == 12)
-    //assert(sumQualityLevel(exampleBlueprints) == 33)
+    assert(maxGeodes(exampleBlueprints(1)) == 12)
+    assert(sumQualityLevel(exampleBlueprints) == 33)
+  }
+
+  ignore("Part 1 input answer") {
+    assert(sumQualityLevel(parseBlueprints(input)) == 1487) // TODO: optimize
   }
 }

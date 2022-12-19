@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2022
 
 import scala.annotation.tailrec
+import scala.collection.immutable.ArraySeq
 import scala.util.parsing.combinator.RegexParsers
 
 object Day19 extends RegexParsers {
@@ -16,21 +17,21 @@ object Day19 extends RegexParsers {
 
   def maxGeodes(blueprint: Blueprint): Int = {
 
-    case class State(robots: Map[Resource, Int],
-                     resources: Map[Resource, Int]) {
+    case class State(robots: ArraySeq[Int],
+                     resources: ArraySeq[Int]) {
 
       def nexts: IterableOnce[State] = {
         val newRobotStates = for {
           //(robot, costs) <- blueprint.robotCosts.iterator
           robot <- Iterator(Resource.Geode, Resource.Obsidian, Resource.Clay, Resource.Ore)
           costs = blueprint.robotCosts(robot)
-          if costs.forall({ case (resource, amount) => resources.getOrElse(resource, 0) >= amount })
-          newRobots = robots.updated(robot, robots.getOrElse(robot, 0) + 1)
-          newResources = costs.foldLeft(resources)({ case (acc, (resource, amount)) => acc.updated(resource, acc(resource) - amount) })
+          if costs.forall({ case (resource, amount) => resources(resource.ordinal) >= amount })
+          newRobots = robots.updated(robot.ordinal, robots(robot.ordinal) + 1)
+          newResources = costs.foldLeft(resources)({ case (acc, (resource, amount)) => acc.updated(resource.ordinal, acc(resource.ordinal) - amount) })
         } yield State(newRobots, newResources)
 
         def collectResources(state: State): State = {
-          val newResources = robots.foldLeft(state.resources)({ case (acc, (robot, amount)) => acc.updated(robot, acc.getOrElse(robot, 0) + amount) })
+          val newResources = robots.zipWithIndex.foldLeft(state.resources)({ case (acc, (amount, robot)) => acc.updated(robot, acc(robot) + amount) })
           state.copy(resources = newResources)
         }
 
@@ -52,11 +53,11 @@ object Day19 extends RegexParsers {
       }
     }
 
-    val initialStates = Set(State(Map(Resource.Ore -> 1), Map.empty))
+    val initialStates = Set(State(ArraySeq(1, 0, 0, 0), ArraySeq(0, 0, 0, 0)))
     val finalStates = helper(0, initialStates)
     finalStates
       .view
-      .map(_.resources.getOrElse(Resource.Geode, 0))
+      .map(_.resources(3))
       .max
   }
 
