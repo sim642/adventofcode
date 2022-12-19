@@ -24,7 +24,7 @@ object Day19 extends RegexParsers {
       }).to(ArraySeq)
     }
 
-    val maxOreCost = robotCosts2.map(_.head).max
+    val maxResourceCosts = robotCosts2.transpose.map(_.max).updated(3, Int.MaxValue)
 
     case class State(robots: ArraySeq[Int],
                      resources: ArraySeq[Int]) {
@@ -33,6 +33,8 @@ object Day19 extends RegexParsers {
         val newRobotStates = for {
           //(robot, costs) <- blueprint.robotCosts.iterator
           robot <- (0 to 3).reverseIterator
+          //if robot != 0 || resources.head <= maxOreCost
+          if robots(robot) < maxResourceCosts(robot)
           costs = robotCosts2(robot)
           //if costs.zipWithIndex.forall({ case (amount, resource) => resources(resource) >= amount })
           if resources.lazyZip(costs).forall(_ >= _)
@@ -50,7 +52,8 @@ object Day19 extends RegexParsers {
         /*if (newRobotStates.size == 4)
           newRobotStates.map(collectResources)
         else*/
-          (newRobotStates.take(2) ++ (if (resources.head < maxOreCost) Iterator.single(this) else Iterator.empty)).map(collectResources)
+          (newRobotStates.take(2) ++ Iterator.single(this)).map(collectResources)
+          //(newRobotStates.take(2) ++ (if (resources.head < maxOreCost) Iterator.single(this) else Iterator.empty)).map(collectResources)
       }
     }
 
