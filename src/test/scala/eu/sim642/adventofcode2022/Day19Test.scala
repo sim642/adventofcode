@@ -34,7 +34,7 @@ class Day19Test extends AnyFunSuite {
     assert(productMaxGeodes(exampleBlueprints) == 56 * 62)
   }
 
-  ignore("Part 2 input answer") {
-    assert(productMaxGeodes(parseBlueprints(input)) == 13440) // TODO: optimize
+  test("Part 2 input answer") {
+    assert(productMaxGeodes(parseBlueprints(input)) == 13440)
   }
 }

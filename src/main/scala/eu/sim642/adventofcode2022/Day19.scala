@@ -54,11 +54,19 @@ object Day19 extends RegexParsers {
           state.copy(resources = newResources2)(robots, resources)
         }
 
+        val r =
         /*if (newRobotStates.size == 4)
           newRobotStates.map(collectResources)
         else*/
-          (newRobotStates.take(4) ++ Iterator.single(this)).map(collectResources)
+          (newRobotStates.take(2) ++ Iterator.single(this)).map(collectResources)
           //(newRobotStates.take(2) ++ (if (resources.head < maxOreCost) Iterator.single(this) else Iterator.empty)).map(collectResources)
+        val r2 = r.toSeq
+        val best = r2.view.map(_.resources(3)).max
+        val rem = maxMinutes - minute
+
+        def t(n: Int): Int = (n + 1) * n / 2
+
+        r2.filterNot(s => s.resources(3) + s.robots(3) * rem + t(rem) < best)
       }
     }
 
