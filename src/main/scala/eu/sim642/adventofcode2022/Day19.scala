@@ -15,76 +15,106 @@ object Day19 extends RegexParsers {
 
   case class Blueprint(robotCosts: Map[Resource, Map[Resource, Int]])
 
+  def triangular(n: Int): Int = (n + 1) * n / 2
+
   def maxGeodes(blueprint: Blueprint, maxMinutes: Int): Int = {
 
-    val robotCosts2 = {
-      Resource.values.map({ r =>
-        val c = blueprint.robotCosts(r)
-        Resource.values.map(r2 => c.getOrElse(r2, 0)).to(ArraySeq)
+    // use arrays with resources in order
+
+    val robotCostsIndexed =
+      Resource.values.map({ robot =>
+        val costs = blueprint.robotCosts(robot)
+        Resource.values.map(resource => costs(resource)).to(ArraySeq)
       }).to(ArraySeq)
-    }
 
-    val maxResourceCosts = robotCosts2.transpose.map(_.max).updated(3, Int.MaxValue)
+    val geodeIndex = Resource.Geode.ordinal
+    val maxResourceCosts = robotCostsIndexed.transpose.map(_.max).updated(geodeIndex, Int.MaxValue) // no geode limit
 
-    case class State(robots: ArraySeq[Int],
-                     resources: ArraySeq[Int])(val prevRob: ArraySeq[Int], val prevRes: ArraySeq[Int]) {
+    case class State(minutesRemaining: Int,
+                     robots: ArraySeq[Int],
+                     resources: ArraySeq[Int])
+                    (val prevRobots: ArraySeq[Int],
+                     val prevResources: ArraySeq[Int]) {
 
-      def nexts(minute: Int): IterableOnce[State] = {
-        var geodebot = false
-        //println(this)
-        val newRobotStates =( for {
-          //(robot, costs) <- blueprint.robotCosts.iterator
-          robot <- (0 to 3).reverseIterator
-          //if robot != 0 || resources.head <= maxOreCost
-          if robots(robot) < maxResourceCosts(robot)
-          costs = robotCosts2(robot)
-          //if costs.zipWithIndex.forall({ case (amount, resource) => resources(resource) >= amount })
-          if resources.lazyZip(costs).forall(_ >= _)
-          stuff = prevRes.lazyZip(costs).forall(_ >= _) && robots == prevRob
-          //() = println(s" $robot prevRes=$prevRes resources=$resources costs=$costs $stuff")
-          if !stuff
-          newRobots = robots.updated(robot, robots(robot) + 1)
-          //newResources = costs.zipWithIndex.foldLeft(resources)({ case (acc, (amount, resource)) => acc.updated(resource, acc(resource) - amount) })
-          newResources = resources.lazyZip(costs).map(_ - _)
-          () = (if (robot == 3) geodebot = true)
-        } yield State(newRobots, newResources)(robots, resources)).toSeq
+      /**
+       * Can construct robot with resources?
+       */
+      private def canConstruct(robot: Int): Boolean = {
+        val costs = robotCostsIndexed(robot)
+        resources.lazyZip(costs).forall(_ >= _)
+      }
 
-        def collectResources(state: State): State = {
-          //val newResources = robots.zipWithIndex.foldLeft(state.resources)({ case (acc, (amount, robot)) => acc.updated(robot, acc(robot) + amount) })
-          val newResources = state.resources.lazyZip(robots).map(_ + _)
-          val newResources2 = newResources.lazyZip(maxResourceCosts).lazyZip(state.robots).map((a, b, c) => a min ((maxMinutes - minute) * b - c * (maxMinutes - minute - 1))).updated(3, newResources(3))
-          state.copy(resources = newResources2)(robots, resources)
-        }
+      /**
+       * Should construct robot?
+       * For pruning.
+       */
+      private def shouldConstruct(robot: Int): Boolean = {
+        val costs = robotCostsIndexed(robot)
+        robots(robot) < maxResourceCosts(robot) && // no need for more robots, already enough to instantly generate all possible needs
+          (robots != prevRobots || // previously built some robot, don't prune
+            !prevResources.lazyZip(costs).forall(_ >= _)) // don't build robot, which could've been previously built already
+      }
 
-        val r =
-          if (geodebot)
-            (newRobotStates.take(1)).map(collectResources)
-          else
-            (newRobotStates.take(4) ++ Iterator.single(this)).map(collectResources)
-          //(newRobotStates.take(2) ++ (if (resources.head < maxOreCost) Iterator.single(this) else Iterator.empty)).map(collectResources)
-        val r2 = r.toSeq
-        val best = r2.view.map(_.resources(3)).max
-        val rem = maxMinutes - minute
+      private def construct(robot: Int): State = {
+        val costs = robotCostsIndexed(robot)
+        val newRobots = robots.updated(robot, robots(robot) + 1)
+        val newResources = resources.lazyZip(costs).map(_ - _)
+        State(minutesRemaining, newRobots, newResources)(robots, resources)
+      }
 
-        def t(n: Int): Int = (n + 1) * n / 2
+      private def noop: State = copy()(robots, resources)
 
-        r2.filterNot(s => s.resources(3) + s.robots(3) * rem + t(rem) < best)
+      private def collectResources(collectRobots: ArraySeq[Int]): State = {
+        val newResources = resources.lazyZip(collectRobots).map(_ + _) // resources from robots, which existed in the beginning of the step
+        val newResources2 = newResources.lazyZip(maxResourceCosts).lazyZip(robots).map({ (resource, maxCost, robots) =>
+          val maxRemainingNeed = minutesRemaining * maxCost
+          val minRemainingCollect = robots * (minutesRemaining - 1)
+          resource min (maxRemainingNeed - minRemainingCollect) // discard resources that cannot get used, prunes by deduplicating
+        }).updated(geodeIndex, newResources(geodeIndex)) // don't prune geodes
+        copy(resources = newResources2, minutesRemaining = minutesRemaining - 1)(robots, resources)
+      }
+
+      /**
+       * Can reach geode count in remaining time?
+       * For pruning.
+       */
+      private def canReachGeodes(geodes: Int): Boolean = {
+        val currentGeodes = resources(geodeIndex)
+        val currentRobotGeodes = robots(geodeIndex) * minutesRemaining
+        val newRobotGeodes = triangular(minutesRemaining) // every remaining minute creates a new geode robot and they all collect geodes
+        currentGeodes + currentRobotGeodes + newRobotGeodes >= geodes
+      }
+
+      def steps: IterableOnce[State] = {
+        val newStates =
+          if (canConstruct(geodeIndex)) // prefer geode robot if possible
+            List(construct(geodeIndex))
+          else {
+            val newRobotStates = (for {
+              robot <- (0 until geodeIndex).iterator
+              if canConstruct(robot) && shouldConstruct(robot)
+            } yield construct(robot)).toList
+            noop :: newRobotStates
+          }
+        val newStates2 = newStates.map(_.collectResources(robots))
+
+        val maxGeodes = newStates2.view.map(_.resources(geodeIndex)).max
+        newStates2.filter(_.canReachGeodes(maxGeodes)) // prune states, which cannot beat best
       }
     }
 
     @tailrec
-    def helper(minute: Int, states: Set[State]): Set[State] = {
-      println(s"$minute: ${states.size}")
-      if (minute >= maxMinutes)
+    def helper(states: Set[State]): Set[State] = {
+      val minutesRemaining = states.head.minutesRemaining // all states have same
+      //println(s"${maxMinutes - minutesRemaining}: ${states.size}")
+      if (minutesRemaining <= 0)
         states
-      else {
-        val newStates = states.flatMap(_.nexts(minute))
-        helper(minute + 1, newStates)
-      }
+      else
+        helper(states.flatMap(_.steps))
     }
 
-    val initialStates = Set(State(ArraySeq(1, 0, 0, 0), ArraySeq(0, 0, 0, 0))(ArraySeq(1, 0, 0, 0), ArraySeq(0, 0, 0, 0)))
-    val finalStates = helper(0, initialStates)
+    val initialStates = Set(State(maxMinutes, ArraySeq(1, 0, 0, 0), ArraySeq(0, 0, 0, 0))(ArraySeq(1, 0, 0, 0), ArraySeq(0, 0, 0, 0)))
+    val finalStates = helper(initialStates)
     finalStates
       .view
       .map(_.resources(3))
@@ -126,15 +156,12 @@ object Day19 extends RegexParsers {
     )
 
     def robotCost: Parser[(Resource, Map[Resource, Int])] =
-      "Each" ~> resource ~ "robot costs" ~ costs <~ "." ^^ { case resource ~ _ ~ costs => resource -> costs }
+      "Each" ~> resource ~ "robot costs" ~ costs <~ "." ^^ { case resource ~ _ ~ costs => resource -> costs.withDefaultValue(0) }
 
     def blueprint: Parser[Blueprint] =
       "Blueprint \\d+:".r ~> rep(robotCost) ^^ { robotCosts => Blueprint(robotCosts.toMap) }
 
-    parseAll(blueprint, s) match {
-      case Success(r, _) => r
-      case NoSuccess(s2, t) => throw new IllegalArgumentException(s"$s, $s2: ${t.toString}")
-    }
+    parseAll(blueprint, s).get
   }
 
   def parseBlueprints(input: String): Seq[Blueprint] = input.linesIterator.map(parseBlueprint).toSeq
@@ -142,14 +169,8 @@ object Day19 extends RegexParsers {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    val exampleInput =
-      """Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.
-        |Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian.""".stripMargin
-
-
-    //println(sumQualityLevel(parseBlueprints(exampleInput)))
     println(sumQualityLevel(parseBlueprints(input)))
-    //println(productMaxGeodes(parseBlueprints(input)))
+    println(productMaxGeodes(parseBlueprints(input)))
 
     // part 1: 1310 - too low (greedily make best robot)
   }
