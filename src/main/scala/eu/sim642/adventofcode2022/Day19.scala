@@ -15,7 +15,16 @@ object Day19 extends RegexParsers {
 
   case class Blueprint(robotCosts: Map[Resource, Map[Resource, Int]])
 
-  def maxGeodes(blueprint: Blueprint): Int = {
+  def maxGeodes(blueprint: Blueprint, maxMinutes: Int): Int = {
+
+    val robotCosts2 = {
+      Resource.values.map({ r =>
+        val c = blueprint.robotCosts(r)
+        Resource.values.map(r2 => c.getOrElse(r2, 0)).to(ArraySeq)
+      }).to(ArraySeq)
+    }
+
+    val maxOreCost = robotCosts2.map(_.head).max
 
     case class State(robots: ArraySeq[Int],
                      resources: ArraySeq[Int]) {
@@ -23,29 +32,32 @@ object Day19 extends RegexParsers {
       def nexts: IterableOnce[State] = {
         val newRobotStates = for {
           //(robot, costs) <- blueprint.robotCosts.iterator
-          robot <- Iterator(Resource.Geode, Resource.Obsidian, Resource.Clay, Resource.Ore)
-          costs = blueprint.robotCosts(robot)
-          if costs.forall({ case (resource, amount) => resources(resource.ordinal) >= amount })
-          newRobots = robots.updated(robot.ordinal, robots(robot.ordinal) + 1)
-          newResources = costs.foldLeft(resources)({ case (acc, (resource, amount)) => acc.updated(resource.ordinal, acc(resource.ordinal) - amount) })
+          robot <- (0 to 3).reverseIterator
+          costs = robotCosts2(robot)
+          //if costs.zipWithIndex.forall({ case (amount, resource) => resources(resource) >= amount })
+          if resources.lazyZip(costs).forall(_ >= _)
+          newRobots = robots.updated(robot, robots(robot) + 1)
+          //newResources = costs.zipWithIndex.foldLeft(resources)({ case (acc, (amount, resource)) => acc.updated(resource, acc(resource) - amount) })
+          newResources = resources.lazyZip(costs).map(_ - _)
         } yield State(newRobots, newResources)
 
         def collectResources(state: State): State = {
-          val newResources = robots.zipWithIndex.foldLeft(state.resources)({ case (acc, (amount, robot)) => acc.updated(robot, acc(robot) + amount) })
+          //val newResources = robots.zipWithIndex.foldLeft(state.resources)({ case (acc, (amount, robot)) => acc.updated(robot, acc(robot) + amount) })
+          val newResources = state.resources.lazyZip(robots).map(_ + _)
           state.copy(resources = newResources)
         }
 
         /*if (newRobotStates.size == 4)
           newRobotStates.map(collectResources)
         else*/
-          (newRobotStates.take(2) ++ Iterator.single(this)).map(collectResources)
+          (newRobotStates.take(2) ++ (if (resources.head < maxOreCost) Iterator.single(this) else Iterator.empty)).map(collectResources)
       }
     }
 
     @tailrec
     def helper(minute: Int, states: Set[State]): Set[State] = {
       println(s"$minute: ${states.size}")
-      if (minute >= 24)
+      if (minute >= maxMinutes)
         states
       else {
         val newStates = states.flatMap(_.nexts)
@@ -65,8 +77,16 @@ object Day19 extends RegexParsers {
     blueprints
       .view
       .zipWithIndex
-      .map({ case (blueprint, i) => (i + 1) * maxGeodes(blueprint) })
+      .map({ case (blueprint, i) => (i + 1) * maxGeodes(blueprint, 24) })
       .sum
+  }
+
+  def productMaxGeodes(blueprints: Seq[Blueprint]): Long = {
+    blueprints
+      .view
+      .take(3)
+      .map(maxGeodes(_, 32).toLong)
+      .product
   }
 
 
@@ -110,7 +130,8 @@ object Day19 extends RegexParsers {
 
 
     //println(sumQualityLevel(parseBlueprints(exampleInput)))
-    println(sumQualityLevel(parseBlueprints(input)))
+    //println(sumQualityLevel(parseBlueprints(input)))
+    println(productMaxGeodes(parseBlueprints(input)))
 
     // part 1: 1310 - too low (greedily make best robot)
   }

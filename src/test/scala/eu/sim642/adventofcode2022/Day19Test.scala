@@ -17,12 +17,24 @@ class Day19Test extends AnyFunSuite {
   ignore("Part 1 examples") { // TODO: optimize
     val exampleBlueprints = parseBlueprints(exampleInput)
 
-    assert(maxGeodes(exampleBlueprints.head) == 9)
-    assert(maxGeodes(exampleBlueprints(1)) == 12)
+    assert(maxGeodes(exampleBlueprints.head, 24) == 9)
+    assert(maxGeodes(exampleBlueprints(1), 24) == 12)
     assert(sumQualityLevel(exampleBlueprints) == 33)
   }
 
   ignore("Part 1 input answer") {
     assert(sumQualityLevel(parseBlueprints(input)) == 1487) // TODO: optimize
+  }
+
+  ignore("Part 2 examples") { // TODO: optimize
+    val exampleBlueprints = parseBlueprints(exampleInput)
+
+    assert(maxGeodes(exampleBlueprints.head, 32) == 56)
+    assert(maxGeodes(exampleBlueprints(1), 32) == 62)
+    assert(productMaxGeodes(exampleBlueprints) == 56 * 62)
+  }
+
+  ignore("Part 2 input answer") {
+    assert(productMaxGeodes(parseBlueprints(input)) == 13440) // TODO: optimize
   }
 }
