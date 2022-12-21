@@ -4,9 +4,9 @@ import eu.sim642.adventofcodelib.IntegralImplicits.*
 import eu.sim642.adventofcodelib.OrderedSearch
 
 import scala.collection.mutable
-import scala.math.Integral.Implicits.infixIntegralOps
-import scala.math.Numeric.Implicits.infixNumericOps
-import scala.math.Numeric.{BigDecimalIsFractional, DoubleIsFractional, LongIsIntegral}
+import scala.math.Numeric
+import scala.math.Numeric.{BigDecimalAsIfIntegral, LongIsIntegral}
+import scala.math.Ordering.{BigDecimalOrdering, LongOrdering}
 
 object Day21 {
 
@@ -24,31 +24,30 @@ object Day21 {
 
   type Monkeys = Map[String, Job]
 
-  trait Divisble[A] extends Numeric[A] {
-    def div(x: A, y: A): A
-    def fromLong(x: Long): A
+  trait PseudoIntegral[A] extends Integral[A] {
+    def fromLong(x: Long): A // need Long for BinarySearchPart2Solution
   }
 
-  given Divisble[Long] = new Divisble[Long] with LongIsIntegral with Ordering.LongOrdering {
-    override def div(x: Long, y: Long): Long = x / y
-
+  given PseudoIntegral[Long] = new PseudoIntegral[Long] with LongIsIntegral with LongOrdering {
     override def fromLong(x: Long): Long = x
   }
-  given Divisble[Double] = new Divisble[Double] with DoubleIsFractional with Ordering.Double.TotalOrdering {
-    override def fromLong(x: Long): Double = x.toDouble
-  }
-  given Divisble[BigDecimal] = new Divisble[BigDecimal] with BigDecimalIsFractional with Ordering.BigDecimalOrdering {
-    override def fromLong(x: Long): BigDecimal = BigDecimal(x)
+
+  given PseudoIntegral[BigDecimal] = new PseudoIntegral[BigDecimal] with BigDecimalAsIfIntegral with BigDecimalOrdering {
+    override def fromLong(x: Long): BigDecimal = x
+
+    override def quot(x: BigDecimal, y: BigDecimal): BigDecimal = x / y // pseudo-quot, fractional result
   }
 
-  def makeEvalName[A](monkeys: Monkeys)(using aDivisble: Divisble[A]): String => Option[A] = {
+  def makeEvalName[A](monkeys: Monkeys)(using aPseudoIntegral: PseudoIntegral[A]): String => Option[A] = {
     val memo = mutable.Map.empty[String, Option[A]]
 
     def evalName(name: String): Option[A] =
       memo.getOrElseUpdate(name, monkeys.get(name).flatMap(evalJob))
 
+    import Integral.Implicits._
+
     def evalJob(job: Job): Option[A] = job match {
-      case Job.Number(value) => Some(aDivisble.fromLong(value))
+      case Job.Number(value) => Some(aPseudoIntegral.fromLong(value))
       case Job.Operation(lhs, op, rhs) =>
         for {
           left <- evalName(lhs)
@@ -57,7 +56,7 @@ object Day21 {
           case Op.Add => left + right
           case Op.Sub => left - right
           case Op.Mul => left * right
-          case Op.Div => aDivisble.div(left, right)
+          case Op.Div => left / right
         }
     }
 
