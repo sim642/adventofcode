@@ -29,4 +29,12 @@ class Day21Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(evalRoot(parseMonkeys(input)) == 158731561459602L)
   }
+
+  test("Part 2 examples") {
+    assert(findHumn(parseMonkeys(exampleInput)) == 301)
+  }
+
+  test("Part 2 input answer") {
+    assert(findHumn(parseMonkeys(input)) == 3769668716709L)
+  }
 }

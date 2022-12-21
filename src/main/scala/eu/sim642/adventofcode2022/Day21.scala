@@ -42,6 +42,74 @@ object Day21 {
     evalName("root")
   }
 
+  def findHumn(monkeys: Monkeys): Long = {
+
+    val memo = mutable.Map.empty[String, Option[Long]]
+
+    def evalName(name: String): Option[Long] = {
+      if (name == "humn")
+        None
+      else
+        memo.getOrElseUpdate(name, evalJob(monkeys(name)))
+    }
+
+    def evalJob(job: Job): Option[Long] = job match {
+      case Job.Number(value) => Some(value)
+      case Job.Operation(lhs, op, rhs) =>
+        for {
+          left <- evalName(lhs)
+          right <- evalName(rhs)
+        } yield op match {
+          case Op.Add => left + right
+          case Op.Sub => left - right
+          case Op.Mul => left * right
+          case Op.Div => left / right
+        }
+    }
+
+    def invertName(name: String, x: Long): Option[Long] = {
+      println(s"$name $x")
+      if (name == "humn")
+        Some(x)
+      else
+        invertJob(monkeys(name), x)
+    }
+
+
+    def invertJob(job: Job, x: Long): Option[Long] = job match {
+      case Job.Number(value) => None
+      case Job.Operation(lhs, op, rhs) =>
+        (evalName(lhs), evalName(rhs)) match {
+          case (Some(left), None) =>
+            // left op y == x
+            val y = op match {
+              case Op.Add => x - left
+              case Op.Sub => -(x - left)
+              case Op.Mul => x / left
+              case Op.Div => left / x
+            }
+            invertName(rhs, y)
+          case (None, Some(right)) =>
+            // y op right == x
+            val y = op match {
+              case Op.Add => x - right
+              case Op.Sub => x + right
+              case Op.Mul => x / right
+              case Op.Div => x * right
+            }
+            invertName(lhs, y)
+          case (_, _) => ???
+        }
+    }
+
+    monkeys("root") match {
+      case Job.Number(value) => ???
+      case Job.Operation(lhs, op, rhs) =>
+        val right = evalName(rhs).get
+        invertName(lhs, right).get
+    }
+  }
+
 
   def parseMonkey(s: String): (String, Job) = s match {
     case s"$name: $lhs $opStr $rhs" =>
@@ -62,5 +130,6 @@ object Day21 {
 
   def main(args: Array[String]): Unit = {
     println(evalRoot(parseMonkeys(input)))
+    println(findHumn(parseMonkeys(input)))
   }
 }
