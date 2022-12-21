@@ -4,6 +4,9 @@ import eu.sim642.adventofcodelib.IntegralImplicits.*
 import eu.sim642.adventofcodelib.OrderedSearch
 
 import scala.collection.mutable
+import scala.math.Integral.Implicits.infixIntegralOps
+import scala.math.Numeric.Implicits.infixNumericOps
+import scala.math.Numeric.{BigDecimalIsFractional, DoubleIsFractional, LongIsIntegral}
 
 object Day21 {
 
@@ -21,14 +24,31 @@ object Day21 {
 
   type Monkeys = Map[String, Job]
 
-  def makeEvalName(monkeys: Monkeys): String => Option[Long] = {
-    val memo = mutable.Map.empty[String, Option[Long]]
+  trait Divisble[A] extends Numeric[A] {
+    def div(x: A, y: A): A
+    def fromLong(x: Long): A
+  }
 
-    def evalName(name: String): Option[Long] =
+  given Divisble[Long] = new Divisble[Long] with LongIsIntegral with Ordering.LongOrdering {
+    override def div(x: Long, y: Long): Long = x / y
+
+    override def fromLong(x: Long): Long = x
+  }
+  given Divisble[Double] = new Divisble[Double] with DoubleIsFractional with Ordering.Double.TotalOrdering {
+    override def fromLong(x: Long): Double = x.toDouble
+  }
+  given Divisble[BigDecimal] = new Divisble[BigDecimal] with BigDecimalIsFractional with Ordering.BigDecimalOrdering {
+    override def fromLong(x: Long): BigDecimal = BigDecimal(x)
+  }
+
+  def makeEvalName[A](monkeys: Monkeys)(using aDivisble: Divisble[A]): String => Option[A] = {
+    val memo = mutable.Map.empty[String, Option[A]]
+
+    def evalName(name: String): Option[A] =
       memo.getOrElseUpdate(name, monkeys.get(name).flatMap(evalJob))
 
-    def evalJob(job: Job): Option[Long] = job match {
-      case Job.Number(value) => Some(value)
+    def evalJob(job: Job): Option[A] = job match {
+      case Job.Number(value) => Some(aDivisble.fromLong(value))
       case Job.Operation(lhs, op, rhs) =>
         for {
           left <- evalName(lhs)
@@ -37,7 +57,7 @@ object Day21 {
           case Op.Add => left + right
           case Op.Sub => left - right
           case Op.Mul => left * right
-          case Op.Div => left / right
+          case Op.Div => aDivisble.div(left, right)
         }
     }
 
@@ -46,7 +66,7 @@ object Day21 {
 
   private val root = "root"
 
-  def evalRoot(monkeys: Monkeys): Long = makeEvalName(monkeys)(root).get
+  def evalRoot(monkeys: Monkeys): Long = makeEvalName[Long](monkeys)(root).get
 
   private val humn = "humn"
 
@@ -63,11 +83,15 @@ object Day21 {
     def findHumn(monkeys: Monkeys): Long
   }
 
+  /**
+   * Solution, which evaluates inversed top-down from target value to humn.
+   * Assumes single occurrence of humn in expression.
+   */
   object InvertPart2Solution extends Part2Solution {
 
     override def findHumn(monkeys: Monkeys): Long = {
       val humnMonkeys = makeHumnMonkeys(monkeys)
-      val evalName = makeEvalName(humnMonkeys)
+      val evalName = makeEvalName[Long](humnMonkeys)
 
       def invertName(name: String, target: Long): Option[Long] = {
         if (name == humn)
@@ -105,24 +129,45 @@ object Day21 {
     }
   }
 
+  /**
+   * Solution, which uses binary search to find humn.
+   * Assumes expression is monotonic w.r.t. humn.
+   */
   object BinarySearchPart2Solution extends Part2Solution {
 
     override def findHumn(monkeys: Monkeys): Long = {
       val humnMonkeys = makeHumnMonkeys(monkeys)
 
-      def f(humnValue: Long): Long = {
+      def f(humnValue: Long): BigDecimal = {
         val humnMonkeys2 = humnMonkeys + (humn -> Job.Number(humnValue))
-        val rvalue = makeEvalName(humnMonkeys2)(root).get
-        println(s"$humnValue: $rvalue")
-        rvalue
+        makeEvalName[BigDecimal](humnMonkeys2)(root).get
       }
 
-      if (f(0) < f(1000))
-        OrderedSearch.exponentialBinaryLower(f, 0)(0L)
-      else {
-        OrderedSearch.exponentialBinaryUpper[Long, Long](x => -f(x), 0)(0L)
-        OrderedSearch.exponentialBinaryUpper[Long, Long](x => -f(x), 0)(0L)
+      // OrderedSearch requires monotonic, negate if anti-monotonic
+      val g = if (f(0) < f(1)) f else (x: Long) => -f(x)
+      OrderedSearch.exponentialBinaryLower[Long, BigDecimal](g, 0)(0L)
+    }
+  }
+
+  /**
+   * Solution, which solves linear equation to find humn.
+   * Assumes expression is linear w.r.t. humn.
+   */
+  object LinearPart2Solution extends Part2Solution {
+
+    override def findHumn(monkeys: Monkeys): Long = {
+      val humnMonkeys = makeHumnMonkeys(monkeys)
+
+      def f(humnValue: Long): BigDecimal = {
+        val humnMonkeys2 = humnMonkeys + (humn -> Job.Number(humnValue))
+        makeEvalName[BigDecimal](humnMonkeys2)(root).get
       }
+
+      val y0 = f(0)
+      val y1 = f(1)
+      val dy = y1 - y0
+      val x0 = y0 / -dy
+      x0.setScale(0, BigDecimal.RoundingMode.HALF_UP).longValue
     }
   }
 

@@ -9,6 +9,7 @@ class Day21Test extends Suites(
   new Part1Test,
   new InvertPart2SolutionTest,
   new BinarySearchPart2SolutionTest,
+  new LinearPart2SolutionTest,
 )
 
 object Day21Test {
@@ -55,4 +56,6 @@ object Day21Test {
   class InvertPart2SolutionTest extends Part2SolutionTest(InvertPart2Solution)
 
   class BinarySearchPart2SolutionTest extends Part2SolutionTest(BinarySearchPart2Solution)
+
+  class LinearPart2SolutionTest extends Part2SolutionTest(LinearPart2Solution)
 }
