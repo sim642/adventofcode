@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcodelib.IntegralImplicits.*
+import eu.sim642.adventofcodelib.OrderedSearch
 
 import scala.collection.mutable
 
@@ -14,7 +15,7 @@ object Day21 {
   }
 
   enum Job {
-    case Number(value: Int)
+    case Number(value: Long)
     case Operation(lhs: String, op: Op, rhs: String)
   }
 
@@ -58,43 +59,71 @@ object Day21 {
       .removed(humn)
   }
 
-  def findHumn(monkeys: Monkeys): Long = {
-    val humnMonkeys = makeHumnMonkeys(monkeys)
-    val evalName = makeEvalName(humnMonkeys)
+  trait Part2Solution {
+    def findHumn(monkeys: Monkeys): Long
+  }
 
-    def invertName(name: String, target: Long): Option[Long] = {
-      if (name == humn)
-        Some(target)
-      else
-        invertJob(humnMonkeys(name), target)
+  object InvertPart2Solution extends Part2Solution {
+
+    override def findHumn(monkeys: Monkeys): Long = {
+      val humnMonkeys = makeHumnMonkeys(monkeys)
+      val evalName = makeEvalName(humnMonkeys)
+
+      def invertName(name: String, target: Long): Option[Long] = {
+        if (name == humn)
+          Some(target)
+        else
+          invertJob(humnMonkeys(name), target)
+      }
+
+      def invertJob(job: Job, target: Long): Option[Long] = job match {
+        case Job.Number(_) => None
+        case Job.Operation(lhs, op, rhs) =>
+          // left op right == target
+          (evalName(lhs), evalName(rhs)) match {
+            case (Some(left), None) =>
+              val right = op match {
+                case Op.Add => target - left
+                case Op.Sub => left - target
+                case Op.Mul => target / left
+                case Op.Div => left / target
+              }
+              invertName(rhs, right)
+            case (None, Some(right)) =>
+              val left = op match {
+                case Op.Add => target - right
+                case Op.Sub => target + right
+                case Op.Mul => target / right
+                case Op.Div => target * right
+              }
+              invertName(lhs, left)
+            case (_, _) => throw new IllegalArgumentException("job does not contain " + humn)
+          }
+      }
+
+      invertName(root, 0).get
     }
+  }
 
-    def invertJob(job: Job, target: Long): Option[Long] = job match {
-      case Job.Number(_) => None
-      case Job.Operation(lhs, op, rhs) =>
-        // left op right == target
-        (evalName(lhs), evalName(rhs)) match {
-          case (Some(left), None) =>
-            val right = op match {
-              case Op.Add => target - left
-              case Op.Sub => left - target
-              case Op.Mul => target / left
-              case Op.Div => left / target
-            }
-            invertName(rhs, right)
-          case (None, Some(right)) =>
-            val left = op match {
-              case Op.Add => target - right
-              case Op.Sub => target + right
-              case Op.Mul => target / right
-              case Op.Div => target * right
-            }
-            invertName(lhs, left)
-          case (_, _) => throw new IllegalArgumentException("job does not contain " + humn)
-        }
+  object BinarySearchPart2Solution extends Part2Solution {
+
+    override def findHumn(monkeys: Monkeys): Long = {
+      val humnMonkeys = makeHumnMonkeys(monkeys)
+
+      def f(humnValue: Long): Long = {
+        val humnMonkeys2 = humnMonkeys + (humn -> Job.Number(humnValue))
+        val rvalue = makeEvalName(humnMonkeys2)(root).get
+        println(s"$humnValue: $rvalue")
+        rvalue
+      }
+
+      if (f(0) < f(1000))
+        OrderedSearch.exponentialBinaryLower(f, 0)(0L)
+      else {
+        OrderedSearch.exponentialBinaryUpper[Long, Long](x => -f(x), 0)(0L)
+        OrderedSearch.exponentialBinaryUpper[Long, Long](x => -f(x), 0)(0L)
+      }
     }
-
-    invertName(root, 0).get
   }
 
 
@@ -116,6 +145,8 @@ object Day21 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import InvertPart2Solution._
+
     println(evalRoot(parseMonkeys(input)))
     println(findHumn(parseMonkeys(input)))
   }

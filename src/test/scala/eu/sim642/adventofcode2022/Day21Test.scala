@@ -1,9 +1,17 @@
 package eu.sim642.adventofcode2022
 
-import Day21._
+import Day21.*
+import Day21Test.*
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day21Test extends AnyFunSuite {
+class Day21Test extends Suites(
+  new Part1Test,
+  new InvertPart2SolutionTest,
+  new BinarySearchPart2SolutionTest,
+)
+
+object Day21Test {
 
   val exampleInput =
     """root: pppw + sjmn
@@ -22,19 +30,29 @@ class Day21Test extends AnyFunSuite {
       |drzm: hmdt - zczc
       |hmdt: 32""".stripMargin
 
-  test("Part 1 examples") {
-    assert(evalRoot(parseMonkeys(exampleInput)) == 152)
+  class Part1Test extends AnyFunSuite {
+
+    test("Part 1 examples") {
+      assert(evalRoot(parseMonkeys(exampleInput)) == 152)
+    }
+
+    test("Part 1 input answer") {
+      assert(evalRoot(parseMonkeys(input)) == 158731561459602L)
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(evalRoot(parseMonkeys(input)) == 158731561459602L)
+  abstract class Part2SolutionTest(part2Solution: Part2Solution) extends AnyFunSuite {
+
+    test("Part 2 examples") {
+      assert(part2Solution.findHumn(parseMonkeys(exampleInput)) == 301)
+    }
+
+    test("Part 2 input answer") {
+      assert(part2Solution.findHumn(parseMonkeys(input)) == 3769668716709L)
+    }
   }
 
-  test("Part 2 examples") {
-    assert(findHumn(parseMonkeys(exampleInput)) == 301)
-  }
+  class InvertPart2SolutionTest extends Part2SolutionTest(InvertPart2Solution)
 
-  test("Part 2 input answer") {
-    assert(findHumn(parseMonkeys(input)) == 3769668716709L)
-  }
+  class BinarySearchPart2SolutionTest extends Part2SolutionTest(BinarySearchPart2Solution)
 }
