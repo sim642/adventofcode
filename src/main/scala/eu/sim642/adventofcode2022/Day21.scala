@@ -20,38 +20,11 @@ object Day21 {
 
   type Monkeys = Map[String, Job]
 
-  def evalRoot(monkeys: Monkeys): Long = {
-
-    val memo = mutable.Map.empty[String, Long]
-
-    def evalName(name: String): Long = memo.getOrElseUpdate(name, evalJob(monkeys(name)))
-
-    def evalJob(job: Job): Long = job match {
-      case Job.Number(value) => value
-      case Job.Operation(lhs, op, rhs) =>
-        val left = evalName(lhs)
-        val right = evalName(rhs)
-        op match {
-          case Op.Add => left + right
-          case Op.Sub => left - right
-          case Op.Mul => left * right
-          case Op.Div => left / right
-        }
-    }
-
-    evalName("root")
-  }
-
-  def findHumn(monkeys: Monkeys): Long = {
-
+  def makeEvalName(monkeys: Monkeys): String => Option[Long] = {
     val memo = mutable.Map.empty[String, Option[Long]]
 
-    def evalName(name: String): Option[Long] = {
-      if (name == "humn")
-        None
-      else
-        memo.getOrElseUpdate(name, evalJob(monkeys(name)))
-    }
+    def evalName(name: String): Option[Long] =
+      memo.getOrElseUpdate(name, monkeys.get(name).flatMap(evalJob))
 
     def evalJob(job: Job): Option[Long] = job match {
       case Job.Number(value) => Some(value)
@@ -67,47 +40,61 @@ object Day21 {
         }
     }
 
-    def invertName(name: String, x: Long): Option[Long] = {
-      println(s"$name $x")
-      if (name == "humn")
-        Some(x)
+    evalName
+  }
+
+  private val root = "root"
+
+  def evalRoot(monkeys: Monkeys): Long = makeEvalName(monkeys)(root).get
+
+  private val humn = "humn"
+
+  def makeHumnMonkeys(monkeys: Monkeys): Monkeys = {
+    monkeys
+      .updatedWith(root)({
+        // change root to subtraction, so can solve for root == 0
+        case Some(Job.Operation(lhs, _, rhs)) => Some(Job.Operation(lhs, Op.Sub, rhs))
+      })
+      .removed(humn)
+  }
+
+  def findHumn(monkeys: Monkeys): Long = {
+    val humnMonkeys = makeHumnMonkeys(monkeys)
+    val evalName = makeEvalName(humnMonkeys)
+
+    def invertName(name: String, target: Long): Option[Long] = {
+      if (name == humn)
+        Some(target)
       else
-        invertJob(monkeys(name), x)
+        invertJob(humnMonkeys(name), target)
     }
 
-
-    def invertJob(job: Job, x: Long): Option[Long] = job match {
-      case Job.Number(value) => None
+    def invertJob(job: Job, target: Long): Option[Long] = job match {
+      case Job.Number(_) => None
       case Job.Operation(lhs, op, rhs) =>
+        // left op right == target
         (evalName(lhs), evalName(rhs)) match {
           case (Some(left), None) =>
-            // left op y == x
-            val y = op match {
-              case Op.Add => x - left
-              case Op.Sub => -(x - left)
-              case Op.Mul => x / left
-              case Op.Div => left / x
+            val right = op match {
+              case Op.Add => target - left
+              case Op.Sub => left - target
+              case Op.Mul => target / left
+              case Op.Div => left / target
             }
-            invertName(rhs, y)
+            invertName(rhs, right)
           case (None, Some(right)) =>
-            // y op right == x
-            val y = op match {
-              case Op.Add => x - right
-              case Op.Sub => x + right
-              case Op.Mul => x / right
-              case Op.Div => x * right
+            val left = op match {
+              case Op.Add => target - right
+              case Op.Sub => target + right
+              case Op.Mul => target / right
+              case Op.Div => target * right
             }
-            invertName(lhs, y)
-          case (_, _) => ???
+            invertName(lhs, left)
+          case (_, _) => throw new IllegalArgumentException("job does not contain " + humn)
         }
     }
 
-    monkeys("root") match {
-      case Job.Number(value) => ???
-      case Job.Operation(lhs, op, rhs) =>
-        val right = evalName(rhs).get
-        invertName(lhs, right).get
-    }
+    invertName(root, 0).get
   }
 
 
