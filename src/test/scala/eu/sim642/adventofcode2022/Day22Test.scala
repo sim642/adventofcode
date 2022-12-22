@@ -30,10 +30,10 @@ class Day22Test extends AnyFunSuite {
   }
 
   test("Part 2 examples") {
-    assert(finalPassword2(parseInput(exampleInput), exampleWrap) == 5031)
+    assert(finalPassword2(parseInput(exampleInput), exampleGlue) == 5031)
   }
 
   test("Part 2 input answer") {
-    assert(finalPassword2(parseInput(input), inputWrap) == 136182)
+    assert(finalPassword2(parseInput(input), inputGlue) == 136182)
   }
 }
