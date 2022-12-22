@@ -22,18 +22,18 @@ class Day22Test extends AnyFunSuite {
       |10R5L5R10L4R5L5""".stripMargin
 
   test("Part 1 examples") {
-    assert(finalPassword(parseInput(exampleInput)) == 6032)
+    assert(Part1.finalPassword(parseInput(exampleInput)) == 6032)
   }
 
   test("Part 1 input answer") {
-    assert(finalPassword(parseInput(input)) == 89224)
+    assert(Part1.finalPassword(parseInput(input)) == 89224)
   }
 
   test("Part 2 examples") {
-    assert(finalPassword2(parseInput(exampleInput), exampleGlue) == 5031)
+    assert(Part2.finalPassword(parseInput(exampleInput), ExampleCubeNet) == 5031)
   }
 
   test("Part 2 input answer") {
-    assert(finalPassword2(parseInput(input), inputGlue) == 136182)
+    assert(Part2.finalPassword(parseInput(input)) == 136182)
   }
 }

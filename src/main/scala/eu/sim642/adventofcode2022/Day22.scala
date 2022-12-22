@@ -22,172 +22,18 @@ object Day22 {
 
   case class PosFacing(pos: Pos, facing: Pos)
 
-  def followPath(input: Input): PosFacing = {
-    val Input(map, path) = input
-    val mapTranspose = map.transpose
-
-    def moveForward(posFacing: PosFacing): PosFacing = {
-      val PosFacing(pos, facing) = posFacing
-
-      val newPos = pos + facing
-      val newPos2 =
-        if (!map.containsPos(newPos) || map(newPos) == ' ') {
-          facing match {
-            case Pos(1, 0) => Pos(map(pos.y).indexWhere(_ != ' '), pos.y)
-            case Pos(0, 1) => Pos(pos.x, mapTranspose(pos.x).indexWhere(_ != ' '))
-            case Pos(-1, 0) => Pos(map(pos.y).lastIndexWhere(_ != ' '), pos.y)
-            case Pos(0, -1) => Pos(pos.x, mapTranspose(pos.x).lastIndexWhere(_ != ' '))
-          }
-        }
-        else
-          newPos
-
-      map(newPos2) match {
-        case '.' => PosFacing(newPos2, facing)
-        case '#' => posFacing
-      }
-    }
-
-    def move(posFacing: PosFacing, move: Move): PosFacing = {
-      //println((posFacing, move))
-      move match {
-        case Move.Forward(n) => (0 until n).foldLeft(posFacing)((x, _) => moveForward(x))
-        case Move.Left => posFacing.copy(facing = posFacing.facing.left)
-        case Move.Right => posFacing.copy(facing = posFacing.facing.right)
-      }
-    }
-
-    //println(map.head)
-    val initialX = map.head.indexOf('.')
-    val initialPosFacing = PosFacing(Pos(initialX, 0), Pos(1, 0))
-
-    path.foldLeft(initialPosFacing)(move)
-  }
-
-  def finalPassword(input: Input): Int = {
-    val finalPosFacing = followPath(input)
-    //println(finalPosFacing)
-    1000 * (finalPosFacing.pos.y + 1) + 4 * (finalPosFacing.pos.x + 1) + (finalPosFacing.facing match {
-      case Pos(1, 0) => 0
-      case Pos(0, 1) => 1
-      case Pos(-1, 0) => 2
-      case Pos(0, -1) => 3
-    })
-  }
-
-  // manually hard-coded wrap around for example
-  val exampleGlue = {
-    val layout =
-      """  0
-        |123
-        |  45""".stripMargin.linesIterator.map(_.toVector).toVector
-    val faces = (0 until 6).map(i => layout.posOf('0' + i))
-
-    val glue = Seq(
-      (3, Pos(1, 0), 5, Pos(0, -1)),
-      (4, Pos(0, 1), 1, Pos(0, 1)),
-      (2, Pos(0, -1), 0, Pos(-1, 0)),
-    )
-
-    val glue2 = glue.flatMap({ case (p1, f1, p2, f2) =>
-      Seq((faces(p1), f1) -> (faces(p2), f2), (faces(p2), f2) -> (faces(p1), f1))
-    }).toMap
-
-    val faceSize = 4
-
-    def facingCorner(facing: Pos): Pos = facing match {
-      case Pos(1, 0) => Pos(faceSize - 1, 0)
-      case Pos(0, 1) => Pos(faceSize - 1, faceSize - 1)
-      case Pos(-1, 0) => Pos(0, faceSize - 1)
-      case Pos(0, -1) => Pos(0, 0)
-    }
-
-    def wrap(posFacing: PosFacing): PosFacing = {
-      val PosFacing(pos, facing) = posFacing
-      println(posFacing)
-      val facePos = Pos(pos.x / faceSize, pos.y / faceSize)
-      val (newFacePos, newFacing) = glue2((facePos, facing))
-      val newFacing2 = -newFacing
-      val edgePos = Pos(pos.x % faceSize, pos.y % faceSize)
-      val i = facingCorner(facing) manhattanDistance edgePos
-      val newEdgePos = facingCorner(newFacing2) + i *: newFacing2.right
-      val newPos = faceSize *: (newFacePos + newFacing) + newEdgePos + newFacing2
-      println(newPos)
-      PosFacing(newPos, newFacing2)
-    }
-
-    wrap
-  }
-
-  // manually hard-coded wrap around for my input
-  val inputGlue = {
-    val layout =
-      """ 01
-        | 2
-        |34
-        |5  """.stripMargin.linesIterator.map(_.toVector).toVector
-    val faces = (0 until 6).map(i => layout.posOf('0' + i))
-
-    val glue = Seq(
-      (0, Pos(0, -1), 5, Pos(-1, 0)),
-      (1, Pos(1, 0), 4, Pos(1, 0)),
-      (4, Pos(0, 1), 5, Pos(1, 0)),
-      (1, Pos(0, 1), 2, Pos(1, 0)),
-      (0, Pos(-1, 0), 3, Pos(-1, 0)),
-      (1, Pos(0, -1), 5, Pos(0, 1)),
-      (3, Pos(0, -1), 2, Pos(-1, 0)),
-    )
-
-    val glue2 = glue.flatMap({ case (p1, f1, p2, f2) =>
-      Seq((faces(p1), f1) -> (faces(p2), f2), (faces(p2), f2) -> (faces(p1), f1))
-    }).toMap
-
-    val faceSize = 50
-
-    def facingCorner(facing: Pos): Pos = facing match {
-      case Pos(1, 0) => Pos(faceSize - 1, 0)
-      case Pos(0, 1) => Pos(faceSize - 1, faceSize - 1)
-      case Pos(-1, 0) => Pos(0, faceSize - 1)
-      case Pos(0, -1) => Pos(0, 0)
-    }
-
-    def wrap(posFacing: PosFacing): PosFacing = {
-      val PosFacing(pos, facing) = posFacing
-      println(posFacing)
-      val facePos = Pos(pos.x / faceSize, pos.y / faceSize)
-      val (newFacePos, newFacing) = glue2((facePos, facing))
-      val newFacing2 = -newFacing
-      val edgePos = Pos(pos.x % faceSize, pos.y % faceSize)
-      val i = facingCorner(facing) manhattanDistance edgePos
-      val newEdgePos = facingCorner(newFacing2) + i *: newFacing2.right
-      val newPos = faceSize *: (newFacePos + newFacing) + newEdgePos + newFacing2
-      println(newPos)
-      PosFacing(newPos, newFacing2)
-    }
-
-    wrap
-  }
-
-  // TODO: deduplicate
-  def followPath2(input: Input, wrap: PosFacing => PosFacing): PosFacing = {
+  def followPath(input: Input, wrap: PosFacing => PosFacing): PosFacing = {
     val Input(map, path) = input
 
     def moveForward(posFacing: PosFacing): PosFacing = {
-      //println(s"  $posFacing")
       val PosFacing(pos, facing) = posFacing
 
       val newPos = pos + facing
       val newPosFacing =
-        if (!map.containsPos(newPos) || map(newPos) == ' ') {
-          val w = wrap(posFacing)
-          //println(s"      $w")
-          //assert(wrap(w.copy(facing = -w.facing)) == PosFacing(pos, -facing))
-          w
-        }
+        if (!map.containsPos(newPos) || map(newPos) == ' ')
+          wrap(posFacing)
         else
           PosFacing(newPos, facing)
-
-      //println(s"    $newPosFacing")
 
       map(newPosFacing.pos) match {
         case '.' => newPosFacing
@@ -196,9 +42,8 @@ object Day22 {
     }
 
     def move(posFacing: PosFacing, move: Move): PosFacing = {
-      //println((posFacing, move))
       move match {
-        case Move.Forward(n) => (0 until n).foldLeft(posFacing)((x, _) => moveForward(x))
+        case Move.Forward(n) => (0 until n).foldLeft(posFacing)((acc, _) => moveForward(acc))
         case Move.Left => posFacing.copy(facing = posFacing.facing.left)
         case Move.Right => posFacing.copy(facing = posFacing.facing.right)
       }
@@ -210,15 +55,143 @@ object Day22 {
     path.foldLeft(initialPosFacing)(move)
   }
 
-  def finalPassword2(input: Input, wrap: PosFacing => PosFacing): Int = {
-    val finalPosFacing = followPath2(input, wrap)
-    //println(finalPosFacing)
-    1000 * (finalPosFacing.pos.y + 1) + 4 * (finalPosFacing.pos.x + 1) + (finalPosFacing.facing match {
-      case Pos(1, 0) => 0
-      case Pos(0, 1) => 1
-      case Pos(-1, 0) => 2
-      case Pos(0, -1) => 3
-    })
+  private val facingPassword = Map(
+    Pos(1, 0) -> 0,
+    Pos(0, 1) -> 1,
+    Pos(-1, 0) -> 2,
+    Pos(0, -1) -> 3,
+  )
+
+  def posFacingPassword(posFacing: PosFacing): Int = {
+    val PosFacing(Pos(x, y), facing) = posFacing
+    1000 * (y + 1) + 4 * (x + 1) + facingPassword(facing)
+  }
+
+  trait Part {
+    def finalPassword(input: Input): Int
+  }
+
+  object Part1 extends Part {
+
+    override def finalPassword(input: Input): Int = {
+      val Input(map, _) = input
+      val mapTranspose = map.transpose
+
+      // TODO: simplify?
+      def wrap(posFacing: PosFacing): PosFacing = {
+        val PosFacing(pos, facing) = posFacing
+        val newPos = facing match {
+          case Pos(1, 0) => Pos(map(pos.y).indexWhere(_ != ' '), pos.y)
+          case Pos(0, 1) => Pos(pos.x, mapTranspose(pos.x).indexWhere(_ != ' '))
+          case Pos(-1, 0) => Pos(map(pos.y).lastIndexWhere(_ != ' '), pos.y)
+          case Pos(0, -1) => Pos(pos.x, mapTranspose(pos.x).lastIndexWhere(_ != ' '))
+        }
+        PosFacing(newPos, facing)
+      }
+
+      val finalPosFacing = followPath(input, wrap)
+      posFacingPassword(finalPosFacing)
+    }
+  }
+
+  trait CubeNet {
+    val edgeLength: Int
+    val layout: String
+    val glue: Seq[(Int, Pos, Int, Pos)]
+  }
+
+  def cubeNetWrap(cubeNet: CubeNet): PosFacing => PosFacing = {
+    import cubeNet._
+
+    val layoutGrid = layout.linesIterator.map(_.toVector).toVector
+    val facePoss = (0 until 6).map(i => layoutGrid.posOf('0' + i))
+
+    val glueMap = glue.flatMap({ case (face1, edge1, face2, edge2) =>
+      val facePos1 = facePoss(face1)
+      val facePos2 = facePoss(face2)
+      Seq(
+        (facePos1, edge1) -> (facePos2, edge2),
+        (facePos2, edge2) -> (facePos1, edge1),
+      )
+    }).toMap
+
+    def edgeCorner(edge: Pos): Pos = edge match {
+      case Pos(1, 0) => Pos(edgeLength - 1, 0)
+      case Pos(0, 1) => Pos(edgeLength - 1, edgeLength - 1)
+      case Pos(-1, 0) => Pos(0, edgeLength - 1)
+      case Pos(0, -1) => Pos(0, 0)
+    }
+
+    def wrap(posFacing: PosFacing): PosFacing = {
+      val PosFacing(pos, facing) = posFacing
+      val facePos = Pos(pos.x / edgeLength, pos.y / edgeLength)
+      val (newFacePos, newEdge) = glueMap((facePos, facing))
+      val newFacing = -newEdge
+      val inFacePos = Pos(pos.x % edgeLength, pos.y % edgeLength)
+      val cornerDist = edgeCorner(facing) manhattanDistance inFacePos
+      val newInFacePos = edgeCorner(newFacing) + cornerDist *: newFacing.right
+      val newPos = edgeLength *: (newFacePos + newEdge) + newInFacePos + newFacing
+      PosFacing(newPos, newFacing)
+    }
+
+    wrap
+  }
+
+  /**
+   * Cube net for example.
+   */
+  object ExampleCubeNet extends CubeNet {
+
+    override val edgeLength: Int = 4
+
+    override val layout: String =
+      """  0
+        |123
+        |  45""".stripMargin
+
+    override val glue: Seq[(Int, Pos, Int, Pos)] = Seq(
+      // only 3 glue required for example
+      (3, Pos(1, 0), 5, Pos(0, -1)),
+      (4, Pos(0, 1), 1, Pos(0, 1)),
+      (2, Pos(0, -1), 0, Pos(-1, 0)),
+      // TODO: remaining 4 glue, not required for example
+    )
+  }
+
+
+  /**
+   * Cube net for input.
+   * Same for all inputs: https://www.reddit.com/r/adventofcode/comments/zsgbe7/2022_day_22_question_about_your_input/j17smus/.
+   */
+  object InputCubeNet extends CubeNet {
+
+    override val edgeLength: Int = 50
+
+    override val layout: String =
+      """ 01
+        | 2
+        |34
+        |5  """.stripMargin
+
+    override val glue: Seq[(Int, Pos, Int, Pos)] = Seq(
+      (0, Pos(0, -1), 5, Pos(-1, 0)),
+      (1, Pos(1, 0), 4, Pos(1, 0)),
+      (4, Pos(0, 1), 5, Pos(1, 0)),
+      (1, Pos(0, 1), 2, Pos(1, 0)),
+      (0, Pos(-1, 0), 3, Pos(-1, 0)),
+      (1, Pos(0, -1), 5, Pos(0, 1)),
+      (3, Pos(0, -1), 2, Pos(-1, 0)),
+    )
+  }
+
+  object Part2 extends Part {
+
+    def finalPassword(input: Input, cubeNet: CubeNet): Int = {
+      val finalPosFacing = followPath(input, cubeNetWrap(cubeNet))
+      posFacingPassword(finalPosFacing)
+    }
+
+    override def finalPassword(input: Input): Int = finalPassword(input, InputCubeNet)
   }
 
   def parsePath(s: String): Seq[Move] = {
@@ -234,6 +207,7 @@ object Day22 {
     val Array(mapStr, pathStr) = input.split("\n\n", 2)
     val mapLines = mapStr.linesIterator.toSeq
     // pad lines just for transpose in wrap around
+    // TODO: extract Grid padding to library
     val maxMapLineLength = mapLines.view.map(_.length).max
     val paddedMapLines = mapLines.map(_.padTo(maxMapLineLength, ' '))
     val map = paddedMapLines.map(_.toVector).toVector
@@ -244,8 +218,8 @@ object Day22 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.stripLineEnd
 
   def main(args: Array[String]): Unit = {
-    println(finalPassword(parseInput(input)))
-    println(finalPassword2(parseInput(input), inputGlue))
+    println(Part1.finalPassword(parseInput(input)))
+    println(Part2.finalPassword(parseInput(input)))
 
     // part 2: 120330 - too low
   }
