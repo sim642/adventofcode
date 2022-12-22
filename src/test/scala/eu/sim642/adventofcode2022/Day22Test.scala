@@ -28,4 +28,12 @@ class Day22Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(finalPassword(parseInput(input)) == 89224)
   }
+
+  test("Part 2 examples") {
+    assert(finalPassword2(parseInput(exampleInput), exampleWrap) == 5031)
+  }
+
+  test("Part 2 input answer") {
+    assert(finalPassword2(parseInput(input), inputWrap) == 136182)
+  }
 }
