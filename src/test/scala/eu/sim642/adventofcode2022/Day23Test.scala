@@ -33,6 +33,7 @@ class Day23Test extends AnyFunSuite {
 
   test("Part 2 examples") {
     assert(countRounds(parseElves(exampleInput1)) == 20)
+    assert(countRounds(parseElves(exampleInput2)) == 4)
   }
 
   test("Part 2 input answer") {
