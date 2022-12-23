@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2022
 
+import eu.sim642.adventofcodelib.GridImplicits._
+
 object Day5 {
 
   type Crate = Char
@@ -41,11 +43,8 @@ object Day5 {
 
 
   def parseCrates(s: String): Seq[Stack] = {
-    val lines = s.linesIterator.toSeq
-    // pad lines just for example input in tests
-    val maxLineLength = lines.view.map(_.length).max
-    val paddedLines = lines.map(_.padTo(maxLineLength, ' '))
-    val cols = paddedLines.reverse.transpose
+    val rows = s.linesIterator.map(_.toVector).toVector.padGrid(' ') // pad lines just for example input in tests
+    val cols = rows.reverse.transpose
     (1 until cols.size by 4)
       .map(cols(_).tail.filter(_ != ' ').reverse)
   }

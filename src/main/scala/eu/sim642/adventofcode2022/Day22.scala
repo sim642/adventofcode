@@ -205,12 +205,8 @@ object Day22 {
 
   def parseInput(input: String): Input = {
     val Array(mapStr, pathStr) = input.split("\n\n", 2)
-    val mapLines = mapStr.linesIterator.toSeq
+    val map = mapStr.linesIterator.map(_.toVector).toVector.padGrid(' ')
     // pad lines just for transpose in wrap around
-    // TODO: extract Grid padding to library
-    val maxMapLineLength = mapLines.view.map(_.length).max
-    val paddedMapLines = mapLines.map(_.padTo(maxMapLineLength, ' '))
-    val map = paddedMapLines.map(_.toVector).toVector
     val path = parsePath(pathStr)
     Input(map, path)
   }

@@ -54,5 +54,10 @@ object GridImplicits {
       grid.iterator.map(_.sum).sum
 
     def sizeGrid: Int = grid.size * grid(0).size // assumes rectangular grid!
+
+    def padGrid(elem: A): Grid[A] = {
+      val maxWidth = grid.view.map(_.length).max
+      grid.map(_.padTo(maxWidth, elem))
+    }
   }
 }
