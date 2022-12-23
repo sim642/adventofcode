@@ -151,10 +151,14 @@ object Day22 {
 
     override val glue: Seq[(Int, Pos, Int, Pos)] = Seq(
       // only 3 glue required for example
+      (0, Pos(-1, 0), 2, Pos(0, -1)),
+      (1, Pos(0, 1), 4, Pos(0, 1)),
       (3, Pos(1, 0), 5, Pos(0, -1)),
-      (4, Pos(0, 1), 1, Pos(0, 1)),
-      (2, Pos(0, -1), 0, Pos(-1, 0)),
-      // TODO: remaining 4 glue, not required for example
+      // remaining 4 glue, not required for example
+      (0, Pos(0, -1), 1, Pos(0, -1)),
+      (0, Pos(1, 0), 5, Pos(1, 0)),
+      (1, Pos(-1, 0), 5, Pos(0, 1)),
+      (2, Pos(0, 1), 4, Pos(-1, 0)),
     )
   }
 
@@ -174,13 +178,13 @@ object Day22 {
         |5  """.stripMargin
 
     override val glue: Seq[(Int, Pos, Int, Pos)] = Seq(
-      (0, Pos(0, -1), 5, Pos(-1, 0)),
-      (1, Pos(1, 0), 4, Pos(1, 0)),
-      (4, Pos(0, 1), 5, Pos(1, 0)),
-      (1, Pos(0, 1), 2, Pos(1, 0)),
       (0, Pos(-1, 0), 3, Pos(-1, 0)),
+      (0, Pos(0, -1), 5, Pos(-1, 0)),
+      (1, Pos(0, 1), 2, Pos(1, 0)),
+      (1, Pos(1, 0), 4, Pos(1, 0)),
       (1, Pos(0, -1), 5, Pos(0, 1)),
-      (3, Pos(0, -1), 2, Pos(-1, 0)),
+      (2, Pos(-1, 0), 3, Pos(0, -1)),
+      (4, Pos(0, 1), 5, Pos(1, 0)),
     )
   }
 
