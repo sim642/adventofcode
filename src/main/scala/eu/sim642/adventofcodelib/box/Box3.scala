@@ -2,6 +2,8 @@ package eu.sim642.adventofcodelib.box
 
 import eu.sim642.adventofcodelib.pos.Pos3
 
+import scala.math.Numeric.Implicits.infixNumericOps
+
 case class Box3(min: Pos3, max: Pos3) extends BoxOps[Pos3, Box3] {
   override def factory: BoxFactory[Pos3, Box3] = Box3
 
@@ -11,6 +13,11 @@ case class Box3(min: Pos3, max: Pos3) extends BoxOps[Pos3, Box3] {
       y <- (min.y to max.y).iterator
       z <- (min.z to max.z).iterator
     } yield Pos3(x, y, z)
+  }
+
+  override def size[C](using cNumeric: Numeric[C]): C = {
+    val d = max - min + Pos3(1, 1, 1)
+    cNumeric.fromInt(d.x) * cNumeric.fromInt(d.y) * cNumeric.fromInt(d.z)
   }
 
   /*def closestTo(pos: Pos3): Pos3 = {

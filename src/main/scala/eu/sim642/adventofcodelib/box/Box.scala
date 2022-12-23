@@ -2,6 +2,8 @@ package eu.sim642.adventofcodelib.box
 
 import eu.sim642.adventofcodelib.pos.Pos
 
+import scala.math.Numeric.Implicits.infixNumericOps
+
 case class Box(min: Pos, max: Pos) extends BoxOps[Pos, Box] {
   override def factory: BoxFactory[Pos, Box] = Box
 
@@ -10,6 +12,11 @@ case class Box(min: Pos, max: Pos) extends BoxOps[Pos, Box] {
       x <- (min.x to max.x).iterator
       y <- (min.y to max.y).iterator
     } yield Pos(x, y)
+  }
+
+  override def size[C](using cNumeric: Numeric[C]): C = {
+    val d = max - min + Pos(1, 1)
+    cNumeric.fromInt(d.x) * cNumeric.fromInt(d.y)
   }
 
   def diffSplit(that: Box): Seq[Box] = {

@@ -54,9 +54,8 @@ object Day23 {
   }
 
   def countEmpty(elves: Set[Pos]): Int = {
-    val Box(min, max) = Box.bounding(elves)
-    val boxSize = (max.x - min.x + 1) * (max.y - min.y + 1) // TODO: move to library
-    boxSize - elves.size
+    val box = Box.bounding(elves)
+    box.size[Int] - elves.size
   }
 
   def simulateEmpty(initialElves: Set[Pos], rounds: Int = 10): Int = {

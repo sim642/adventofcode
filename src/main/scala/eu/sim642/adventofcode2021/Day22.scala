@@ -7,14 +7,6 @@ import scala.annotation.tailrec
 
 object Day22 {
 
-  // TODO: move to library?
-  extension (box3: Box3) {
-    def size: BigInt = {
-      val Box3(min, max) = box3
-      BigInt(max.x - min.x + 1) * BigInt(max.y - min.y + 1) * BigInt(max.z - min.z + 1)
-    }
-  }
-
   type Step = (Boolean, Box3)
 
   private val initializationBox = Box3(Pos3(-50, -50, -50), Pos3(50, 50, 50))
@@ -63,7 +55,7 @@ object Day22 {
     }
 
     override def countReboot(steps: Seq[(Boolean, Box3)]): Long = {
-      simulateReboot(steps).map(_.size).sum.toLong
+      simulateReboot(steps).map(_.size[Long]).sum
     }
   }
 
@@ -77,7 +69,7 @@ object Day22 {
         if (sections.isEmpty)
           acc.toLong
         else {
-          val sectionsSize = sections.view.map(_._1.size).sum
+          val sectionsSize = sections.view.map(_._1.size[BigInt]).sum
           val newAcc = acc + sign * sectionsSize
           val newSections = for {
             (sectionBox, sectionI) <- sections

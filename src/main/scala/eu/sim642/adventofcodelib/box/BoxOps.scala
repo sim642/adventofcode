@@ -32,4 +32,6 @@ trait BoxOps[A <: BoxPosOps[A], B <: BoxOps[A, B]] {
   }
 
   def iterator: Iterator[A]
+
+  def size[C: Numeric]: C
 }
