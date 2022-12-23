@@ -30,4 +30,12 @@ class Day23Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(simulateEmpty(parseElves(input)) == 3920)
   }
+
+  test("Part 2 examples") {
+    assert(countRounds(parseElves(exampleInput1)) == 20)
+  }
+
+  test("Part 2 input answer") {
+    assert(countRounds(parseElves(input)) == 889) // TODO: optimize, ~3s
+  }
 }

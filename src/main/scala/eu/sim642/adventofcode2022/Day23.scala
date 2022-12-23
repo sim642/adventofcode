@@ -3,10 +3,11 @@ package eu.sim642.adventofcode2022
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.IteratorImplicits._
-import eu.sim642.adventofcodelib.IterableImplicits._
-import eu.sim642.adventofcodelib.SeqImplicits._
+import eu.sim642.adventofcodelib.IteratorImplicits.*
+import eu.sim642.adventofcodelib.IterableImplicits.*
+import eu.sim642.adventofcodelib.SeqImplicits.*
 import eu.sim642.adventofcode2018.Day13.DirectionPos
+import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
 object Day23 {
 
@@ -63,6 +64,12 @@ object Day23 {
     countEmpty(finalElves)
   }
 
+  def countRounds(initialElves: Set[Pos]): Int = {
+    val cycle = NaiveCycleFinder.findBy((initialElves, initialOffsetOrder), simulateRound)(_._1)
+    assert(cycle.cycleLength == 1) // should be fixpoint
+    cycle.stemCycleLength
+  }
+
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
@@ -78,5 +85,6 @@ object Day23 {
 
   def main(args: Array[String]): Unit = {
     println(simulateEmpty(parseElves(input)))
+    println(countRounds(parseElves(input)))
   }
 }
