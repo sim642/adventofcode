@@ -6,16 +6,16 @@ import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic, UnitNeigh
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.IntegralImplicits.*
 
-import scala.collection.View
+import scala.collection.immutable.BitSet
 
 object Day24 {
 
   case class Input(size: Pos,
                    wall: Set[Pos],
-                   up: Map[Int, Set[Int]],
-                   down: Map[Int, Set[Int]],
-                   left: Map[Int, Set[Int]],
-                   right: Map[Int, Set[Int]])
+                   up: Map[Int, BitSet],
+                   down: Map[Int, BitSet],
+                   left: Map[Int, BitSet],
+                   right: Map[Int, BitSet])
 
   trait Part {
 
@@ -98,10 +98,10 @@ object Day24 {
     } yield Pos(x, y)).toSet
 
     val wall = findChars('#')
-    val up = findChars('^').groupMap(_.x)(_.y).withDefaultValue(Set.empty)
-    val down = findChars('v').groupMap(_.x)(_.y).withDefaultValue(Set.empty)
-    val left = findChars('<').groupMap(_.y)(_.x).withDefaultValue(Set.empty)
-    val right = findChars('>').groupMap(_.y)(_.x).withDefaultValue(Set.empty)
+    val up = findChars('^').groupMap(_.x)(_.y).view.mapValues(_.to(BitSet)).toMap.withDefaultValue(BitSet.empty)
+    val down = findChars('v').groupMap(_.x)(_.y).view.mapValues(_.to(BitSet)).toMap.withDefaultValue(BitSet.empty)
+    val left = findChars('<').groupMap(_.y)(_.x).view.mapValues(_.to(BitSet)).toMap.withDefaultValue(BitSet.empty)
+    val right = findChars('>').groupMap(_.y)(_.x).view.mapValues(_.to(BitSet)).toMap.withDefaultValue(BitSet.empty)
 
     Input(size, wall, up, down, left, right)
   }
