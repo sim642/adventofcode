@@ -9,7 +9,9 @@ import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.IntegralImplicits._
+import eu.sim642.adventofcodelib.IntegralImplicits.*
+
+import scala.collection.View
 
 object Day24 {
 
@@ -20,6 +22,10 @@ object Day24 {
                    left: Map[Int, Set[Int]],
                    right: Map[Int, Set[Int]])
 
+  extension [A](view: View[A]) {
+    def contains(elem: A): Boolean = view.exists(_ == elem)
+  }
+
   trait Part {
 
     val stages: Int
@@ -29,18 +35,10 @@ object Day24 {
       val max = size - Pos(1, 1)
 
       def isFree(pos: Pos, time: Int): Boolean = {
-        val r = right(pos.y).map(x => (x - 1 + time) %+ (size.x - 2) + 1)
-        val l = left(pos.y).map(x => (x - 1 - time) %+ (size.x - 2) + 1)
-        val d = down(pos.x).map(y => (y - 1 + time) %+ (size.y - 2) + 1)
-        val u = up(pos.x).map(y => (y - 1 - time) %+ (size.y - 2) + 1)
-        //println(r)
-        //println(l)
-        //println(d)
-        //println(u)
-        !r.contains(pos.x) &&
-          !l.contains(pos.x) &&
-          !d.contains(pos.y) &&
-          !u.contains(pos.y)
+        !right(pos.y).view.map(x => (x - 1 + time) %+ (size.x - 2) + 1).contains(pos.x) &&
+          !left(pos.y).view.map(x => (x - 1 - time) %+ (size.x - 2) + 1).contains(pos.x) &&
+          !down(pos.x).view.map(y => (y - 1 + time) %+ (size.y - 2) + 1).contains(pos.y) &&
+          !up(pos.x).view.map(y => (y - 1 - time) %+ (size.y - 2) + 1).contains(pos.y)
       }
 
       //println(isFree(Pos(1, 2), 3))
