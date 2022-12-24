@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcode2018.Day13.DirectionPos
-import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.{Grid, NumberTheory}
 import eu.sim642.adventofcodelib.IterableImplicits.*
 import eu.sim642.adventofcodelib.IteratorImplicits.*
 import eu.sim642.adventofcodelib.SeqImplicits.*
@@ -33,6 +33,7 @@ object Day24 {
     def fewestMinutes(input: Input): Int = {
       val Input(size, wall, up, down, left, right) = input
       val max = size - Pos(1, 1)
+      val timeModulus = NumberTheory.lcm(size.x - 2, size.y - 2)
 
       def isFree(pos: Pos, time: Int): Boolean = {
         !right(pos.y).view.map(x => (x - 1 + time) %+ (size.x - 2) + 1).contains(pos.x) &&
@@ -52,14 +53,15 @@ object Day24 {
             newPos = pos + offset
             if Pos.zero <= newPos && newPos <= max
             if !wall(newPos)
-            if isFree(newPos, time + 1)
+            newTime = (time + 1) % timeModulus
+            if isFree(newPos, newTime)
             newStage = stage match {
               case 0 if newPos == max - Pos(1, 0) => 1
               case 1 if newPos == Pos(1, 0) => 2
               case 2 if newPos == max - Pos(1, 0) => 3
               case stage => stage
             }
-          } yield State(newPos, time + 1, newStage)
+          } yield State(newPos, newTime, newStage)
         }
       }
 
