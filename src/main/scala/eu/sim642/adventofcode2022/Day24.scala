@@ -7,7 +7,7 @@ import eu.sim642.adventofcodelib.IteratorImplicits.*
 import eu.sim642.adventofcodelib.SeqImplicits.*
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
-import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{AStar, GraphSearch, Heuristic, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.IntegralImplicits.*
 
@@ -65,15 +65,17 @@ object Day24 {
         }
       }
 
-      val graphSearch = new GraphSearch[State] with UnitNeighbors[State] {
+      val graphSearch = new GraphSearch[State] with UnitNeighbors[State] with Heuristic[State] {
         override val startNode: State = State(Pos(1, 0), 0, 0)
 
         override def unitNeighbors(state: State): IterableOnce[State] = state.steps
 
         override def isTargetNode(state: State, dist: Int): Boolean = state.pos == max - Pos(1, 0) && state.stage == stages
+
+        override def heuristic(state: State): Int = (stages - state.stage - 1) * (Pos(1, 0) manhattanDistance (max - Pos(1, 0))) + (state.pos manhattanDistance (if (state.stage % 2 == 0) max - Pos(1, 0) else Pos(1, 0)))
       }
 
-      BFS.search(graphSearch).target.get._2
+      AStar.search(graphSearch).target.get._2
     }
   }
 
@@ -110,6 +112,6 @@ object Day24 {
 
   def main(args: Array[String]): Unit = {
     println(Part1.fewestMinutes(parseInput(input)))
-    //println(Part2.fewestMinutes(parseInput(input)))
+    println(Part2.fewestMinutes(parseInput(input)))
   }
 }
