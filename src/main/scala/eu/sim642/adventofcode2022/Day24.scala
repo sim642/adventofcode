@@ -29,25 +29,19 @@ object Day24 {
       val innerSize = Pos(size.x - 2, size.y - 2)
       val timeModulus = NumberTheory.lcm(innerSize.x, innerSize.y)
 
-      // precompute occupied by direction and modulo time
-      val timeRight = Vector.tabulate(innerSize.x, innerSize.y)((time, y) =>
-        right(y + 1).map(x => (x - 1 + time) %+ innerSize.x + 1)
+      // precompute occupied by axis and modulo time
+      val timeHorizontal = Vector.tabulate(innerSize.x, innerSize.y)((time, y) =>
+        right(y + 1).map(x => (x - 1 + time) %+ innerSize.x + 1) ++
+          left(y + 1).map(x => (x - 1 - time) %+ innerSize.x + 1)
       )
-      val timeLeft = Vector.tabulate(innerSize.x, innerSize.y)((time, y) =>
-        left(y + 1).map(x => (x - 1 - time) %+ innerSize.x + 1)
-      )
-      val timeDown = Vector.tabulate(innerSize.y, innerSize.x)((time, x) =>
-        down(x + 1).map(y => (y - 1 + time) %+ innerSize.y + 1)
-      )
-      val timeUp = Vector.tabulate(innerSize.y, innerSize.x)((time, x) =>
-        up(x + 1).map(y => (y - 1 - time) %+ innerSize.y + 1)
+      val timeVertical = Vector.tabulate(innerSize.y, innerSize.x)((time, x) =>
+        down(x + 1).map(y => (y - 1 + time) %+ innerSize.y + 1) ++
+          up(x + 1).map(y => (y - 1 - time) %+ innerSize.y + 1)
       )
 
       def isFree(pos: Pos, time: Int): Boolean = {
-        !timeRight(time % innerSize.x)(pos.y - 1).contains(pos.x) &&
-          !timeLeft(time % innerSize.x)(pos.y - 1).contains(pos.x) &&
-          !timeDown(time % innerSize.y)(pos.x - 1).contains(pos.y) &&
-          !timeUp(time % innerSize.y)(pos.x - 1).contains(pos.y)
+        !timeHorizontal(time % innerSize.x)(pos.y - 1).contains(pos.x) &&
+          !timeVertical(time % innerSize.y)(pos.x - 1).contains(pos.y)
       }
 
       case class State(pos: Pos, time: Int, stage: Int) {
