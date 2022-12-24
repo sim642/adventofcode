@@ -17,10 +17,6 @@ object Day24 {
                    left: Map[Int, Set[Int]],
                    right: Map[Int, Set[Int]])
 
-  extension [A](view: View[A]) {
-    def contains(elem: A): Boolean = view.exists(_ == elem)
-  }
-
   trait Part {
 
     val stages: Int
