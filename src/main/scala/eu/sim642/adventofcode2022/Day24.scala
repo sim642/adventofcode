@@ -33,6 +33,8 @@ object Day24 {
     def fewestMinutes(input: Input): Int = {
       val Input(size, wall, up, down, left, right) = input
       val max = size - Pos(1, 1)
+      val entrance = Pos(1, 0)
+      val exit = max - Pos(1, 0)
       val timeModulus = NumberTheory.lcm(size.x - 2, size.y - 2)
 
       def isFree(pos: Pos, time: Int): Boolean = {
@@ -42,12 +44,10 @@ object Day24 {
           !up(pos.x).view.map(y => (y - 1 - time) %+ (size.y - 2) + 1).contains(pos.y)
       }
 
-      //println(isFree(Pos(1, 2), 3))
-
       case class State(pos: Pos, time: Int, stage: Int) {
+        def stageTarget: Pos = if (stage % 2 == 0) exit else entrance
 
         def steps: Iterator[State] = {
-          //println(this)
           for {
             offset <- Pos.axisOffsets.iterator ++ Iterator.single(Pos.zero)
             newPos = pos + offset
@@ -55,24 +55,22 @@ object Day24 {
             if !wall(newPos)
             newTime = (time + 1) % timeModulus
             if isFree(newPos, newTime)
-            newStage = stage match {
-              case 0 if newPos == max - Pos(1, 0) => 1
-              case 1 if newPos == Pos(1, 0) => 2
-              case 2 if newPos == max - Pos(1, 0) => 3
-              case stage => stage
-            }
+            newStage = if (pos == stageTarget) stage + 1 else stage
           } yield State(newPos, newTime, newStage)
         }
       }
 
       val graphSearch = new GraphSearch[State] with UnitNeighbors[State] with Heuristic[State] {
-        override val startNode: State = State(Pos(1, 0), 0, 0)
+        override val startNode: State = State(entrance, 0, 0)
 
         override def unitNeighbors(state: State): IterableOnce[State] = state.steps
 
-        override def isTargetNode(state: State, dist: Int): Boolean = state.pos == max - Pos(1, 0) && state.stage == stages
+        override def isTargetNode(state: State, dist: Int): Boolean = state.pos == exit && state.stage == stages - 1
 
-        override def heuristic(state: State): Int = (stages - state.stage - 1) * (Pos(1, 0) manhattanDistance (max - Pos(1, 0))) + (state.pos manhattanDistance (if (state.stage % 2 == 0) max - Pos(1, 0) else Pos(1, 0)))
+        private val entranceExitDist = entrance manhattanDistance exit
+
+        override def heuristic(state: State): Int =
+          (state.pos manhattanDistance state.stageTarget) + (stages - state.stage - 1) * entranceExitDist
       }
 
       AStar.search(graphSearch).target.get._2
