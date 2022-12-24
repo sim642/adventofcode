@@ -30,11 +30,11 @@ object Day24 {
       val timeModulus = NumberTheory.lcm(innerSize.x, innerSize.y)
 
       // precompute occupied by axis and modulo time
-      val timeHorizontal = Vector.tabulate(innerSize.x, innerSize.y)((time, y) =>
+      val timeHorizontal = Array.tabulate(innerSize.x, innerSize.y)((time, y) =>
         right(y + 1).map(x => (x - 1 + time) %+ innerSize.x + 1) ++
           left(y + 1).map(x => (x - 1 - time) %+ innerSize.x + 1)
       )
-      val timeVertical = Vector.tabulate(innerSize.y, innerSize.x)((time, x) =>
+      val timeVertical = Array.tabulate(innerSize.y, innerSize.x)((time, x) =>
         down(x + 1).map(y => (y - 1 + time) %+ innerSize.y + 1) ++
           up(x + 1).map(y => (y - 1 - time) %+ innerSize.y + 1)
       )
