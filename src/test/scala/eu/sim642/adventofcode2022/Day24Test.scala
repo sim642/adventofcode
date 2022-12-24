@@ -18,6 +18,14 @@ class Day24Test extends AnyFunSuite {
   }
 
   test("Part 1 input answer") {
-    assert(fewestMinutes(parseInput(input)) == 253)
+    assert(fewestMinutes(parseInput(input)) == 253) // TODO: optimize, 3.5s
+  }
+
+  test("Part 2 examples") {
+    assert(fewestMinutes2(parseInput(exampleInput)) == 54)
+  }
+
+  ignore("Part 2 input answer") {
+    assert(fewestMinutes2(parseInput(input)) == 794) // TODO: optimize, 31.2s
   }
 }

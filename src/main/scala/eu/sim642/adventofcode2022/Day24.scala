@@ -66,6 +66,58 @@ object Day24 {
     BFS.search(graphSearch).target.get._2
   }
 
+  // TODO: deduplicate
+  def fewestMinutes2(input: Input): Int = {
+    val Input(size, wall, up, down, left, right) = input
+    val max = size - Pos(1, 1)
+
+    def isFree(pos: Pos, time: Int): Boolean = {
+      val r = right(pos.y).map(x => (x - 1 + time) %+ (size.x - 2) + 1)
+      val l = left(pos.y).map(x => (x - 1 - time) %+ (size.x - 2) + 1)
+      val d = down(pos.x).map(y => (y - 1 + time) %+ (size.y - 2) + 1)
+      val u = up(pos.x).map(y => (y - 1 - time) %+ (size.y - 2) + 1)
+      //println(r)
+      //println(l)
+      //println(d)
+      //println(u)
+      !r.contains(pos.x) &&
+        !l.contains(pos.x) &&
+        !d.contains(pos.y) &&
+        !u.contains(pos.y)
+    }
+
+    //println(isFree(Pos(1, 2), 3))
+
+    case class State(pos: Pos, time: Int, stage: Int) {
+
+      def steps: Iterator[State] = {
+        //println(this)
+        for {
+          offset <- Pos.axisOffsets.iterator ++ Iterator.single(Pos.zero)
+          newPos = pos + offset
+          if Pos.zero <= newPos && newPos <= max
+          if !wall(newPos)
+          if isFree(newPos, time + 1)
+          newStage = stage match {
+            case 0 if newPos == max - Pos(1, 0) => 1
+            case 1 if newPos == Pos(1, 0) => 2
+            case stage => stage
+          }
+        } yield State(newPos, time + 1, newStage)
+      }
+    }
+
+    val graphSearch = new GraphSearch[State] with UnitNeighbors[State] {
+      override val startNode: State = State(Pos(1, 0), 0, 0)
+
+      override def unitNeighbors(state: State): IterableOnce[State] = state.steps
+
+      override def isTargetNode(state: State, dist: Int): Boolean = state.pos == max - Pos(1, 0) && state.stage == 2
+    }
+
+    BFS.search(graphSearch).target.get._2
+  }
+
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
   def parseInput(input: String): Input = {
@@ -90,6 +142,7 @@ object Day24 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(fewestMinutes(parseInput(input)))
+    //println(fewestMinutes(parseInput(input)))
+    println(fewestMinutes2(parseInput(input)))
   }
 }
