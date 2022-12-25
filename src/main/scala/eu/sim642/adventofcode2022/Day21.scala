@@ -170,6 +170,44 @@ object Day21 {
     }
   }
 
+  /**
+   * Solution, which finds the derivative w.r.t. humn to get the slope
+   * and then solves linear equation to find humn.
+   * Assumes expression is linear w.r.t. humn.
+   */
+  object DerivativePart2Solution extends Part2Solution {
+
+    override def findHumn(monkeys: Monkeys): Long = {
+      val humnMonkeys = makeHumnMonkeys(monkeys) + (humn -> Job.Number(0)) // evaluate at 0
+      val evalName = makeEvalName[BigDecimal](humnMonkeys).andThen(_.get) // always get, because all variables set
+
+      def deriveName(name: String): BigDecimal = {
+        if (name == humn)
+          1
+        else
+          deriveJob(humnMonkeys(name))
+      }
+
+      def deriveJob(job: Job): BigDecimal = job match {
+        case Job.Number(_) => 0
+        case Job.Operation(lhs, op, rhs) =>
+          op match {
+            case Op.Add => deriveName(lhs) + deriveName(rhs)
+            case Op.Sub => deriveName(lhs) - deriveName(rhs)
+            case Op.Mul =>
+              deriveName(lhs) * evalName(rhs) + evalName(lhs) * deriveName(rhs)
+            case Op.Div =>
+              (deriveName(lhs) * evalName(rhs) - evalName(lhs) * deriveName(rhs)) / (evalName(rhs) * evalName(rhs))
+          }
+      }
+
+      val y0 = evalName(root)
+      val dy0 = deriveName(root) // derivative at 0
+      val x0 = y0 / -dy0
+      x0.setScale(0, BigDecimal.RoundingMode.HALF_UP).longValue
+    }
+  }
+
 
   def parseMonkey(s: String): (String, Job) = s match {
     case s"$name: $lhs $opStr $rhs" =>
