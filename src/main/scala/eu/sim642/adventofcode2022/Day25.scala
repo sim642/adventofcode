@@ -30,11 +30,9 @@ object Day25 {
       if (int == 0)
         None
       else {
-        val (q, r) = int /% 5
-        if (r <= 2)
-          Some((r, q))
-        else
-          Some((r - 5, q + 1)) // subtract from carried instead
+        // shift by 2 to avoid carrying
+        val (q, r) = (int + 2) /% 5
+        Some((r - 2, q))
       }
     })
       .view
