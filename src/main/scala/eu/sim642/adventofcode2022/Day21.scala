@@ -2,11 +2,11 @@ package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcodelib.IntegralImplicits.*
 import eu.sim642.adventofcodelib.{OrderedSearch, Rational}
-import eu.sim642.adventofcodelib.Rational._
+import eu.sim642.adventofcodelib.Rational.*
 
 import scala.collection.mutable
 import scala.math.Numeric
-import scala.math.Numeric.{BigDecimalAsIfIntegral, LongIsIntegral}
+import scala.math.Numeric.{BigDecimalIsFractional, LongIsIntegral}
 import scala.math.Ordering.{BigDecimalOrdering, LongOrdering}
 
 object Day21 {
@@ -25,38 +25,51 @@ object Day21 {
 
   type Monkeys = Map[String, Job]
 
-  trait PseudoIntegral[A] extends Integral[A] {
+  trait FromLong[A] {
     def fromLong(x: Long): A // need Long for BinarySearchPart2Solution
   }
 
-  given PseudoIntegral[Long] = new PseudoIntegral[Long] with LongIsIntegral with LongOrdering {
+  trait LongIntegral[A] extends Integral[A] with FromLong[A]
+
+  trait LongFractional[A] extends Fractional[A] with FromLong[A]
+
+  given LongFractional[Long] = new LongFractional[Long] with LongOrdering {
+    override def fromLong(x: Long): Long = x
+    override def div(x: Long, y: Long): Long = x / y
+    override def plus(x: Long, y: Long): Long = LongIsIntegral.plus(x, y)
+    override def minus(x: Long, y: Long): Long = LongIsIntegral.minus(x, y)
+    override def times(x: Long, y: Long): Long = LongIsIntegral.times(x, y)
+    override def negate(x: Long): Long = LongIsIntegral.negate(x)
+    override def fromInt(x: Int): Long = LongIsIntegral.fromInt(x)
+    override def parseString(str: String): Option[Long] = LongIsIntegral.parseString(str)
+    override def toInt(x: Long): Int = LongIsIntegral.toInt(x)
+    override def toLong(x: Long): Long = LongIsIntegral.toLong(x)
+    override def toFloat(x: Long): Float = LongIsIntegral.toFloat(x)
+    override def toDouble(x: Long): Double = LongIsIntegral.toDouble(x)
+  }
+
+  given LongIntegral[Long] = new LongIntegral[Long] with LongIsIntegral with LongOrdering {
     override def fromLong(x: Long): Long = x
   }
 
-  given PseudoIntegral[BigDecimal] = new PseudoIntegral[BigDecimal] with BigDecimalAsIfIntegral with BigDecimalOrdering {
+  given LongFractional[BigDecimal] = new LongFractional[BigDecimal] with BigDecimalIsFractional with BigDecimalOrdering {
     override def fromLong(x: Long): BigDecimal = x
-
-    override def quot(x: BigDecimal, y: BigDecimal): BigDecimal = x / y // pseudo-quot, fractional result
   }
 
-  given [A](using aPseudoIntegral: PseudoIntegral[A]): PseudoIntegral[Rational[A]] = new PseudoIntegral[Rational[A]] with RationalNumeric[A] with RationalOrdering[A] {
-    override def fromLong(x: Long): Rational[A] = Rational(aPseudoIntegral.fromLong(x))
-
-    override def quot(x: Rational[A], y: Rational[A]): Rational[A] = x / y // pseudo-quot, fractional result
-
-    override def rem(x: Rational[A], y: Rational[A]): Rational[A] = ???
+  given [A](using aLongIntegral: LongIntegral[A]): LongFractional[Rational[A]] = new LongFractional[Rational[A]] with RationalFractional[A] with RationalOrdering[A] {
+    override def fromLong(x: Long): Rational[A] = Rational(aLongIntegral.fromLong(x))
   }
 
-  def makeEvalName[A](monkeys: Monkeys)(using aPseudoIntegral: PseudoIntegral[A]): String => Option[A] = {
+  def makeEvalName[A](monkeys: Monkeys)(using aLongFractional: LongFractional[A]): String => Option[A] = {
     val memo = mutable.Map.empty[String, Option[A]]
 
     def evalName(name: String): Option[A] =
       memo.getOrElseUpdate(name, monkeys.get(name).flatMap(evalJob))
 
-    import Integral.Implicits._
+    import Fractional.Implicits._
 
     def evalJob(job: Job): Option[A] = job match {
-      case Job.Number(value) => Some(aPseudoIntegral.fromLong(value))
+      case Job.Number(value) => Some(aLongFractional.fromLong(value))
       case Job.Operation(lhs, op, rhs) =>
         for {
           left <- evalName(lhs)
