@@ -8,6 +8,8 @@ import scala.collection.mutable
 import scala.math.Numeric
 import scala.math.Numeric.{BigDecimalIsFractional, LongIsIntegral}
 import scala.math.Ordering.{BigDecimalOrdering, LongOrdering}
+import math.Ordering.Implicits.infixOrderingOps
+import scala.math.Fractional.Implicits.infixFractionalOps
 
 object Day21 {
 
@@ -54,6 +56,8 @@ object Day21 {
 
   given LongFractional[BigDecimal] = new LongFractional[BigDecimal] with BigDecimalIsFractional with BigDecimalOrdering {
     override def fromLong(x: Long): BigDecimal = x
+
+    override def toLong(x: BigDecimal): Long = x.setScale(0, BigDecimal.RoundingMode.HALF_UP).longValue
   }
 
   given [A](using aLongIntegral: LongIntegral[A]): LongFractional[Rational[A]] = new LongFractional[Rational[A]] with RationalFractional[A] with RationalOrdering[A] {
@@ -154,34 +158,36 @@ object Day21 {
    * Solution, which uses binary search to find humn.
    * Assumes expression is monotonic w.r.t. humn.
    */
-  object BinarySearchPart2Solution extends Part2Solution {
+  trait BinarySearchPart2Solution[A](using aLongFractional: LongFractional[A]) extends Part2Solution {
 
     override def findHumn(monkeys: Monkeys): Long = {
       val humnMonkeys = makeHumnMonkeys(monkeys)
 
-      def f(humnValue: Long): Rational[Long] = {
+      def f(humnValue: Long): A = {
         val humnMonkeys2 = humnMonkeys + (humn -> Job.Number(humnValue))
-        makeEvalName[Rational[Long]](humnMonkeys2)(root).get
+        makeEvalName[A](humnMonkeys2)(root).get
       }
 
       // OrderedSearch requires monotonic, negate if anti-monotonic
       val g = if (f(0) < f(1)) f else (x: Long) => -f(x)
-      OrderedSearch.exponentialBinaryLower[Long, Rational[Long]](g, 0)(Rational(0L))
+      OrderedSearch.exponentialBinaryLower[Long, A](g, 0)(aLongFractional.zero)
     }
   }
+
+  object BinarySearchPart2Solution extends BinarySearchPart2Solution[BigDecimal]
 
   /**
    * Solution, which solves linear equation to find humn.
    * Assumes expression is linear w.r.t. humn.
    */
-  object LinearPart2Solution extends Part2Solution {
+  trait LinearPart2Solution[A: LongFractional] extends Part2Solution {
 
     override def findHumn(monkeys: Monkeys): Long = {
       val humnMonkeys = makeHumnMonkeys(monkeys)
 
-      def f(humnValue: Long): Rational[Long] = {
+      def f(humnValue: Long): A = {
         val humnMonkeys2 = humnMonkeys + (humn -> Job.Number(humnValue))
-        makeEvalName[Rational[Long]](humnMonkeys2)(root).get
+        makeEvalName[A](humnMonkeys2)(root).get
       }
 
       val y0 = f(0)
@@ -192,26 +198,28 @@ object Day21 {
     }
   }
 
+  object LinearPart2Solution extends LinearPart2Solution[BigDecimal]
+
   /**
    * Solution, which finds the derivative w.r.t. humn to get the slope
    * and then solves linear equation to find humn.
    * Assumes expression is linear w.r.t. humn.
    */
-  object DerivativePart2Solution extends Part2Solution {
+  trait DerivativePart2Solution[A](using aLongFractional: LongFractional[A]) extends Part2Solution {
 
     override def findHumn(monkeys: Monkeys): Long = {
       val humnMonkeys = makeHumnMonkeys(monkeys) + (humn -> Job.Number(0)) // evaluate at 0
-      val evalName = makeEvalName[Rational[Long]](humnMonkeys).andThen(_.get) // always get, because all variables set
+      val evalName = makeEvalName[A](humnMonkeys).andThen(_.get) // always get, because all variables set
 
-      def deriveName(name: String): Rational[Long] = {
+      def deriveName(name: String): A = {
         if (name == humn)
-          1
+          aLongFractional.one
         else
           deriveJob(humnMonkeys(name))
       }
 
-      def deriveJob(job: Job): Rational[Long] = job match {
-        case Job.Number(_) => 0
+      def deriveJob(job: Job): A = job match {
+        case Job.Number(_) => aLongFractional.zero
         case Job.Operation(lhs, op, rhs) =>
           op match {
             case Op.Add => deriveName(lhs) + deriveName(rhs)
@@ -229,6 +237,8 @@ object Day21 {
       x0.toLong
     }
   }
+
+  object DerivativePart2Solution extends DerivativePart2Solution[BigDecimal]
 
 
   def parseMonkey(s: String): (String, Job) = s match {
