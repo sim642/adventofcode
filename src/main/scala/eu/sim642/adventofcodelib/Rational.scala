@@ -51,7 +51,10 @@ class Rational[A](numerator: A, denumerator: A)(using aIntegral: Integral[A]) ex
 
   override def hashCode(): Int = 31 * n.hashCode() + d.hashCode()
 
+  def toInt: Int = (n / d).toInt
   def toLong: Long = (n / d).toLong
+  def toFloat: Float = n.toFloat / d.toFloat
+  def toDouble: Double = n.toDouble / d.toDouble
 }
 
 object Rational {
@@ -66,30 +69,41 @@ object Rational {
     override def compare(x: Rational[A], y: Rational[A]): Int = x.compare(y)
   }
 
-  trait RationalNumeric[A: Integral] extends Numeric[Rational[A]] {
+  given RationalOrdering[A: Integral]: Ordering[Rational[A]] = new RationalOrdering[A] {}
+
+  trait RationalNumeric[A](using aIntegral: Integral[A]) extends Numeric[Rational[A]] {
     override def plus(x: Rational[A], y: Rational[A]): Rational[A] = x + y
-
     override def minus(x: Rational[A], y: Rational[A]): Rational[A] = x - y
-
     override def times(x: Rational[A], y: Rational[A]): Rational[A] = x * y
-
     override def negate(x: Rational[A]): Rational[A] = -x
+    override def fromInt(x: Int): Rational[A] = Rational(aIntegral.fromInt(x))
 
-    override def fromInt(x: Int): Rational[A] = Rational(summon[Integral[A]].fromInt(x))
-    //override def fromInt(x: Int): Rational[A] = ???
+    override def parseString(str: String): Option[Rational[A]] = str match {
+      case s"$nStr/$dStr" =>
+        for {
+          n <- aIntegral.parseString(nStr)
+          d <- aIntegral.parseString(dStr)
+        } yield Rational(n, d)
+      case nStr =>
+        aIntegral.parseString(nStr).map(Rational.apply)
+    }
 
-    override def parseString(str: String): Option[Rational[A]] = ???
-
-    override def toInt(x: Rational[A]): Int = ???
-
-    override def toLong(x: Rational[A]): Long = ???
-
-    override def toFloat(x: Rational[A]): Float = ???
-
-    override def toDouble(x: Rational[A]): Double = ???
+    override def toInt(x: Rational[A]): Int = x.toInt
+    override def toLong(x: Rational[A]): Long = x.toLong
+    override def toFloat(x: Rational[A]): Float = x.toFloat
+    override def toDouble(x: Rational[A]): Double = x.toDouble
+    override def abs(x: Rational[A]): Rational[A] = Rational(x.n.abs, x.d)
+    override def sign(x: Rational[A]): Rational[A] = Rational(x.n.sign)
   }
 
-  given [A](using aIntegral: Integral[A]): Conversion[Int, Rational[A]] = new Conversion[Int, Rational[A]] {
-    override def apply(x: Int): Rational[A] = Rational(aIntegral.fromInt(x))
+  given RationalNumeric[A: Integral]: Numeric[Rational[A]] = new RationalNumeric[A] with RationalOrdering[A] {}
+
+  trait RationalFractional[A: Integral] extends Fractional[Rational[A]] with RationalNumeric[A] {
+    override def div(x: Rational[A], y: Rational[A]): Rational[A] = x / y
   }
+
+  given RationalFractional[A: Integral]: Fractional[Rational[A]] = new RationalFractional[A] with RationalOrdering[A] {}
+
+  given IntRationalConversion[A](using aIntegral: Integral[A]): Conversion[Int, Rational[A]] = (x: Int) => Rational(aIntegral.fromInt(x))
+  given AnyRationalConversion[A](using aIntegral: Integral[A]): Conversion[A, Rational[A]] = Rational(_)
 }
