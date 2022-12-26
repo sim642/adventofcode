@@ -1,7 +1,8 @@
 package eu.sim642.adventofcode2022
 
 import eu.sim642.adventofcodelib.IntegralImplicits.*
-import eu.sim642.adventofcodelib.OrderedSearch
+import eu.sim642.adventofcodelib.{OrderedSearch, Rational}
+import eu.sim642.adventofcodelib.Rational._
 
 import scala.collection.mutable
 import scala.math.Numeric
@@ -36,6 +37,14 @@ object Day21 {
     override def fromLong(x: Long): BigDecimal = x
 
     override def quot(x: BigDecimal, y: BigDecimal): BigDecimal = x / y // pseudo-quot, fractional result
+  }
+
+  given [A](using aPseudoIntegral: PseudoIntegral[A]): PseudoIntegral[Rational[A]] = new PseudoIntegral[Rational[A]] with RationalNumeric[A] with RationalOrdering[A] {
+    override def fromLong(x: Long): Rational[A] = Rational(aPseudoIntegral.fromLong(x))
+
+    override def quot(x: Rational[A], y: Rational[A]): Rational[A] = x / y // pseudo-quot, fractional result
+
+    override def rem(x: Rational[A], y: Rational[A]): Rational[A] = ???
   }
 
   def makeEvalName[A](monkeys: Monkeys)(using aPseudoIntegral: PseudoIntegral[A]): String => Option[A] = {
@@ -137,14 +146,14 @@ object Day21 {
     override def findHumn(monkeys: Monkeys): Long = {
       val humnMonkeys = makeHumnMonkeys(monkeys)
 
-      def f(humnValue: Long): BigDecimal = {
+      def f(humnValue: Long): Rational[Long] = {
         val humnMonkeys2 = humnMonkeys + (humn -> Job.Number(humnValue))
-        makeEvalName[BigDecimal](humnMonkeys2)(root).get
+        makeEvalName[Rational[Long]](humnMonkeys2)(root).get
       }
 
       // OrderedSearch requires monotonic, negate if anti-monotonic
       val g = if (f(0) < f(1)) f else (x: Long) => -f(x)
-      OrderedSearch.exponentialBinaryLower[Long, BigDecimal](g, 0)(0L)
+      OrderedSearch.exponentialBinaryLower[Long, Rational[Long]](g, 0)(Rational(0L))
     }
   }
 
@@ -157,16 +166,16 @@ object Day21 {
     override def findHumn(monkeys: Monkeys): Long = {
       val humnMonkeys = makeHumnMonkeys(monkeys)
 
-      def f(humnValue: Long): BigDecimal = {
+      def f(humnValue: Long): Rational[Long] = {
         val humnMonkeys2 = humnMonkeys + (humn -> Job.Number(humnValue))
-        makeEvalName[BigDecimal](humnMonkeys2)(root).get
+        makeEvalName[Rational[Long]](humnMonkeys2)(root).get
       }
 
       val y0 = f(0)
       val y1 = f(1)
       val dy = y1 - y0
       val x0 = y0 / -dy
-      x0.setScale(0, BigDecimal.RoundingMode.HALF_UP).longValue
+      x0.toLong
     }
   }
 
@@ -179,16 +188,16 @@ object Day21 {
 
     override def findHumn(monkeys: Monkeys): Long = {
       val humnMonkeys = makeHumnMonkeys(monkeys) + (humn -> Job.Number(0)) // evaluate at 0
-      val evalName = makeEvalName[BigDecimal](humnMonkeys).andThen(_.get) // always get, because all variables set
+      val evalName = makeEvalName[Rational[Long]](humnMonkeys).andThen(_.get) // always get, because all variables set
 
-      def deriveName(name: String): BigDecimal = {
+      def deriveName(name: String): Rational[Long] = {
         if (name == humn)
           1
         else
           deriveJob(humnMonkeys(name))
       }
 
-      def deriveJob(job: Job): BigDecimal = job match {
+      def deriveJob(job: Job): Rational[Long] = job match {
         case Job.Number(_) => 0
         case Job.Operation(lhs, op, rhs) =>
           op match {
@@ -204,7 +213,7 @@ object Day21 {
       val y0 = evalName(root)
       val dy0 = deriveName(root) // derivative at 0
       val x0 = y0 / -dy0
-      x0.setScale(0, BigDecimal.RoundingMode.HALF_UP).longValue
+      x0.toLong
     }
   }
 
