@@ -12,3 +12,4 @@
 | 2020 | [Solutions](src/main/scala/eu/sim642/adventofcode2020) | [My inputs](src/main/resources/eu/sim642/adventofcode2020), [other inputs](src/test/resources/eu/sim642/adventofcode2020) | [Tests](src/test/scala/eu/sim642/adventofcode2020) |
 | 2021 | [Solutions](src/main/scala/eu/sim642/adventofcode2021) | [My inputs](src/main/resources/eu/sim642/adventofcode2021), [other inputs](src/test/resources/eu/sim642/adventofcode2021) | [Tests](src/test/scala/eu/sim642/adventofcode2021) |
 | 2022 | [Solutions](src/main/scala/eu/sim642/adventofcode2022) | [My inputs](src/main/resources/eu/sim642/adventofcode2022) | [Tests](src/test/scala/eu/sim642/adventofcode2022) |
+| 2023 | [Solutions](src/main/scala/eu/sim642/adventofcode2023) | [My inputs](src/main/resources/eu/sim642/adventofcode2023) | [Tests](src/test/scala/eu/sim642/adventofcode2023) |
