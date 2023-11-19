@@ -14,12 +14,12 @@ scalacOptions ++= Seq(
 //resolvers += "Sonatype OSS Snapshots" at
 //  "https://oss.sonatype.org/content/repositories/snapshots"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.14"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test"
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.17"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.17" % "test"
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.17.0" % "test"
-libraryDependencies += "org.scalatestplus" %% "scalacheck-1-17" % "3.2.14.0" % "test"
-libraryDependencies += ("org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1").cross(CrossVersion.for3Use2_13) // for scalameter 2.13
-libraryDependencies += "com.lihaoyi" %% "ujson" % "2.0.0"
+libraryDependencies += "org.scalatestplus" %% "scalacheck-1-17" % "3.2.17.0" % "test"
+libraryDependencies += ("org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0").cross(CrossVersion.for3Use2_13) // for scalameter 2.13
+libraryDependencies += "com.lihaoyi" %% "ujson" % "3.1.3"
 libraryDependencies += ("com.storm-enroute" %% "scalameter" % "0.19" % "test").cross(CrossVersion.for3Use2_13) // 0.21 has transitive io.github.... dependency which breaks io.Source in tests
   //.exclude("org.scala-lang.modules", "scala-parser-combinators_2.13") // scalameter 2.13 dependency workaround
   .exclude("org.scala-lang.modules", "scala-xml_2.13") // scalameter 2.13 dependency workaround
