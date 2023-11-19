@@ -74,6 +74,7 @@ object Day21 {
       .updatedWith(root)({
         // change root to subtraction, so can solve for root == 0
         case Some(Job.Operation(lhs, _, rhs)) => Some(Job.Operation(lhs, Op.Sub, rhs))
+        case _ => throw new IllegalArgumentException("invalid root")
       })
       .removed(humn)
   }
