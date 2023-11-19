@@ -5,7 +5,8 @@ import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 
 import scala.annotation.tailrec
-import scala.util.control.NonLocalReturns.*
+import scala.util.boundary
+import scala.util.boundary.break
 
 object Day15 {
 
@@ -70,7 +71,7 @@ object Day15 {
    * Runs in ~2s.
    */
   object SeminaivePart2Solution extends Part2Solution {
-    override def findDistressBeacon(sensorBeacons: Seq[SensorBeacon], maxCoord: Int): Pos = returning {
+    override def findDistressBeacon(sensorBeacons: Seq[SensorBeacon], maxCoord: Int): Pos = boundary {
       val beacons = sensorBeacons.map(_.beacon).toSet
 
       for (y <- 0 to maxCoord) {
@@ -82,7 +83,7 @@ object Day15 {
             val x = left.max + 1
             val pos = Pos(x, y)
             if (0 <= x && x <= maxCoord && !beacons.contains(pos))
-              throwReturn(pos)
+              break(pos)
           case _ => throw new IllegalArgumentException("ambiguous distress beacon found")
         }
       }

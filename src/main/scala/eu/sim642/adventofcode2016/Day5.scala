@@ -3,7 +3,8 @@ package eu.sim642.adventofcode2016
 import scala.collection.mutable
 import eu.sim642.adventofcodelib.Hash
 
-import scala.util.control.NonLocalReturns._
+import scala.util.boundary
+import scala.util.boundary.break
 
 object Day5 {
 
@@ -12,7 +13,7 @@ object Day5 {
     Iterator.from(0).map(i => md5(i.toString)).filter(_.startsWith("00000")).map(_(5)).take(times).mkString("")
   }
 
-  def getPassword2(doorId: String): String = returning {
+  def getPassword2(doorId: String): String = boundary {
     val md5 = Hash.md5.prefix(doorId)
     val it = Iterator.from(0).map(i => md5(i.toString)).filter(_.startsWith("00000")).map(s => (s(5), s(6))).filter(p => ('0' to '7').contains(p._1)).map(p => (p._1 - '0', p._2))
 
@@ -29,7 +30,7 @@ object Day5 {
       filled += 1
 
       if (filled == 8)
-        throwReturn(password.map(_.get).mkString(""))
+        break(password.map(_.get).mkString(""))
     }
 
     ???

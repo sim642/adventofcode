@@ -2,7 +2,8 @@ package eu.sim642.adventofcodelib
 
 import eu.sim642.adventofcodelib.pos.Pos
 
-import scala.util.control.NonLocalReturns._
+import scala.util.boundary
+import scala.util.boundary.break
 
 object GridImplicits {
 
@@ -17,12 +18,12 @@ object GridImplicits {
       0 <= pos.x && 0 <= pos.y && pos.y < grid.size && pos.x < grid(pos.y).size
     }
 
-    def posOf(elem: A): Pos = returning {
+    def posOf(elem: A): Pos = boundary {
       for {
         (row, y) <- grid.view.zipWithIndex
         (cell, x) <- row.view.zipWithIndex
         if cell == elem
-      } throwReturn(Pos(x, y))
+      } break(Pos(x, y))
 
       Pos(-1, -1)
     }

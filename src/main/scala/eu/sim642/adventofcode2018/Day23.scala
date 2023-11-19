@@ -3,11 +3,11 @@ package eu.sim642.adventofcode2018
 import eu.sim642.adventofcodelib.box.{Box3, Box4}
 import eu.sim642.adventofcodelib.pos.Pos3
 import eu.sim642.adventofcodelib.pos.Pos4
-import eu.sim642.adventofcodelib.IntegralImplicits._
+import eu.sim642.adventofcodelib.IntegralImplicits.*
 
 import scala.collection.mutable
-import scala.util.control.Breaks._
-import scala.util.control.NonLocalReturns._
+import scala.util.boundary
+import scala.util.boundary.break
 
 object Day23 {
 
@@ -181,14 +181,14 @@ object Day23 {
       val initialOctahedron = getInitialOctahedron(nanobots)
       enqueue(initialOctahedron)
 
-      returning {
+      boundary {
         while (queue.nonEmpty) {
           val (octahedron, (lower, upper), originDist) = queue.dequeue()
           if (!done.contains(octahedron)) {
             done += octahedron
 
             if (lower == upper)
-              throwReturn(originDist)
+              break(originDist)
 
             for (splitOctahedron <- getSplits(octahedron))
               enqueue(splitOctahedron)
@@ -280,7 +280,7 @@ object Day23 {
       enqueue(initialBox)
 
       var closestBox: Option[(Box3, Int, Int)] = None
-      breakable {
+      boundary {
         while (queue.nonEmpty) {
           val (box, (lower, upper), originDist) = queue.dequeue()
           if (!done.contains(box)) {
