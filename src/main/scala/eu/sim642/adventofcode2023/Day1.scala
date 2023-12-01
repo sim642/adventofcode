@@ -3,16 +3,19 @@ package eu.sim642.adventofcode2023
 object Day1 {
 
   trait Part {
-    def recoverCalibrationValue(line: String): Int
+    def recoverDigits(line: String): Seq[Int]
+
+    def recoverCalibrationValue(line: String): Int = {
+      val digits = recoverDigits(line)
+      10 * digits.head + digits.last
+    }
 
     def sumCalibrationValues(document: Seq[String]): Int = document.map(recoverCalibrationValue).sum
   }
 
   object Part1 extends Part {
-    def recoverCalibrationValue(line: String): Int = {
-      val digits = line.filter(_.isDigit).map(_.asDigit)
-      10 * digits.head + digits.last
-    }
+    override def recoverDigits(line: String): Seq[Int] =
+      line.filter(_.isDigit).map(_.asDigit) // TODO: asDigitOpt in library
   }
 
   object Part2 extends Part {
@@ -29,37 +32,14 @@ object Day1 {
       9 -> "nine",
     )
 
-    private val map2: Map[String, Int] = for {
-      (d, s) <- digitStrings
-    } yield s -> d
-
-    /*def recoverCalibrationValue(line: String): Int = {
-      val line2 = digitStrings.foldLeft(line)({ case (line, (digit, string)) =>
-        line.replaceAll(string, digit.toString)
-      })
-      println(Part1.recoverCalibrationValue(line2))
-      Part1.recoverCalibrationValue(line2)
-    }*/
-
-    def recoverCalibrationValue(line: String): Int = {
-      val first = digitStrings.values.filter(line.contains).map(line.indexOf).minOption
-      val last = digitStrings.values.map(line.lastIndexOf).maxOption
-      val digit1 = line.indexWhere(_.isDigit)
-      val digit2 = line.lastIndexWhere(_.isDigit)
-      val x =
-        if (digit1 >= 0 && (first.isEmpty || digit1 < first.get))
-          line(digit1).asDigit
-        else {
-          map2(digitStrings.values.filter(line.contains).minBy(line.indexOf))
+    override def recoverDigits(line: String): Seq[Int] = {
+      line.tails.flatMap(tail =>
+        tail.headOption match {
+          case Some(c) if c.isDigit => Some(c.asDigit)
+          case _ =>
+            digitStrings.find((_, digitString) => tail.startsWith(digitString)).map(_._1)
         }
-      val y =
-        if (last.isEmpty || digit2 > last.get)
-          line(digit2).asDigit
-        else {
-          map2(digitStrings.values.maxBy(line.lastIndexOf))
-        }
-      //println(10 * x + y)
-      10 * x + y
+      ).toSeq
     }
   }
 
