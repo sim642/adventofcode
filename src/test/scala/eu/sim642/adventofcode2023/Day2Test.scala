@@ -19,4 +19,12 @@ class Day2Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumPossibleIds(parseGames(input)) == 2720)
   }
+
+  test("Part 2 examples") {
+    assert(sumPowers(parseGames(exampleInput)) == 2286)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumPowers(parseGames(input)) == 71535)
+  }
 }
