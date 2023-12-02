@@ -29,22 +29,16 @@ object Day2 {
   def sumPowers(games: Seq[Game]): Int = games.map(_.reduce(_ max _).power).sum
 
 
-  private val colorRegex = """(\d+) (red|green|blue)""".r
-
   def parseColor(s: String): Cubes = s match {
-    case colorRegex(count, "red") => Cubes(red = count.toInt)
-    case colorRegex(count, "green") => Cubes(green = count.toInt)
-    case colorRegex(count, "blue") => Cubes(blue = count.toInt)
+    case s"$count red" => Cubes(red = count.toInt)
+    case s"$count green" => Cubes(green = count.toInt)
+    case s"$count blue" => Cubes(blue = count.toInt)
   }
 
-  def parseCubes(s: String): Cubes = {
-    val colors = s.split(", ")
-    colors.map(parseColor).reduce(_ + _)
-  }
+  def parseCubes(s: String): Cubes = s.split(", ").map(parseColor).reduce(_ + _)
 
-  def parseGame(s: String): Game = {
-    val cubess = s.split(": ", 2)(1)
-    cubess.split("; ").map(parseCubes).toSet
+  def parseGame(s: String): Game = s match {
+    case s"Game $id: $cubess" => cubess.split("; ").map(parseCubes).toSet
   }
 
   def parseGames(input: String): Seq[Game] = input.linesIterator.map(parseGame).toSeq
