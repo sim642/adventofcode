@@ -1,0 +1,49 @@
+package eu.sim642.adventofcode2023
+
+object Day2 {
+
+  case class Cubes(red: Int = 0, green: Int = 0, blue: Int = 0) {
+    def +(that: Cubes): Cubes =
+      Cubes(red + that.red, green + that.green, blue + that.blue)
+
+    def <=(that: Cubes): Boolean =
+      red <= that.red && green <= that.green && blue <= that.blue
+  }
+
+  type Game = Set[Cubes]
+
+  def sumPossibleIds(games: Seq[Game], possible: Cubes = Cubes(12, 13, 14)): Int = {
+    games
+      .zipWithIndex
+      .filter((game, _) => game.forall(_ <= possible))
+      .map(_._2 + 1)
+      .sum
+  }
+
+
+  private val colorRegex = """(\d+) (red|green|blue)""".r
+
+  def parseColor(s: String): Cubes = s match {
+    case colorRegex(count, "red") => Cubes(red = count.toInt)
+    case colorRegex(count, "green") => Cubes(green = count.toInt)
+    case colorRegex(count, "blue") => Cubes(blue = count.toInt)
+  }
+
+  def parseCubes(s: String): Cubes = {
+    val colors = s.split(", ")
+    colors.map(parseColor).reduce(_ + _)
+  }
+
+  def parseGame(s: String): Game = {
+    val cubess = s.split(": ", 2)(1)
+    cubess.split("; ").map(parseCubes).toSet
+  }
+
+  def parseGames(input: String): Seq[Game] = input.linesIterator.map(parseGame).toSeq
+
+  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
+
+  def main(args: Array[String]): Unit = {
+    println(sumPossibleIds(parseGames(input)))
+  }
+}
