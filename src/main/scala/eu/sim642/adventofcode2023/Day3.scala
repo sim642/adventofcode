@@ -8,35 +8,38 @@ object Day3 {
 
   type Schematic = Vector[String]
 
+  extension (schematic: Schematic) {
+    def apply(pos: Pos): Char = schematic(pos.y)(pos.x)
+  }
+
   def isSymbol(c: Char): Boolean = c != '.' && !c.isDigit
 
   def isGear(c: Char): Boolean = c == '*'
 
   private val numberRegex = """\d+""".r
 
-  def iteratePartNumbers(schematic: Schematic): Iterator[Int] = {
-    val schematicBox = Box(Pos.zero, Pos(schematic(0).length - 1, schematic.length - 1))
+  def iteratePartNumberBoxes(schematic: Schematic): Iterator[(Int, Box)] = {
+    val schematicBox = Box(Pos.zero, Pos(schematic(0).length - 1, schematic.size - 1))
 
     for {
       (row, y) <- schematic.iterator.zipWithIndex
       m <- numberRegex.findAllMatchIn(row)
-      box = Box(Pos(m.start, y) - Pos(1, 1), Pos(m.end - 1, y) + Pos(1, 1))
-      if box.iterator.exists(p => schematicBox.contains(p) && isSymbol(schematic(p.y)(p.x)))
-    } yield m.toString().toInt
+      box <- Box(Pos(m.start, y) - Pos(1, 1), Pos(m.end - 1, y) + Pos(1, 1)) intersect schematicBox
+    } yield m.toString().toInt -> box
   }
 
-  def sumPartNumbers(schematic: Schematic): Int = iteratePartNumbers(schematic).sum
+  def sumPartNumbers(schematic: Schematic): Int = {
+    iteratePartNumberBoxes(schematic)
+      .filter(_._2.iterator.exists(p => isSymbol(schematic(p))))
+      .map(_._1).sum
+  }
 
   def sumGearRatios(schematic: Schematic): Int = {
-    val schematicBox = Box(Pos.zero, Pos(schematic(0).length - 1, schematic.length - 1))
-
     val gears = for {
-      (row, y) <- schematic.iterator.zipWithIndex
-      m <- numberRegex.findAllMatchIn(row)
-      box = Box(Pos(m.start, y) - Pos(1, 1), Pos(m.end - 1, y) + Pos(1, 1))
+      (number, box) <- iteratePartNumberBoxes(schematic)
       gearPos <- box.iterator
-      if schematicBox.contains(gearPos) && isGear(schematic(gearPos.y)(gearPos.x))
-    } yield gearPos -> m.toString().toInt
+      if isGear(schematic(gearPos))
+    } yield gearPos -> number
 
     gears.toSeq
       .groupMap(_._1)(_._2) // TODO: groupMap to IteratorImplicits
