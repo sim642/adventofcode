@@ -24,4 +24,12 @@ class Day3Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumPartNumbers(parseSchematic(input)) == 521515)
   }
+
+  test("Part 2 examples") {
+    assert(sumGearRatios(parseSchematic(exampleInput)) == 467835)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumGearRatios(parseSchematic(input)) == 69527306)
+  }
 }
