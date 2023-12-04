@@ -20,4 +20,12 @@ class Day4Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumPoints(parseCards(input)) == 23235)
   }
+
+  test("Part 2 examples") {
+    assert(countWonCards(parseCards(exampleInput)) == 30)
+  }
+
+  test("Part 2 input answer") {
+    assert(countWonCards(parseCards(input)) == 5920640)
+  }
 }
