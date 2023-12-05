@@ -89,13 +89,13 @@ object Day5 {
   }
 
   def parseRangeMap(s: String): RangeMap = s match {
-    //case s"$name map:\n$entries" =>
-    case entries => // TODO: why doesn't match work?
+    //case s"$name map:\n$entries" => // TODO: doesn't work due to Scala bug: https://github.com/scala/bug/issues/12893
+    case s =>
       RangeMap(s.linesIterator.tail.map(parseRangeMapEntry).toSeq)
   }
 
   def parseInput(input: String): Input = {
-    val seedsStr +: rangeMapStrs = input.split("\n\n").toSeq // TODO: fix warning
+    val seedsStr +: rangeMapStrs = input.split("\n\n").toSeq: @unchecked
     val seeds = seedsStr match {
       case s"seeds: $seeds" => seeds.split(' ').map(_.toLong).toSeq
     }
