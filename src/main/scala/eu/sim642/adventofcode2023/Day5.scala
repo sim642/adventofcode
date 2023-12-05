@@ -1,32 +1,92 @@
 package eu.sim642.adventofcode2023
 
-import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.IteratorImplicits.*
+
+import scala.annotation.tailrec
 
 object Day5 {
 
-  case class RangeMapEntry(destination: Long, source: Long, length: Long) extends PartialFunction[Long, Long] {
-    override def isDefinedAt(x: Long): Boolean = source <= x && x < source + length
+  case class Range(start: Long, length: Long) { // TODO: overrides Scala Range
+    def end: Long = start + length - 1
 
-    override def apply(x: Long): Long = destination + (x - source)
-  }
+    def intersect(that: Range): Option[Range] = {
+      val newStart = start max that.start
+      val newEnd = end min that.end
+      if (newStart <= newEnd)
+        Some(Range(newStart, newEnd - newStart + 1))
+      else
+        None
+    }
 
-  case class RangeMap(entries: Seq[RangeMapEntry]) extends Function1[Long, Long] {
-    override def apply(x: Long): Long = {
-      val f = entries.foldRight(PartialFunction.fromFunction[Long, Long](identity))(_ orElse _)
-      //println(s"$x -> ${f(x)}")
-      f(x)
+    def diff(that: Range): Ranges = {
+      val r1 =
+        if (start < that.start)
+          Set(Range(start, length min (that.start - start)))
+        else
+          Set()
+      val r2 =
+        if (that.end < end) {
+          val newStart = start max (that.end + 1)
+          Set(Range(newStart, end - newStart + 1))
+        }
+        else
+          Set()
+      r1 ++ r2
     }
   }
 
-  case class Input(seeds: Seq[Long], rangeMaps: Seq[RangeMap]) extends Function1[Long, Long] {
-    override def apply(x: Long): Long = {
-      val f = rangeMaps.foldRight[Long => Long](identity)(_ andThen _)
-      f(x)
+  type Ranges = Set[Range]
+
+  case class RangeMapEntry(destination: Long, source: Long, length: Long) extends Function1[Range, Option[Range]] {
+    val sourceRange: Range = Range(source, length)
+
+    override def apply(x: Range): Option[Range] = x intersect sourceRange match {
+      case Some(Range(start, length)) => Some(Range(start - source + destination, length))
+      case None => None
+    }
+  }
+
+  case class RangeMap(entries: Seq[RangeMapEntry]) extends Function1[Range, Ranges] {
+    override def apply(x: Range): Ranges = {
+      val ranges = entries.flatMap(entry => entry(x)).toSet
+
+      @tailrec
+      def helper(ranges: Ranges, entries: Seq[RangeMapEntry]): Ranges = {
+        if (entries.isEmpty)
+          ranges
+        else {
+          val newRanges = ranges.flatMap(_.diff(entries.head.sourceRange))
+          helper(newRanges, entries.tail)
+        }
+      }
+
+      ranges ++ helper(Set(x), entries)
+    }
+  }
+
+  case class Input(seeds: Seq[Long], rangeMaps: Seq[RangeMap]) extends Function1[Range, Ranges] {
+    override def apply(x: Range): Ranges = {
+
+      @tailrec
+      def helper(ranges: Ranges, rangeMaps: Seq[RangeMap]): Ranges = {
+        if (rangeMaps.isEmpty)
+          ranges
+        else {
+          val newRanges = ranges.flatMap(r => rangeMaps.head(r))
+          helper(newRanges, rangeMaps.tail)
+        }
+      }
+
+      helper(Set(x), rangeMaps)
     }
   }
 
   def lowestSeedLocation(input: Input): Long = {
-    input.seeds.map(input).min
+    input.seeds.flatMap(seed => input(Range(seed, 1))).map(_.start).min
+  }
+
+  def lowestSeedRangeLocation(input: Input): Long = {
+    input.seeds.grouped(2).map({ case Seq(start, range) => Range(start, range) }).flatMap(input).map(_.start).min
   }
 
 
@@ -53,5 +113,6 @@ object Day5 {
 
   def main(args: Array[String]): Unit = {
     println(lowestSeedLocation(parseInput(input)))
+    println(lowestSeedRangeLocation(parseInput(input)))
   }
 }

@@ -41,10 +41,26 @@ class Day5Test extends AnyFunSuite {
       |56 93 4""".stripMargin
 
   test("Part 1 examples") {
-    assert(lowestSeedLocation(parseInput(exampleInput)) == 35)
+    val input = parseInput(exampleInput)
+
+    val seed2soil = input.rangeMaps.head
+    assert(seed2soil(Range(79, 1)) == Set(Range(81, 1)))
+    assert(seed2soil(Range(14, 1)) == Set(Range(14, 1)))
+    assert(seed2soil(Range(55, 1)) == Set(Range(57, 1)))
+    assert(seed2soil(Range(13, 1)) == Set(Range(13, 1)))
+
+    assert(lowestSeedLocation(input) == 35)
   }
 
   test("Part 1 input answer") {
     assert(lowestSeedLocation(parseInput(input)) == 226172555)
+  }
+
+  test("Part 2 examples") {
+    assert(lowestSeedRangeLocation(parseInput(exampleInput)) == 46)
+  }
+
+  test("Part 2 input answer") {
+    assert(lowestSeedRangeLocation(parseInput(input)) == 47909639)
   }
 }
