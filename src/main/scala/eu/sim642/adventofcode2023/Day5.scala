@@ -6,56 +6,62 @@ import scala.annotation.tailrec
 
 object Day5 {
 
-  case class Range(start: Long, length: Long) { // TODO: overrides Scala Range
-    def end: Long = start + length - 1
+  // TODO: move to library
+  case class Interval(min: Long, max: Long) {
+    require(min <= max)
 
-    def intersect(that: Range): Option[Range] = {
-      val newStart = start max that.start
-      val newEnd = end min that.end
-      if (newStart <= newEnd)
-        Some(Range(newStart, newEnd - newStart + 1))
+    def intersect(that: Interval): Option[Interval] = {
+      val intersectMin = min max that.min
+      val intersectMax = max min that.max
+      if (intersectMin <= intersectMax)
+        Some(Interval(intersectMin, intersectMax))
       else
         None
     }
 
-    def diff(that: Range): Ranges = {
-      val r1 =
-        if (start < that.start)
-          Set(Range(start, length min (that.start - start)))
-        else
-          Set()
-      val r2 =
-        if (that.end < end) {
-          val newStart = start max (that.end + 1)
-          Set(Range(newStart, end - newStart + 1))
+    def diffSplit(that: Interval): Intervals = this intersect that match {
+      case None => Set(this)
+      case Some(inter) =>
+
+        def make(a: Long, b: Long): Option[Interval] = {
+          if (a <= b)
+            Some(Interval(a, b))
+          else
+            None
         }
-        else
-          Set()
-      r1 ++ r2
+
+        Set(
+          (min, inter.min - 1),
+          (inter.max + 1, max),
+        ).flatMap(make)
     }
   }
 
-  type Ranges = Set[Range]
+  object Interval {
+    def apply(x: Long): Interval = Interval(x, x)
+  }
 
-  case class RangeMapEntry(destination: Long, source: Long, length: Long) extends Function1[Range, Option[Range]] {
-    val sourceRange: Range = Range(source, length)
+  type Intervals = Set[Interval]
 
-    override def apply(x: Range): Option[Range] = x intersect sourceRange match {
-      case Some(Range(start, length)) => Some(Range(start - source + destination, length))
+  case class RangeMapEntry(destination: Long, source: Long, length: Long) extends Function1[Interval, Option[Interval]] {
+    val sourceRange: Interval = Interval(source, source + length - 1)
+
+    override def apply(x: Interval): Option[Interval] = x intersect sourceRange match {
+      case Some(Interval(start, end)) => Some(Interval(start - source + destination, end - source + destination))
       case None => None
     }
   }
 
-  case class RangeMap(entries: Seq[RangeMapEntry]) extends Function1[Range, Ranges] {
-    override def apply(x: Range): Ranges = {
+  case class RangeMap(entries: Seq[RangeMapEntry]) extends Function1[Interval, Intervals] {
+    override def apply(x: Interval): Intervals = {
       val ranges = entries.flatMap(entry => entry(x)).toSet
 
       @tailrec
-      def helper(ranges: Ranges, entries: Seq[RangeMapEntry]): Ranges = {
+      def helper(ranges: Intervals, entries: Seq[RangeMapEntry]): Intervals = {
         if (entries.isEmpty)
           ranges
         else {
-          val newRanges = ranges.flatMap(_.diff(entries.head.sourceRange))
+          val newRanges = ranges.flatMap(_.diffSplit(entries.head.sourceRange))
           helper(newRanges, entries.tail)
         }
       }
@@ -64,11 +70,11 @@ object Day5 {
     }
   }
 
-  case class Input(seeds: Seq[Long], rangeMaps: Seq[RangeMap]) extends Function1[Range, Ranges] {
-    override def apply(x: Range): Ranges = {
+  case class Input(seeds: Seq[Long], rangeMaps: Seq[RangeMap]) extends Function1[Interval, Intervals] {
+    override def apply(x: Interval): Intervals = {
 
       @tailrec
-      def helper(ranges: Ranges, rangeMaps: Seq[RangeMap]): Ranges = {
+      def helper(ranges: Intervals, rangeMaps: Seq[RangeMap]): Intervals = {
         if (rangeMaps.isEmpty)
           ranges
         else {
@@ -82,11 +88,11 @@ object Day5 {
   }
 
   def lowestSeedLocation(input: Input): Long = {
-    input.seeds.flatMap(seed => input(Range(seed, 1))).map(_.start).min
+    input.seeds.flatMap(seed => input(Interval(seed, seed + 1))).map(_.min).min
   }
 
   def lowestSeedRangeLocation(input: Input): Long = {
-    input.seeds.grouped(2).map({ case Seq(start, range) => Range(start, range) }).flatMap(input).map(_.start).min
+    input.seeds.grouped(2).map({ case Seq(start, range) => Interval(start, start + range - 1) }).flatMap(input).map(_.min).min
   }
 
 

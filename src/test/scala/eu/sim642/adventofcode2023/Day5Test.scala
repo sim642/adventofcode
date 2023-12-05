@@ -44,10 +44,10 @@ class Day5Test extends AnyFunSuite {
     val input = parseInput(exampleInput)
 
     val seed2soil = input.rangeMaps.head
-    assert(seed2soil(Range(79, 1)) == Set(Range(81, 1)))
-    assert(seed2soil(Range(14, 1)) == Set(Range(14, 1)))
-    assert(seed2soil(Range(55, 1)) == Set(Range(57, 1)))
-    assert(seed2soil(Range(13, 1)) == Set(Range(13, 1)))
+    assert(seed2soil(Interval(79)) == Set(Interval(81)))
+    assert(seed2soil(Interval(14)) == Set(Interval(14)))
+    assert(seed2soil(Interval(55)) == Set(Interval(57)))
+    assert(seed2soil(Interval(13)) == Set(Interval(13)))
 
     assert(lowestSeedLocation(input) == 35)
   }
