@@ -16,4 +16,12 @@ class Day6Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(multiplyRaceWins(parseRaces(input)) == 2756160)
   }
+
+  test("Part 2 examples") {
+    assert(concatenatedRaceWin(parseRaces(exampleInput)) == 71503)
+  }
+
+  test("Part 2 input answer") {
+    assert(concatenatedRaceWin(parseRaces(input)) == 34788142)
+  }
 }
