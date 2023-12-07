@@ -2,8 +2,6 @@ package eu.sim642.adventofcode2023
 
 import eu.sim642.adventofcodelib.IterableImplicits.*
 
-import scala.math.Ordering.IntOrdering
-
 object Day7 {
 
   type Card = Char
@@ -20,6 +18,20 @@ object Day7 {
   }
 
   val handTypeOrdering: Ordering[HandType] = Ordering.by[HandType, Int](_.ordinal)(Ordering[Int]).reverse
+
+  def handFrequency(hand: Hand): Seq[Int] =
+    hand.groupCount(identity).values.toSeq.sorted(Ordering[Int].reverse)
+
+  def frequencyHandType(freq: Seq[Int]): HandType = freq match {
+    case Seq(5) => HandType.FiveOfAKind
+    case Seq(4, 1) => HandType.FourOfAKind
+    case Seq(3, 2) => HandType.FullHouse
+    case Seq(3, 1, 1) => HandType.ThreeOfAKind
+    case Seq(2, 2, 1) => HandType.TwoPair
+    case Seq(2, 1, 1, 1) => HandType.OnePair
+    case Seq(1, 1, 1, 1, 1) => HandType.HighCard
+    case _ => throw IllegalArgumentException("invalid hand frequency")
+  }
 
   trait Part {
     protected val cardStrengthOrder: Seq[Card]
@@ -43,16 +55,7 @@ object Day7 {
     override protected val cardStrengthOrder: Seq[Card] =
       Seq('A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2')
 
-    override def handType(hand: Hand): HandType = hand.groupCount(identity).values.toSeq.sorted(Ordering[Int].reverse) match {
-      case Seq(5) => HandType.FiveOfAKind
-      case Seq(4, 1) => HandType.FourOfAKind
-      case Seq(3, 2) => HandType.FullHouse
-      case Seq(3, 1, 1) => HandType.ThreeOfAKind
-      case Seq(2, 2, 1) => HandType.TwoPair
-      case Seq(2, 1, 1, 1) => HandType.OnePair
-      case Seq(1, 1, 1, 1, 1) => HandType.HighCard
-      case _ => throw IllegalArgumentException("invalid hand")
-    }
+    override def handType(hand: Hand): HandType = frequencyHandType(handFrequency(hand))
   }
 
   object Part2 extends Part {
@@ -60,33 +63,12 @@ object Day7 {
       Seq('A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J')
 
     override def handType(hand: Hand): HandType = {
-      val jokers = hand.count(_ == 'J')
       val handWithoutJokers = hand.filter(_ != 'J')
-      // TODO: simplify, is complete?
-      (jokers, handWithoutJokers.groupCount(identity).values.toSeq.sorted(Ordering[Int].reverse)) match {
-        case (5, Seq()) => HandType.FiveOfAKind
-        case (_, Seq(_)) => HandType.FiveOfAKind
-
-        case (3, Seq(1, 1)) => HandType.FourOfAKind
-        case (2, Seq(2, 1)) => HandType.FourOfAKind
-        case (1, Seq(3, 1)) => HandType.FourOfAKind
-        case (0, Seq(4, 1)) => HandType.FourOfAKind
-
-        case (1, Seq(2, 2)) => HandType.FullHouse
-        case (0, Seq(3, 2)) => HandType.FullHouse
-
-        case (2, Seq(1, 1, 1)) => HandType.ThreeOfAKind
-        case (1, Seq(2, 1, 1)) => HandType.ThreeOfAKind
-        case (0, Seq(3, 1, 1)) => HandType.ThreeOfAKind
-
-        case (0, Seq(2, 2, 1)) => HandType.TwoPair
-
-        case (1, Seq(1, 1, 1, 1)) => HandType.OnePair
-        case (0, Seq(2, 1, 1, 1)) => HandType.OnePair
-
-        case (0, Seq(1, 1, 1, 1, 1)) => HandType.HighCard
-
-        case _ => throw IllegalArgumentException(s"invalid hand $hand")
+      handFrequency(handWithoutJokers) match {
+        case Seq() => HandType.FiveOfAKind
+        case topFreq +: restFreq =>
+          val jokers = hand.count(_ == 'J')
+          frequencyHandType((topFreq + jokers) +: restFreq)
       }
     }
   }
