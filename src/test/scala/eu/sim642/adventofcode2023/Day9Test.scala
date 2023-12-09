@@ -11,28 +11,32 @@ class Day9Test extends AnyFunSuite {
       |10 13 16 21 30 45""".stripMargin
 
   test("Part 1 examples") {
+    import Part1._
+    
     val histories = parseHistories(exampleInput)
 
-    assert(nextValue(histories(0)) == 18)
-    assert(nextValue(histories(1)) == 28)
-    assert(nextValue(histories(2)) == 68)
+    assert(extrapolate(histories(0)) == 18)
+    assert(extrapolate(histories(1)) == 28)
+    assert(extrapolate(histories(2)) == 68)
 
-    assert(sumNextValues(histories) == 114)
+    assert(sumExtrapolated(histories) == 114)
   }
 
   test("Part 1 input answer") {
-    assert(sumNextValues(parseHistories(input)) == 1708206096)
+    assert(Part1.sumExtrapolated(parseHistories(input)) == 1708206096)
   }
 
   test("Part 2 examples") {
+    import Part2._
+    
     val histories = parseHistories(exampleInput)
 
-    assert(prevValue(histories(0)) == -3)
-    assert(prevValue(histories(1)) == 0)
-    assert(prevValue(histories(2)) == 5)
+    assert(extrapolate(histories(0)) == -3)
+    assert(extrapolate(histories(1)) == 0)
+    assert(extrapolate(histories(2)) == 5)
   }
 
   test("Part 2 input answer") {
-    assert(sumPrevValues(parseHistories(input)) == 1050)
+    assert(Part2.sumExtrapolated(parseHistories(input)) == 1050)
   }
 }

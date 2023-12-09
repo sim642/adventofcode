@@ -4,30 +4,26 @@ object Day9 {
 
   type History = Seq[Int]
 
-  def nextValue(history: History): Int = {
-    val differences = LazyList.iterate(history)(history =>
-      (history lazyZip history.tail).map(-_ + _)
-    )
-    val nonZeroDifferences = differences.takeWhile(!_.forall(_ == 0))
-    nonZeroDifferences
-      .map(_.last)
-      .sum
+  def difference(history: History): History = (history.tail lazyZip history).map(_ - _)
+
+  trait Part {
+    def extrapolate(history: History): Int
+
+    def sumExtrapolated(histories: Seq[History]): Int = histories.map(extrapolate).sum
   }
 
-  def sumNextValues(histories: Seq[History]): Int = histories.map(nextValue).sum
-
-  def prevValue(history: History): Int = {
-    // TODO: deduplicate
-    val differences = LazyList.iterate(history)(history =>
-      (history lazyZip history.tail).map(-_ + _)
-    )
-    val nonZeroDifferences = differences.takeWhile(!_.forall(_ == 0))
-    nonZeroDifferences
-      .map(_.head)
-      .foldRight(0)((a, b) => a - b)
+  object Part1 extends Part {
+    override def extrapolate(history: History): Int = {
+      LazyList.iterate(history)(difference)
+        .takeWhile(!_.forall(_ == 0))
+        .map(_.last)
+        .sum
+    }
   }
 
-  def sumPrevValues(histories: Seq[History]): Int = histories.map(prevValue).sum
+  object Part2 extends Part {
+    override def extrapolate(history: History): Int = Part1.extrapolate(history.reverse)
+  }
 
 
   def parseHistories(input: String): Seq[History] =
@@ -36,7 +32,7 @@ object Day9 {
   lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(sumNextValues(parseHistories(input)))
-    println(sumPrevValues(parseHistories(input)))
+    println(Part1.sumExtrapolated(parseHistories(input)))
+    println(Part2.sumExtrapolated(parseHistories(input)))
   }
 }
