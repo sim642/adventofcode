@@ -23,4 +23,16 @@ class Day9Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumNextValues(parseHistories(input)) == 1708206096)
   }
+
+  test("Part 2 examples") {
+    val histories = parseHistories(exampleInput)
+
+    assert(prevValue(histories(0)) == -3)
+    assert(prevValue(histories(1)) == 0)
+    assert(prevValue(histories(2)) == 5)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumPrevValues(parseHistories(input)) == 1050)
+  }
 }
