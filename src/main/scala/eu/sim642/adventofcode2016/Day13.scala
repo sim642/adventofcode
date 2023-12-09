@@ -47,7 +47,7 @@ object Day13 {
     BFS.search(graphSearch).nodes.size
   }
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
   val input = 1364
 
   def main(args: Array[String]): Unit = {

@@ -105,7 +105,7 @@ object Day23 {
     override def countMul(input: String): Int = countMul(parseInstructions(input))
 
 
-    lazy val isPrimeRegex: Regex = io.Source.fromInputStream(getClass.getResourceAsStream("day23/isPrime_regex.txt")).mkString.trim.r
+    lazy val isPrimeRegex: Regex = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23/isPrime_regex.txt")).mkString.trim.r
 
     def registerH(instructions: Instructions): Integer = iterateSmallStep(AsmState(instructions, registers = Map('a' -> 1L).withDefaultValue(0L))).dropWhile(!_.terminated).next().registers('h')
 
@@ -122,7 +122,7 @@ object Day23 {
 
   object ReverseEngineeredSolution extends Solution {
 
-    lazy val inputRegex: Regex = io.Source.fromInputStream(getClass.getResourceAsStream("day23/reverse_regex.txt")).mkString.trim.r
+    lazy val inputRegex: Regex = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23/reverse_regex.txt")).mkString.trim.r
 
     case class RangeParams(b: Int, bMul: Int, bAdd: Int, cAdd: Int, bInc: Int) {
       def bRange: Range = {
@@ -154,7 +154,7 @@ object Day23 {
     }
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import ReverseEngineeredSolution._

@@ -46,7 +46,7 @@ object Day6 {
 
   object BrentSolution extends FunctionCycleFinderSolution(BrentCycleFinder)
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
   lazy val inputSeq: IndexedSeq[Int] = input.split("\\s+").toIndexedSeq.map(_.toInt)
 
   def main(args: Array[String]): Unit = {

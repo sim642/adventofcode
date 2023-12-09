@@ -99,7 +99,7 @@ object Day11 {
     }
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import OutputLoopSolution._

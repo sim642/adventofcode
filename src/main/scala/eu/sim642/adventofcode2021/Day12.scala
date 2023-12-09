@@ -70,7 +70,7 @@ object Day12 {
     } yield p).groupMapReduce(_._1)(p => Set(p._2))(_ ++ _)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.countPaths(parseCaveMap(input)))

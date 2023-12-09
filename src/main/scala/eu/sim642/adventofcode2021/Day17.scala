@@ -101,7 +101,7 @@ object Day17 {
       Box(Pos(xMin.toInt, yMin.toInt), Pos(xMax.toInt, yMax.toInt))
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import AxisTimePart2Solution._

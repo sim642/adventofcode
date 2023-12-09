@@ -55,7 +55,7 @@ object Day13 extends RegexParsers {
 
   def parsePackets(input: String): Seq[PacketNode] = input.linesIterator.filterNot(_.isEmpty).map(parsePacket).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(sumPairOrderedIndices(parsePackets(input)))

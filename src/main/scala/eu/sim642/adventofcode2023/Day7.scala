@@ -82,7 +82,7 @@ object Day7 {
 
   def parseHands(input: String): Seq[(Hand, Int)] = input.linesIterator.map(parseHandBid).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.totalWinnings(parseHands(input)))

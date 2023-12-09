@@ -71,7 +71,7 @@ object Day17 {
       .values.max
   }
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
   val input = "yjjvjgan"
 
   def main(args: Array[String]): Unit = {

@@ -75,7 +75,7 @@ object Day8 {
 
   def parseInstructions(input: String): Instructions = input.linesIterator.map(parseInstruction).toVector
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(accBeforeLoop(parseInstructions(input)))

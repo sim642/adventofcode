@@ -43,7 +43,7 @@ object Day10 {
 
   def knotHashHex(input: String): String = mkHexString(knotHash(input))
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(knotCheckProduct(input))

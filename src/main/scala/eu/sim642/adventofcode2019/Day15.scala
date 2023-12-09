@@ -60,7 +60,7 @@ object Day15 {
     BFS.traverse(graphTraversal).distances.values.max
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(oxygenSystemMoves(parseProgram(input)))

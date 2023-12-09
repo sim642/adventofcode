@@ -176,7 +176,7 @@ object Day18 {
     def countSnd1(input: String): Int = countSnd1(parseInstructions(input))
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.firstRcv(input))

@@ -56,7 +56,7 @@ object Day10 {
   def parseInstructions(input: String): Seq[Instruction] = input.linesIterator.map(parseInstruction).toSeq
 
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(sumSignalStrengths(parseInstructions(input)))

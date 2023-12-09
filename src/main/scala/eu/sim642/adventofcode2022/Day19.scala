@@ -166,7 +166,7 @@ object Day19 extends RegexParsers {
 
   def parseBlueprints(input: String): Seq[Blueprint] = input.linesIterator.map(parseBlueprint).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(sumQualityLevel(parseBlueprints(input)))

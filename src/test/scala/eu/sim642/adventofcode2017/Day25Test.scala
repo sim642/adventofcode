@@ -7,7 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class Day25Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
-  lazy val exampleInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day25example.txt")).mkString.trim
+  lazy val exampleInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day25example.txt")).mkString.trim
 
   test("parseConfiguration") {
     assert(parseConfiguration(exampleInput) == Configuration(

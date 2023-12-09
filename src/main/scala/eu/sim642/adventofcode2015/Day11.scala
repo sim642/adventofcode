@@ -60,7 +60,7 @@ object Day11 {
     iterateIncrements(s).filter(s => req1(s) && req2(s) && req3(s))(i)
   }
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
   val input = "hxbxwxba"
 
   def main(args: Array[String]): Unit = {

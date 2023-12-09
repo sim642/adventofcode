@@ -179,7 +179,7 @@ object Day16 {
   def parseHexBits(input: String): Bits = input.view.flatMap(hexBits).toList
 
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import ParserCombinatorSolution._

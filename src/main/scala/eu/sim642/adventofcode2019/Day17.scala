@@ -164,7 +164,7 @@ object Day17 {
     parseGrid(ProgramState(parseProgram(input)).outputs.map(_.toChar).mkString)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     printGrid(parseInputGrid(parseProgram(input)))

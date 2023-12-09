@@ -24,7 +24,7 @@ object Day6 {
 
   def parseGroups(input: String): Seq[Group] = input.split("\n\n").toSeq.map(parseGroup)
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.countYesGroups(parseGroups(input)))

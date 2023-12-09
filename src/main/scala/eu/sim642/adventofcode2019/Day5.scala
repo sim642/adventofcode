@@ -15,7 +15,7 @@ object Day5 {
     diagnostic
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(execDiagnostic(parseProgram(input), 1))

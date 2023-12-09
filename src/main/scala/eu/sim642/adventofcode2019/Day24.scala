@@ -119,7 +119,7 @@ object Day24 {
 
   def parseGrid(input: String): Grid[Boolean] = input.linesIterator.map(_.map(_ == '#').toVector).toVector
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(findCycleBiodiversityRating(parseGrid(input)))

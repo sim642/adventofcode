@@ -46,7 +46,7 @@ object Day15 {
 
   def parseStartingNumbers(input: String): Seq[Int] = input.split(",").toSeq.map(_.toInt)
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
   val input: String = "8,0,17,4,1,12"
 
   def main(args: Array[String]): Unit = {

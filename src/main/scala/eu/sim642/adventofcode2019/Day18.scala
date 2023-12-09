@@ -199,7 +199,7 @@ object Day18 {
     Input(walls, entrances, keys, doors)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import FloydWarshallKeyNeighborsSolution._

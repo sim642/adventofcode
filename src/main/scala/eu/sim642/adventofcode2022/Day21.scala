@@ -225,7 +225,7 @@ object Day21 {
 
   def parseMonkeys(input: String): Monkeys = input.linesIterator.map(parseMonkey).toMap
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import InvertPart2Solution._

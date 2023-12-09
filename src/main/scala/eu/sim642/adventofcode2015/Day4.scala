@@ -22,7 +22,7 @@ object Day4 {
   }
 
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
   val input = "ckczppom"
 
   def main(args: Array[String]): Unit = {

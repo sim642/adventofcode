@@ -85,7 +85,7 @@ object Day2 {
 
   def parseStrategy(input: String): Strategy = input.linesIterator.map(parseRound).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.strategyScore(parseStrategy(input)))

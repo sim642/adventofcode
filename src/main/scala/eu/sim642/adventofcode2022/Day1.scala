@@ -12,7 +12,7 @@ object Day1 {
 
   def parseElves(input: String): Seq[Elf] = input.split("\n\n").toSeq.map(parseElf)
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day1.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day1.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(maxElfTotal(parseElves(input)))

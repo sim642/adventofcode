@@ -44,7 +44,7 @@ object Day8 {
     input.toVector.map(_.asDigit).grouped(width * height).map(_.grouped(width).toVector).toSeq
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(fewestZeroLayer(parseLayers(input)))

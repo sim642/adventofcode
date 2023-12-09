@@ -111,7 +111,7 @@ object Day22 {
     case inputRegex(depth, targetX, targetY) => (depth.toInt, Pos(targetX.toInt, targetY.toInt))
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(totalRiskLevel(input))

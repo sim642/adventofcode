@@ -53,7 +53,7 @@ object Day14 {
     Input(polymer, rules)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day14.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day14.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(elementCountDifference(parseInput(input)))

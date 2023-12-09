@@ -109,7 +109,7 @@ object Day22 {
     (parseDeck(s1), parseDeck(s2))
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.winningScore(parseDecks(input)))

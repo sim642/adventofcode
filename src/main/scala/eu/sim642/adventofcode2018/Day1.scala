@@ -11,7 +11,7 @@ object Day1 {
     NaiveCycleFinder.find(it).get.cycleHead
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day1.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day1.txt")).mkString.trim
   lazy val inputFreqChanges: Seq[Int] = input.linesIterator.map(_.toInt).toSeq
 
   def main(args: Array[String]): Unit = {

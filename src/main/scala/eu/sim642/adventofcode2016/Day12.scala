@@ -97,7 +97,7 @@ object Day12 {
 
   def parseInstructions(input: String): Instructions = input.linesIterator.map(parseInstruction).toVector
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.execRegisterA(input))

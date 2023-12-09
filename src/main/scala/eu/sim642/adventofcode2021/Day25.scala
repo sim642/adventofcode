@@ -61,7 +61,7 @@ object Day25 {
     Input(max, easts, souths)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day25.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day25.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(findStoppedStep(parseInput(input))) // 305

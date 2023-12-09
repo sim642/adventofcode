@@ -49,7 +49,7 @@ object Day16 {
   def applyMovesRepeat(movesStr: String, programsStr: String = ('a' to 'p').mkString, repeat: Int = 1000000000): String =
     applyMovesRepeat(parseMoves(movesStr), programsStr.toVector, repeat).mkString
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(applyMoves(input))

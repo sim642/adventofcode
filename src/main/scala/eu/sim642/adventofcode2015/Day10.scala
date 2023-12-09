@@ -21,7 +21,7 @@ object Day10 {
   def lookAndSayLength(s: String, times: Int): Int = lookAndSayIterator(s)(times).length
 
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
   val input = "1321131112"
 
   def main(args: Array[String]): Unit = {

@@ -42,7 +42,7 @@ object Day19 {
 
   def pathLength(input: String): Int = pathLength(parseGrid(input))
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.stripLineEnd
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.stripLineEnd
 
   def main(args: Array[String]): Unit = {
     println(pathLetters(input))

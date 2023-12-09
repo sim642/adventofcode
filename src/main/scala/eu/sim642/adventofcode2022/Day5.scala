@@ -63,7 +63,7 @@ object Day5 {
     Input(parseCrates(crateStr), parseMoves(moveStr))
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.stripLineEnd
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.stripLineEnd
 
   def main(args: Array[String]): Unit = {
     println(Part1.topMessage(parseInput(input)))

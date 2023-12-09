@@ -72,7 +72,7 @@ object Day24 {
 
   def longestBridgeStrength(input: String): Int = longestBridgeStrength(parseComponents(input))
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(strongestBridgeStrength(input))

@@ -68,7 +68,7 @@ object Day4 {
     lo to hi
   }
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
   val input: String = "278384-824795"
 
   def main(args: Array[String]): Unit = {

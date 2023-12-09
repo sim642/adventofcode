@@ -103,7 +103,7 @@ object Day16 {
   def parseValves(input: String): Map[Valve, ValveData] = input.linesIterator.map(parseValve).toMap
 
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.mostPressure(parseValves(input)))

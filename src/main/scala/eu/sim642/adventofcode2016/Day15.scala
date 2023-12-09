@@ -45,7 +45,7 @@ object Day15 {
 
   def parseInput(input: String): Seq[Disk] = input.linesIterator.map(parseDisk).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.firstPressTime(input))

@@ -46,7 +46,7 @@ object Day13 {
     Notes(line1.toInt, parseBuses(line2))
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(earliestBusWaitTime(parseNotes(input)))

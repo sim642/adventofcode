@@ -22,7 +22,7 @@ object Day2 {
     100 * noun + verb
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(execNounVerb(parseProgram(input)))

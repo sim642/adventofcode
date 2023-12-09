@@ -62,7 +62,7 @@ object Day21 {
 
   def countOn(input: String, iteration: Int): Int = countOn(parseRules(input), iteration)
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countOn(input, 5))

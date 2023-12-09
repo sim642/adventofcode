@@ -153,7 +153,7 @@ object Day23 {
     helper(computers, None, None)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(runNetwork(parseProgram(input)))

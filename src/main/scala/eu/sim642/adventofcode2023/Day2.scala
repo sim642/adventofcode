@@ -42,7 +42,7 @@ object Day2 {
 
   def parseGames(input: String): Seq[Game] = input.linesIterator.map(parseGame).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(sumPossibleIds(parseGames(input)))

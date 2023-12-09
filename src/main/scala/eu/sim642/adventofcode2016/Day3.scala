@@ -31,7 +31,7 @@ object Day3 {
     (parts(0), parts(1), parts(2))
   }).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day3.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day3.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.countPossibleTriangles(input))

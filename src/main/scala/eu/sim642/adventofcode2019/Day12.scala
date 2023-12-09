@@ -138,7 +138,7 @@ object Day12 {
 
   def parseMoons(input: String): Seq[Moon] = input.linesIterator.map(parseMoon).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import CrtPart2Solution._

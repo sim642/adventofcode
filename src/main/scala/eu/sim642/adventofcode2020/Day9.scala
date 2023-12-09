@@ -53,7 +53,7 @@ object Day9 {
 
   def parseNumbers(input: String): Seq[Long] = input.linesIterator.map(_.toLong).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(firstInvalid(parseNumbers(input)))

@@ -30,7 +30,7 @@ object Day11 {
 
   def furthestSteps(input: String): Int = furthestSteps(input.split(",").toSeq)
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(fewestSteps(input))

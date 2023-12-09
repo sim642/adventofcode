@@ -117,7 +117,7 @@ object Day22 {
 
   def stepsToGoal(input: String): Int = stepsToGoal(parseNodes(input))
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countViablePairs(input))

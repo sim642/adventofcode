@@ -20,7 +20,7 @@ class Day22Test extends AnyFunSuite {
       |7
       |10""".stripMargin
 
-  lazy val mstksgInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22mstksg.txt")).mkString.trim
+  lazy val mstksgInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day22mstksg.txt")).mkString.trim
 
   test("Part 1 examples") {
     assert(Part1.winningScore(parseDecks(exampleInput)) == 306)

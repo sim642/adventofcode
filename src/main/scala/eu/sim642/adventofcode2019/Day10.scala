@@ -86,7 +86,7 @@ object Day10 {
     } yield pos).toSet
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(bestMonitoringCount(parseAsteroids(input)))

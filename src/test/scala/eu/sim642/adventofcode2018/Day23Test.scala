@@ -49,12 +49,12 @@ object Day23Test {
         |pos=<50,50,50>, r=200
         |pos=<10,10,10>, r=5""".stripMargin
 
-    lazy val dataforceInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23dataforce.txt")).mkString.trim
-    lazy val dataforceFriendInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23dataforcefriend.txt")).mkString.trim
-    lazy val lamperiInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23lamperi.txt")).mkString.trim
-    lazy val vikestepInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23vikestep.txt")).mkString.trim
-    lazy val magneInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23magne.txt")).mkString.trim
-    lazy val ipavInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23ipav.txt")).mkString.trim
+    lazy val dataforceInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23dataforce.txt")).mkString.trim
+    lazy val dataforceFriendInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23dataforcefriend.txt")).mkString.trim
+    lazy val lamperiInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23lamperi.txt")).mkString.trim
+    lazy val vikestepInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23vikestep.txt")).mkString.trim
+    lazy val magneInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23magne.txt")).mkString.trim
+    lazy val ipavInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23ipav.txt")).mkString.trim
 
     test("Part 2 examples") {
       assert(part2Solution.closestMostNanobots(parseInput(exampleInput2)) == 36)

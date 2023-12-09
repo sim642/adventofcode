@@ -61,7 +61,7 @@ object Day6 {
       (times lazyZip distances).map(Race.apply)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day6.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import QuadraticSolution._

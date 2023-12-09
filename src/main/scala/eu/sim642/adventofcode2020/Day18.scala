@@ -56,7 +56,7 @@ object Day18 extends RegexParsers {
     def expr: Parser[Expr] = chainl1(factor, "*" ^^^ Mul.apply)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(sumEvals(Part1.parseExprs(input)))

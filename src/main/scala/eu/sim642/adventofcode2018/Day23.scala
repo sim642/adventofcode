@@ -319,7 +319,7 @@ object Day23 {
 
   def parseInput(input: String): Seq[Nanobot] = input.linesIterator.map(parseNanobot).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import OctahedronSplittingPart2Solution._

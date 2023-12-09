@@ -55,7 +55,7 @@ object Day17 {
 
   def parseSizes(input: String): List[Int] = input.linesIterator.map(_.toInt).toList
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countCombinations(input))

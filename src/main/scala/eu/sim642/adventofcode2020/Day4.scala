@@ -54,7 +54,7 @@ object Day4 {
 
   def parsePassports(input: String): Seq[Passport] = input.split("\n\n").toSeq.map(parsePassport)
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.countValid(parsePassports(input)))

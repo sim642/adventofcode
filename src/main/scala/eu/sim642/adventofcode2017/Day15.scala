@@ -36,7 +36,7 @@ object Day15 {
     """Generator A starts with (\d+)
       |Generator B starts with (\d+)""".stripMargin.r
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.trim
   lazy val (inputStartA, inputStartB) = input match {
     case inputRegex(a, b) => (a.toInt, b.toInt)
   }

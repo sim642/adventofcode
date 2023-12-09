@@ -107,7 +107,7 @@ object Day13 {
     s"${collisionPos.x},${collisionPos.y}"
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.stripLineEnd
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.stripLineEnd
 
   def main(args: Array[String]): Unit = {
     println(firstCollisionPos(input))

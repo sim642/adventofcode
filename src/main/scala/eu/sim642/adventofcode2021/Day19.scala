@@ -116,7 +116,7 @@ object Day19 {
 
   def parseScanners(input: String): Seq[Scanner] = input.split("\n\n").iterator.map(parseScanner).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countBeacons(parseScanners(input)))

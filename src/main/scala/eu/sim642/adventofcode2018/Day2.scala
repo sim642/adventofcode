@@ -26,7 +26,7 @@ object Day2 {
     } yield common.mkString("")).head
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
   lazy val inputLines: Seq[String] = input.linesIterator.toSeq
 
   def main(args: Array[String]): Unit = {

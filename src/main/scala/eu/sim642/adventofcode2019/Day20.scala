@@ -154,7 +154,7 @@ object Day20 {
     Input(grid, portals)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.stripLineEnd
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.stripLineEnd
 
   def main(args: Array[String]): Unit = {
     println(steps(parseGrid(input)))

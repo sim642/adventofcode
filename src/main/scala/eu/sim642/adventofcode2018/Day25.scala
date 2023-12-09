@@ -25,7 +25,7 @@ object Day25 {
 
   def parseInput(input: String): Seq[Pos4] = input.linesIterator.map(parsePoint).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day25.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day25.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countConstellations(parseInput(input)))

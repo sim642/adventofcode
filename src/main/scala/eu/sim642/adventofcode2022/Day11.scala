@@ -91,7 +91,7 @@ object Day11 {
   def parseMonkeys(input: String): Vector[Monkey] = input.split("\n\n").map(parseMonkey).toVector
 
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.monkeyBusiness(parseMonkeys(input)))

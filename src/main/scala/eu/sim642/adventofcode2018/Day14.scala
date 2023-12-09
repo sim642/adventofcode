@@ -44,7 +44,7 @@ object Day14 {
 
   def recipesToLeft(scores: Int): Int = recipesToLeft(scores.toString)
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day14.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day14.txt")).mkString.trim
   val input = 846021
 
   def main(args: Array[String]): Unit = {

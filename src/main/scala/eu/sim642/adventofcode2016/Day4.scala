@@ -40,7 +40,7 @@ object Day4 {
 
   def northPoleObjectsSectorId(input: String): Int = northPoleObjectsSectorId(parseRooms(input))
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(realSectorIdSum(input))

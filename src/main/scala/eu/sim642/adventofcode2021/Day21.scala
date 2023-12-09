@@ -87,7 +87,7 @@ object Day21 {
       (Player(pos1.toInt), Player(pos2.toInt))
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(loserScoreRolls(parsePlayers(input)))

@@ -70,7 +70,7 @@ object Day3 {
     it.find(x => x > input).get
   }
 
-  lazy val input: Int = io.Source.fromInputStream(getClass.getResourceAsStream("day3.txt")).mkString.trim.toInt
+  lazy val input: Int = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day3.txt")).mkString.trim.toInt
 
   def main(args: Array[String]): Unit = {
     println(steps(input))

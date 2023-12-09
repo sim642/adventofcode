@@ -26,7 +26,7 @@ object Day20 {
     presents.indexWhere(_ * 11 >= atLeast)
   }
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
   val input = 33100000
 
   def main(args: Array[String]): Unit = {

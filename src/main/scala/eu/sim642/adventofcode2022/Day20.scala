@@ -49,7 +49,7 @@ object Day20 {
 
   def parseFile(input: String): Vector[Int] = input.linesIterator.map(_.toInt).toVector
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.mixGroveCoordinates(parseFile(input)))

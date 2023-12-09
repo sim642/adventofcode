@@ -81,7 +81,7 @@ object Day21 {
 
   def unscramble(input: String, s: String = unscrambleString): String = unscramble(parseInput(input), s)
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(scramble(input))

@@ -63,7 +63,7 @@ object Day13 {
     Input(dots, folds)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day13.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countDotsAfter1(parseInput(input)))

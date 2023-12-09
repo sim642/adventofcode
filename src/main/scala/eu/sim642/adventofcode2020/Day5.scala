@@ -30,7 +30,7 @@ object Day5 {
 
   def parseSeats(input: String): Seq[Seat] = input.linesIterator.map(parseSeat).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(highestSeatId(parseSeats(input)))

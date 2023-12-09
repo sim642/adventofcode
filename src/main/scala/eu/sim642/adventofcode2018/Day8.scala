@@ -44,7 +44,7 @@ object Day8 {
 
   def parseTree(input: String): Tree = parseTree(input.split(" ").map(_.toInt).toList)
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(metadataSum(parseTree(input)))

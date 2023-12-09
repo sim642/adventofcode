@@ -184,7 +184,7 @@ object Day10 extends RegexParsers {
 
   def parseLines(input: String): Seq[String] = input.linesIterator.toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import StackSolution._

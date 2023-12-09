@@ -201,7 +201,7 @@ object Day15 {
   }
 
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.stripLineEnd
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day15.txt")).mkString.stripLineEnd
 
   def main(args: Array[String]): Unit = {
     println(combatOutcome(input))

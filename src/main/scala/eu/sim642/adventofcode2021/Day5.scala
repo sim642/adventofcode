@@ -117,7 +117,7 @@ object Day5 {
 
   def parseLines(input: String): Seq[Line] = input.linesIterator.map(parseLine).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import IntersectSolution._

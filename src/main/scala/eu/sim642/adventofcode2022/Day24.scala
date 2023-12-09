@@ -106,7 +106,7 @@ object Day24 {
     Input(size, wall, up, down, left, right)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.fewestMinutes(parseInput(input)))

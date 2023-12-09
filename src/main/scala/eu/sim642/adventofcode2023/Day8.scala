@@ -37,7 +37,7 @@ object Day8 {
       Input(instructions, network.map(parseNode).toMap)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(followInstructionsSteps(parseInput(input)))

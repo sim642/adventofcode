@@ -149,7 +149,7 @@ object Day22 {
 
   def parseTechniques(input: String): Techniques = input.linesIterator.map(parseTechnique).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import LinearSolution._

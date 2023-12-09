@@ -54,7 +54,7 @@ object Day16 {
 
   def parseSues(input: String): Seq[Detection] = input.linesIterator.map(parseSue).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.findWrappingSue(input))

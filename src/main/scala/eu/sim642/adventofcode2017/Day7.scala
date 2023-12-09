@@ -84,7 +84,7 @@ object Day7 {
     correctBalanceWeight(parsePrograms(programsStr))
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day7.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(bottomProgram(input))

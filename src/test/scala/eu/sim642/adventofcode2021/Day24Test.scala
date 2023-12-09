@@ -5,14 +5,14 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class Day24Test extends AnyFunSuite {
 
-  lazy val emilyskidsisterInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24emilyskidsister.txt")).mkString.trim
-  lazy val dphilipsonInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24dphilipson.txt")).mkString.trim
-  lazy val seligmanInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24seligman.txt")).mkString.trim
-  lazy val aimorInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24aimor_.txt")).mkString.trim
-  lazy val alexanderYuInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24alexander-yu.txt")).mkString.trim
-  lazy val fireduck64Input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24fireduck64.txt")).mkString.trim
-  lazy val firetechInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24firetech.txt")).mkString.trim
-  lazy val mebeimInput: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24mebeim.txt")).mkString.trim
+  lazy val emilyskidsisterInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24emilyskidsister.txt")).mkString.trim
+  lazy val dphilipsonInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24dphilipson.txt")).mkString.trim
+  lazy val seligmanInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24seligman.txt")).mkString.trim
+  lazy val aimorInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24aimor_.txt")).mkString.trim
+  lazy val alexanderYuInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24alexander-yu.txt")).mkString.trim
+  lazy val fireduck64Input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24fireduck64.txt")).mkString.trim
+  lazy val firetechInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24firetech.txt")).mkString.trim
+  lazy val mebeimInput: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24mebeim.txt")).mkString.trim
 
   test("Part 1 input answer") {
     assert(maxModelNumber(parseSteps(input)) == "97919997299495")

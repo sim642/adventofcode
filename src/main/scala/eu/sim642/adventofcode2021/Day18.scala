@@ -83,7 +83,7 @@ object Day18 extends RegexParsers {
 
   def parseNumbers(input: String): Seq[Number] = input.linesIterator.map(parseNumber).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(addNumbersMagnitude(parseNumbers(input)))

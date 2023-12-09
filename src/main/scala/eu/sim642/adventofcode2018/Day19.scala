@@ -60,7 +60,7 @@ object Day19 {
   }
 
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day19.txt")).mkString.trim
   // Reverse engineered values
   val inputN1 = 973
   val inputN2 = 10551373

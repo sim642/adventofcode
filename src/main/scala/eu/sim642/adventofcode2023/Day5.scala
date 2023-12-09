@@ -103,7 +103,7 @@ object Day5 {
     Input(seeds, rangeMaps)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day5.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(lowestSeedLocation(parseInput(input)))

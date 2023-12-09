@@ -63,7 +63,7 @@ object Day23 {
 
   def parseCups(input: String): Cups = input.map(_.asDigit).to(LazyList)
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
   val input: String = "318946572"
 
   def main(args: Array[String]): Unit = {

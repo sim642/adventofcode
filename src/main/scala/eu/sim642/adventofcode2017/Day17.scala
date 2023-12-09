@@ -47,7 +47,7 @@ object Day17 {
     override protected val defaultSteps: Int = 50000000
   }
 
-  lazy val input: Int = io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim.toInt
+  lazy val input: Int = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim.toInt
 
   def main(args: Array[String]): Unit = {
     println(Part1.spinlockAfter(input))

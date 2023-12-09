@@ -80,7 +80,7 @@ object Day10 {
 
   def parsePoints(input: String): Seq[Point] = input.linesIterator.map(parsePoint).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     import BinarySearchSolution._

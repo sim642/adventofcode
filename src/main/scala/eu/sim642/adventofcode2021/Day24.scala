@@ -71,7 +71,7 @@ object Day24 {
   }
 
 
-  private lazy val stepRegex = io.Source.fromInputStream(getClass.getResourceAsStream("day24/step_regex.txt")).mkString.trim.r
+  private lazy val stepRegex = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24/step_regex.txt")).mkString.trim.r
 
   def parseSteps(input: String): Seq[Step] = {
     stepRegex.findAllMatchIn(input).map(m =>
@@ -79,7 +79,7 @@ object Day24 {
     ).toSeq
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(maxModelNumber(parseSteps(input)))

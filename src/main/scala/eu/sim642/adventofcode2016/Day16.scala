@@ -42,7 +42,7 @@ object Day16 {
 
   def fillChecksum(initial: String, length: Int): String = checksum(generateData(initial, length))
 
-  //lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
+  //lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
   val input = "00101000101111010"
 
   val part1Length = 272

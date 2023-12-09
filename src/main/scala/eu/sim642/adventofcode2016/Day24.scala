@@ -54,7 +54,7 @@ object Day24 {
 
   def shortestRouteReturn(input: String): Int = shortestRouteReturn(parseGrid(input))
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(shortestRoute(input))

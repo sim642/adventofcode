@@ -89,7 +89,7 @@ object Day21 {
     case inputRegex(hitpoints, damage, armor) => Fighter(damage.toInt, armor.toInt, hitpoints.toInt)
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(leastWinGold(input))

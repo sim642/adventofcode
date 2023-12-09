@@ -35,7 +35,7 @@ object Day2 {
 
   def parseInput(input: String): Seq[Present] = input.linesIterator.map(parsePresent).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(totalWrappingPaperArea(input))

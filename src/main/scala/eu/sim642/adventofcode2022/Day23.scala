@@ -80,7 +80,7 @@ object Day23 {
     } yield Pos(x, y)).toSet
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(simulateEmpty(parseElves(input)))

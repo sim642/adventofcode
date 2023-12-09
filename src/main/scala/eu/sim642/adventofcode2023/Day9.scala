@@ -29,7 +29,7 @@ object Day9 {
   def parseHistories(input: String): Seq[History] =
     input.linesIterator.map(_.split(' ').map(_.toInt).toSeq).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(Part1.sumExtrapolated(parseHistories(input)))

@@ -71,7 +71,7 @@ object Day21 {
 
   def parseFoods(input: String): Seq[Food] = input.linesIterator.map(parseFood).toSeq
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countGoodIngredients(parseFoods(input)))

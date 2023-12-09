@@ -45,7 +45,7 @@ object Day14 {
     bfsGroups(poss).size
   }
 
-  lazy val input: String = io.Source.fromInputStream(getClass.getResourceAsStream("day14.txt")).mkString.trim
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day14.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(squaresUsed(input))
