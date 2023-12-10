@@ -42,45 +42,6 @@ object Day10 {
   def enclosedTiles(grid: Grid[Char]): Int = {
     val loop = findLoop(grid).nodes
 
-    def flood(startPos: Pos): collection.Set[Pos] = {
-
-      val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
-        override val startNode: Pos = startPos
-
-        override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
-          for {
-            offset <- Pos.axisOffsets
-            newPos = pos + offset
-            if grid.containsPos(newPos)
-            if !loop.contains(newPos)
-          } yield newPos
-        }
-      }
-
-      BFS.traverse(graphTraversal).nodes
-    }
-
-    //val outside = flood(Pos.zero)  // assuming outside
-    //
-    //val inside = for {
-    //  outPos <- outside
-    //  offset <- Pos.axisOffsets
-    //  loopPos = outPos + offset
-    //  if grid.containsPos(loopPos)
-    //  if loop.contains(loopPos)
-    //  if grid(loopPos) == '|' || grid(loopPos) == '-'
-    //  inPos = loopPos + offset
-    //  if grid.containsPos(inPos)
-    //  if !loop.contains(inPos) && !outside.contains(inPos)
-    //} yield inPos
-    //
-    //val inside2 = inside.flatMap(flood)
-
-    //println(inside)
-
-    //grid.sizeGrid - loop.size - outside.size
-    //inside2.size
-
     val startAlternative = {
       val pos = grid.posOf('S')
       val newOffsets = for {
@@ -94,12 +55,10 @@ object Day10 {
     }
 
     def isInside(pos: Pos): Boolean = {
-      //println(pos)
 
       @tailrec
       def helper(pos: Pos, count: Int, enterEdge: Char): Boolean = {
         val newPos = pos + Pos(1, 0)
-        //println(s"  $newPos")
         if (grid.containsPos(newPos)) {
           val c = if grid(newPos) == 'S' then startAlternative else if loop.contains(newPos) then grid(newPos) else '.'
           (c, enterEdge) match {
