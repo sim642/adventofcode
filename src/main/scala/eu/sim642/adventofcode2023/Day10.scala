@@ -94,10 +94,6 @@ object Day10 {
     }
   }
 
-  extension (pos: Pos) {
-    def cross(that: Pos): Int = pos.x * that.y - that.x * pos.y
-  }
-
   /**
    * Solution, which calculates inside points using Pick's theorem.
    * Area of the polygon is calculated using the shoelace formula.
