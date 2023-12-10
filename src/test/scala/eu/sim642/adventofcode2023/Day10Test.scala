@@ -1,9 +1,17 @@
 package eu.sim642.adventofcode2023
 
-import Day10._
+import Day10.*
+import Day10Test.*
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day10Test extends AnyFunSuite {
+class Day10Test extends Suites(
+  new Part1Test,
+  new RayCastingPart2SolutionTest,
+  new PicksTheoremPart2SolutionTest,
+)
+
+object Day10Test {
 
   private val exampleInput =
     """.....
@@ -79,25 +87,35 @@ class Day10Test extends AnyFunSuite {
       |L.L7LFJ|||||FJL7||LJ
       |L7JLJL-JLJLJL--JLJ.L""".stripMargin
 
-  test("Part 1 examples") {
-    assert(farthestDistance(parseGrid(exampleInput)) == 4)
-    assert(farthestDistance(parseGrid(exampleInput2)) == 4)
-    assert(farthestDistance(parseGrid(exampleInput3)) == 8)
-    assert(farthestDistance(parseGrid(exampleInput4)) == 8)
+  class Part1Test extends AnyFunSuite {
+
+    test("Part 1 examples") {
+      assert(farthestDistance(parseGrid(exampleInput)) == 4)
+      assert(farthestDistance(parseGrid(exampleInput2)) == 4)
+      assert(farthestDistance(parseGrid(exampleInput3)) == 8)
+      assert(farthestDistance(parseGrid(exampleInput4)) == 8)
+    }
+
+    test("Part 1 input answer") {
+      assert(farthestDistance(parseGrid(input)) == 7063)
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(farthestDistance(parseGrid(input)) == 7063)
+  abstract class Part2SolutionTest(part2Solution: Part2Solution) extends AnyFunSuite {
+
+    test("Part 2 examples") {
+      assert(part2Solution.enclosedTiles(parseGrid(exampleInput5)) == 4)
+      assert(part2Solution.enclosedTiles(parseGrid(exampleInput6)) == 4)
+      assert(part2Solution.enclosedTiles(parseGrid(exampleInput7)) == 8)
+      assert(part2Solution.enclosedTiles(parseGrid(exampleInput8)) == 10)
+    }
+
+    test("Part 2 input answer") {
+      assert(part2Solution.enclosedTiles(parseGrid(input)) == 589)
+    }
   }
 
-  test("Part 2 examples") {
-    assert(enclosedTiles(parseGrid(exampleInput5)) == 4)
-    assert(enclosedTiles(parseGrid(exampleInput6)) == 4)
-    assert(enclosedTiles(parseGrid(exampleInput7)) == 8)
-    assert(enclosedTiles(parseGrid(exampleInput8)) == 10)
-  }
+  class RayCastingPart2SolutionTest extends Part2SolutionTest(RayCastingPart2Solution)
 
-  test("Part 2 input answer") {
-    assert(enclosedTiles(parseGrid(input)) == 589)
-  }
+  class PicksTheoremPart2SolutionTest extends Part2SolutionTest(PicksTheoremPart2Solution)
 }
