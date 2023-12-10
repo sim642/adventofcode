@@ -9,7 +9,7 @@ object Geometry {
    * Calculates the area of a simple polygon using the shoelace formula.
    * @see [[https://en.wikipedia.org/wiki/Shoelace_formula]]
    */
-  def polygonArea(poss: Seq[Pos]): Int = {
+  def polygonArea(poss: collection.Seq[Pos]): Int = {
     ((poss.last +: poss).iterator
       .zipWithTail
       .map(_ cross _)

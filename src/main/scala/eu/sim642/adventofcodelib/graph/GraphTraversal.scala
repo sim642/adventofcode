@@ -17,3 +17,7 @@ trait Distances[A] {
 
   def nodes: collection.Set[A] = distances.keySet
 }
+
+trait Order[A] {
+  def nodeOrder: collection.Seq[A]
+}

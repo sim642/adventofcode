@@ -1,12 +1,9 @@
 package eu.sim642.adventofcode2023
 
-import eu.sim642.adventofcodelib.{Geometry, Grid}
 import eu.sim642.adventofcodelib.GridImplicits.*
-import eu.sim642.adventofcodelib.IteratorImplicits.*
-import eu.sim642.adventofcodelib.graph.{BFS, Distances, GraphTraversal, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.*
 import eu.sim642.adventofcodelib.pos.Pos
-
-import scala.annotation.tailrec
+import eu.sim642.adventofcodelib.{Geometry, Grid}
 
 object Day10 {
 
@@ -20,8 +17,8 @@ object Day10 {
     'S' -> Pos.axisOffsets.toSet,
   )
 
-  def findLoop(grid: Grid[Char]): Distances[Pos] = {
-    val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
+  def loopTraversal(grid: Grid[Char]): GraphTraversal[Pos] with UnitNeighbors[Pos] = {
+    new GraphTraversal[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = grid.posOf('S')
 
       override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
@@ -34,11 +31,10 @@ object Day10 {
         } yield newPos
       }
     }
-
-    BFS.traverse(graphTraversal)
   }
 
-  def farthestDistance(grid: Grid[Char]): Int = findLoop(grid).distances.values.max
+  def farthestDistance(grid: Grid[Char]): Int =
+    BFS.traverse(loopTraversal(grid)).distances.values.max
 
   trait Part2Solution {
     def enclosedTiles(grid: Grid[Char]): Int
@@ -50,7 +46,7 @@ object Day10 {
    */
   object RayCastingPart2Solution extends Part2Solution {
     override def enclosedTiles(grid: Grid[Char]): Int = {
-      val loop = findLoop(grid).nodes
+      val loop = BFS.traverse(loopTraversal(grid)).nodes
 
       // grid with only loop: unconnected pipes removed and start pipe determined
       val loopGrid = {
@@ -101,32 +97,7 @@ object Day10 {
    */
   object PicksTheoremPart2Solution extends Part2Solution {
     override def enclosedTiles(grid: Grid[Char]): Int = {
-
-      // TODO: generalize DFS
-      @tailrec
-      def dfs(pos: Pos, visited: Set[Pos], loop: List[Pos]): List[Pos] = {
-        if (visited.contains(pos))
-          loop
-        else {
-          val newVisited = visited + pos
-          val newPoss = for {
-            offset <- pipeDirections(grid(pos))
-            newPos = pos + offset
-            if grid.containsPos(newPos)
-            if grid(newPos) != '.'
-            if pipeDirections(grid(newPos)).contains(-offset)
-            if !newVisited.contains(newPos)
-          } yield newPos
-
-          if (newPoss.isEmpty)
-            pos :: loop
-          else
-            dfs(newPoss.head, newVisited, pos :: loop)
-        }
-      }
-
-      val loop = dfs(grid.posOf('S'), Set.empty, Nil)
-
+      val loop = DFS.traverse(loopTraversal(grid)).nodeOrder
       Geometry.polygonArea(loop) - loop.size / 2 + 1
     }
   }
