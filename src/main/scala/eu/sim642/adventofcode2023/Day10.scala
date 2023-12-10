@@ -54,14 +54,28 @@ object Day10 {
       pipeDirections.find(_._2 == newOffsets).get._1
     }
 
+    val loopGrid = {
+      // TODO: use view for zipWithIndex?
+      for ((row, y) <- grid.zipWithIndex)
+        yield for ((cell, x) <- row.zipWithIndex)
+          yield {
+            val pos = Pos(x, y)
+            if (cell == 'S')
+              startAlternative
+            else if (loop.contains(pos))
+              cell
+            else
+              '.'
+          }
+    }
+
     def isInside(pos: Pos): Boolean = {
 
       @tailrec
       def helper(pos: Pos, count: Int): Boolean = {
         val newPos = pos + Pos(1, 0)
         if (grid.containsPos(newPos)) {
-          val c = if grid(newPos) == 'S' then startAlternative else if loop.contains(newPos) then grid(newPos) else '.'
-          c match {
+          loopGrid(newPos) match {
             case '|' | 'F' | '7' => helper(newPos, count + 1)
             case '.' | 'L' | 'J' => helper(newPos, count)
             case '-' => helper(newPos, count)
@@ -77,9 +91,9 @@ object Day10 {
     }
 
     (for {
-      (row, y) <- grid.view.zipWithIndex
+      (row, y) <- loopGrid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
-      if !loop.contains(Pos(x, y))
+      if cell == '.'
       if isInside(Pos(x, y))
     } yield 1).sum
   }
