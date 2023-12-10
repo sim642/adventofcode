@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2023
 
-import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.{Geometry, Grid}
 import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.IteratorImplicits.*
 import eu.sim642.adventofcodelib.graph.{BFS, Distances, GraphTraversal, UnitNeighbors}
@@ -97,7 +97,6 @@ object Day10 {
   /**
    * Solution, which calculates inside points using Pick's theorem.
    * Area of the polygon is calculated using the shoelace formula.
-   * @see [[https://en.wikipedia.org/wiki/Shoelace_formula]]
    * @see [[https://en.wikipedia.org/wiki/Pick%27s_theorem]]
    */
   object PicksTheoremPart2Solution extends Part2Solution {
@@ -128,14 +127,7 @@ object Day10 {
 
       val loop = dfs(grid.posOf('S'), Set.empty, Nil)
 
-      val area = {
-        ((loop.last :: loop).iterator
-          .zipWithTail
-          .map(_ cross _)
-          .sum / 2).abs
-      }
-
-      area - loop.size / 2 + 1
+      Geometry.polygonArea(loop) - loop.size / 2 + 1
     }
   }
 
