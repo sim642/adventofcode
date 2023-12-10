@@ -1,11 +1,9 @@
 package eu.sim642.adventofcode2023
 
 import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.graph.{BFS, Distances, GraphTraversal, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.GridImplicits.*
-
-import scala.annotation.tailrec
 
 object Day10 {
 
@@ -42,26 +40,23 @@ object Day10 {
   def enclosedTiles(grid: Grid[Char]): Int = {
     val loop = findLoop(grid).nodes
 
-    val startAlternative = {
-      val pos = grid.posOf('S')
-      val newOffsets = for {
-        offset <- pipeDirections(grid(pos))
-        newPos = pos + offset
-        if grid.containsPos(newPos)
-        if grid(newPos) != '.'
-        if pipeDirections(grid(newPos)).contains(-offset)
-      } yield offset
-      pipeDirections.find(_._2 == newOffsets).get._1
-    }
-
+    // grid with only loop: unconnected pipes removed and start pipe determined
     val loopGrid = {
       // TODO: use view for zipWithIndex?
       for ((row, y) <- grid.zipWithIndex)
         yield for ((cell, x) <- row.zipWithIndex)
           yield {
             val pos = Pos(x, y)
-            if (cell == 'S')
-              startAlternative
+            if (cell == 'S') {
+              val newOffsets = for {
+                offset <- pipeDirections(cell)
+                newPos = pos + offset
+                if grid.containsPos(newPos)
+                if grid(newPos) != '.'
+                if pipeDirections(grid(newPos)).contains(-offset)
+              } yield offset
+              pipeDirections.find(_._2 == newOffsets).get._1
+            }
             else if (loop.contains(pos))
               cell
             else
@@ -69,34 +64,23 @@ object Day10 {
           }
     }
 
-    def isInside(pos: Pos): Boolean = {
-
-      @tailrec
-      def helper(pos: Pos, count: Int): Boolean = {
-        val newPos = pos + Pos(1, 0)
-        if (grid.containsPos(newPos)) {
-          loopGrid(newPos) match {
-            case '|' | 'F' | '7' => helper(newPos, count + 1)
-            case '.' | 'L' | 'J' => helper(newPos, count)
-            case '-' => helper(newPos, count)
-            case a => throw IllegalArgumentException(s"$a")
-          }
-        }
-        else {
-          count % 2 == 1
-        }
-      }
-
-      helper(pos, 0)
+    // grid with pipe crossing count parity
+    val insideGrid = {
+      for (row <- loopGrid)
+        yield row.scanLeft(false)({ // cast ray from left to right
+          case (inside, '|' | 'L' | 'J') => !inside // consider pipe crossing at the top of tile
+          case (inside, _) => inside
+        })
     }
 
-    (for {
-      (row, y) <- loopGrid.view.zipWithIndex
-      (cell, x) <- row.view.zipWithIndex
-      if cell == '.'
-      if isInside(Pos(x, y))
-    } yield 1).sum
+    (loopGrid lazyZip insideGrid)
+      .map((loopRow, insideRow) =>
+        (loopRow lazyZip insideRow)
+          .count((cell, inside) => cell == '.' && inside)
+      )
+      .sum
   }
+
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
