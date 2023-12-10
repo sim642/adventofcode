@@ -57,26 +57,15 @@ object Day10 {
     def isInside(pos: Pos): Boolean = {
 
       @tailrec
-      def helper(pos: Pos, count: Int, enterEdge: Char): Boolean = {
+      def helper(pos: Pos, count: Int): Boolean = {
         val newPos = pos + Pos(1, 0)
         if (grid.containsPos(newPos)) {
           val c = if grid(newPos) == 'S' then startAlternative else if loop.contains(newPos) then grid(newPos) else '.'
-          (c, enterEdge) match {
-            case ('|', _) => helper(newPos, count + 1, enterEdge = '?')
-            case ('.', _) => helper(newPos, count, enterEdge = '?')
-
-            case ('-', _) => helper(newPos, count, enterEdge = enterEdge)
-
-            case ('F', _) => helper(newPos, count, enterEdge = 'F')
-            case ('7', 'F') => helper(newPos, count, enterEdge = '?')
-            case ('J', 'F') => helper(newPos, count + 1, enterEdge = '?')
-
-            case ('L', _) => helper(newPos, count, enterEdge = 'L')
-            case ('7', 'L') => helper(newPos, count + 1, enterEdge = '?')
-            case ('J', 'L') => helper(newPos, count, enterEdge = '?')
-
-            //case (_, _) => helper(newPos, count, enterEdge = '?')
-            case (a, b) => throw IllegalArgumentException(s"$a $b")
+          c match {
+            case '|' | 'F' | '7' => helper(newPos, count + 1)
+            case '.' | 'L' | 'J' => helper(newPos, count)
+            case '-' => helper(newPos, count)
+            case a => throw IllegalArgumentException(s"$a")
           }
         }
         else {
@@ -84,7 +73,7 @@ object Day10 {
         }
       }
 
-      helper(pos, 0, '?')
+      helper(pos, 0)
     }
 
     (for {
