@@ -9,17 +9,25 @@ object Day11 {
     val defaultExpansionFactor: Int
 
     def sumDistances(galaxies: Seq[Pos], expansionFactor: Long = defaultExpansionFactor): Long = {
-      val xs = galaxies.map(_.x).toSet
-      val freeXs = (0 to xs.max).toSet -- xs
-      val ys = galaxies.map(_.y).toSet
-      val freeYs = (0 to ys.max).toSet -- ys
+
+      def prefixFreeCoords(coords: Set[Int]): IndexedSeq[Int] =
+        (0 to coords.max).scanLeft(0)((acc, i) => acc + (if (coords(i)) 0 else 1))
+
+      val prefixFreeXs = prefixFreeCoords(galaxies.map(_.x).toSet)
+      val prefixFreeYs = prefixFreeCoords(galaxies.map(_.y).toSet)
+
+      def dist(galaxy1: Pos, galaxy2: Pos) = {
+        val galaxyMin = galaxy1 min galaxy2
+        val galaxyMax = galaxy1 max galaxy2
+        val freeXs = prefixFreeXs(galaxyMax.x) - prefixFreeXs(galaxyMin.x + 1)
+        val freeYs = prefixFreeYs(galaxyMax.y) - prefixFreeYs(galaxyMin.y + 1)
+        (galaxy1 manhattanDistance galaxy2) + (expansionFactor - 1) * (freeXs + freeYs)
+      }
 
       (for {
         (galaxy1, i) <- galaxies.view.zipWithIndex
         galaxy2 <- galaxies.view.drop(i + 1)
-        galaxyMin = galaxy1 min galaxy2
-        galaxyMax = galaxy1 max galaxy2
-      } yield (galaxy1 manhattanDistance galaxy2) + (expansionFactor - 1) * freeXs.count(x => galaxyMin.x < x && x < galaxyMax.x) + (expansionFactor - 1) * freeYs.count(y => galaxyMin.y < y && y < galaxyMax.y)).sum
+      } yield dist(galaxy1, galaxy2)).sum
     }
   }
 
