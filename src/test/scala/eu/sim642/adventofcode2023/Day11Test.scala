@@ -24,4 +24,13 @@ class Day11Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumDistances(parseGalaxies(input)) == 9509330)
   }
+
+  test("Part 2 examples") {
+    assert(sumDistances2(parseGalaxies(exampleInput), 10) == 1030)
+    assert(sumDistances2(parseGalaxies(exampleInput), 100) == 8410)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumDistances2(parseGalaxies(input)) == 635832237682L)
+  }
 }
