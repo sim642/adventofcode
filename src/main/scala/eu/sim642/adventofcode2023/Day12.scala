@@ -26,7 +26,7 @@ object Day12 {
           }
         case ('#' :: _, _ :: _) => 0 // not enough length remaining
         case ('?' :: newMask, lengths) => // recursively solve both cases
-          countArrangements('.' :: newMask, lengths) + countArrangements('#' :: newMask, lengths)
+          countArrangements(newMask, lengths) + countArrangements('#' :: newMask, lengths)
         case (mask, lengths) => throw new IllegalArgumentException(s"impossible mask ($mask) and lengths ($lengths)")
       }
     })
