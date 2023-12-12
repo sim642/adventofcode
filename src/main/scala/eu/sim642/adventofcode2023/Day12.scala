@@ -9,21 +9,25 @@ object Day12 {
   def countArrangements(mask: List[Char], lengths: List[Int]): Long = {
     countArrangementsMemo.getOrElseUpdate((mask, lengths), {
       (mask, lengths) match {
-        case (mask, Nil) if mask.forall(c => c == '.' || c == '?') => 1
-        case (_, Nil) => 0
-        case (Nil, _) => 0
-        case ('.' :: newMask, lengths) => countArrangements(newMask, lengths)
-        case ('#' :: newMask, l :: newLengths) =>
-          newMask.splitAt(l - 1) match {
-            case (a, x :: b) if a.length == l - 1 && a.forall(c => c == '#' || c == '?') && (x == '.' || x == '?') =>
-              countArrangements(b, newLengths)
-            case (a, Nil) if a.length == l - 1 && a.forall(c => c == '#' || c == '?') =>
-              countArrangements(Nil, newLengths)
-            case (_, _) => 0
+        case (mask, Nil) if mask.contains('#') => 0 // all lengths matched, but # left
+        case (_, Nil) => 1 // all lengths matched, only .-s left (possibly as ?)
+        case (Nil, _ :: _) => 0 // unmatched lengths
+        case ('.' :: newMask, lengths) => countArrangements(newMask, lengths) // skip .
+        case ('#' :: newMask, length :: newLengths) if mask.length >= length => // enough length remaining
+          val (newMaskPrefix, newMaskSuffix) = newMask.splitAt(length - 1)
+          if (newMaskPrefix.contains('.'))
+            0 // cannot match all of length
+          else {
+            newMaskSuffix match {
+              case Nil => countArrangements(Nil, newLengths) // matched length at the end
+              case ('.' | '?') :: newMask => countArrangements(newMask, newLengths) // matched length (can) stop
+              case _ => 0 // # after matched length, but must be delimited by .
+            }
           }
-        case ('?' :: newMask, lengths) =>
+        case ('#' :: _, _ :: _) => 0 // not enough length remaining
+        case ('?' :: newMask, lengths) => // recursively solve both cases
           countArrangements('.' :: newMask, lengths) + countArrangements('#' :: newMask, lengths)
-        case (mask, lengths) => throw IllegalArgumentException(s"$mask $lengths")
+        case (mask, lengths) => throw new IllegalArgumentException(s"impossible mask ($mask) and lengths ($lengths)")
       }
     })
   }
