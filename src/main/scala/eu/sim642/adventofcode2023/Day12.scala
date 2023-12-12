@@ -1,40 +1,55 @@
 package eu.sim642.adventofcode2023
 
-import dk.brics.automaton.{Automaton, RegExp}
-
+import scala.collection.mutable
 
 object Day12 {
 
-  case class Record(mask: String, lengths: Seq[Int]) {
+  private val countArrangementsMemo = mutable.Map.empty[(List[Char], List[Int]), Long]
 
-    lazy val maskAutomaton: Automaton = {
-      mask.map({
-        case '.' => Automaton.makeChar('.')
-        case '#' => Automaton.makeChar('#')
-        case '?' => Automaton.makeCharSet(".#")
-      }).reduce(_ concatenate _)
-    }
-
-    lazy val lengthsAutomaton: Automaton = {
-      val pad1 = Automaton.makeChar('.').repeat(1)
-      val pad0 = Automaton.makeChar('.').repeat(0)
-      val ret = pad0 concatenate lengths.map(l =>
-        Automaton.makeChar('#').repeat(l, l)
-      ).reduce((a, b) => a concatenate pad1 concatenate b) concatenate pad0
-      ret.minimize()
-      ret
-    }
-
-    def possibleArrangements: Int = {
-      val strings = (maskAutomaton intersection lengthsAutomaton).getFiniteStrings
-      //println(s"$mask $lengths: $strings")
-      //println(lengthsAutomaton)
-      //println(lengthsAutomaton.run("#.#.###"))
-      strings.size()
-    }
+  def countArrangements(mask: List[Char], lengths: List[Int]): Long = {
+    countArrangementsMemo.getOrElseUpdate((mask, lengths), {
+      (mask, lengths) match {
+        case (mask, Nil) if mask.forall(c => c == '.' || c == '?') => 1
+        case (_, Nil) => 0
+        case (Nil, _) => 0
+        case ('.' :: newMask, lengths) => countArrangements(newMask, lengths)
+        case ('#' :: newMask, l :: newLengths) =>
+          newMask.splitAt(l - 1) match {
+            case (a, x :: b) if a.length == l - 1 && a.forall(c => c == '#' || c == '?') && (x == '.' || x == '?') =>
+              countArrangements(b, newLengths)
+            case (a, Nil) if a.length == l - 1 && a.forall(c => c == '#' || c == '?') =>
+              countArrangements(Nil, newLengths)
+            case (_, _) => 0
+          }
+        case ('?' :: newMask, lengths) =>
+          countArrangements('.' :: newMask, lengths) + countArrangements('#' :: newMask, lengths)
+        case (mask, lengths) => throw IllegalArgumentException(s"$mask $lengths")
+      }
+    })
   }
 
-  def sumPossibleArrangements(records: Seq[Record]): Int = records.map(_.possibleArrangements).sum
+  case class Record(mask: String, lengths: Seq[Int]) {
+
+    def five: Record =
+      Record(Seq.fill(5)(mask).reduce(_ ++ "?" ++ _), Seq.fill(5)(lengths).reduce(_ ++ _))
+
+    def possibleArrangements: Long = countArrangements(mask.toList, lengths.toList)
+  }
+
+  trait Part {
+    def possibleArrangements(record: Record): Long
+
+    def sumPossibleArrangements(records: Seq[Record]): Long =
+      records.map(possibleArrangements).sum
+  }
+
+  object Part1 extends Part {
+    override def possibleArrangements(record: Record): Long = record.possibleArrangements
+  }
+
+  object Part2 extends Part {
+    override def possibleArrangements(record: Record): Long = record.five.possibleArrangements
+  }
 
 
   def parseRecord(s: String): Record = s match {
@@ -47,6 +62,7 @@ object Day12 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(sumPossibleArrangements(parseRecords(input)))
+    println(Part1.sumPossibleArrangements(parseRecords(input)))
+    println(Part2.sumPossibleArrangements(parseRecords(input)))
   }
 }

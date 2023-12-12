@@ -14,10 +14,18 @@ class Day12Test extends AnyFunSuite {
       |?###???????? 3,2,1""".stripMargin
 
   test("Part 1 examples") {
-    assert(sumPossibleArrangements(parseRecords(exampleInput)) == 21)
+    assert(Part1.sumPossibleArrangements(parseRecords(exampleInput)) == 21)
   }
 
   test("Part 1 input answer") {
-    assert(sumPossibleArrangements(parseRecords(input)) == 8270)
+    assert(Part1.sumPossibleArrangements(parseRecords(input)) == 8270)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.sumPossibleArrangements(parseRecords(exampleInput)) == 525152)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.sumPossibleArrangements(parseRecords(input)) == 204640299929836L)
   }
 }
