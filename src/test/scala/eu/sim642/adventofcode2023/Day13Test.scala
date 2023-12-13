@@ -23,10 +23,18 @@ class Day13Test extends AnyFunSuite {
       |#....#..#""".stripMargin
 
   test("Part 1 examples") {
-    assert(summarizeMirrors(parseGrids(exampleInput)) == 405)
+    assert(Part1.summarizeMirrors(parseGrids(exampleInput)) == 405)
   }
 
   test("Part 1 input answer") {
-    assert(summarizeMirrors(parseGrids(input)) == 30802)
+    assert(Part1.summarizeMirrors(parseGrids(input)) == 30802)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.summarizeMirrors(parseGrids(exampleInput)) == 400)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.summarizeMirrors(parseGrids(input)) == 37876)
   }
 }
