@@ -24,4 +24,12 @@ class Day14Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(totalLoad(parseGrid(input)) == 112048)
   }
+
+  test("Part 2 examples") {
+    assert(totalLoad2(parseGrid(exampleInput)) == 64)
+  }
+
+  test("Part 2 input answer") {
+    assert(totalLoad2(parseGrid(input)) == 105606)
+  }
 }
