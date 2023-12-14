@@ -1,20 +1,21 @@
 package eu.sim642.adventofcode2023
 
 import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.cycle.{NaiveCycleFinder, NaiverCycleFinder}
+import eu.sim642.adventofcodelib.cycle.NaiverCycleFinder
 
 object Day14 {
 
   def rollLeft(row: Vector[Char]): Vector[Char] = {
 
-    def rollOne(row: List[Char]): List[Char] = row match {
-      case Nil => Nil
-      case _ :: Nil => row
-      case '.' :: 'O' :: newColumn => 'O' :: rollOne('.' :: newColumn)
-      case prev :: newColumn => prev :: rollOne(newColumn)
+    def helper(empty: Int, row: List[Char]): List[Char] = row match {
+      case '.' :: newRow => helper(empty + 1, newRow) // remember . for following O
+      case 'O' :: newRow => 'O' :: helper(empty, newRow) // put O at first remembered .
+      case '#' :: newRow => List.fill(empty)('.') ::: '#' :: helper(0, newRow) // materialize .-s and start over
+      case Nil => List.fill(empty)('.') // materialize .-s at the end
+      case _ :: _ => throw new IllegalArgumentException("illegal cell")
     }
 
-    NaiveCycleFinder.find(row.toList, rollOne).cycleHead.toVector // TODO: simpler fixpoint finding?
+    helper(0, row.toList).toVector
   }
 
   def rollNorth(grid: Grid[Char]): Grid[Char] = grid.transpose.map(rollLeft).transpose
