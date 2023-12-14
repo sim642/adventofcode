@@ -18,18 +18,18 @@ class Day14Test extends AnyFunSuite {
       |#OO..#....""".stripMargin
 
   test("Part 1 examples") {
-    assert(totalLoad(parseGrid(exampleInput)) == 136)
+    assert(Part1.totalNorthLoad(parseGrid(exampleInput)) == 136)
   }
 
   test("Part 1 input answer") {
-    assert(totalLoad(parseGrid(input)) == 112048)
+    assert(Part1.totalNorthLoad(parseGrid(input)) == 112048)
   }
 
   test("Part 2 examples") {
-    assert(totalLoad2(parseGrid(exampleInput)) == 64)
+    assert(Part2.totalNorthLoad(parseGrid(exampleInput)) == 64)
   }
 
   test("Part 2 input answer") {
-    assert(totalLoad2(parseGrid(input)) == 105606)
+    assert(Part2.totalNorthLoad(parseGrid(input)) == 105606)
   }
 }
