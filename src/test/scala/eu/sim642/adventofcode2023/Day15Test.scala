@@ -19,4 +19,12 @@ class Day15Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumStepHashes(parseSteps(input)) == 507666)
   }
+
+  test("Part 2 examples") {
+    assert(focusingPower(parseSteps(exampleInput)) == 145)
+  }
+
+  test("Part 2 input answer") {
+    assert(focusingPower(parseSteps(input)) == 233537)
+  }
 }
