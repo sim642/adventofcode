@@ -1,10 +1,13 @@
 package eu.sim642.adventofcode2023
 
 import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{BFS, DFS, GraphTraversal, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcode2018.Day13.DirectionPos
-import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.GridImplicits.*
+
+import scala.annotation.tailrec
+import scala.collection.mutable
 
 object Day16 {
 
@@ -34,7 +37,57 @@ object Day16 {
       }
     }
 
-    BFS.traverse(graphTraversal).nodes.map(_.pos).size
+    def f(x: Beam)(get: Beam => Set[Pos]): Set[Pos] =
+      //graphTraversal.unitNeighbors(x).iterator.flatMap(get).toSet + x.pos
+      graphTraversal.unitNeighbors(x).iterator.map(get).foldLeft(Set.empty[Pos])(_ ++ _) + x.pos
+
+    val stable = mutable.Set.empty[Beam]
+    val called = mutable.Set.empty[Beam]
+    val infl = mutable.Map.empty[Beam, Set[Beam]].withDefaultValue(Set.empty[Beam])
+    val rho = mutable.Map.empty[Beam, Set[Pos]].withDefaultValue(Set.empty[Pos])
+
+    def destabilize(x: Beam): Unit = {
+      val w = infl(x)
+      infl(x) = Set.empty
+      for (y <- w) {
+        stable -= y
+        if (!called(y))
+          destabilize(y)
+      }
+    }
+
+    def eval(x: Beam)(y: Beam): Set[Pos] = {
+      solve(y)
+      infl(y) += x
+      rho(y)
+    }
+
+
+    @tailrec
+    def solve(x: Beam): Unit = {
+      println((rho.size, stable.size, called.size))
+      if (!stable(x) && !called(x)) {
+        stable += x
+        called += x
+        //val tmp = rho(x) union f(x)(eval(x))
+        val tmp = f(x)(eval(x))
+        called -= x
+        if (rho(x) != tmp) {
+          println(s"  ${tmp.size}")
+          rho(x) = tmp
+          destabilize(x)
+          solve(x)
+        }
+      }
+    }
+
+
+    //println(DFS.traverse(graphTraversal).nodes.size)
+    //DFS.traverse(graphTraversal).nodes.map(_.pos).size
+
+    solve(graphTraversal.startNode)
+    //print(rho)
+    rho(graphTraversal.startNode).size
   }
 
   def maxEnergized(grid: Grid[Char]): Int = {
