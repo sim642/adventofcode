@@ -10,10 +10,10 @@ object Day16 {
 
   case class Beam(pos: Pos, direction: Pos)
 
-  def countEnergized(grid: Grid[Char]): Int = {
+  def countEnergized(grid: Grid[Char], startBeam: Beam = Beam(Pos.zero, Pos(1, 0))): Int = {
 
     val graphTraversal = new GraphTraversal[Beam] with UnitNeighbors[Beam] {
-      override val startNode: Beam = Beam(Pos.zero, Pos(1, 0))
+      override val startNode: Beam = startBeam
 
       override def unitNeighbors(beam: Beam): IterableOnce[Beam] = {
         val Beam(pos, direction) = beam
@@ -40,6 +40,14 @@ object Day16 {
     BFS.traverse(graphTraversal).nodes.map(_.pos).size
   }
 
+  def maxEnergized(grid: Grid[Char]): Int = {
+    val top = grid(0).indices.map(x => Beam(Pos(x, 0), Pos(0, 1)))
+    val bottom = grid(0).indices.map(x => Beam(Pos(x, grid.size - 1), Pos(0, -1)))
+    val left = grid.indices.map(y => Beam(Pos(0, y), Pos(1, 0)))
+    val right = grid.indices.map(y => Beam(Pos(grid(0).size - 1, y), Pos(-1, 0)))
+    (top ++ bottom ++ left ++ right).map(countEnergized(grid, _)).max
+  }
+
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
@@ -47,5 +55,8 @@ object Day16 {
 
   def main(args: Array[String]): Unit = {
     println(countEnergized(parseGrid(input)))
+    println(maxEnergized(parseGrid(input)))
+
+    // part 2: 7222 - too low (right pos coordinates swapped in maxEnergized)
   }
 }
