@@ -17,23 +17,20 @@ object Day16 {
 
       override def unitNeighbors(beam: Beam): IterableOnce[Beam] = {
         val Beam(pos, direction) = beam
-        val ret =
+        val newDirections =
           grid(pos) match {
-            case '.' => Seq(beam.copy(pos = pos + direction))
-            case '/' =>
-              val newDirection = direction.reflectMinor
-              Seq(beam.copy(pos = pos + newDirection, direction = newDirection))
-            case '\\' =>
-              val newDirection = direction.reflectMajor
-              Seq(beam.copy(pos = pos + newDirection, direction = newDirection))
-            case '|' if direction.x == 0 => Seq(beam.copy(pos = pos + direction))
-            case '-' if direction.y == 0 => Seq(beam.copy(pos = pos + direction))
-            case '|' | '-' =>
-              for {
-                newDirection <- Seq(direction.left, direction.right)
-              } yield beam.copy(pos = pos + newDirection, direction = newDirection)
+            case '.' => Iterator(direction)
+            case '/' => Iterator(direction.reflectMinor)
+            case '\\' => Iterator(direction.reflectMajor)
+            case '|' if direction.x == 0 => Iterator(direction)
+            case '-' if direction.y == 0 => Iterator(direction)
+            case '|' | '-' => Iterator(direction.left, direction.right)
           }
-        ret.filter(b => grid.containsPos(b.pos))
+        for {
+          newDirection <- newDirections
+          newPos = pos + newDirection
+          if grid.containsPos(newPos)
+        } yield Beam(newPos, newDirection)
       }
     }
 
