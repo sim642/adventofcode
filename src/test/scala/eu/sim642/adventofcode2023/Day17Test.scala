@@ -28,19 +28,19 @@ class Day17Test extends AnyFunSuite {
       |999999999991""".stripMargin
 
   test("Part 1 examples") {
-    assert(leastHeatLoss(parseGrid(exampleInput)) == 102)
+    assert(Part1.leastHeatLoss(parseGrid(exampleInput)) == 102)
   }
 
   test("Part 1 input answer") {
-    assert(leastHeatLoss(parseGrid(input)) == 1110)
+    assert(Part1.leastHeatLoss(parseGrid(input)) == 1110)
   }
 
   test("Part 2 examples") {
-    assert(leastHeatLossUltra(parseGrid(exampleInput)) == 94)
-    assert(leastHeatLossUltra(parseGrid(exampleInput2)) == 71)
+    assert(Part2.leastHeatLoss(parseGrid(exampleInput)) == 94)
+    assert(Part2.leastHeatLoss(parseGrid(exampleInput2)) == 71)
   }
 
   test("Part 2 input answer") {
-    assert(leastHeatLossUltra(parseGrid(input)) == 1294)
+    assert(Part2.leastHeatLoss(parseGrid(input)) == 1294)
   }
 }
