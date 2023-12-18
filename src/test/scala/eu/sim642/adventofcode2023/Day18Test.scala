@@ -28,4 +28,13 @@ class Day18Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(lagoonSize(parseDigPlan(input)) == 70026)
   }
+
+  test("Part 2 examples") {
+    assert(parseColor("70c710") == ('R', 461937))
+    assert(lagoonSize2(parseDigPlan(exampleInput)) == 952408144115L)
+  }
+
+  test("Part 2 input answer") {
+    assert(lagoonSize2(parseDigPlan(input)) == 68548301037382L)
+  }
 }
