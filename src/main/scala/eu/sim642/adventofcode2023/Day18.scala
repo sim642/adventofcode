@@ -25,7 +25,7 @@ object Day18 {
       val vertices = steps.scanLeft(Pos.zero)({ case (pos, (direction, length)) =>
         pos + length *: moveOffsets(direction)
       })
-      val area = Geometry.polygonArea(vertices)
+      val area = Geometry.polygonArea[Long](vertices)
       val boundary = steps.map(_._2.toLong).sum
       val interior = area - boundary / 2 + 1 // Pick's theorem
       boundary + interior

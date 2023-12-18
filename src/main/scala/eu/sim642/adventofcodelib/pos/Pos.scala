@@ -19,8 +19,10 @@ case class Pos(x: Int, y: Int) extends BoxPosOps[Pos] {
   override def max(that: Pos): Pos =
     Pos(x max that.x, y max that.y)
 
-  def cross(that: Pos): Long =
-    x.toLong * that.y - that.x * y.toLong
+  def cross[A](that: Pos)(using aNumeric: Numeric[A]): A = {
+    import scala.math.Numeric.Implicits.infixNumericOps
+    aNumeric.fromInt(x) * aNumeric.fromInt(that.y) - aNumeric.fromInt(that.x) * aNumeric.fromInt(y)
+  }
 }
 
 object Pos extends PosFactory[Pos] {
