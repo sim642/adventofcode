@@ -1,0 +1,60 @@
+package eu.sim642.adventofcode2023
+
+import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
+import eu.sim642.adventofcodelib.pos.Pos
+
+object Day18 {
+
+  case class DigStep(direction: Char, length: Int, color: String)
+
+  type DigPlan = Seq[DigStep]
+
+  private val moveOffsets = Map(
+    'U' -> Pos(0, -1),
+    'D' -> Pos(0, 1),
+    'L' -> Pos(-1, 0),
+    'R' -> Pos(1, 0),
+  )
+
+  def digTrench(digPlan: DigPlan): Set[Pos] = {
+    digPlan.iterator
+      .flatMap(step => Iterator.fill(step.length)(step.direction))
+      .scanLeft(Pos.zero)((pos, direction) => pos + moveOffsets(direction))
+      .toSet
+  }
+
+  def digInterior(digPlan: DigPlan): Set[Pos] = {
+    val trench = digTrench(digPlan)
+
+    val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
+      override val startNode: Pos = Pos(1, 1)
+
+      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
+        for {
+          offset <- Pos.axisOffsets
+          newPos = pos + offset
+          if !trench(newPos)
+        } yield newPos
+      }
+    }
+
+    val interior = BFS.traverse(graphTraversal).nodes
+    trench ++ interior
+  }
+
+  def lagoonSize(digPlan: DigPlan): Int = digInterior(digPlan).size
+
+
+  def parseDigStep(s: String): DigStep = s match {
+    case s"$direction $length (#$color)" =>
+      DigStep(direction.head, length.toInt, color)
+  }
+
+  def parseDigPlan(input: String): DigPlan = input.linesIterator.map(parseDigStep).toSeq
+
+  lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
+
+  def main(args: Array[String]): Unit = {
+    println(lagoonSize(parseDigPlan(input)))
+  }
+}
