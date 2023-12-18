@@ -1,10 +1,8 @@
 package eu.sim642.adventofcode2023
 
 import eu.sim642.adventofcodelib.Geometry
-import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.StringImplicits.*
-import eu.sim642.adventofcodelib.IteratorImplicits.*
 
 object Day18 {
 
