@@ -22,19 +22,19 @@ class Day18Test extends AnyFunSuite {
       |U 2 (#7a21e3)""".stripMargin
 
   test("Part 1 examples") {
-    assert(lagoonSize(parseDigPlan(exampleInput)) == 62)
+    assert(Part1.lagoonSize(parseDigPlan(exampleInput)) == 62)
   }
 
   test("Part 1 input answer") {
-    assert(lagoonSize(parseDigPlan(input)) == 70026)
+    assert(Part1.lagoonSize(parseDigPlan(input)) == 70026)
   }
 
   test("Part 2 examples") {
-    assert(parseColor("70c710") == ('R', 461937))
-    assert(lagoonSize2(parseDigPlan(exampleInput)) == 952408144115L)
+    assert(Part2.parseColor("70c710") == ('R', 461937))
+    assert(Part2.lagoonSize(parseDigPlan(exampleInput)) == 952408144115L)
   }
 
   test("Part 2 input answer") {
-    assert(lagoonSize2(parseDigPlan(input)) == 68548301037382L)
+    assert(Part2.lagoonSize(parseDigPlan(input)) == 68548301037382L)
   }
 }

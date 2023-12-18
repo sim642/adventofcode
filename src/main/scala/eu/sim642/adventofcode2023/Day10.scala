@@ -98,7 +98,7 @@ object Day10 {
   object PicksTheoremPart2Solution extends Part2Solution {
     override def enclosedTiles(grid: Grid[Char]): Int = {
       val loop = DFS.traverse(loopTraversal(grid)).nodeOrder
-      Geometry.polygonArea(loop) - loop.size / 2 + 1
+      Geometry.polygonArea(loop).toInt - loop.size / 2 + 1
     }
   }
 

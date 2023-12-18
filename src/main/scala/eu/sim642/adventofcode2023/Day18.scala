@@ -19,56 +19,39 @@ object Day18 {
     'R' -> Pos(1, 0),
   )
 
-  def digTrench(digPlan: DigPlan): Set[Pos] = {
-    digPlan.iterator
-      .flatMap(step => Iterator.fill(step.length)(step.direction))
-      .scanLeft(Pos.zero)((pos, direction) => pos + moveOffsets(direction))
-      .toSet
+  trait Part {
+    def extractSteps(digPlan: DigPlan): Seq[(Char, Int)]
+
+    def lagoonSize(digPlan: DigPlan): Long = {
+      val steps = extractSteps(digPlan)
+      val vertices = steps.scanLeft(Pos.zero)({ case (pos, (direction, length)) =>
+        pos + length *: moveOffsets(direction)
+      })
+      val area = Geometry.polygonArea(vertices)
+      val boundary = steps.map(_._2.toLong).sum
+      val interior = area - boundary / 2 + 1 // Pick's theorem
+      boundary + interior
+    }
   }
 
-  def digInterior(digPlan: DigPlan): Set[Pos] = {
-    val trench = digTrench(digPlan)
+  object Part1 extends Part {
+    override def extractSteps(digPlan: DigPlan): Seq[(Char, Int)] =
+      digPlan.map(step => (step.direction, step.length))
+  }
 
-    val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
-      override val startNode: Pos = Pos(1, 1)
-
-      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
-        for {
-          offset <- Pos.axisOffsets
-          newPos = pos + offset
-          if !trench(newPos)
-        } yield newPos
+  object Part2 extends Part {
+    def parseColor(color: String): (Char, Int) = {
+      val direction = color.last match {
+        case '0' => 'R'
+        case '1' => 'D'
+        case '2' => 'L'
+        case '3' => 'U'
       }
+      (direction, color.take(5).toIntRadix(16))
     }
 
-    val interior = BFS.traverse(graphTraversal).nodes
-    trench ++ interior
-  }
-
-  def lagoonSize(digPlan: DigPlan): Int = digInterior(digPlan).size
-
-  def parseColor(color: String): (Char, Int) = {
-    val direction = color.last match {
-      case '0' => 'R'
-      case '1' => 'D'
-      case '2' => 'L'
-      case '3' => 'U'
-    }
-    (direction, color.take(5).toIntRadix(16))
-  }
-
-  def lagoonSize2(digPlan: DigPlan): Long = {
-    val plan2 = digPlan
-      .map(step => parseColor(step.color))
-    val points = plan2
-      .scanLeft(Pos.zero)({ case (pos, (direction, length)) => pos + length *: moveOffsets(direction) })
-    //Geometry.polygonArea(points)
-    val area = (points.iterator
-      .zipWithTail
-      .map((p, q) => p.x.toLong * q.y - q.x.toLong * p.y)
-      .sum / 2).abs
-    val perim = plan2.map(_._2.toLong).sum
-    area + perim / 2 + 1
+    override def extractSteps(digPlan: DigPlan): Seq[(Char, Int)] =
+      digPlan.map(step => parseColor(step.color))
   }
 
 
@@ -82,7 +65,7 @@ object Day18 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day18.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(lagoonSize(parseDigPlan(input)))
-    println(lagoonSize2(parseDigPlan(input)))
+    println(Part1.lagoonSize(parseDigPlan(input)))
+    println(Part2.lagoonSize(parseDigPlan(input)))
   }
 }

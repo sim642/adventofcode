@@ -19,8 +19,8 @@ case class Pos(x: Int, y: Int) extends BoxPosOps[Pos] {
   override def max(that: Pos): Pos =
     Pos(x max that.x, y max that.y)
 
-  def cross(that: Pos): Int =
-    x * that.y - that.x * y
+  def cross(that: Pos): Long =
+    x.toLong * that.y - that.x * y.toLong
 }
 
 object Pos extends PosFactory[Pos] {
