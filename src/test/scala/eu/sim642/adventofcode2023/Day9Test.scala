@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2023
 
-import Day9._
+import Day9.*
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day9Test extends AnyFunSuite {
+class Day9Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   private val exampleInput =
     """0 3 6 9 12 15
@@ -15,9 +16,16 @@ class Day9Test extends AnyFunSuite {
     
     val histories = parseHistories(exampleInput)
 
-    assert(extrapolate(histories(0)) == 18)
-    assert(extrapolate(histories(1)) == 28)
-    assert(extrapolate(histories(2)) == 68)
+    val expectedExtrapolateds = Table(
+      ("i", "expectedExtrapolate"),
+      (0, 18),
+      (1, 28),
+      (2, 68),
+    )
+
+    forAll(expectedExtrapolateds) { (i, expectedExtrapolate) =>
+      assert(extrapolate(histories(i)) == expectedExtrapolate)
+    }
 
     assert(sumExtrapolated(histories) == 114)
   }
@@ -31,9 +39,16 @@ class Day9Test extends AnyFunSuite {
     
     val histories = parseHistories(exampleInput)
 
-    assert(extrapolate(histories(0)) == -3)
-    assert(extrapolate(histories(1)) == 0)
-    assert(extrapolate(histories(2)) == 5)
+    val expectedExtrapolateds = Table(
+      ("i", "expectedExtrapolate"),
+      (0, -3),
+      (1, 0),
+      (2, 5),
+    )
+
+    forAll(expectedExtrapolateds) { (i, expectedExtrapolate) =>
+      assert(extrapolate(histories(i)) == expectedExtrapolate)
+    }
   }
 
   test("Part 2 input answer") {

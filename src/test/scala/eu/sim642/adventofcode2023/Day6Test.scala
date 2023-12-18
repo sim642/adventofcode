@@ -4,6 +4,7 @@ import Day6.*
 import Day6Test.*
 import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 class Day6Test extends Suites(
   new NaiveSolutionTest,
@@ -17,14 +18,21 @@ object Day6Test {
       |Distance:  9  40  200""".stripMargin
 
 
-  abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
+  abstract class SolutionTest(solution: Solution) extends AnyFunSuite with ScalaCheckPropertyChecks {
 
     test("Part 1 examples") {
       val races = parseRaces(exampleInput)
 
-      assert(solution.raceWins(races(0)) == 4)
-      assert(solution.raceWins(races(1)) == 8)
-      assert(solution.raceWins(races(2)) == 9)
+      val expectedRaceWins = Table(
+        ("i", "expectedRaceWins"),
+        (0, 4),
+        (1, 8),
+        (2, 9),
+      )
+
+      forAll(expectedRaceWins) { (i, expectedRaceWins) =>
+        assert(solution.raceWins(races(i)) == expectedRaceWins)
+      }
 
       assert(solution.multiplyRaceWins(races) == 288)
     }
@@ -43,5 +51,6 @@ object Day6Test {
   }
 
   class NaiveSolutionTest extends SolutionTest(NaiveSolution)
+
   class QuadraticSolutionTest extends SolutionTest(QuadraticSolution)
 }

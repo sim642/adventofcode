@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2023
 
-import Day5._
+import Day5.*
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day5Test extends AnyFunSuite {
+class Day5Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   private val exampleInput =
     """seeds: 79 14 55 13
@@ -43,11 +44,18 @@ class Day5Test extends AnyFunSuite {
   test("Part 1 examples") {
     val input = parseInput(exampleInput)
 
+    val seed2expectedSoil = Table(
+      ("seed", "expectedSoil"),
+      (79, 81),
+      (14, 14),
+      (55, 57),
+      (13, 13),
+    )
+
     val seed2soil = input.rangeMaps.head
-    assert(seed2soil(Interval(79)) == Set(Interval(81)))
-    assert(seed2soil(Interval(14)) == Set(Interval(14)))
-    assert(seed2soil(Interval(55)) == Set(Interval(57)))
-    assert(seed2soil(Interval(13)) == Set(Interval(13)))
+    forAll(seed2expectedSoil) { (seed, expectedSoil) =>
+      assert(seed2soil(Interval(seed)) == Set(Interval(expectedSoil)))
+    }
 
     assert(lowestSeedLocation(input) == 35)
   }
