@@ -31,4 +31,12 @@ class Day19Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(totalAcceptedRating(parseInput(input)) == 418498)
   }
+
+  test("Part 2 examples") {
+    assert(countAllAccepted(parseInput(exampleInput)) == 167409079868000L)
+  }
+
+  test("Part 2 input answer") {
+    assert(countAllAccepted(parseInput(input)) == 123331556462603L)
+  }
 }

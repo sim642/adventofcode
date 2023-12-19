@@ -1,5 +1,8 @@
 package eu.sim642.adventofcode2023
 
+import eu.sim642.adventofcodelib.box.Box4
+import eu.sim642.adventofcodelib.pos.Pos4
+
 import scala.annotation.tailrec
 
 
@@ -10,6 +13,8 @@ object Day19 {
   case class Part(ratings: Map[Category, Int]) {
     def totalRating: Int = ratings.values.sum
   }
+
+  type PartBox = Box4
 
   enum Comparison {
     case Lt
@@ -31,6 +36,33 @@ object Day19 {
         case _ => None
       }
     }
+
+    // TODO: simplify
+    private val (trueBox, falseBox): (PartBox, PartBox) = (category, comparison) match {
+      case ('x', Comparison.Lt) =>
+        (Box4(Pos4(1, 1, 1, 1), Pos4(rating - 1, 4000, 4000, 4000)), Box4(Pos4(rating, 1, 1, 1), Pos4(4000, 4000, 4000, 4000)))
+      case ('m', Comparison.Lt) =>
+        (Box4(Pos4(1, 1, 1, 1), Pos4(4000, rating - 1, 4000, 4000)), Box4(Pos4(1, rating, 1, 1), Pos4(4000, 4000, 4000, 4000)))
+      case ('a', Comparison.Lt) =>
+        (Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, rating - 1, 4000)), Box4(Pos4(1, 1, rating, 1), Pos4(4000, 4000, 4000, 4000)))
+      case ('s', Comparison.Lt) =>
+        (Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, 4000, rating - 1)), Box4(Pos4(1, 1, 1, rating), Pos4(4000, 4000, 4000, 4000)))
+      case ('x', Comparison.Gt) =>
+        (Box4(Pos4(rating + 1, 1, 1, 1), Pos4(4000, 4000, 4000, 4000)), Box4(Pos4(1, 1, 1, 1), Pos4(rating, 4000, 4000, 4000)))
+      case ('m', Comparison.Gt) =>
+        (Box4(Pos4(1, rating + 1, 1, 1), Pos4(4000, 4000, 4000, 4000)), Box4(Pos4(1, 1, 1, 1), Pos4(4000, rating, 4000, 4000)))
+      case ('a', Comparison.Gt) =>
+        (Box4(Pos4(1, 1, rating + 1, 1), Pos4(4000, 4000, 4000, 4000)), Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, rating, 4000)))
+      case ('s', Comparison.Gt) =>
+        (Box4(Pos4(1, 1, 1, rating + 1), Pos4(4000, 4000, 4000, 4000)), Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, 4000, rating)))
+      case (_, _) => ???
+    }
+
+    def apply(partBox: PartBox): Map[PartBox, Option[Verdict]] = {
+      val trueMap = (partBox intersect trueBox).map(_ -> Option.apply(verdict)).toMap
+      val falseMap = (partBox intersect falseBox).map(_ -> Option.empty[Verdict]).toMap
+      trueMap ++ falseMap
+    }
   }
 
   case class Workflow(rules: List[Rule], fallback: Verdict) {
@@ -39,12 +71,27 @@ object Day19 {
       @tailrec
       def helper(rules: List[Rule]): Verdict = rules match {
         case Nil => fallback
-        case rule :: newRules => rule(part) match
+        case rule :: newRules => rule(part) match {
           case Some(verdict) => verdict
           case None => helper(newRules)
+        }
       }
 
       helper(rules)
+    }
+
+    def apply(partBox: PartBox): Map[PartBox, Verdict] = {
+
+      def helper(rules: List[Rule], partBox: PartBox): Map[PartBox, Verdict] = rules match {
+        case Nil => Map(partBox -> fallback)
+        case rule :: newRules =>
+          rule(partBox).flatMap({
+            case (partBox, Some(verdict)) => Map(partBox -> verdict)
+            case (partBox, None) => helper(newRules, partBox)
+          })
+      }
+
+      helper(rules, partBox)
     }
   }
 
@@ -60,10 +107,29 @@ object Day19 {
 
       helper("in")
     }
+
+    def apply(partBox: PartBox): Set[PartBox] = {
+
+      def helper(workflow: String, partBox: PartBox): Set[PartBox] = {
+        val verdicts = workflows(workflow)(partBox)
+        verdicts.flatMap({
+          case (partBox, Verdict.Accept) => Set(partBox)
+          case (_, Verdict.Reject) => Set.empty
+          case (partBox, Verdict.Continue(workflow)) => helper(workflow, partBox)
+        }).toSet
+      }
+
+      helper("in", partBox)
+    }
   }
 
   def totalAcceptedRating(input: Input): Int =
     input.parts.filter(input(_)).map(_.totalRating).sum
+
+  def countAllAccepted(input: Input): Long = {
+    val partBox = Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, 4000, 4000))
+    input(partBox).map(_.size[Long]).sum
+  }
 
 
   def parsePart(s: String): Part = s match {
@@ -107,5 +173,6 @@ object Day19 {
 
   def main(args: Array[String]): Unit = {
     println(totalAcceptedRating(parseInput(input)))
+    println(countAllAccepted(parseInput(input)))
   }
 }
