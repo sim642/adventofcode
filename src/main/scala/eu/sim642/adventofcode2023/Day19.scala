@@ -16,6 +16,15 @@ object Day19 {
 
   type PartBox = Box4
 
+  private val allPartBox = Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, 4000, 4000))
+
+  def copyPartPos(pos4: Pos4, category: Category, rating: Int): Pos4 = category match {
+    case 'x' => pos4.copy(x = rating)
+    case 'm' => pos4.copy(y = rating)
+    case 'a' => pos4.copy(z = rating)
+    case 's' => pos4.copy(w = rating)
+  }
+
   enum Comparison {
     case Lt
     case Gt
@@ -37,25 +46,13 @@ object Day19 {
       }
     }
 
-    // TODO: simplify
-    private val (trueBox, falseBox): (PartBox, PartBox) = (category, comparison) match {
-      case ('x', Comparison.Lt) =>
-        (Box4(Pos4(1, 1, 1, 1), Pos4(rating - 1, 4000, 4000, 4000)), Box4(Pos4(rating, 1, 1, 1), Pos4(4000, 4000, 4000, 4000)))
-      case ('m', Comparison.Lt) =>
-        (Box4(Pos4(1, 1, 1, 1), Pos4(4000, rating - 1, 4000, 4000)), Box4(Pos4(1, rating, 1, 1), Pos4(4000, 4000, 4000, 4000)))
-      case ('a', Comparison.Lt) =>
-        (Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, rating - 1, 4000)), Box4(Pos4(1, 1, rating, 1), Pos4(4000, 4000, 4000, 4000)))
-      case ('s', Comparison.Lt) =>
-        (Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, 4000, rating - 1)), Box4(Pos4(1, 1, 1, rating), Pos4(4000, 4000, 4000, 4000)))
-      case ('x', Comparison.Gt) =>
-        (Box4(Pos4(rating + 1, 1, 1, 1), Pos4(4000, 4000, 4000, 4000)), Box4(Pos4(1, 1, 1, 1), Pos4(rating, 4000, 4000, 4000)))
-      case ('m', Comparison.Gt) =>
-        (Box4(Pos4(1, rating + 1, 1, 1), Pos4(4000, 4000, 4000, 4000)), Box4(Pos4(1, 1, 1, 1), Pos4(4000, rating, 4000, 4000)))
-      case ('a', Comparison.Gt) =>
-        (Box4(Pos4(1, 1, rating + 1, 1), Pos4(4000, 4000, 4000, 4000)), Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, rating, 4000)))
-      case ('s', Comparison.Gt) =>
-        (Box4(Pos4(1, 1, 1, rating + 1), Pos4(4000, 4000, 4000, 4000)), Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, 4000, rating)))
-      case (_, _) => ???
+    private val (trueBox, falseBox) = comparison match {
+      case Comparison.Lt =>
+        (allPartBox.copy(max = copyPartPos(allPartBox.max, category, rating - 1)),
+          allPartBox.copy(min = copyPartPos(allPartBox.min, category, rating)))
+      case Comparison.Gt =>
+        (allPartBox.copy(min = copyPartPos(allPartBox.min, category, rating + 1)),
+          allPartBox.copy(max = copyPartPos(allPartBox.max, category, rating)))
     }
 
     def apply(partBox: PartBox): Map[PartBox, Option[Verdict]] = {
@@ -126,10 +123,8 @@ object Day19 {
   def totalAcceptedRating(input: Input): Int =
     input.parts.filter(input(_)).map(_.totalRating).sum
 
-  def countAllAccepted(input: Input): Long = {
-    val partBox = Box4(Pos4(1, 1, 1, 1), Pos4(4000, 4000, 4000, 4000))
-    input(partBox).map(_.size[Long]).sum
-  }
+  def countAllAccepted(input: Input): Long =
+    input(allPartBox).map(_.size[Long]).sum
 
 
   def parsePart(s: String): Part = s match {
