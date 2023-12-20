@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2023
 
 import eu.sim642.adventofcodelib.NumberTheory
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 import scala.collection.{View, mutable}
 
@@ -135,9 +136,9 @@ object Day20 {
     val outputs = moduleOutputs.view.mapValues(_._2).toMap
 
     val inputs = (for {
-      (module, outputs) <- outputs.view // TODO: why need view?
+      (module, outputs) <- outputs.iterator
       output <- outputs
-    } yield module -> output).groupMap(_._2)(_._1).view.mapValues(_.toSet).toMap
+    } yield module -> output).groupMapReduce(_._2)(p => Set(p._1))(_ ++ _)
 
     val initializedModules = modules.map({
       case (module, Conjunction(_)) =>
@@ -148,25 +149,21 @@ object Day20 {
     Circuit(initializedModules, outputs, inputs)
   }
 
-  def printDot(circuit: Circuit): Unit = {
-    //println("digraph G {")
-    //for ((module, (m, outputs)) <- circuit) {
-    //  for (output <- outputs)
-    //    println(s"$module -> $output;")
-    //}
-    //println("}")
+  def printCircuitDot(circuit: Circuit): Unit = {
+    println("digraph circuit {")
+    for ((module, outputs) <- circuit.outputs) {
+      for (output <- outputs)
+        println(s"  $module -> $output;")
+    }
+    println("}")
   }
 
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    //println(countPulses(parseCircuit(input)))
-    //printDot(parseCircuit(input))
-    println(countRx(parseCircuit(input))) // 217317393039529
-
-    //high from xr after 3769
-    //high from vt after 3797
-    //high from fv after 3863
-    //high from kk after 3931
+    val circuit = parseCircuit(input)
+    println(countPulses(circuit))
+    //printCircuitDot(circuit)
+    println(countRx(circuit))
   }
 }
