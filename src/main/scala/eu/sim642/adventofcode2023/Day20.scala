@@ -1,6 +1,8 @@
 package eu.sim642.adventofcode2023
 
-import scala.collection.mutable
+import eu.sim642.adventofcodelib.NumberTheory
+
+import scala.collection.{View, mutable}
 
 object Day20 {
 
@@ -33,10 +35,16 @@ object Day20 {
       (this, Some(pulse))
   }
 
-  type Circuit = Map[String, (Module, Seq[String])]
+  case class Circuit(modules: Map[String, Module], outputs: Map[String, Seq[String]]) {
+
+    val inputs: Map[String, View[String]] = (for {
+      (module, outputs) <- outputs.view // TODO: why need view?
+      output <- outputs
+    } yield module -> output).groupMap(_._2)(_._1)
+  }
 
   def countPulses(circuit: Circuit): Int = {
-    val mCircuit = circuit.to(mutable.Map)
+    val mCircuit = circuit.modules.to(mutable.Map)
 
     var lowPulses = 0
     var highPulses = 0
@@ -57,9 +65,10 @@ object Day20 {
 
         mCircuit.get(to) match {
           case None => () // output
-          case Some(module, outputs) =>
+          case Some(module) =>
+            val outputs = circuit.outputs(to)
             val (newModule, outPulse) = module.handle(from, pulse)
-            mCircuit(to) = (newModule, outputs)
+            mCircuit(to) = newModule
 
             for {
               pulse <- outPulse
@@ -74,11 +83,15 @@ object Day20 {
   }
 
   def countRx(circuit: Circuit): Long = {
-    val mCircuit = circuit.to(mutable.Map)
+    val ms = circuit.inputs(circuit.inputs("rx").head).toSeq
 
-    var presses = 0L
+    val mCircuit = circuit.modules.to(mutable.Map)
 
-    while (true) {
+    var presses = 0
+
+    val found = mutable.Map.empty[String, Int]
+
+    while (found.size < ms.size) {
 
       val queue = mutable.Queue.empty[(String, Pulse, String)]
       queue.enqueue(("button", Pulse.Low, "broadcaster"))
@@ -89,18 +102,20 @@ object Day20 {
         //println(s)
 
         s match {
-          case (_, Pulse.Low, "rx") =>
-            return presses
-          case (from, Pulse.High, "sq") =>
+          //case (_, Pulse.Low, "rx") =>
+          //  return presses
+          case (from, Pulse.High, to) if ms.contains(from) =>
+            found(from) = presses
             println(s"high from $from after $presses")
           case _ => ()
         }
 
         mCircuit.get(to) match {
           case None => () // output
-          case Some(module, outputs) =>
+          case Some(module) =>
+            val outputs = circuit.outputs(to)
             val (newModule, outPulse) = module.handle(from, pulse)
-            mCircuit(to) = (newModule, outputs)
+            mCircuit(to) = newModule
 
             for {
               pulse <- outPulse
@@ -110,7 +125,7 @@ object Day20 {
       }
     }
 
-    ???
+    NumberTheory.lcm(found.values.map(_.toLong).toSeq)
   }
 
 
@@ -126,29 +141,28 @@ object Day20 {
   }
 
   def initializeConjunctions(circuit: Circuit): Circuit = {
-    //println(circuit)
-    val inputs = (for {
-      (module, (_, outputs)) <- circuit.view // TODO: why need view?
-      output <- outputs
-    } yield module -> output).groupMap(_._2)(_._1)
-    //println(inputs)
-
-    circuit.map({
-      case (module, (Conjunction(_), outputs)) =>
-        module -> (Conjunction(inputs(module).map(_ -> Pulse.Low).toMap), outputs)
+    circuit.copy(modules = circuit.modules.map({
+      case (module, Conjunction(_)) =>
+        module -> Conjunction(circuit.inputs(module).map(_ -> Pulse.Low).toMap)
       case other => other
-    })
+    }))
   }
 
-  def parseCircuit(input: String): Circuit = initializeConjunctions(input.linesIterator.map(parseModule).toMap)
+  def parseCircuit(input: String): Circuit = {
+    val map = input.linesIterator.map(parseModule).toMap
+    val modules = map.view.mapValues(_._1).toMap
+    val outputs = map.view.mapValues(_._2).toMap
+    val circuit = Circuit(modules, outputs)
+    initializeConjunctions(circuit)
+  }
 
   def printDot(circuit: Circuit): Unit = {
-    println("digraph G {")
-    for ((module, (m, outputs)) <- circuit) {
-      for (output <- outputs)
-        println(s"$module -> $output;")
-    }
-    println("}")
+    //println("digraph G {")
+    //for ((module, (m, outputs)) <- circuit) {
+    //  for (output <- outputs)
+    //    println(s"$module -> $output;")
+    //}
+    //println("}")
   }
 
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
@@ -157,5 +171,10 @@ object Day20 {
     //println(countPulses(parseCircuit(input)))
     //printDot(parseCircuit(input))
     println(countRx(parseCircuit(input))) // 217317393039529
+
+    //high from xr after 3769
+    //high from vt after 3797
+    //high from fv after 3863
+    //high from kk after 3931
   }
 }

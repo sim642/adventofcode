@@ -27,4 +27,8 @@ class Day20Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countPulses(parseCircuit(input)) == 867118762)
   }
+
+  test("Part 2 input answer") {
+    assert(countRx(parseCircuit(input)) == 217317393039529L)
+  }
 }
