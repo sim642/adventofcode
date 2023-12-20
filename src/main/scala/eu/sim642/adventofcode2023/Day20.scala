@@ -73,6 +73,46 @@ object Day20 {
     lowPulses * highPulses
   }
 
+  def countRx(circuit: Circuit): Long = {
+    val mCircuit = circuit.to(mutable.Map)
+
+    var presses = 0L
+
+    while (true) {
+
+      val queue = mutable.Queue.empty[(String, Pulse, String)]
+      queue.enqueue(("button", Pulse.Low, "broadcaster"))
+      presses += 1
+
+      while (queue.nonEmpty) {
+        val s@(from, pulse, to) = queue.dequeue()
+        //println(s)
+
+        s match {
+          case (_, Pulse.Low, "rx") =>
+            return presses
+          case (from, Pulse.High, "sq") =>
+            println(s"high from $from after $presses")
+          case _ => ()
+        }
+
+        mCircuit.get(to) match {
+          case None => () // output
+          case Some(module, outputs) =>
+            val (newModule, outPulse) = module.handle(from, pulse)
+            mCircuit(to) = (newModule, outputs)
+
+            for {
+              pulse <- outPulse
+              output <- outputs
+            } queue.enqueue((to, pulse, output))
+        }
+      }
+    }
+
+    ???
+  }
+
 
   def parseModule(s: String): (String, (Module, Seq[String])) = s match {
     case s"$moduleStr -> $outputsStr" =>
@@ -102,9 +142,20 @@ object Day20 {
 
   def parseCircuit(input: String): Circuit = initializeConjunctions(input.linesIterator.map(parseModule).toMap)
 
+  def printDot(circuit: Circuit): Unit = {
+    println("digraph G {")
+    for ((module, (m, outputs)) <- circuit) {
+      for (output <- outputs)
+        println(s"$module -> $output;")
+    }
+    println("}")
+  }
+
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day20.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countPulses(parseCircuit(input)))
+    //println(countPulses(parseCircuit(input)))
+    //printDot(parseCircuit(input))
+    println(countRx(parseCircuit(input))) // 217317393039529
   }
 }
