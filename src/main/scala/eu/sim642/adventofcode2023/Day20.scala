@@ -41,15 +41,10 @@ object Day20 {
       (module, outputs) <- outputs.view // TODO: why need view?
       output <- outputs
     } yield module -> output).groupMap(_._2)(_._1)
-  }
 
-  def countPulses(circuit: Circuit): Int = {
-    val mCircuit = circuit.modules.to(mutable.Map)
-
-    var lowPulses = 0
-    var highPulses = 0
-
-    for (i <- 0 until 1000) {
+    def simulate(): (Circuit, Seq[(String, Pulse, String)]) = {
+      val mCircuit = modules.to(mutable.Map)
+      val b = Seq.newBuilder[(String, Pulse, String)]
 
       val queue = mutable.Queue.empty[(String, Pulse, String)]
       queue.enqueue(("button", Pulse.Low, "broadcaster"))
@@ -57,16 +52,12 @@ object Day20 {
       while (queue.nonEmpty) {
         val s@(from, pulse, to) = queue.dequeue()
         //println(s)
-
-        pulse match {
-          case Pulse.Low => lowPulses += 1
-          case Pulse.High => highPulses += 1
-        }
+        b += s
 
         mCircuit.get(to) match {
           case None => () // output
           case Some(module) =>
-            val outputs = circuit.outputs(to)
+            val outputs = this.outputs(to)
             val (newModule, outPulse) = module.handle(from, pulse)
             mCircuit(to) = newModule
 
@@ -76,51 +67,52 @@ object Day20 {
             } queue.enqueue((to, pulse, output))
         }
       }
+
+      val newCircuit = copy(modules = mCircuit.toMap)
+      (newCircuit, b.result())
+    }
+  }
+
+  def countPulses(circuit: Circuit): Int = {
+    var mCircuit = circuit
+
+    var lowPulses = 0
+    var highPulses = 0
+
+    for (i <- 0 until 1000) {
+      val (mCircuit2, pulses) = mCircuit.simulate()
+      mCircuit = mCircuit2
+
+      for ((_, pulse, _) <- pulses) {
+        pulse match {
+          case Pulse.Low => lowPulses += 1
+          case Pulse.High => highPulses += 1
+        }
+      }
     }
 
-    println((lowPulses, highPulses))
     lowPulses * highPulses
   }
 
   def countRx(circuit: Circuit): Long = {
     val ms = circuit.inputs(circuit.inputs("rx").head).toSeq
 
-    val mCircuit = circuit.modules.to(mutable.Map)
+    var mCircuit = circuit
 
     var presses = 0
 
     val found = mutable.Map.empty[String, Int]
 
     while (found.size < ms.size) {
-
-      val queue = mutable.Queue.empty[(String, Pulse, String)]
-      queue.enqueue(("button", Pulse.Low, "broadcaster"))
+      val (mCircuit2, pulses) = mCircuit.simulate()
+      mCircuit = mCircuit2
       presses += 1
 
-      while (queue.nonEmpty) {
-        val s@(from, pulse, to) = queue.dequeue()
-        //println(s)
-
-        s match {
-          //case (_, Pulse.Low, "rx") =>
-          //  return presses
+      for (pulse <- pulses) {
+        pulse match {
           case (from, Pulse.High, to) if ms.contains(from) =>
             found(from) = presses
-            println(s"high from $from after $presses")
           case _ => ()
-        }
-
-        mCircuit.get(to) match {
-          case None => () // output
-          case Some(module) =>
-            val outputs = circuit.outputs(to)
-            val (newModule, outPulse) = module.handle(from, pulse)
-            mCircuit(to) = newModule
-
-            for {
-              pulse <- outPulse
-              output <- outputs
-            } queue.enqueue((to, pulse, output))
         }
       }
     }
