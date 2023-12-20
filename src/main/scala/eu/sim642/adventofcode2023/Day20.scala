@@ -1,9 +1,9 @@
 package eu.sim642.adventofcode2023
 
+import eu.sim642.adventofcodelib.IteratorImplicits.*
 import eu.sim642.adventofcodelib.NumberTheory
-import eu.sim642.adventofcodelib.IteratorImplicits._
 
-import scala.collection.{View, mutable}
+import scala.collection.mutable
 
 object Day20 {
 
@@ -23,7 +23,7 @@ object Day20 {
     }
   }
 
-  case class Conjunction(remember: Map[String, Pulse] = Map.empty) extends Module { // TODO: add initial Lows
+  case class Conjunction(remember: Map[String, Pulse] = Map.empty) extends Module {
     override def handle(from: String, pulse: Pulse): (Module, Option[Pulse]) = {
       val newRemember = remember.updated(from, pulse)
       val outPulse = if (newRemember.forall(_._2 == Pulse.High)) Pulse.Low else Pulse.High
@@ -41,77 +41,67 @@ object Day20 {
                      inputs: Map[String, Set[String]]) {
 
     def simulate(): (Circuit, Seq[(String, Pulse, String)]) = {
-      val mCircuit = modules.to(mutable.Map)
-      val b = Seq.newBuilder[(String, Pulse, String)]
+      val currentModules = modules.to(mutable.Map)
+      val pulses = Seq.newBuilder[(String, Pulse, String)]
 
       val queue = mutable.Queue.empty[(String, Pulse, String)]
       queue.enqueue(("button", Pulse.Low, "broadcaster"))
 
       while (queue.nonEmpty) {
-        val s@(from, pulse, to) = queue.dequeue()
-        //println(s)
-        b += s
+        val pulseTriple@(from, pulse, to) = queue.dequeue()
+        pulses += pulseTriple
 
-        mCircuit.get(to) match {
+        currentModules.get(to) match {
           case None => () // output
           case Some(module) =>
-            val outputs = this.outputs(to)
+            val toOutputs = outputs(to)
             val (newModule, outPulse) = module.handle(from, pulse)
-            mCircuit(to) = newModule
+            currentModules(to) = newModule
 
             for {
               pulse <- outPulse
-              output <- outputs
-            } queue.enqueue((to, pulse, output))
+              toOutput <- toOutputs
+            } queue.enqueue((to, pulse, toOutput))
         }
       }
 
-      val newCircuit = copy(modules = mCircuit.toMap)
-      (newCircuit, b.result())
+      val newCircuit = copy(modules = currentModules.toMap)
+      (newCircuit, pulses.result())
     }
   }
 
-  def countPulses(circuit: Circuit): Int = {
-    var mCircuit = circuit
+  def countLowHigh(initialCircuit: Circuit): Int = {
+    var circuit = initialCircuit
+    val pulseCount = mutable.Map.empty[Pulse, Int].withDefaultValue(0)
 
-    var lowPulses = 0
-    var highPulses = 0
+    for (_ <- 0 until 1000) {
+      val (newCircuit, pulses) = circuit.simulate()
+      circuit = newCircuit
 
-    for (i <- 0 until 1000) {
-      val (mCircuit2, pulses) = mCircuit.simulate()
-      mCircuit = mCircuit2
-
-      for ((_, pulse, _) <- pulses) {
-        pulse match {
-          case Pulse.Low => lowPulses += 1
-          case Pulse.High => highPulses += 1
-        }
-      }
+      for ((_, pulse, _) <- pulses)
+        pulseCount(pulse) += 1
     }
 
-    lowPulses * highPulses
+    pulseCount.values.product
   }
 
-  def countRx(circuit: Circuit): Long = {
-    val ms = circuit.inputs(circuit.inputs("rx").head)
-
-    var mCircuit = circuit
-
-    var presses = 0
-
+  def countRx(initialCircuit: Circuit): Long = {
+    var circuit = initialCircuit
+    val rxInputs = circuit.inputs("rx")
+    assert(rxInputs.size == 1)
+    val todo = circuit.inputs(rxInputs.head).to(mutable.Set)
+    assert(todo.size == 4)
     val found = mutable.Map.empty[String, Int]
 
-    while (found.size < ms.size) {
-      val (mCircuit2, pulses) = mCircuit.simulate()
-      mCircuit = mCircuit2
-      presses += 1
+    var i = 0
+    while (todo.nonEmpty) {
+      val (newCircuit, pulses) = circuit.simulate()
+      circuit = newCircuit
+      i += 1
 
-      for (pulse <- pulses) {
-        pulse match {
-          case (from, Pulse.High, to) if ms(from) =>
-            found(from) = presses
-          case _ => ()
-        }
+      for (case (from, Pulse.High, _) <- pulses if todo(from)) {
+        todo -= from
+        found(from) = i
       }
     }
 
@@ -162,7 +152,7 @@ object Day20 {
 
   def main(args: Array[String]): Unit = {
     val circuit = parseCircuit(input)
-    println(countPulses(circuit))
+    println(countLowHigh(circuit))
     //printCircuitDot(circuit)
     println(countRx(circuit))
   }

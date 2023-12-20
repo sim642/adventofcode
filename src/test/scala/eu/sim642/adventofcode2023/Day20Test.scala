@@ -20,12 +20,12 @@ class Day20Test extends AnyFunSuite {
       |&con -> output""".stripMargin
 
   test("Part 1 examples") {
-    assert(countPulses(parseCircuit(exampleInput)) == 32000000)
-    assert(countPulses(parseCircuit(exampleInput2)) == 11687500)
+    assert(countLowHigh(parseCircuit(exampleInput)) == 32000000)
+    assert(countLowHigh(parseCircuit(exampleInput2)) == 11687500)
   }
 
   test("Part 1 input answer") {
-    assert(countPulses(parseCircuit(input)) == 867118762)
+    assert(countLowHigh(parseCircuit(input)) == 867118762)
   }
 
   test("Part 2 input answer") {
