@@ -35,12 +35,9 @@ object Day20 {
       (this, Some(pulse))
   }
 
-  case class Circuit(modules: Map[String, Module], outputs: Map[String, Seq[String]]) {
-
-    val inputs: Map[String, View[String]] = (for {
-      (module, outputs) <- outputs.view // TODO: why need view?
-      output <- outputs
-    } yield module -> output).groupMap(_._2)(_._1)
+  case class Circuit(modules: Map[String, Module],
+                     outputs: Map[String, Seq[String]],
+                     inputs: Map[String, Set[String]]) {
 
     def simulate(): (Circuit, Seq[(String, Pulse, String)]) = {
       val mCircuit = modules.to(mutable.Map)
@@ -95,7 +92,7 @@ object Day20 {
   }
 
   def countRx(circuit: Circuit): Long = {
-    val ms = circuit.inputs(circuit.inputs("rx").head).toSeq
+    val ms = circuit.inputs(circuit.inputs("rx").head)
 
     var mCircuit = circuit
 
@@ -110,7 +107,7 @@ object Day20 {
 
       for (pulse <- pulses) {
         pulse match {
-          case (from, Pulse.High, to) if ms.contains(from) =>
+          case (from, Pulse.High, to) if ms(from) =>
             found(from) = presses
           case _ => ()
         }
@@ -132,20 +129,23 @@ object Day20 {
       (name, (module, outputs))
   }
 
-  def initializeConjunctions(circuit: Circuit): Circuit = {
-    circuit.copy(modules = circuit.modules.map({
-      case (module, Conjunction(_)) =>
-        module -> Conjunction(circuit.inputs(module).map(_ -> Pulse.Low).toMap)
-      case other => other
-    }))
-  }
-
   def parseCircuit(input: String): Circuit = {
-    val map = input.linesIterator.map(parseModule).toMap
-    val modules = map.view.mapValues(_._1).toMap
-    val outputs = map.view.mapValues(_._2).toMap
-    val circuit = Circuit(modules, outputs)
-    initializeConjunctions(circuit)
+    val moduleOutputs = input.linesIterator.map(parseModule).toMap
+    val modules = moduleOutputs.view.mapValues(_._1).toMap
+    val outputs = moduleOutputs.view.mapValues(_._2).toMap
+
+    val inputs = (for {
+      (module, outputs) <- outputs.view // TODO: why need view?
+      output <- outputs
+    } yield module -> output).groupMap(_._2)(_._1).view.mapValues(_.toSet).toMap
+
+    val initializedModules = modules.map({
+      case (module, Conjunction(_)) =>
+        module -> Conjunction(inputs(module).map(_ -> Pulse.Low).toMap)
+      case other => other
+    })
+
+    Circuit(initializedModules, outputs, inputs)
   }
 
   def printDot(circuit: Circuit): Unit = {
