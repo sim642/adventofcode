@@ -1,11 +1,12 @@
 package eu.sim642.adventofcode2023
 
-import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits.*
+import eu.sim642.adventofcodelib.IntegralImplicits.*
 import eu.sim642.adventofcodelib.graph.{GraphSearch, SimultaneousBFS, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.IntegralImplicits._
-import Integral.Implicits._
+import eu.sim642.adventofcodelib.{Grid, Polynomial}
+
+import scala.math.Integral.Implicits.*
 
 object Day21 {
 
@@ -65,22 +66,10 @@ object Day21 {
 
     override def countReachableExactlyInfinite(grid: Grid[Char], steps: Int = 26501365): Long = {
       val (q, r) = steps /% 131
-      //println((q, r))
 
-      val x1 = 0
-      val y1 = NaivePart2Solution.countReachableExactlyInfinite(grid, r)
-      val x2 = 1
-      val y2 = NaivePart2Solution.countReachableExactlyInfinite(grid, r + 131)
-      val x3 = 2
-      val y3 = NaivePart2Solution.countReachableExactlyInfinite(grid, r + 2 * 131)
+      def p(x: Int): Pos = Pos(x, NaivePart2Solution.countReachableExactlyInfinite(grid, r + x * 131).toInt)
 
-      def f(x: Long): Long = {
-        y1 * (x - x2) * (x - x3) / (x1 - x2) / (x1 - x3) +
-          y2 * (x - x1) * (x - x3) / (x2 - x1) / (x2 - x3) +
-          y3 * (x - x1) * (x - x2) / (x3 - x1) / (x3 - x2)
-      }
-
-      f(q)
+      Polynomial.fitQuadratic(p(0), p(1), p(2))(q)
     }
   }
 
@@ -90,7 +79,7 @@ object Day21 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day21.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    import QuadraticPart2Solution._
+    import QuadraticPart2Solution.*
 
     println(countReachableExactly(parseGrid(input)))
     println(countReachableExactlyInfinite(parseGrid(input)))
