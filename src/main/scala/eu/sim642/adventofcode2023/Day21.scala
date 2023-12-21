@@ -10,23 +10,24 @@ import scala.math.Integral.Implicits.*
 
 object Day21 {
 
-  def countReachableExactly(grid: Grid[Char], steps: Int = 64): Int = {
-
-    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
-      override val startNode: Pos = grid.posOf('S')
+  def gardenSearch(startPos: Pos, grid: Pos => Boolean, maxDist: Int): GraphSearch[Pos] with UnitNeighbors[Pos] = {
+    new GraphSearch[Pos] with UnitNeighbors[Pos] {
+      override val startNode: Pos = startPos
 
       override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
         for {
           offset <- Pos.axisOffsets
           newPos = pos + offset
-          if grid.containsPos(newPos)
-          if grid(newPos) != '#'
+          if grid(newPos)
         } yield newPos
       }
 
-      override def isTargetNode(pos: Pos, dist: Int): Boolean = dist == steps
+      override def isTargetNode(pos: Pos, dist: Int): Boolean = dist == maxDist
     }
+  }
 
+  def countReachableExactly(grid: Grid[Char], steps: Int = 64): Int = {
+    val graphSearch = gardenSearch(grid.posOf('S'), pos => grid.containsPos(pos) && grid(pos) != '#', steps)
     SimultaneousBFS.search(graphSearch).distances.count(_._2 % 2 == steps % 2)
   }
 
@@ -43,21 +44,7 @@ object Day21 {
 
     override def countReachableExactlyInfinite(grid: Grid[Char], steps: Int = 26501365): Long = {
       val gridSize = Pos(grid(0).size, grid.size)
-
-      val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] {
-        override val startNode: Pos = grid.posOf('S')
-
-        override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
-          for {
-            offset <- Pos.axisOffsets
-            newPos = pos + offset
-            if grid(newPos %+ gridSize) != '#'
-          } yield newPos
-        }
-
-        override def isTargetNode(pos: Pos, dist: Int): Boolean = dist == steps
-      }
-
+      val graphSearch = gardenSearch(grid.posOf('S'), pos => grid(pos %+ gridSize) != '#', steps)
       SimultaneousBFS.search(graphSearch).distances.count(_._2 % 2 == steps % 2)
     }
   }
