@@ -35,13 +35,12 @@ object Day21 {
     def countReachableExactlyInfinite(grid: Grid[Char], steps: Int = 26501365): Long
   }
 
+  // copied from 2021 day 25
+  extension (pos: Pos) {
+    def %+(other: Pos): Pos = Pos(pos.x %+ other.x, pos.y %+ other.y)
+  }
+
   object NaivePart2Solution extends Part2Solution {
-
-    // copied from 2021 day 25
-    extension (pos: Pos) {
-      def %+(other: Pos): Pos = Pos(pos.x %+ other.x, pos.y %+ other.y)
-    }
-
     override def countReachableExactlyInfinite(grid: Grid[Char], steps: Int = 26501365): Long = {
       val gridSize = Pos(grid(0).size, grid.size)
       val graphSearch = gardenSearch(grid.posOf('S'), pos => grid(pos %+ gridSize) != '#', steps)
@@ -50,11 +49,22 @@ object Day21 {
   }
 
   object QuadraticPart2Solution extends Part2Solution {
-
     override def countReachableExactlyInfinite(grid: Grid[Char], steps: Int = 26501365): Long = {
-      val (q, r) = steps /% 131
+      val gridSize = Pos(grid(0).size, grid.size)
+      assert(gridSize.x == 131 && gridSize.y == 131)
 
-      def p(x: Int): Pos = Pos(x, NaivePart2Solution.countReachableExactlyInfinite(grid, r + x * 131).toInt)
+      val (q, r) = steps /% 131
+      //assert(r == 65) // TODO: need this?
+
+      def maxDist(x: Int) = r + x * 131
+
+      val graphSearch = gardenSearch(grid.posOf('S'), pos => grid(pos %+ gridSize) != '#', maxDist(2))
+      val distances = SimultaneousBFS.search(graphSearch).distances
+
+      def p(x: Int): Pos = Pos(x, distances.count({ case (_, dist) =>
+        val steps = maxDist(x)
+        dist <= steps && dist % 2 == steps % 2
+      }))
 
       Polynomial.fitQuadratic(p(0), p(1), p(2))(q)
     }
