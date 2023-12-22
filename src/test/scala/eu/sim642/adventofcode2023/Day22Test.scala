@@ -26,7 +26,7 @@ class Day22Test extends AnyFunSuite {
     assert(sumDisintegrateFall(parseBricks(exampleInput)) == 7)
   }
 
-  test("Part 2 test") {
+  test("Part 2 fall into same place") {
     assert(sumDisintegrateFall(parseBricks(
       """0,0,1~0,0,1
         |0,0,2~0,0,2""".stripMargin

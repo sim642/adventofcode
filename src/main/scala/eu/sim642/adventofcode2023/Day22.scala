@@ -2,6 +2,9 @@ package eu.sim642.adventofcode2023
 
 import eu.sim642.adventofcodelib.box.Box3
 import eu.sim642.adventofcodelib.pos.Pos3
+import eu.sim642.adventofcodelib.IteratorImplicits._
+
+import scala.annotation.tailrec
 
 object Day22 {
 
@@ -26,87 +29,52 @@ object Day22 {
     })
   }
 
-  def countDisintegrable(bricks: Seq[Brick]): Int = {
-    val settledBricks = settle(bricks)
-    //println(settledBricks)
-
-    //def countSupports(brick: Brick): Int = {
-    //  val newBrick = fallBrick(brick, -1)
-    //  bricks.count(b => (b intersect newBrick).isDefined)
-    //}
-    //
-    //settledBricks.count(countSupports(_) <= 1)
-
-    val cannotRemove = settledBricks
+  def computeSupportedBy(bricks: Seq[Brick]): Map[Brick, Set[Brick]] = {
+    bricks
       .map({ brick =>
         val newBrick = fallBrick(brick, 1)
-        val supportedBy = settledBricks.filter(b => b != brick && (b intersect newBrick).isDefined)
-        //println(s"$brick supported by $supportedBy")
-        supportedBy
+        val supportedBy = bricks.view.filter(supportBrick =>
+          supportBrick != brick && (supportBrick intersect newBrick).isDefined
+        ).toSet
+        brick -> supportedBy
       })
+      .toMap
+  }
+
+  def countDisintegrable(bricks: Seq[Brick]): Int = {
+    val settledBricks = settle(bricks)
+    val supportedBy = computeSupportedBy(settledBricks)
+
+    val cannotRemove = supportedBy.values
       .filter(_.size == 1)
       .map(_.head)
-    //println(bricks.size)
-    //println(cannotRemove.toSet.size)
     bricks.size - cannotRemove.toSet.size
   }
 
   def sumDisintegrateFall(bricks: Seq[Brick]): Int = {
     val settledBricks = settle(bricks)
-
-    val supportedBy = settledBricks
-      .map({ brick =>
-        val newBrick = fallBrick(brick, 1)
-        val supportedBy = settledBricks.filter(b => b != brick && (b intersect newBrick).isDefined)
-        brick -> supportedBy
-      })
-      .toMap
-
+    val supportedBy = computeSupportedBy(settledBricks)
     val supports = (for {
-      (brick, s) <- supportedBy.toSeq
-      brick2 <- s
-    } yield brick2 -> brick).groupMap(_._1)(_._2)
-    //println(supports)
+      (brick, brickSupportedBy) <- supportedBy.iterator
+      supportBrick <- brickSupportedBy
+    } yield supportBrick -> brick).groupMapReduce(_._1)(p => Set(p._2))(_ ++ _).withDefaultValue(Set.empty)
 
-    //val settledSet = settledBricks.toSet
-    //def countDisintegrateFall(remove: Brick, removed: Set[Brick]): Int = {
-    //  val after = settle((settledSet - remove).toSeq).toSet
-    //  println(settledSet)
-    //  println(after)
-    //  val diff = settledSet -- after ++ (after -- settledSet)
-    //  (diff.size - 1) / 2
-    //}
-
-    //val settledSet = settledBricks.toSet
-    //def countDisintegrateFall(remove: Brick, removed: Set[Brick]): Set[Brick] = {
-    //  if (removed(remove))
-    //    removed
-    //  else {
-    //    val s = supports.getOrElse(remove, Seq.empty)
-    //    val newRemoved = removed + remove
-    //    val x = s.filter(b => (supportedBy(b).toSet -- newRemoved).size == 1)
-    //    x.foldLeft(newRemoved)((acc, b) => countDisintegrateFall(b, acc))
-    //  }
-    //}
-
+    // non-standard BFS that uses visited for neighbors
+    @tailrec
     def countDisintegrateFall(todo: Set[Brick], visited: Set[Brick]): Int = {
-      if (todo.isEmpty)
-        visited.size - 1
-      else {
-        val b = todo.head
-        val newTodo = todo - b
-        val s = supports.getOrElse(b, Set.empty)
-        val newVisited = visited + b
-        val moreTodo = s.filter(x => (supportedBy(x).toSet -- newVisited).isEmpty).toSet
-        countDisintegrateFall(newTodo ++ moreTodo, newVisited)
-      }
+      val newVisited = visited ++ todo
+      val newTodo = for {
+        brick <- todo
+        supportedBrick <- supports(brick)
+        if supportedBy(supportedBrick).subsetOf(newVisited) // all supports visited
+      } yield supportedBrick
+      if (newTodo.isEmpty)
+        newVisited.size - 1 // exclude removed brick
+      else
+        countDisintegrateFall(newTodo, newVisited)
     }
 
-    settledBricks.map({ p =>
-      val f = countDisintegrateFall(Set(p), Set.empty)
-      println((p, f))
-      f
-    }).sum
+    settledBricks.map(brick => countDisintegrateFall(Set(brick), Set.empty)).sum
   }
 
 
