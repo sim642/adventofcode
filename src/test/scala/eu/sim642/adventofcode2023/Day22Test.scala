@@ -21,4 +21,19 @@ class Day22Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countDisintegrable(parseBricks(input)) == 428)
   }
+
+  test("Part 2 examples") {
+    assert(sumDisintegrateFall(parseBricks(exampleInput)) == 7)
+  }
+
+  test("Part 2 test") {
+    assert(sumDisintegrateFall(parseBricks(
+      """0,0,1~0,0,1
+        |0,0,2~0,0,2""".stripMargin
+    )) == 1)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumDisintegrateFall(parseBricks(input)) == 35654)
+  }
 }

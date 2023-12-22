@@ -28,7 +28,7 @@ object Day22 {
 
   def countDisintegrable(bricks: Seq[Brick]): Int = {
     val settledBricks = settle(bricks)
-    println(settledBricks)
+    //println(settledBricks)
 
     //def countSupports(brick: Brick): Int = {
     //  val newBrick = fallBrick(brick, -1)
@@ -41,14 +41,72 @@ object Day22 {
       .map({ brick =>
         val newBrick = fallBrick(brick, 1)
         val supportedBy = settledBricks.filter(b => b != brick && (b intersect newBrick).isDefined)
-        println(s"$brick supported by $supportedBy")
+        //println(s"$brick supported by $supportedBy")
         supportedBy
       })
       .filter(_.size == 1)
       .map(_.head)
-    println(bricks.size)
-    println(cannotRemove.toSet.size)
+    //println(bricks.size)
+    //println(cannotRemove.toSet.size)
     bricks.size - cannotRemove.toSet.size
+  }
+
+  def sumDisintegrateFall(bricks: Seq[Brick]): Int = {
+    val settledBricks = settle(bricks)
+
+    val supportedBy = settledBricks
+      .map({ brick =>
+        val newBrick = fallBrick(brick, 1)
+        val supportedBy = settledBricks.filter(b => b != brick && (b intersect newBrick).isDefined)
+        brick -> supportedBy
+      })
+      .toMap
+
+    val supports = (for {
+      (brick, s) <- supportedBy.toSeq
+      brick2 <- s
+    } yield brick2 -> brick).groupMap(_._1)(_._2)
+    //println(supports)
+
+    //val settledSet = settledBricks.toSet
+    //def countDisintegrateFall(remove: Brick, removed: Set[Brick]): Int = {
+    //  val after = settle((settledSet - remove).toSeq).toSet
+    //  println(settledSet)
+    //  println(after)
+    //  val diff = settledSet -- after ++ (after -- settledSet)
+    //  (diff.size - 1) / 2
+    //}
+
+    //val settledSet = settledBricks.toSet
+    //def countDisintegrateFall(remove: Brick, removed: Set[Brick]): Set[Brick] = {
+    //  if (removed(remove))
+    //    removed
+    //  else {
+    //    val s = supports.getOrElse(remove, Seq.empty)
+    //    val newRemoved = removed + remove
+    //    val x = s.filter(b => (supportedBy(b).toSet -- newRemoved).size == 1)
+    //    x.foldLeft(newRemoved)((acc, b) => countDisintegrateFall(b, acc))
+    //  }
+    //}
+
+    def countDisintegrateFall(todo: Set[Brick], visited: Set[Brick]): Int = {
+      if (todo.isEmpty)
+        visited.size - 1
+      else {
+        val b = todo.head
+        val newTodo = todo - b
+        val s = supports.getOrElse(b, Set.empty)
+        val newVisited = visited + b
+        val moreTodo = s.filter(x => (supportedBy(x).toSet -- newVisited).isEmpty).toSet
+        countDisintegrateFall(newTodo ++ moreTodo, newVisited)
+      }
+    }
+
+    settledBricks.map({ p =>
+      val f = countDisintegrateFall(Set(p), Set.empty)
+      println((p, f))
+      f
+    }).sum
   }
 
 
@@ -65,8 +123,11 @@ object Day22 {
 
   def main(args: Array[String]): Unit = {
     println(countDisintegrable(parseBricks(input)))
+    println(sumDisintegrateFall(parseBricks(input)))
 
     // part 1: 963 - too high (cannotRemove checked against unsettled)
     // part 1: 482 - too high (self-supporting bricksanswer for someone else)
+
+    // part 2: 34751 - too low (re-settling may fall into same place)
   }
 }
