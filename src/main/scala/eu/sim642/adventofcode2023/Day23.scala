@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2023
 
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits.*
+import eu.sim642.adventofcodelib.IteratorImplicits.*
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
@@ -9,8 +10,6 @@ import eu.sim642.adventofcodelib.pos.Pos
 import scala.annotation.tailrec
 
 object Day23 {
-
-  case class HikePos(pos: Pos, pathSet: Set[Pos])
 
   private val slopeOffsets = Map(
     '^' -> Pos(0, -1),
@@ -34,14 +33,15 @@ object Day23 {
 
       val keyPoss = branchPoss + startPos + targetPos
 
-      val keyNeighbors: Map[Pos, Map[Pos, Int]] = {
-        keyPoss.view.map({ fromPos =>
+      // based on 2019 day 18
+      val keyAdjacents: Map[Pos, Map[Pos, Int]] = {
+        (branchPoss + startPos).view.map({ fromPos =>
           val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
             override val startNode: Pos = fromPos
 
             override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
               if (pos != fromPos && keyPoss(pos))
-                Iterator.empty
+                Iterator.empty // don't move beyond bounding keys
               else {
                 for {
                   offset <- if (!slopes || grid(pos) == '.') Pos.axisOffsets else Seq(slopeOffsets(grid(pos)))
@@ -53,52 +53,44 @@ object Day23 {
             }
           }
 
-          val distances = BFS.traverse(graphTraversal).distances.toMap
-          fromPos -> distances.filter(p => p._1 != fromPos && keyPoss(p._1))
+          val distances = BFS.traverse(graphTraversal).distances
+          val keyDistances = distances.filter({ (toPos, _) =>
+            toPos != fromPos && keyPoss(toPos)
+          }).toMap
+
+          fromPos -> keyDistances
         }).toMap
       }
+
+      case class HikePos(pos: Pos, path: Set[Pos])
 
       val graphTraversal = new GraphTraversal[HikePos] {
         override val startNode: HikePos = HikePos(startPos, Set(startPos))
 
         override def neighbors(hikePos: HikePos): IterableOnce[(HikePos, Int)] = {
-          if (hikePos.pos != targetPos) {
-            val HikePos(pos, pathSet) = hikePos
-            for {
-              (newPos, dist) <- keyNeighbors(pos)
-              if !pathSet.contains(newPos)
-            } yield HikePos(newPos, pathSet + newPos) -> dist
-          }
-          else
-            Iterator.empty
+          val HikePos(pos, path) = hikePos
+          for {
+            (newPos, dist) <- keyAdjacents.getOrElse(pos, Map.empty)
+            if !path.contains(newPos)
+          } yield HikePos(newPos, path + newPos) -> dist
         }
       }
 
       @tailrec
-      def helper(todo: Set[HikePos], visited: Map[HikePos, Int]): Map[HikePos, Int] = {
-        if (todo.isEmpty)
-          visited.filter(_._1.pathSet.contains(targetPos))
-        else {
-          val hikePos = todo.head
-          val newTodo = todo - hikePos
-          val visited0 = visited
-          val oldDist = visited0(hikePos)
-          val (newTodo2, newVisited) = graphTraversal.neighbors(hikePos).iterator.foldLeft((newTodo, visited))({ case ((todo, visited), (newHikePos2, dist)) =>
-            val newDist = oldDist + dist
-            if (visited0.contains(newHikePos2)) {
-              if (visited0(newHikePos2) < newDist) {
-                (todo + newHikePos2, visited + (newHikePos2 -> newDist))
-              }
-              else {
-                (todo, visited)
-              }
-            }
-            else {
-              (todo + newHikePos2, visited + (newHikePos2 -> newDist))
-            }
-          })
-          helper(newTodo2, newVisited)
-        }
+      def helper(todo: Set[HikePos], distances: Map[HikePos, Int]): Map[HikePos, Int] = {
+        val newTodoDistances = (for {
+          fromPos <- todo.iterator
+          fromDist = distances(fromPos)
+          (toPos, dist) <- graphTraversal.neighbors(fromPos).iterator
+          toDist = fromDist + dist
+          if distances.getOrElse(toPos, 0) < toDist
+        } yield toPos -> toDist).groupMapReduce(_._1)(_._2)(_ max _)
+        val newTodo = newTodoDistances.keySet
+        val newDistances = distances ++ newTodoDistances
+        if (newTodo.isEmpty)
+          newDistances.filter(_._1.pos == targetPos)
+        else
+          helper(newTodoDistances.keySet, newDistances)
       }
 
       val distances = helper(Set(graphTraversal.startNode), Map(graphTraversal.startNode -> 0))
