@@ -6,6 +6,8 @@ import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.box.Box
 
+import scala.annotation.tailrec
+
 object Day23 {
 
   case class HikePos(pos: Pos, path: List[Pos], pathSet: Set[Pos])
@@ -57,25 +59,64 @@ object Day23 {
     }
 
     val graphTraversal = new GraphTraversal[HikePos] {
-      override val startNode: HikePos = HikePos(startPos, List(startPos), Set(startPos))
+      //override val startNode: HikePos = HikePos(startPos, List(startPos), Set(startPos))
+      override val startNode: HikePos = HikePos(startPos, List(), Set(startPos))
 
       override def neighbors(hikePos: HikePos): IterableOnce[(HikePos, Int)] = {
-        val HikePos(pos, path, pathSet) = hikePos
-        for {
-          (newPos, dist) <- keyNeighbors(pos)
-          //() = println((pos, newPos, dist))
-          //() = assert(slopes || keyNeighbors(newPos)(pos) == dist)
-          if !path.contains(newPos)
-        } yield HikePos(newPos, newPos :: path, pathSet + newPos) -> dist
+        if (hikePos.pos != targetPos) {
+          val HikePos(pos, path, pathSet) = hikePos
+          for {
+            (newPos, dist) <- keyNeighbors(pos)
+            //() = println((pos, newPos, dist))
+            //() = assert(slopes || keyNeighbors(newPos)(pos) == dist)
+            if !pathSet.contains(newPos)
+          } yield HikePos(newPos, path, pathSet + newPos) -> dist
+        }
+        else
+          Iterator.empty
       }
     }
 
 
-    val asd = Dijkstra.traverse(graphTraversal).distances
-      .filter(_._1.pos == targetPos)
+    //val asd = Dijkstra.traverse(graphTraversal).distances
+    //  .filter(_._1.pos == targetPos)
 
-    asd.values.toSet.foreach(println)
-    println(asd.maxBy(_._2)._1.path)
+    @tailrec
+    def helper(todo: Set[HikePos], visited: Map[HikePos, Int]): Map[HikePos, Int] = {
+      if (todo.isEmpty)
+        visited.filter(_._1.pathSet.contains(targetPos))
+      else {
+        val hikePos = todo.head
+        val newTodo = todo - hikePos
+        val visited0 = visited
+        //if (hikePos.pathSet == Set(Pos(21,11), Pos(1,0), Pos(19,19), Pos(11,3), Pos(13,13), Pos(3,5), Pos(5,13), Pos(13,19)))
+        val oldDist = visited0(hikePos)
+        //if (hikePos.pos == Pos(19, 19))
+        //println(s"from $hikePos ($oldDist)")
+        val (newTodo2, newVisited) = graphTraversal.neighbors(hikePos).iterator.foldLeft((newTodo, visited))({ case ((todo, visited), (newHikePos2, dist)) =>
+          //println(s"  to $newHikePos2 -> $dist")
+          val newDist = oldDist + dist
+          if (visited0.contains(newHikePos2)) {
+            if (visited0(newHikePos2) < newDist) {
+              (todo + newHikePos2, visited + (newHikePos2 -> newDist))
+            }
+            else {
+              (todo, visited)
+            }
+          }
+          else {
+            (todo + newHikePos2, visited + (newHikePos2 -> newDist))
+          }
+        })
+        helper(newTodo2, newVisited)
+      }
+    }
+
+    val asd = helper(Set(graphTraversal.startNode), Map(graphTraversal.startNode -> 0))
+
+    //asd.values.toSet.foreach(println)
+    asd.foreach(println)
+    println(asd.maxBy(_._2)._1)
     asd
       .values
       .max

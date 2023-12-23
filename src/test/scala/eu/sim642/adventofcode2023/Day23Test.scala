@@ -43,6 +43,6 @@ class Day23Test extends AnyFunSuite {
   }
 
   ignore("Part 2 input answer") { // TODO: optimize
-    //assert(longestHike(parseGrid(input), slopes = false) == 2414)
+    assert(longestHike(parseGrid(input), slopes = false) == 6598)
   }
 }
