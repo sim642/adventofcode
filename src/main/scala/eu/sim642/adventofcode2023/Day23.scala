@@ -62,39 +62,23 @@ object Day23 {
         }).toMap
       }
 
-      case class HikePos(pos: Pos, path: Set[Pos])
-
-      val graphTraversal = new GraphTraversal[HikePos] {
-        override val startNode: HikePos = HikePos(startPos, Set(startPos))
-
-        override def neighbors(hikePos: HikePos): IterableOnce[(HikePos, Int)] = {
-          val HikePos(pos, path) = hikePos
-          for {
-            (newPos, dist) <- keyAdjacents.getOrElse(pos, Map.empty)
-            if !path.contains(newPos)
-          } yield HikePos(newPos, path + newPos) -> dist
+      // based on https://github.com/glguy/advent/blob/9c27a67f756c44b7f0711539ee5e892dca252791/solutions/src/2023/23.hs
+      def helper(pos: Pos, keyAdjacents: Map[Pos, Map[Pos, Int]], dist: Int): Int = {
+        if (pos == targetPos)
+          dist
+        else {
+          keyAdjacents.get(pos) match {
+            case Some(adjacents) =>
+              val newKeyAdjacents = keyAdjacents - pos
+              (for {
+                (toPos, cost) <- adjacents
+              } yield helper(toPos, newKeyAdjacents, dist + cost)).max
+            case None => 0
+          }
         }
       }
 
-      @tailrec
-      def helper(todo: Set[HikePos], distances: Map[HikePos, Int]): Map[HikePos, Int] = {
-        val newTodoDistances = (for {
-          fromPos <- todo.iterator
-          fromDist = distances(fromPos)
-          (toPos, dist) <- graphTraversal.neighbors(fromPos).iterator
-          toDist = fromDist + dist
-          if distances.getOrElse(toPos, 0) < toDist
-        } yield toPos -> toDist).groupMapReduce(_._1)(_._2)(_ max _)
-        val newTodo = newTodoDistances.keySet
-        val newDistances = distances ++ newTodoDistances
-        if (newTodo.isEmpty)
-          newDistances.filter(_._1.pos == targetPos)
-        else
-          helper(newTodoDistances.keySet, newDistances)
-      }
-
-      val distances = helper(Set(graphTraversal.startNode), Map(graphTraversal.startNode -> 0))
-      distances.values.max
+      helper(startPos, keyAdjacents, 0)
     }
   }
 
