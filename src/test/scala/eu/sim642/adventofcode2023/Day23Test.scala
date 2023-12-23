@@ -34,7 +34,7 @@ class Day23Test extends AnyFunSuite {
     assert(longestHike(parseGrid(exampleInput)) == 94)
   }
 
-  ignore("Part 1 input answer") { // TODO: optimize
+  test("Part 1 input answer") { // TODO: optimize
     assert(longestHike(parseGrid(input)) == 2414)
   }
 
@@ -43,6 +43,6 @@ class Day23Test extends AnyFunSuite {
   }
 
   ignore("Part 2 input answer") { // TODO: optimize
-    assert(longestHike(parseGrid(input), slopes = false) == 2414)
+    //assert(longestHike(parseGrid(input), slopes = false) == 2414)
   }
 }
