@@ -16,7 +16,7 @@ object Day23 {
     '<' -> Pos(-1, 0),
   )
 
-  def longestHike(grid: Grid[Char]): Int = {
+  def longestHike(grid: Grid[Char], slopes: Boolean = true): Int = {
 
     val graphTraversal = new GraphTraversal[HikePos] with UnitNeighbors[HikePos] {
       override val startNode: HikePos = HikePos(Pos(1, 0), Set(Pos(1, 0))) // TODO: don't hardcode
@@ -24,7 +24,7 @@ object Day23 {
       override def unitNeighbors(hikePos: HikePos): IterableOnce[HikePos] = {
         val HikePos(pos, path) = hikePos
         for {
-          offset <- if (grid(pos) == '.') Pos.axisOffsets else Seq(slopeOffsets(grid(pos)))
+          offset <- if (!slopes || grid(pos) == '.') Pos.axisOffsets else Seq(slopeOffsets(grid(pos)))
           newPos = pos + offset
           if grid.containsPos(newPos)
           if grid(newPos) != '#'
@@ -49,6 +49,7 @@ object Day23 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day23.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(longestHike(parseGrid(input)))
+    //println(longestHike(parseGrid(input)))
+    println(longestHike(parseGrid(input), slopes = false))
   }
 }
