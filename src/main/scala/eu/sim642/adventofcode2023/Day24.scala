@@ -57,6 +57,14 @@ object Day24 {
     inters.size
   }
 
+  // throw: 6 unk
+  // per-hailstone: 3 eqs, 1 unk
+
+  // 0, 6
+  // 3, 7
+  // 6, 8
+  // 9, 9
+
 
   def parseHailstone(s: String): Hailstone = s match {
     case s"$x, $y, $z @ $vx, $vy, $vz" =>
@@ -71,5 +79,7 @@ object Day24 {
 
   def main(args: Array[String]): Unit = {
     println(countIntersections1(parseHailstones(input)))
+
+    // part 2: 554668916217145
   }
 }
