@@ -29,6 +29,12 @@ object Day25 {
     foo.toSeq.map(_.size).product
   }
 
+  def disconnectComponents2(edges: Set[Edge]): Int = {
+    val foo = connectedComponents(edges -- Seq("bbg" -> "htb", "htb" -> "bbg", "pcc" -> "htj", "htj" -> "pcc", "pjj" -> "dlk", "dlk" -> "pjj"))
+    println(foo.size)
+    foo.toSeq.map(_.size).product
+  }
+
   def parseEdges(input: String): Set[Edge] = {
     (for {
       case s"$from: $tos" <- input.linesIterator
@@ -36,9 +42,22 @@ object Day25 {
     } yield (from, to)).toSet
   }
 
+  def printDot(edges: Set[Edge]): Unit = {
+    println("graph G {")
+    for ((a, b) <- edges)
+      println(s"  $a -> $b;")
+    println("}")
+  }
+
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day25.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(disconnectComponents(parseEdges(input)))
+    //printDot(parseEdges(input))
+    // bbg -- htb
+    // pcc -- htj
+    // pjj -- dlk
+    println(disconnectComponents2(parseEdges(input)))
+
+    // part 1: 1468 - too low (had pjj wrong)
   }
 }

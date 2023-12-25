@@ -24,7 +24,7 @@ class Day25Test extends AnyFunSuite {
     assert(disconnectComponents(parseEdges(exampleInput)) == 54)
   }
 
-  test("Part 1 input answer") {
-    //assert(disconnectComponents(parseEdges(input)) == 54)
+  ignore("Part 1 input answer") { // TODO: optimize
+    assert(disconnectComponents(parseEdges(input)) == 538560)
   }
 }
