@@ -1,5 +1,7 @@
 package eu.sim642.adventofcodelib.graph
 
+import eu.sim642.adventofcodelib.LazyListImplicits._
+
 trait GraphTraversal[A] {
   val startNode: A
   def neighbors(node: A): IterableOnce[(A, Int)]
@@ -19,7 +21,13 @@ trait Distances[A] {
 }
 
 trait Paths[A] {
-  def paths: collection.Map[A, Seq[A]]
+  def prevNodes: collection.Map[A, A]
+
+  def paths: collection.Map[A, Seq[A]] = {
+    prevNodes.map((node, _) =>
+      node -> (node +: LazyList.unfold0(node)(prevNodes.get)).reverse
+    )
+  }
 }
 
 trait Order[A] {

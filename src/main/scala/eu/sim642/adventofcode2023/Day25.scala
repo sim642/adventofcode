@@ -44,7 +44,7 @@ object Day25 {
         if (searchResult.target.isEmpty)
           break()
         else {
-          val targetPath = searchResult.paths(targetNode0).reverse // TODO: reverse in library?
+          val targetPath = searchResult.paths(targetNode0)
           val pathEdges = targetPath lazyZip targetPath.tail
           val pathFlow = pathEdges.map(residual(_)(_)).min
           for ((u, v) <- pathEdges) {
