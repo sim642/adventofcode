@@ -1,8 +1,10 @@
 package eu.sim642.adventofcode2023
 
+import com.microsoft.z3.{Context, Status}
 import eu.sim642.adventofcodelib.pos.Pos3
 
 import scala.collection.immutable.ArraySeq
+import scala.jdk.CollectionConverters.*
 
 object Day24 {
 
@@ -57,13 +59,31 @@ object Day24 {
     inters.size
   }
 
-  // throw: 6 unk
-  // per-hailstone: 3 eqs, 1 unk
+  def sumThrowCoords(hailstones: Seq[Hailstone]): Long = {
+    val ctx = new Context(Map("model" -> "true").asJava)
+    import ctx.*
+    val s = mkSolver()
 
-  // 0, 6
-  // 3, 7
-  // 6, 8
-  // 9, 9
+    // 6 unknowns
+    val x = mkRealConst("x")
+    val y = mkRealConst("y")
+    val z = mkRealConst("z")
+    val vx = mkRealConst("vx")
+    val vy = mkRealConst("vy")
+    val vz = mkRealConst("vz")
+
+    for (i <- 0 until 3) { // 9 equations, 9 unknowns
+      // 3 equations, 1 unknown
+      val Hailstone(p, v) = hailstones(i)
+      val ti = ctx.mkRealConst(s"t${i}")
+      s.add(mkEq(mkAdd(mkReal(p.x), mkMul(ti, mkReal(v.x))), mkAdd(x, mkMul(ti, vx))))
+      s.add(mkEq(mkAdd(mkReal(p.y), mkMul(ti, mkReal(v.y))), mkAdd(y, mkMul(ti, vy))))
+      s.add(mkEq(mkAdd(mkReal(p.z), mkMul(ti, mkReal(v.z))), mkAdd(z, mkMul(ti, vz))))
+    }
+
+    assert(s.check() == Status.SATISFIABLE)
+    s.getModel.evaluate(mkAdd(x, mkAdd(y, z)), false).toString.toLong
+  }
 
 
   def parseHailstone(s: String): Hailstone = s match {
@@ -79,7 +99,6 @@ object Day24 {
 
   def main(args: Array[String]): Unit = {
     println(countIntersections1(parseHailstones(input)))
-
-    // part 2: 554668916217145
+    println(sumThrowCoords(parseHailstones(input)))
   }
 }

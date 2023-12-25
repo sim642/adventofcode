@@ -19,4 +19,12 @@ class Day24Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countIntersections1(parseHailstones(input)) == 21785)
   }
+
+  test("Part 2 examples") {
+    assert(sumThrowCoords(parseHailstones(exampleInput)) == 47)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumThrowCoords(parseHailstones(input)) == 554668916217145L)
+  }
 }
