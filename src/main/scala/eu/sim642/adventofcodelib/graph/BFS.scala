@@ -2,6 +2,7 @@ package eu.sim642.adventofcodelib.graph
 
 import scala.annotation.tailrec
 import scala.collection.mutable
+import eu.sim642.adventofcodelib.LazyListImplicits._
 
 object BFS {
   // TODO: reduce duplication without impacting performance
@@ -76,6 +77,60 @@ object BFS {
 
     new Distances[A] with Target[A] {
       override def distances: collection.Map[A, Int] = visitedDistance
+
+      override def target: Option[(A, Int)] = None
+    }
+  }
+
+  // copied from Dijkstra
+  def searchPaths[A](graphSearch: GraphSearch[A] with UnitNeighbors[A]): Distances[A] with Paths[A] with Target[A] = {
+    val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
+    val prevNode: mutable.Map[A, A] = mutable.Map.empty
+    val toVisit: mutable.Queue[(Int, A)] = mutable.Queue.empty
+
+    def enqueue(node: A, dist: Int): Unit = {
+      toVisit.enqueue((dist, node))
+    }
+
+    enqueue(graphSearch.startNode, 0)
+
+    while (toVisit.nonEmpty) {
+      val (dist, node) = toVisit.dequeue()
+      if (!visitedDistance.contains(node)) {
+        visitedDistance(node) = dist
+
+        if (graphSearch.isTargetNode(node, dist)) {
+          return new Distances[A] with Paths[A] with Target[A] {
+            override def distances: collection.Map[A, Int] = visitedDistance
+
+            override def paths: collection.Map[A, Seq[A]] = {
+              prevNode.map((node, _) => node -> (node +: LazyList.unfold0(node)(prevNode.get))).toMap
+            }
+
+            override def target: Option[(A, Int)] = Some(node -> dist)
+          }
+        }
+
+
+        def goNeighbor(newNode: A): Unit = {
+          if (!visitedDistance.contains(newNode)) { // avoids some unnecessary queue duplication but not all
+            val newDist = dist + 1
+            enqueue(newNode, newDist)
+            if (!prevNode.contains(newNode)) // TODO: is this right?
+              prevNode(newNode) = node
+          }
+        }
+
+        graphSearch.unitNeighbors(node).iterator.foreach(goNeighbor)
+      }
+    }
+
+    new Distances[A] with Paths[A] with Target[A] {
+      override def distances: collection.Map[A, Int] = visitedDistance
+
+      override def paths: collection.Map[A, Seq[A]] = {
+        prevNode.map((node, _) => node -> (node +: LazyList.unfold0(node)(prevNode.get))).toMap
+      }
 
       override def target: Option[(A, Int)] = None
     }

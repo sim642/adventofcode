@@ -1,6 +1,10 @@
 package eu.sim642.adventofcode2023
 
-import eu.sim642.adventofcodelib.graph.{BFS, GraphComponents}
+import eu.sim642.adventofcodelib.graph.{BFS, GraphComponents, GraphSearch, GraphTraversal, TargetNode, UnitNeighbors}
+
+import scala.collection.mutable
+import scala.util.boundary
+import scala.util.boundary.break
 
 object Day25 {
 
@@ -21,12 +25,86 @@ object Day25 {
   }
 
   def disconnectComponents(edges: Set[Edge]): Int = {
-    val foo = edges.toSeq.combinations(3)
+    /* val foo = edges.toSeq.combinations(3)
       .map(edges -- _)
       .map(connectedComponents)
       .find(_.size == 2)
       .get
-    foo.toSeq.map(_.size).product
+    foo.toSeq.map(_.size).product*/
+
+    def edmondsKarp(startNode0: String, targetNode0: String): (Int, collection.Map[String, collection.Map[String, Int]]) = {
+
+      val residual: mutable.Map[String, mutable.Map[String, Int]] = mutable.Map.empty
+      for ((u, v) <- edges) {
+        // TODO: why doesn't withDefault work?
+        if (!residual.contains(u))
+          residual(u) = mutable.Map.empty
+        if (!residual.contains(v))
+          residual(v) = mutable.Map.empty
+        residual(u)(v) = 1
+        residual(v)(u) = 1
+      }
+
+      var flow = 0
+      boundary {
+        while (true) {
+          val graphSearch = new GraphSearch[String] with UnitNeighbors[String] with TargetNode[String] {
+            override val startNode: String = startNode0
+
+            override def unitNeighbors(node: String): IterableOnce[String] = {
+              for {
+                (toNode, r) <- residual(node)
+                if r > 0
+              } yield toNode
+            }
+
+            override val targetNode: String = targetNode0
+          }
+
+          val r = BFS.searchPaths(graphSearch)
+          if (r.target.isEmpty)
+            break()
+          val path = r.paths(r.target.get._1).reverse
+
+          val newFlow = (path lazyZip path.tail).map((u, v) => residual(u)(v)).max
+          flow += newFlow
+          for ((u, v) <- path lazyZip path.tail) {
+            residual(u)(v) -= newFlow
+            residual(v)(u) += newFlow
+          }
+        }
+      }
+
+      //println(flow)
+
+      (flow, residual)
+    }
+
+    val nodes = edges.flatMap(Seq(_, _))
+    val startNode0 = nodes.head
+    //val startNode0 = "frs"
+
+    for (targetNode <- nodes - startNode0) {
+      val (flow, residual) = edmondsKarp(startNode0, targetNode)
+      if (flow == 3) {
+        val graphTraversal = new GraphTraversal[String] with UnitNeighbors[String] {
+          override val startNode: String = startNode0
+
+          override def unitNeighbors(node: String): IterableOnce[String] = {
+            for {
+              (toNode, r) <- residual(node)
+              if r > 0
+            } yield toNode
+          }
+        }
+
+        val comp = BFS.traverse(graphTraversal).nodes
+        //println(comp)
+        return comp.size * (nodes.size - comp.size)
+      }
+    }
+
+    ???
   }
 
   def disconnectComponents2(edges: Set[Edge]): Int = {
@@ -45,7 +123,7 @@ object Day25 {
   def printDot(edges: Set[Edge]): Unit = {
     println("graph G {")
     for ((a, b) <- edges)
-      println(s"  $a -> $b;")
+      println(s"  $a -- $b;")
     println("}")
   }
 
