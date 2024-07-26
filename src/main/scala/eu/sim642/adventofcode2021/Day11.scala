@@ -80,7 +80,7 @@ object Day11 {
       def dfs(todo: List[Pos], grid: Grid[Int], visited: Set[Pos]): (Grid[Int], Set[Pos]) = todo match {
         case Nil => (grid, visited)
         case pos :: todo if !visited.contains(pos) =>
-          var grid2 = grid.updatedGrid(pos, 0)
+          val grid2 = grid.updatedGrid(pos, 0)
           val newNeighbors = Pos.allOffsets.map(pos + _).filter(grid2.containsPos).filter(!visited.contains(_))
           val newGrid = newNeighbors.foldLeft(grid2)((grid, pos) => grid.updatedGrid(pos, grid(pos) + 1))
           val newTodo = newNeighbors.filter(newGrid(_) > 9) ++: todo
