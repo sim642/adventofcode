@@ -12,6 +12,7 @@ object Geometry {
    * @see [[https://en.wikipedia.org/wiki/Shoelace_formula]]
    */
   def polygonArea[A](poss: collection.Seq[Pos])(using aIntegral: Integral[A]): A = {
+    //noinspection ConvertibleToMethodValue
     ((poss.last +: poss).iterator
       .zipWithTail
       .map(_ cross _)

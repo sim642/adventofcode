@@ -24,6 +24,7 @@ object Day10 {
           helper(visible, visibleMinDelta, otherAsteroids)
     }
 
+    //noinspection ConvertibleToMethodValue
     val todo = asteroids.toList.sortBy(monitoring manhattanDistance _)
     helper(Set.empty, Set.empty, todo)
   }
