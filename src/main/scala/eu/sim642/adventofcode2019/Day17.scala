@@ -104,7 +104,7 @@ object Day17 {
     else {
       val firstPathPart = pathParts.head
       for {
-        n <- (1 to (firstPathPart.size min pathMaxLength)).reverse.iterator
+        n <- (1 to (firstPathPart.size min pathMaxLength)).reverseIterator
         init = firstPathPart.take(n)
         if pathToString(init).lengthIs <= pathStringMaxLength
         newPathParts = pathParts.flatMap(split(_, init).filter(_.nonEmpty))
