@@ -38,7 +38,7 @@ object Dijkstra {
   }
 
   // copied from AStar
-  def search[A](graphSearch: GraphSearch[A]): Distances[A] with Target[A] = {
+  def search[A](graphSearch: GraphSearch[A]): Distances[A] & Target[A] = {
     val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
     val toVisit: mutable.PriorityQueue[(Int, A)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
 

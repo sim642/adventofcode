@@ -10,7 +10,7 @@ object SimultaneousBFS {
   // TODO: reduce duplication without impacting performance
 
   // moved from 2018 Day 20
-  def traverse[A](graphTraversal: GraphTraversal[A] with UnitNeighbors[A]): Distances[A] = {
+  def traverse[A](graphTraversal: GraphTraversal[A] & UnitNeighbors[A]): Distances[A] = {
 
     @tailrec
     def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] = {
@@ -34,10 +34,10 @@ object SimultaneousBFS {
   }
 
   // moved from 2018 Day 20
-  def search[A](graphSearch: GraphSearch[A] with UnitNeighbors[A]): Distances[A] with Target[A] = {
+  def search[A](graphSearch: GraphSearch[A] & UnitNeighbors[A]): Distances[A] & Target[A] = {
 
     @tailrec
-    def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] with Target[A] = {
+    def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] & Target[A] = {
       // TODO: use one dist: Int argument instead of all same toVisit values
       val newVisited = visited ++ toVisit
       toVisit.find(graphSearch.isTargetNode.tupled) match {

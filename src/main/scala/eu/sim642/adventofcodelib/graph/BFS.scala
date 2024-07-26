@@ -7,7 +7,7 @@ object BFS {
   // TODO: reduce duplication without impacting performance
 
   // copied from Dijkstra
-  def traverse[A](graphTraversal: GraphTraversal[A] with UnitNeighbors[A]): Distances[A] = {
+  def traverse[A](graphTraversal: GraphTraversal[A] & UnitNeighbors[A]): Distances[A] = {
     val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
     val toVisit: mutable.Queue[(Int, A)] = mutable.Queue.empty
 
@@ -39,7 +39,7 @@ object BFS {
   }
 
   // copied from Dijkstra
-  def search[A](graphSearch: GraphSearch[A] with UnitNeighbors[A]): Distances[A] with Target[A] = {
+  def search[A](graphSearch: GraphSearch[A] & UnitNeighbors[A]): Distances[A] & Target[A] = {
     val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
     val toVisit: mutable.Queue[(Int, A)] = mutable.Queue.empty
 
@@ -82,7 +82,7 @@ object BFS {
   }
 
   // copied from search
-  def searchPaths[A](graphSearch: GraphSearch[A] with UnitNeighbors[A]): Distances[A] with Paths[A] with Target[A] = {
+  def searchPaths[A](graphSearch: GraphSearch[A] & UnitNeighbors[A]): Distances[A] & Paths[A] & Target[A] = {
     val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
     val prevNode: mutable.Map[A, A] = mutable.Map.empty
     val toVisit: mutable.Queue[(Int, Option[A], A)] = mutable.Queue.empty

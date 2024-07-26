@@ -6,7 +6,7 @@ object DFS {
   // TODO: reduce duplication without impacting performance
 
   // copied from BFS
-  def traverse[A](graphTraversal: GraphTraversal[A] with UnitNeighbors[A]): Distances[A] with Order[A] = {
+  def traverse[A](graphTraversal: GraphTraversal[A] & UnitNeighbors[A]): Distances[A] & Order[A] = {
     val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
     val visitedOrder: mutable.Buffer[A] = mutable.Buffer.empty
     val toVisit: mutable.Stack[(Int, A)] = mutable.Stack.empty

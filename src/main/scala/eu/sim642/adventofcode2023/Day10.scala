@@ -17,7 +17,7 @@ object Day10 {
     'S' -> Pos.axisOffsets.toSet,
   )
 
-  def loopTraversal(grid: Grid[Char]): GraphTraversal[Pos] with UnitNeighbors[Pos] = {
+  def loopTraversal(grid: Grid[Char]): GraphTraversal[Pos] & UnitNeighbors[Pos] = {
     new GraphTraversal[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = grid.posOf('S')
 

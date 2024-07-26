@@ -26,7 +26,7 @@ object NaiveCycleFinder
       })
   }
 
-  override def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
+  override def find[A](x0: A, f: A => A): Cycle[A] & Indexing[A] = {
     val cycle = find(Iterator.iterate(x0)(f)).get
     FunctionCycle(
       stemLength = cycle.stemLength,

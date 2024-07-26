@@ -85,6 +85,6 @@ object Day22Test {
   }
 
   class LinearSolutionTest extends Part1SolutionTest with Part2SolutionTest {
-    override val solution: Part1Solution with Part2Solution = LinearSolution
+    override val solution: Part1Solution & Part2Solution = LinearSolution
   }
 }

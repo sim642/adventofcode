@@ -4,7 +4,7 @@ object BrentCycleFinder
   extends FunctionCycleFinder
     with FunctionCycleByFinder {
 
-  override def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
+  override def find[A](x0: A, f: A => A): Cycle[A] & Indexing[A] = {
     // https://en.wikipedia.org/wiki/Cycle_detection#Brent's_algorithm
     var power = 1
     var λ = 1

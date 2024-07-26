@@ -4,7 +4,7 @@ import scala.collection.mutable
 
 object AStar {
   // moved from 2018 Day 22
-  def search[A](graphSearch: GraphSearch[A] with Heuristic[A]): Distances[A] with Target[A] = {
+  def search[A](graphSearch: GraphSearch[A] & Heuristic[A]): Distances[A] & Target[A] = {
     val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
     val toVisit: mutable.PriorityQueue[(Int, Int, A)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
 

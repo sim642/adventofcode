@@ -15,7 +15,7 @@ object Day12 {
   sealed trait Part {
     type Node <: PathNode
 
-    def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] with UnitNeighbors[Node]
+    def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] & UnitNeighbors[Node]
 
     def countPaths(caveMap: CaveMap): Int = {
       val pathNodes = BFS.traverse(caveTraversal(caveMap)).nodes
@@ -27,7 +27,7 @@ object Day12 {
 
     override case class Node(path: List[Cave]) extends PathNode
 
-    override def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] with UnitNeighbors[Node] = new GraphTraversal[Node] with UnitNeighbors[Node] {
+    override def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] & UnitNeighbors[Node] = new GraphTraversal[Node] with UnitNeighbors[Node] {
       override val startNode: Node = Node(List("start"))
 
       override def unitNeighbors(node: Node): IterableOnce[Node] = {
@@ -43,7 +43,7 @@ object Day12 {
 
     override case class Node(path: List[Cave])(val canDuplicateSmall: Boolean) extends PathNode
 
-    override def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] with UnitNeighbors[Node] = new GraphTraversal[Node] with UnitNeighbors[Node] {
+    override def caveTraversal(caveMap: CaveMap): GraphTraversal[Node] & UnitNeighbors[Node] = new GraphTraversal[Node] with UnitNeighbors[Node] {
       override val startNode: Node = Node(List("start"))(true)
 
       override def unitNeighbors(node: Node): IterableOnce[Node] = {

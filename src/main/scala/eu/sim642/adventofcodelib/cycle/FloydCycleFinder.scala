@@ -4,7 +4,7 @@ object FloydCycleFinder
   extends FunctionCycleFinder
     with FunctionCycleByFinder {
 
-  override def find[A](x0: A, f: A => A): Cycle[A] with Indexing[A] = {
+  override def find[A](x0: A, f: A => A): Cycle[A] & Indexing[A] = {
     // https://en.wikipedia.org/wiki/Cycle_detection#Floyd's_Tortoise_and_Hare
     var tortoise = f(x0)
     var hare = f(f(x0))

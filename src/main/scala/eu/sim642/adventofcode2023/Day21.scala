@@ -10,7 +10,7 @@ import scala.math.Integral.Implicits.*
 
 object Day21 {
 
-  def gardenSearch(startPos: Pos, grid: Pos => Boolean, maxDist: Int): GraphSearch[Pos] with UnitNeighbors[Pos] = {
+  def gardenSearch(startPos: Pos, grid: Pos => Boolean, maxDist: Int): GraphSearch[Pos] & UnitNeighbors[Pos] = {
     new GraphSearch[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = startPos
 
