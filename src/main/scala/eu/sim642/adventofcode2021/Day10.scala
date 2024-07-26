@@ -100,6 +100,7 @@ object Day10 extends RegexParsers {
 
       def chunks: Parser[Unit] = rep(chunk) ^^^ ()
 
+      //noinspection ScalaUnnecessaryParentheses
       def chunk: Parser[Unit] = (
         "(" ~> chunks <~ ")"
       | "[" ~> chunks <~ "]"

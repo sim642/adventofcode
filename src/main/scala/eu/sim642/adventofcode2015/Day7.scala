@@ -59,6 +59,7 @@ object Day7 extends RegexParsers {
   }
 
 
+  //noinspection ScalaUnnecessaryParentheses
   def parseInstruction(s: String): (String, Expr) = {
     // parser combinators might be a bit overkill for this...
     def ident: Parser[String] = "[a-z]+".r

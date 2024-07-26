@@ -3,6 +3,7 @@ package eu.sim642.adventofcode2020
 import Day18.Expr._
 import scala.util.parsing.combinator.RegexParsers
 
+//noinspection ScalaUnnecessaryParentheses
 object Day18 extends RegexParsers {
 
   enum Expr {

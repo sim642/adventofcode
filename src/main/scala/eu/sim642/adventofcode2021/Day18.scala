@@ -73,6 +73,7 @@ object Day18 extends RegexParsers {
 
   def parseNumber(s: String): Number = {
 
+    //noinspection ScalaUnnecessaryParentheses
     def number: Parser[Number] = (
       "\\d+".r ^^ (_.toInt) ^^ Regular.apply
     | "[" ~> number ~ "," ~ number <~ "]" ^^ { case left ~ _ ~ right => Pair(left, right) }

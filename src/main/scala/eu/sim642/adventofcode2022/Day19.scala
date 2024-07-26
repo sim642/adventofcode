@@ -138,6 +138,7 @@ object Day19 extends RegexParsers {
   }
 
 
+  //noinspection ScalaUnnecessaryParentheses
   def parseBlueprint(s: String): Blueprint = {
 
     def resource: Parser[Resource] = (

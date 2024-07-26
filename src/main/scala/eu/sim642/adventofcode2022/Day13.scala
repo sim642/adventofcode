@@ -46,6 +46,7 @@ object Day13 extends RegexParsers {
 
   def parsePacket(s: String): PacketNode = {
 
+    //noinspection ScalaUnnecessaryParentheses
     def packetNode: Parser[PacketNode] = (
       "\\d+".r ^^ (value => IntNode(value.toInt))
     | "[" ~> repsep(packetNode, ",") <~ "]" ^^ ListNode.apply

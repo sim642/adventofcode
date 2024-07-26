@@ -134,6 +134,7 @@ object Day20 extends RegexParsers {
 
     def emptyNode: Parser[StringNode] = "" ^^^ StringNode("")
 
+    //noinspection ScalaUnnecessaryParentheses
     def regexNode: Parser[RegexNode] = (
       "[NESW]+".r ^^ StringNode.apply
     | "(" ~> repsep(concatNode | emptyNode, "|") <~ ")" ^^ ChoiceNode.apply
