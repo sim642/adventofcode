@@ -103,6 +103,7 @@ object Day16 {
   }
 
   def runProgram(program: Seq[InputInstruction], opcodeMap: Map[Int, String]): Int = {
+    //noinspection ZeroIndexToHead
     program.foldLeft(Seq(0, 0, 0, 0))({ case (registers, inputInstruction) =>
       val opcode = opcodeMap(inputInstruction.opcode)
       val instruction = inputInstruction.toInstruction(opcode)

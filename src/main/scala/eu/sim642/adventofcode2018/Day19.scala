@@ -18,6 +18,7 @@ object Day19 {
       registers = afterRegisters
       ip += 1
     }
+    //noinspection ZeroIndexToHead
     registers(0)
   }
 

@@ -4,6 +4,7 @@ import Day19.*
 import eu.sim642.adventofcodelib.pos.Pos3
 import org.scalatest.funsuite.AnyFunSuite
 
+//noinspection ZeroIndexToHead
 class Day19Test extends AnyFunSuite {
 
   val exampleInput =

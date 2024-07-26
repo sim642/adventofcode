@@ -49,6 +49,7 @@ class Day17Test extends AnyFunSuite {
     assert(pathToString(path) == "R,8,R,8,R,4,R,4,R,8,L,6,L,2,R,4,R,4,R,8,R,8,R,8,L,6,L,2")
 
     val pathParts = factorPathParts(Seq(path)).head
+    //noinspection ZeroIndexToHead
     assert(pathToString(pathParts(0)) == "R,8,R,8")
     assert(pathToString(pathParts(1)) == "R,4,R,4,R,8")
     assert(pathToString(pathParts(2)) == "L,6,L,2")
