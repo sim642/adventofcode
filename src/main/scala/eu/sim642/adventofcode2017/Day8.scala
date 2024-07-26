@@ -26,8 +26,8 @@ object Day8 {
   def parseInstruction(instructionStr: String): Instruction = instructionStr match {
     case instructionRegex(register, op, amount, conditionRegister, comp, conditionAmount) =>
       val operation = (op match {
-        case "inc" => Inc.apply _
-        case "dec" => Dec.apply _
+        case "inc" => Inc.apply
+        case "dec" => Dec.apply
       })(amount.toInt)
 
       val comparison = comp match {

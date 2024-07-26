@@ -35,7 +35,7 @@ object AStar {
           }
         }
 
-        graphSearch.neighbors(node).iterator.foreach((goNeighbor _).tupled) // eta expansion postfix operator _
+        graphSearch.neighbors(node).iterator.foreach(goNeighbor.tupled)
       }
     }
 

@@ -67,7 +67,7 @@ object Day12 {
   def xMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.x, moon.vel.x))
   def yMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.y, moon.vel.y))
   def zMoons(moons: Seq[Moon]): Seq[(Int, Int)] = moons.map(moon => (moon.pos.z, moon.vel.z))
-  val xyzMoons = Seq(xMoons _, yMoons _, zMoons _)
+  val xyzMoons = Seq(xMoons, yMoons, zMoons)
 
   /**
     * Part 2 solution which finds per-axis cycles with the first state repeating.
@@ -90,7 +90,7 @@ object Day12 {
   def xVelocities(moons: Seq[Moon]): Seq[Int] = moons.map(_.vel.x)
   def yVelocities(moons: Seq[Moon]): Seq[Int] = moons.map(_.vel.y)
   def zVelocities(moons: Seq[Moon]): Seq[Int] = moons.map(_.vel.z)
-  val xyzVelocities = Seq(xVelocities _, yVelocities _, zVelocities _)
+  val xyzVelocities = Seq(xVelocities, yVelocities, zVelocities)
 
   /**
     * Part 2 solution which finds per-axis half-cycles with the first velocity repeating.
@@ -115,7 +115,7 @@ object Day12 {
     */
   object CrtPart2Solution extends Part2Solution {
     override def simulateCycleSteps(moons: Seq[Moon]): Long = {
-      val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons) _
+      val cycleFinder = NaiveCycleFinder.findBy(moons, stepMoons)
 
       val xyzCycleEqs = {
         for {

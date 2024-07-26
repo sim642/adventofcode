@@ -10,7 +10,7 @@ object Day2 {
   }
 
   def totalWrappingPaperArea(presents: Seq[Present]): Int = {
-    presents.map((wrappingPaperArea _).tupled).sum
+    presents.map(wrappingPaperArea.tupled).sum
   }
 
   def totalWrappingPaperArea(input: String): Int = totalWrappingPaperArea(parseInput(input))
@@ -22,7 +22,7 @@ object Day2 {
   }
 
   def totalRibbonLength(presents: Seq[Present]): Int = {
-    presents.map((ribbonLength _).tupled).sum
+    presents.map(ribbonLength.tupled).sum
   }
 
   def totalRibbonLength(input: String): Int = totalRibbonLength(parseInput(input))

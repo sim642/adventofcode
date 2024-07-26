@@ -42,8 +42,8 @@ object Day18 extends RegexParsers {
   object Part1 extends Part {
 
     def op: Parser[(Expr, Expr) => Expr] = (
-      "+" ^^^ Add.apply _
-    | "*" ^^^ Mul.apply _
+      "+" ^^^ Add.apply
+    | "*" ^^^ Mul.apply
     )
 
     def expr: Parser[Expr] = chainl1(simple, op)

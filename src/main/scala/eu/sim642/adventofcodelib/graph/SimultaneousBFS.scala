@@ -40,7 +40,7 @@ object SimultaneousBFS {
     def helper(visited: Map[A, Int], toVisit: Map[A, Int]): Distances[A] with Target[A] = {
       // TODO: use one dist: Int argument instead of all same toVisit values
       val newVisited = visited ++ toVisit
-      toVisit.find((graphSearch.isTargetNode _).tupled) match {
+      toVisit.find(graphSearch.isTargetNode.tupled) match {
         case targetNodeDist@Some(_) =>
           new Distances[A] with Target[A] {
             override def distances: collection.Map[A, Int] = newVisited

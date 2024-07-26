@@ -9,7 +9,7 @@ object Day2 {
   sealed trait Part {
     def isValid(policy: Policy, password: Password): Boolean
 
-    def countValid(passwordPolicies: Seq[(Policy, Password)]): Int = passwordPolicies.count((isValid _).tupled)
+    def countValid(passwordPolicies: Seq[(Policy, Password)]): Int = passwordPolicies.count(isValid.tupled)
   }
 
   object Part1 extends Part {
