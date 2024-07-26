@@ -8,7 +8,7 @@ object Day15 {
 
   case class HashMap(boxes: Vector[Vector[(String, Int)]]) {
     def +(keyValue: (String, Int)): HashMap = {
-      val (key -> value) = keyValue
+      val key -> value = keyValue
       val boxI = hash(key)
       val box = boxes(boxI)
       val keyI = box.indexWhere(_._1 == key)

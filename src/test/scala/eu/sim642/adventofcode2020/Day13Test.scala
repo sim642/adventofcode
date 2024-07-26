@@ -57,7 +57,7 @@ class Day13Test extends AnyFunSuite with ScalaCheckPropertyChecks {
       assert(earliestSubsequentDepart(parseBuses(buses)) == BigInt(expectedDepart))
     }
 
-    forAll(busesExpectedContradiction) { (buses) =>
+    forAll(busesExpectedContradiction) { buses =>
       assertThrows[NoSuchElementException](earliestSubsequentDepart(parseBuses(buses)))
     }
   }

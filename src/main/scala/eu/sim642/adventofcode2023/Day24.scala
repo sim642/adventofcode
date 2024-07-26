@@ -75,7 +75,7 @@ object Day24 {
     for (i <- 0 until 3) { // 9 equations, 9 unknowns
       // 3 equations, 1 unknown
       val Hailstone(p, v) = hailstones(i)
-      val ti = ctx.mkRealConst(s"t${i}")
+      val ti = ctx.mkRealConst(s"t$i")
       s.add(mkEq(mkAdd(mkReal(p.x), mkMul(ti, mkReal(v.x))), mkAdd(x, mkMul(ti, vx))))
       s.add(mkEq(mkAdd(mkReal(p.y), mkMul(ti, mkReal(v.y))), mkAdd(y, mkMul(ti, vy))))
       s.add(mkEq(mkAdd(mkReal(p.z), mkMul(ti, mkReal(v.z))), mkAdd(z, mkMul(ti, vz))))

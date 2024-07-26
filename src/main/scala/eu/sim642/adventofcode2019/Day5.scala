@@ -10,7 +10,7 @@ object Day5 {
   }
 
   def execDiagnostic(program: Memory, systemId: Int): Int = {
-    val (diagnostic #:: outputs) = execInputsReverse(program, LazyList(systemId)): @unchecked
+    val diagnostic #:: outputs = execInputsReverse(program, LazyList(systemId)): @unchecked
     assert(outputs.forall(_ == 0))
     diagnostic
   }
