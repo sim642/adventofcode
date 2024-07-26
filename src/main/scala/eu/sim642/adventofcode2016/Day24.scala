@@ -4,6 +4,7 @@ import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.graph.{BFS, GraphTraversal, NaiveTSP, UnitNeighbors}
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.CharImplicits._
 
 object Day24 {
 
@@ -11,8 +12,8 @@ object Day24 {
     (for {
       (row, y) <- grid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
-      if cell.isDigit
-    } yield cell.asDigit -> Pos(x, y)).toMap
+      digit <- cell.asDigitOption
+    } yield digit -> Pos(x, y)).toMap
   }
 
   def getPoiDistMatrix(grid: Grid[Char], pois: Map[Int, Pos]): Map[Int, Map[Int, Int]] = {

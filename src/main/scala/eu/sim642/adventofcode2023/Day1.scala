@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2023
 
+import eu.sim642.adventofcodelib.CharImplicits._
+
 object Day1 {
 
   trait Part {
@@ -14,8 +16,7 @@ object Day1 {
   }
 
   object Part1 extends Part {
-    override def recoverDigits(line: String): Seq[Int] =
-      line.filter(_.isDigit).map(_.asDigit) // TODO: asDigitOpt in library
+    override def recoverDigits(line: String): Seq[Int] = line.flatMap(_.asDigitOption)
   }
 
   object Part2 extends Part {
