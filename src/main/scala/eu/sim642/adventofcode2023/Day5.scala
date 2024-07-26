@@ -43,7 +43,7 @@ object Day5 {
 
   type Intervals = Set[Interval]
 
-  case class RangeMapEntry(destination: Long, source: Long, length: Long) extends Function1[Interval, Option[Interval]] {
+  case class RangeMapEntry(destination: Long, source: Long, length: Long) extends (Interval => Option[Interval]) {
     val sourceRange: Interval = Interval(source, source + length - 1)
 
     override def apply(x: Interval): Option[Interval] = {
@@ -53,7 +53,7 @@ object Day5 {
     }
   }
 
-  case class RangeMap(entries: Seq[RangeMapEntry]) extends Function1[Interval, Intervals] {
+  case class RangeMap(entries: Seq[RangeMapEntry]) extends (Interval => Intervals) {
     override def apply(x: Interval): Intervals = {
       val mapped = entries.flatMap(_(x)).toSet
       val unmapped = entries.foldLeft(Set(x))((acc, entry) => acc.flatMap(_.diffSplit(entry.sourceRange)))
@@ -61,7 +61,7 @@ object Day5 {
     }
   }
 
-  case class Input(seeds: Seq[Long], rangeMaps: Seq[RangeMap]) extends Function1[Interval, Intervals] {
+  case class Input(seeds: Seq[Long], rangeMaps: Seq[RangeMap]) extends (Interval => Intervals) {
     override def apply(x: Interval): Intervals =
       rangeMaps.foldLeft(Set(x))(_.flatMap(_))
   }
