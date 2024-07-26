@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2018
 
+import scala.annotation.tailrec
 import scala.collection.immutable.SortedSet
 
 object Day7 {
@@ -7,6 +8,7 @@ object Day7 {
   type Step = Char
   type Requirements = Map[Step, Set[Step]]
 
+  @tailrec
   def topologicalSort(reqs: Requirements, revOrder: List[Step] = Nil): String = {
     reqs.values.reduceOption(_ ++ _) match {
       case None => revOrder.reverse.mkString("")
@@ -50,6 +52,7 @@ object Day7 {
       }
     }
 
+    @tailrec
     def helper(reqs: Requirements, works: Set[Work] = Set.empty, time: Int = 0): Int = {
       if (reqs.isEmpty && works.isEmpty)
         return time

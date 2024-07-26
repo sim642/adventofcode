@@ -55,6 +55,7 @@ object Day9 {
   }
 
   def highscore(playerCount: Int, lastMarble: Int): Long = {
+    @tailrec
     def helper(marbles: CircularZipper[Int], marble: Int, player: Int, scores: Map[Int, Long]): Map[Int, Long] = {
       val nextPlayer = ((player - 1) + 1) % playerCount + 1
 

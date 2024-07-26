@@ -3,8 +3,9 @@ package eu.sim642.adventofcode2018
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits.*
-import eu.sim642.adventofcodelib.graph.{SimultaneousBFS, GraphSearch, UnitNeighbors}
+import eu.sim642.adventofcodelib.graph.{GraphSearch, SimultaneousBFS, UnitNeighbors}
 
+import scala.annotation.tailrec
 import scala.util.Try
 
 object Day15 {
@@ -91,6 +92,7 @@ object Day15 {
 
     def round(units: List[CombatUnit]): (List[CombatUnit], Boolean) = {
 
+      @tailrec
       def turn(init: List[CombatUnit], tail: List[CombatUnit], done: Boolean): (List[CombatUnit], Boolean) = tail match {
         case Nil => (init, done)
         case unit :: tl =>

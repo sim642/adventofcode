@@ -1,6 +1,8 @@
 package eu.sim642.adventofcode2018
 
-import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.IteratorImplicits.*
+
+import scala.annotation.tailrec
 
 object Day24 {
 
@@ -32,6 +34,7 @@ object Day24 {
 
   def targetSelectionPhase(groups: Seq[Group]): Map[Group, Group] = {
 
+    @tailrec
     def helper(choosingGroups: List[Group], attackableGroups: Set[Group], targets: Map[Group, Group] = Map.empty): Map[Group, Group] = choosingGroups match {
       case Nil => targets
       case attackingGroup :: tl =>
@@ -53,6 +56,7 @@ object Day24 {
 
   def attackingPhase(groups: Seq[Group], targets: Map[Group, Group]): Seq[Group] = {
 
+    @tailrec
     def helper(attackingGroups: List[Group], targets: Map[Group, Group], groups: Set[Group]): Seq[Group] = attackingGroups match {
       case Nil => groups.toSeq
       case attackingGroup :: tl =>

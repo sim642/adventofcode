@@ -1,7 +1,9 @@
 package eu.sim642.adventofcode2017
 
 import eu.sim642.adventofcodelib.pos.Pos3
-import eu.sim642.adventofcodelib.IterableOnceImplicits._
+import eu.sim642.adventofcodelib.IterableOnceImplicits.*
+
+import scala.annotation.tailrec
 
 object Day20 {
 
@@ -126,6 +128,7 @@ object Day20 {
     override def particlesLeft(particles: Seq[Particle]): Int = {
       import Quadratic._
 
+      @tailrec
       def helper(collisions: Seq[(Int, Int, Int)], ps: Set[Int]): Set[Int] = collisions match {
         case Seq() => ps
         case (i, j, t) +: rest =>

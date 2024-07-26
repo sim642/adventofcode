@@ -1,8 +1,10 @@
 package eu.sim642.adventofcode2018
 
 import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.pos.Pos
+
+import scala.annotation.tailrec
 
 object Day13 {
 
@@ -47,6 +49,7 @@ object Day13 {
   }
 
   def tickCartsCollide(grid: Grid[Char], carts: Seq[Cart]): Seq[Cart] = {
+    @tailrec
     def helper(init: List[Cart], tail: List[Cart]): List[Cart] = tail match {
       case Nil => init
       case cart :: tl =>

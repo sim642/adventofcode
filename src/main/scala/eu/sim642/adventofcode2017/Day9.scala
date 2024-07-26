@@ -1,7 +1,10 @@
 package eu.sim642.adventofcode2017
 
+import scala.annotation.tailrec
+
 object Day9 {
 
+  @tailrec
   def skipGarbage(chars: List[Char]): List[Char] = chars match {
     case '>' :: xs => xs
     case '!' :: _ :: xs => skipGarbage(xs)
