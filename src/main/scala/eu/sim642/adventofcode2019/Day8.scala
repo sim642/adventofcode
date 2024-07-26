@@ -21,8 +21,8 @@ object Day8 {
               case (2, bottomCell) => bottomCell // top transparent
               case (topCell, _) => topCell
             }
-          }).toVector
-        ).toVector
+          })
+        )
     }
 
     layers.reduce(stack2)

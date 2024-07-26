@@ -36,7 +36,7 @@ object Day22 {
       case DealWithIncrement(n) =>
         val size = deck.size
         val nInv = NumberTheory.modInv(n, size)
-        Vector.tabulate(size)(i => deck(((nInv * i) % size).toInt))
+        Vector.tabulate(size)(i => deck((nInv * i) % size))
     }
 
     def shuffleFactoryOrder(techniques: Techniques, size: Long): Deck = {
