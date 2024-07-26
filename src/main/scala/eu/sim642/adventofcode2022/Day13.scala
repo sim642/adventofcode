@@ -13,6 +13,7 @@ object Day13 extends RegexParsers {
     case ListNode(nodes: Seq[PacketNode])
   }
 
+  //noinspection ConvertExpressionToSAM
   given Ordering[PacketNode] = new Ordering[PacketNode] {
 
     import math.Ordered.orderingToOrdered
