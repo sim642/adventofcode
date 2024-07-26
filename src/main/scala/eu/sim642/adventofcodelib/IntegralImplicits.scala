@@ -38,6 +38,6 @@ object IntegralImplicits {
   }
 
   implicit class ExtraDivIntOps(n: Int) {
-    def floorDiv(d: Int): Int = Math.floorDiv(n, d)
+    infix def floorDiv(d: Int): Int = Math.floorDiv(n, d)
   }
 }

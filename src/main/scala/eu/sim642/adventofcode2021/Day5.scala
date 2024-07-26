@@ -10,7 +10,7 @@ object Day5 {
   type Line = (Pos, Pos)
 
   extension (start: Int) {
-    def directedTo(end: Int): Range.Inclusive = {
+    infix def directedTo(end: Int): Range.Inclusive = {
       Range.inclusive(start, end, if (start > end) -1 else 1)
     }
   }

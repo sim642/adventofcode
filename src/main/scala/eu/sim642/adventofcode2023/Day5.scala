@@ -10,7 +10,7 @@ object Day5 {
   case class Interval(min: Long, max: Long) {
     require(min <= max)
 
-    def intersect(that: Interval): Option[Interval] = {
+    infix def intersect(that: Interval): Option[Interval] = {
       val intersectMin = min max that.min
       val intersectMax = max min that.max
       if (intersectMin <= intersectMax)

@@ -69,7 +69,7 @@ object Day22 {
           ((BigInt(a) * b) %+ m).toLong
         }
 
-        def compose(that: Linear): Linear = {
+        infix def compose(that: Linear): Linear = {
           val Linear(c, d) = that // cx + d
           // a(cx + d) + b = (ac)x + (ad + b)
           Linear(safeMul(a, c), (safeMul(a, d) + b) %+ m)

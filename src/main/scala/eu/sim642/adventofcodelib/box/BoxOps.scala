@@ -16,13 +16,13 @@ trait BoxOps[A <: BoxPosOps[A], B <: BoxOps[A, B]] {
   def contains(that: B): Boolean =
     min <= that.min && that.max <= max
 
-  def union(that: B): B = {
+  infix def union(that: B): B = {
     val unionMin = min min that.min
     val unionMax = max max that.max
     factory(unionMin, unionMax)
   }
 
-  def intersect(that: B): Option[B] = {
+  infix def intersect(that: B): Option[B] = {
     val intersectMin = min max that.min
     val intersectMax = max min that.max
     if (intersectMin <= intersectMax)

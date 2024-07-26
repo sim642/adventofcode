@@ -110,7 +110,7 @@ object Day20 {
     implicit class ParticleCollides(particle: Particle) {
       private val Particle(p, v, a) = particle
 
-      def collides(that: Particle): Quadratic.Solution[Int] = Quadratic.solveSimInt(Seq(
+      infix def collides(that: Particle): Quadratic.Solution[Int] = Quadratic.solveSimInt(Seq(
         ((a.x - that.a.x) / 2.0, (v.x + a.x / 2.0) - (that.v.x + that.a.x / 2.0), p.x - that.p.x),
         ((a.y - that.a.y) / 2.0, (v.y + a.y / 2.0) - (that.v.y + that.a.y / 2.0), p.y - that.p.y),
         ((a.z - that.a.z) / 2.0, (v.z + a.z / 2.0) - (that.v.z + that.a.z / 2.0), p.z - that.p.z)

@@ -11,7 +11,7 @@ object Day18 {
 
   // TODO: move to library, reuse elsewhere?
   implicit class DisjointSetOps[A](thisSet: Set[A]) {
-    def disjoint(thatSet: Set[A]): Boolean = !thisSet.exists(thatSet)
+    infix def disjoint(thatSet: Set[A]): Boolean = !thisSet.exists(thatSet)
   }
 
   trait Solution {

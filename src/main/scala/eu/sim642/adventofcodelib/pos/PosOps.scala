@@ -7,5 +7,5 @@ trait PosOps[A <: PosOps[A]] {
   def unary_- : A = -1 *: this
   def -(that: A): A = this + (-that)
 
-  def manhattanDistance(that: A): Int
+  infix def manhattanDistance(that: A): Int
 }
