@@ -9,6 +9,7 @@ class Day17Test extends AnyFunSuite with ScalaCheckPropertyChecks {
   test("Part 1 example states") {
     import Part1._
 
+    //noinspection RedundantDefaultArgument
     val states = Table(
       "state",
       SpinState(Vector(0), 0),
