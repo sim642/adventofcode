@@ -16,6 +16,6 @@ object Memory {
   }
 
   def parse(s: String): Memory = {
-    Memory(s.split(',').map(_.toLong).toSeq: _*)
+    Memory(s.split(',').map(_.toLong).toSeq*)
   }
 }
