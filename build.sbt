@@ -14,13 +14,13 @@ scalacOptions ++= Seq(
 //resolvers += "Sonatype OSS Snapshots" at
 //  "https://oss.sonatype.org/content/repositories/snapshots"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.17"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.17" % "test"
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.17.0" % "test"
-libraryDependencies += "org.scalatestplus" %% "scalacheck-1-17" % "3.2.17.0" % "test"
-libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0"
-libraryDependencies += "com.lihaoyi" %% "ujson" % "3.1.3"
-libraryDependencies += "tools.aqua" % "z3-turnkey" % "4.12.2.1"
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.19"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test"
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.18.0" % "test"
+libraryDependencies += "org.scalatestplus" %% "scalacheck-1-18" % "3.2.19.0" % "test"
+libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
+libraryDependencies += "com.lihaoyi" %% "ujson" % "4.0.0"
+libraryDependencies += "tools.aqua" % "z3-turnkey" % "4.13.0"
 libraryDependencies += "io.github.hughsimpson" %% "scalameter" % "0.22.1" % "test" // Scala 3 compatible scalameter fork
 
 // TODO: scalameter tests don't work in SBT
