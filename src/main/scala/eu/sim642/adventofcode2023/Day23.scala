@@ -71,7 +71,7 @@ object Day23 {
             case Some(adjacents) =>
               val newKeyAdjacents = keyAdjacents - pos
               (for {
-                (toPos, cost) <- adjacents
+                (toPos, cost) <- adjacents.iterator
               } yield helper(toPos, newKeyAdjacents, dist + cost)).max
             case None => 0
           }
