@@ -20,4 +20,12 @@ class Day1Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(totalListDistance(parseLists(input)) == 1666427)
   }
+
+  test("Part 2 examples") {
+    assert(similarityScore(parseLists(exampleInput)) == 31)
+  }
+
+  test("Part 2 input answer") {
+    assert(similarityScore(parseLists(input)) == 24316233)
+  }
 }
