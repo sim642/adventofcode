@@ -4,18 +4,18 @@ import eu.sim642.adventofcodelib.IterableImplicits._
 
 object Day1 {
 
-  def totalListDistance(lists: Seq[(Int, Int)]): Int = {
-    val (list1, list2) = lists.unzip
-    (list1.sorted lazyZip list2.sorted)
+  def totalListDistance(lists: (Seq[Int], Seq[Int])): Int = {
+    val (left, right) = lists
+    (left.sorted lazyZip right.sorted)
       .map((i, j) => (i - j).abs)
       .sum
   }
 
-  def similarityScore(lists: Seq[(Int, Int)]): Int = {
-    val (list1, list2) = lists.unzip
-    val list2Count = list2.groupCount(identity).withDefaultValue(0)
-    list1
-      .map(i => i * list2Count(i))
+  def similarityScore(lists: (Seq[Int], Seq[Int])): Int = {
+    val (left, right) = lists
+    val rightCount = right.groupCount(identity).withDefaultValue(0)
+    left
+      .map(i => i * rightCount(i))
       .sum
   }
 
@@ -23,7 +23,7 @@ object Day1 {
     case s"$i   $j" => (i.toInt, j.toInt)
   }
 
-  def parseLists(input: String): Seq[(Int, Int)] = input.linesIterator.map(parsePair).toSeq
+  def parseLists(input: String): (Seq[Int], Seq[Int]) = input.linesIterator.map(parsePair).toSeq.unzip
 
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day1.txt")).mkString.trim
 
