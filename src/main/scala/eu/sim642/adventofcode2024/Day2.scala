@@ -18,13 +18,24 @@ object Day2 {
     monotonic && safeDifferences
   }
 
-  def countSafe(reports: Seq[Report]): Int = reports.count(isSafe)
+  object Part1 {
+    def countSafe(reports: Seq[Report]): Int = reports.count(isSafe)
+  }
+
+  object Part2 {
+    private def isSafe2(report: Report): Boolean = {
+      isSafe(report) || report.indices.exists(i => isSafe(report.slice(0, i) ++ report.slice(i + 1, report.size))) // TODO: better seq removal? optimize?
+    }
+
+    def countSafe(reports: Seq[Report]): Int = reports.count(isSafe2)
+  }
 
   def parseReports(input: String): Seq[Report] = input.linesIterator.map(_.split(" ").map(_.toInt).toSeq).toSeq
 
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day2.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countSafe(parseReports(input)))
+    println(Part1.countSafe(parseReports(input)))
+    println(Part2.countSafe(parseReports(input)))
   }
 }

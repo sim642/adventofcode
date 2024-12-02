@@ -14,16 +14,18 @@ class Day2Test extends AnyFunSuite {
       |1 3 6 7 9""".stripMargin
 
   test("Part 1 examples") {
-    assert(countSafe(parseReports(exampleInput)) == 2)
+    assert(Part1.countSafe(parseReports(exampleInput)) == 2)
   }
 
   test("Part 1 input answer") {
-    assert(countSafe(parseReports(input)) == 549)
+    assert(Part1.countSafe(parseReports(input)) == 549)
   }
 
   test("Part 2 examples") {
+    assert(Part2.countSafe(parseReports(exampleInput)) == 4)
   }
 
   test("Part 2 input answer") {
+    assert(Part2.countSafe(parseReports(input)) == 589)
   }
 }
