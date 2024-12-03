@@ -9,18 +9,18 @@ class Day3Test extends AnyFunSuite {
   val exampleInput2 = """xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"""
 
   test("Part 1 examples") {
-    assert(sumUncorruptedMuls(exampleInput) == 161)
+    assert(Part1.sumMuls(exampleInput) == 161)
   }
 
   test("Part 1 input answer") {
-    assert(sumUncorruptedMuls(input) == 182780583)
+    assert(Part1.sumMuls(input) == 182780583)
   }
 
   test("Part 2 examples") {
-    assert(sumUncorruptedMuls2(exampleInput2) == 48)
+    assert(Part2.sumMuls(exampleInput2) == 48)
   }
 
   test("Part 2 input answer") {
-    assert(sumUncorruptedMuls2(input) == 90772405)
+    assert(Part2.sumMuls(input) == 90772405)
   }
 }
