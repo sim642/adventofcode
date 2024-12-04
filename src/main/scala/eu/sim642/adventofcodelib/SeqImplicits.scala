@@ -23,6 +23,9 @@ object SeqImplicits {
 
     def rotateRight[That](n: Int)(using BuildFrom[Repr, seq.A, That]): That =
       rotateLeft(-n)
+
+    def removed[That](index: Int)(using bf: BuildFrom[Repr, seq.A, That]): That =
+      bf.fromSpecific(coll)(seq(coll).patch(index, Nil, 1))
   }
 
   // alternate more limited view-less implementation by OlegYch|h on freenode#scala

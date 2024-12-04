@@ -28,7 +28,7 @@ object Day2 {
 
   object Part2 extends Part {
     override def isSafe(report: Report): Boolean = {
-      Part1.isSafe(report) || report.indices.exists(i => Part1.isSafe(report.slice(0, i) ++ report.slice(i + 1, report.size))) // TODO: better seq removal? optimize?
+      Part1.isSafe(report) || report.indices.view.map(report.removed).exists(Part1.isSafe)
     }
   }
 
