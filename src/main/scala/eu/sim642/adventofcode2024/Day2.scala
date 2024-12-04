@@ -1,6 +1,7 @@
 package eu.sim642.adventofcode2024
 
 import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.SeqImplicits._
 
 object Day2 {
 
@@ -15,8 +16,8 @@ object Day2 {
   object Part1 extends Part {
     override def isSafe(report: Report): Boolean = {
       val sorted = report.sorted
-      val increasing = report == sorted // TODO: add isSorted to library
-      val decreasing = report.reverse == sorted // TODO: add isSorted to library (with Ordering)
+      val increasing = report.isSorted
+      val decreasing = report.isSorted(using Ordering[Int].reverse)
       val monotonic = increasing || decreasing
       val safeDifferences = report.iterator.zipWithTail.forall({ case (a, b) =>
         (1 to 3).contains((a - b).abs)

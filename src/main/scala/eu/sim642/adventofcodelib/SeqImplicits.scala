@@ -1,11 +1,17 @@
 package eu.sim642.adventofcodelib
 
 import eu.sim642.adventofcodelib.IntegralImplicits._
+import IteratorImplicits._
 
 import scala.collection.BuildFrom
 import scala.collection.generic.IsSeq
 
 object SeqImplicits {
+
+  extension [A](seq: Seq[A]) {
+    def isSorted(using ord: Ordering[A]): Boolean =
+      seq.iterator.zipWithTail.forall(ord.lteq)
+  }
 
   extension [Repr](coll: Repr)(using seq: IsSeq[Repr]) {
     def rotateLeft[That](n: Int)(using bf: BuildFrom[Repr, seq.A, That]): That = {

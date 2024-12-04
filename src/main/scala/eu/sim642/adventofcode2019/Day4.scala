@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2019
 
+import eu.sim642.adventofcodelib.SeqImplicits._
+
 import scala.Integral.Implicits._
 import scala.annotation.tailrec
 
@@ -43,15 +45,11 @@ object Day4 {
     }
   }
 
-  def isSorted(list: List[Int]): Boolean = {
-    (list lazyZip list.tail).forall(_ <= _)
-  }
-
   object Part1 extends Part {
     override def isPassword(number: Int): Boolean = {
       val digits = toDigitList(number)
       // seems a bit faster to short-circuit isSorted first
-      isSorted(digits) && runLengthsReverse(digits).exists(_ >= 2)
+      digits.isSorted && runLengthsReverse(digits).exists(_ >= 2)
     }
   }
 
@@ -59,7 +57,7 @@ object Day4 {
     override def isPassword(number: Int): Boolean = {
       val digits = toDigitList(number)
       // seems a bit faster to short-circuit isSorted first
-      isSorted(digits) && runLengthsReverse(digits).contains(2)
+      digits.isSorted && runLengthsReverse(digits).contains(2)
     }
   }
 
