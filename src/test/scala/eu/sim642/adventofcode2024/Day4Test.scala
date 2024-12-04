@@ -24,4 +24,12 @@ class Day4Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countXMAS(parseGrid(input)) == 2454)
   }
+
+  test("Part 2 examples") {
+    assert(countCrossMAS(parseGrid(exampleInput)) == 9)
+  }
+
+  test("Part 2 input answer") {
+    assert(countCrossMAS(parseGrid(input)) == 1858)
+  }
 }

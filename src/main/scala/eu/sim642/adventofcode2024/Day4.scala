@@ -36,11 +36,30 @@ object Day4 {
     grids1.map(countHorizontal).sum + grids2.map(countDiagonal).sum
   }
 
+  def countCrossMAS(grid: Grid[Char]): Int = {
+    def countCross(grid: Grid[Char]): Int = {
+      grid
+        .slidingGrid(3)
+        .flatten
+        .count(w => w(0)(0) == 'M' && w(0)(2) == 'S' && w(1)(1) == 'A' && w(2)(0) == 'M' && w(2)(2) == 'S')
+    }
+
+    val grids = Seq(
+      grid,
+      grid.map(_.reverse),
+      grid.transpose,
+      grid.transpose.map(_.reverse)
+    )
+
+    grids.map(countCross).sum
+  }
+
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day4.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(countXMAS(parseGrid(input)))
+    println(countCrossMAS(parseGrid(input)))
   }
 }
