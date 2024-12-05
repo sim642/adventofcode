@@ -51,4 +51,18 @@ class Day5Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumCorrectMiddles(parseInput(input)) == 6051)
   }
+
+  test("Part 2 examples") {
+    val input@Input(rules, updates) = parseInput(exampleInput)
+
+    assert(sort(rules, updates(3)) == parseUpdate("97,75,47,61,53"))
+    assert(sort(rules, updates(4)) == parseUpdate("61,29,13"))
+    assert(sort(rules, updates(5)) == parseUpdate("97,75,47,29,13"))
+
+    assert(sumIncorrectMiddles(input) == 123)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumIncorrectMiddles(parseInput(input)) == 5093)
+  }
 }
