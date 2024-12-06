@@ -1,11 +1,10 @@
 package eu.sim642.adventofcode2024
 
-import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcode2018.Day13.DirectionPos
-import eu.sim642.adventofcodelib.box.Box
-import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
+import eu.sim642.adventofcodelib.Grid
+import eu.sim642.adventofcodelib.GridImplicits.*
+import eu.sim642.adventofcodelib.cycle.BrentCycleFinder
+import eu.sim642.adventofcodelib.pos.Pos
 
 object Day6 {
 
@@ -34,9 +33,18 @@ object Day6 {
   def countGuardPoss(input: Input): Int = guardPoss(input).size
 
   def isGuardCycle(input: Input): Boolean = {
-    val it = iterateGuard(input).takeWhile(guard => input.grid.containsPos(guard.pos))
-    val cycle = NaiveCycleFinder.find(it)
-    cycle.isDefined
+
+    // wrapper to turn out-of-grid into None-cycle
+    // TODO: allow ending sequence with Floyd/Brent
+    // TODO: allow LazyList with Floyd/Brent
+    def stepGuardOption(guardOption: Option[Guard]): Option[Guard] = {
+      guardOption
+        .map(stepGuard(input.grid))
+        .filter(guard => input.grid.containsPos(guard.pos))
+    }
+
+    val cycle = BrentCycleFinder.find(Some(input.guard), stepGuardOption)
+    cycle.cycleHead.isDefined
   }
 
   def countObstructionPoss(input: Input): Int = { // TODO: optimize?
