@@ -24,13 +24,14 @@ object Day6 {
   def iterateGuard(input: Input): Iterator[Guard] =
     Iterator.iterate(input.guard)(stepGuard(input.grid))
 
-  def countGuardPoss(input: Input): Int = {
+  def guardPoss(input: Input): Set[Pos] = {
     iterateGuard(input)
       .takeWhile(guard => input.grid.containsPos(guard.pos))
       .map(_.pos)
       .toSet
-      .size
   }
+
+  def countGuardPoss(input: Input): Int = guardPoss(input).size
 
   def isGuardCycle(input: Input): Boolean = {
     val it = iterateGuard(input).takeWhile(guard => input.grid.containsPos(guard.pos))
@@ -38,11 +39,11 @@ object Day6 {
     cycle.isDefined
   }
 
-  def countObstructionPoss(input: Input): Int = { // TODO: optimize
+  def countObstructionPoss(input: Input): Int = { // TODO: optimize?
     val Input(grid, guard) = input
-    Box(Pos.zero, Pos(grid(8).size - 1, grid.size - 1))
+    guardPoss(input)
       .iterator
-      .filter(obstructionPos => obstructionPos != guard.pos && !grid(obstructionPos))
+      .filter(obstructionPos => obstructionPos != guard.pos)
       .map(obstructionPos => Input(grid.updatedGrid(obstructionPos, true), guard))
       .count(isGuardCycle)
   }

@@ -29,7 +29,7 @@ class Day6Test extends AnyFunSuite {
     assert(countObstructionPoss(parseInput(exampleInput)) == 6)
   }
 
-  ignore("Part 2 input answer") {
-    assert(countObstructionPoss(parseInput(input)) == 1719) // TODO: optimize
+  test("Part 2 input answer") {
+    assert(countObstructionPoss(parseInput(input)) == 1719) // TODO: optimize?
   }
 }
