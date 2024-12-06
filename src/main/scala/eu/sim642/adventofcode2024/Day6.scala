@@ -2,8 +2,10 @@ package eu.sim642.adventofcode2024
 
 import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.pos.Pos
-import eu.sim642.adventofcodelib.GridImplicits._
+import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcode2018.Day13.DirectionPos
+import eu.sim642.adventofcodelib.box.Box
+import eu.sim642.adventofcodelib.cycle.NaiveCycleFinder
 
 object Day6 {
 
@@ -30,6 +32,21 @@ object Day6 {
       .size
   }
 
+  def isGuardCycle(input: Input): Boolean = {
+    val it = iterateGuard(input).takeWhile(guard => input.grid.containsPos(guard.pos))
+    val cycle = NaiveCycleFinder.find(it)
+    cycle.isDefined
+  }
+
+  def countObstructionPoss(input: Input): Int = { // TODO: optimize
+    val Input(grid, guard) = input
+    Box(Pos.zero, Pos(grid(8).size - 1, grid.size - 1))
+      .iterator
+      .filter(obstructionPos => obstructionPos != guard.pos && !grid(obstructionPos))
+      .map(obstructionPos => Input(grid.updatedGrid(obstructionPos, true), guard))
+      .count(isGuardCycle)
+  }
+
   def parseGrid(input: String): Grid[Boolean] = input.linesIterator.map(_.toVector).toVector.mapGrid({
     case '#' => true
     case '.' => false
@@ -49,5 +66,6 @@ object Day6 {
 
   def main(args: Array[String]): Unit = {
     println(countGuardPoss(parseInput(input)))
+    println(countObstructionPoss(parseInput(input)))
   }
 }
