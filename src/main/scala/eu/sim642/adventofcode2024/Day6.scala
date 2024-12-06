@@ -5,6 +5,7 @@ import eu.sim642.adventofcodelib.Grid
 import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.cycle.BrentCycleFinder
 import eu.sim642.adventofcodelib.pos.Pos
+import eu.sim642.adventofcodelib.IteratorImplicits._
 
 object Day6 {
 
@@ -49,11 +50,19 @@ object Day6 {
 
   def countObstructionPoss(input: Input): Int = { // TODO: optimize?
     val Input(grid, guard) = input
-    guardPoss(input)
-      .iterator
-      .filter(obstructionPos => obstructionPos != guard.pos)
-      .map(obstructionPos => Input(grid.updatedGrid(obstructionPos, true), guard))
-      .count(isGuardCycle)
+    iterateGuard(input) // only consider obstacles on initial path
+      .takeWhile(guard => input.grid.containsPos(guard.pos))
+      .scanLeft((Set.empty[Pos], Guard(Pos(-1, -1), Pos.zero)))({ case ((acc, prevGuard), guard) => (acc + prevGuard.pos, guard) }) // incrementally compute guardPoss
+      // TODO: scanLeftMap or something
+      .tail // ignore first scanLeft element with dummy guard
+      .filter({ case (acc, guard) => !acc.contains(guard.pos) }) // keep only those positions that are being visited for the first time
+      .map(_._2)
+      .zipWithTail
+      //.filter(obstructionPos => obstructionPos != guard.pos)
+      .count({ case (guard, obstruction) =>
+        val newGrid = grid.updatedGrid(obstruction.pos, true) // place obstacle in front of guard
+        isGuardCycle(Input(newGrid, guard)) // check cycle starting from previous guard
+      })
   }
 
   def parseGrid(input: String): Grid[Boolean] = input.linesIterator.map(_.toVector).toVector.mapGrid({
