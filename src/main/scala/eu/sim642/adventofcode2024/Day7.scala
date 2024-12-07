@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2024
 
+import eu.sim642.adventofcodelib.IntegralImplicits._
+
 object Day7 {
 
   case class Equation(testValue: Long, numbers: Seq[Int])
@@ -15,45 +17,42 @@ object Day7 {
     }
   }
 
-  object Part1 extends Part {
+  def unAdd(testValue: Long, number: Int): Option[Long] =
+    if (testValue > number) Some(testValue - number) else None
+
+  def unMultiply(testValue: Long, number: Int): Option[Long] = testValue /! number
+
+  def unConcatenate(testValue: Long, number: Int): Option[Long] = {
+    val testValueStr = testValue.toString
+    val numberStr = number.toString
+    if (testValueStr.length > numberStr.length && testValueStr.endsWith(numberStr))
+      Some(testValueStr.dropRight(numberStr.length).toLong)
+    else
+      None
+  }
+
+  trait RightToLeftPart extends Part {
+    val unOperators: Seq[(Long, Int) => Option[Long]]
+
     override def isSolvable(equation: Equation): Boolean = {
 
       def helper(testValue: Long, numbers: List[Int]): Boolean = numbers match {
-        case Nil => ???
+        case Nil => throw new IllegalAccessException("illegal empty equation")
         case List(number) => number == testValue
-        case number :: numbers =>
-          testValue % number == 0 && helper(testValue / number, numbers) || helper(testValue - number, numbers)
+        case number :: newNumbers =>
+          unOperators.exists(_(testValue, number).exists(helper(_, newNumbers)))
       }
 
       helper(equation.testValue, equation.numbers.view.reverse.toList)
     }
   }
 
-  object Part2 extends Part {
-    override def isSolvable(equation: Equation): Boolean = {
+  object Part1 extends RightToLeftPart {
+    override val unOperators: Seq[(Long, Int) => Option[Long]] = Seq(unMultiply, unAdd)
+  }
 
-      def helper(testValue: Long, numbers: List[Int]): Boolean = numbers match {
-        case Nil => ???
-        case List(number) => number == testValue
-        case number :: newNumbers =>
-          testValue % number == 0 && helper(testValue / number, newNumbers) || helper(testValue - number, newNumbers) || concatHelper(testValue, numbers)
-      }
-
-      def concatHelper(testValue: Long, numbers: List[Int]): Boolean = numbers match {
-        case number :: newNumbers =>
-          val testValueStr = testValue.toString
-          val numberStr = number.toString
-          if (testValueStr.length > numberStr.length && testValueStr.endsWith(numberStr)) {
-            val newTestValue = testValueStr.dropRight(numberStr.length).toLong
-            helper(newTestValue, newNumbers)
-          }
-          else
-            false
-        case _ => false
-      }
-
-      helper(equation.testValue, equation.numbers.view.reverse.toList)
-    }
+  object Part2 extends RightToLeftPart {
+    override val unOperators: Seq[(Long, Int) => Option[Long]] = Seq(unMultiply, unAdd, unConcatenate)
   }
 
   def parseEquation(s: String): Equation = s match {
