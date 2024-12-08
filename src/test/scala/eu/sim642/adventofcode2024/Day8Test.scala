@@ -19,11 +19,32 @@ class Day8Test extends AnyFunSuite {
       |............
       |............""".stripMargin
 
+  val exampleInput2 =
+    """T.........
+      |...T......
+      |.T........
+      |..........
+      |..........
+      |..........
+      |..........
+      |..........
+      |..........
+      |..........""".stripMargin
+
   test("Part 1 examples") {
-    assert(countAntinodes(parseGrid(exampleInput)) == 14)
+    assert(Part1.countAntinodes(parseGrid(exampleInput)) == 14)
   }
 
   test("Part 1 input answer") {
-    assert(countAntinodes(parseGrid(input)) == 357)
+    assert(Part1.countAntinodes(parseGrid(input)) == 357)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.countAntinodes(parseGrid(exampleInput2)) == 9)
+    assert(Part2.countAntinodes(parseGrid(exampleInput)) == 34)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.countAntinodes(parseGrid(input)) == 1266)
   }
 }
