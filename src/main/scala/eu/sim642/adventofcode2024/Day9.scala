@@ -22,6 +22,15 @@ object Day9 {
     })._1
   }
 
+  def filesystemToString(filesystem: Filesystem): String = {
+    val sb = new StringBuilder
+    filesystem.foreach({
+      case File(id, size) => sb ++= ('0' + id).toChar.toString * size // TODO: toDigit?
+      case Free(size) => sb ++= "." * size
+    })
+    sb.toString
+  }
+
   trait Part {
     def compact(filesystem: Filesystem): Filesystem
 

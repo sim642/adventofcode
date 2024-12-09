@@ -9,10 +9,13 @@ class Day9Test extends AnyFunSuite {
   val exampleInput2 = "2333133121414131402"
 
   test("Part 1 examples") {
-    //assert(Part1.compactChecksum(parseFilesystem(exampleInput)) == ???)
-    //println(Part1.compact(parseFilesystem(exampleInput)))
-    //println(Part1.compact(parseFilesystem(exampleInput2)))
+    assert(filesystemToString(Part1.compact(parseFilesystem(exampleInput))) ==
+      "022111222") // trailing Free trimmed
+    assert(filesystemToString(Part1.compact(parseFilesystem(exampleInput2))) ==
+      "0099811188827773336446555566") // trailing Free trimmed
     assert(Part1.compactChecksum(parseFilesystem(exampleInput2)) == 1928)
+
+    assert(Part1.compactChecksum(parseFilesystem(exampleInput)) == 69) // not in text
   }
 
   test("Part 1 input answer") {
@@ -20,7 +23,8 @@ class Day9Test extends AnyFunSuite {
   }
 
   test("Part 2 examples") {
-    //println(Part2.compact(parseFilesystem(exampleInput2)))
+    assert(filesystemToString(Part2.compact(parseFilesystem(exampleInput2))) ==
+      "00992111777.44.333....5555.6666.....8888..")
     assert(Part2.compactChecksum(parseFilesystem(exampleInput2)) == 2858)
   }
 
