@@ -64,7 +64,7 @@ object Day9 {
               case File(_, _) => false
             })
             if (moveIndex >= 0) {
-              val (before, Free(freeSize) +: after) = newFilesystem.splitAt(moveIndex): @unchecked // TODO: return from indexWhere?
+              val (before, Free(freeSize) +: after) = newFilesystem.splitAt(moveIndex): @unchecked // indexWhere+splitAt is faster than span
               val replace =
                 if (freeSize == fileSize)
                   Vector(file)
