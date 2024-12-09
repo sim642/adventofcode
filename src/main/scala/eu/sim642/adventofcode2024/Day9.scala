@@ -23,13 +23,13 @@ object Day9 {
   }
 
   trait Part {
-    def defragment(filesystem: Filesystem): Filesystem
+    def compact(filesystem: Filesystem): Filesystem
 
-    def defragmentChecksum(filesystem: Filesystem): Long = checksum(defragment(filesystem))
+    def compactChecksum(filesystem: Filesystem): Long = checksum(compact(filesystem))
   }
 
   object Part1 extends Part {
-    override def defragment(filesystem: Filesystem): Filesystem = {
+    override def compact(filesystem: Filesystem): Filesystem = {
 
       @tailrec
       def helper(filesystem: Filesystem, acc: Filesystem): Filesystem = {
@@ -52,7 +52,7 @@ object Day9 {
   }
 
   object Part2 extends Part {
-    override def defragment(filesystem: Filesystem): Filesystem = {
+    override def compact(filesystem: Filesystem): Filesystem = {
 
       @tailrec
       def helper(filesystem: Filesystem, acc: Filesystem): Filesystem = {
@@ -95,8 +95,8 @@ object Day9 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(Part1.defragmentChecksum(parseFilesystem(input)))
-    println(Part2.defragmentChecksum(parseFilesystem(input)))
+    println(Part1.compactChecksum(parseFilesystem(input)))
+    println(Part2.compactChecksum(parseFilesystem(input)))
 
     // part 1: 1368861652 - too low (Int overflowed in checksum)
   }
