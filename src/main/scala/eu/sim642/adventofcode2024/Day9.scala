@@ -13,27 +13,6 @@ object Day9 {
 
   type Filesystem = Vector[Block]
 
-  def defragment(filesystem: Filesystem): Filesystem = {
-
-    @tailrec
-    def helper(filesystem: Filesystem, acc: Filesystem): Filesystem = {
-      filesystem match {
-        case (file@File(_, _)) +: newFilesystem => helper(newFilesystem, file +: acc)
-        case (newFileSystem@Free(_) +: _) :+ Free(_) => helper(newFileSystem, acc)
-        case Free(freeSize) +: newFileSystem :+ (file@File(id, fileSize)) =>
-          if (freeSize == fileSize)
-            helper(newFileSystem, file +: acc)
-          else if (freeSize > fileSize)
-            helper(Free(freeSize - fileSize) +: newFileSystem, file +: acc)
-          else // freeSize < fileSize
-            helper(newFileSystem :+ File(id, fileSize - freeSize), File(id, freeSize) +: acc)
-        case Seq(Free(_)) | Seq() => acc.reverse
-      }
-    }
-
-    helper(filesystem, Vector.empty)
-  }
-
   def checksum(filesystem: Filesystem): Long = {
     filesystem.foldLeft((0L, 0))({ case ((acc, i), block) =>
       block match {
@@ -43,7 +22,66 @@ object Day9 {
     })._1
   }
 
-  def defragmentChecksum(filesystem: Filesystem): Long = checksum(defragment(filesystem))
+  trait Part {
+    def defragment(filesystem: Filesystem): Filesystem
+
+    def defragmentChecksum(filesystem: Filesystem): Long = checksum(defragment(filesystem))
+  }
+
+  object Part1 extends Part {
+    override def defragment(filesystem: Filesystem): Filesystem = {
+
+      @tailrec
+      def helper(filesystem: Filesystem, acc: Filesystem): Filesystem = {
+        filesystem match {
+          case (file@File(_, _)) +: newFilesystem => helper(newFilesystem, file +: acc)
+          case (newFileSystem@Free(_) +: _) :+ Free(_) => helper(newFileSystem, acc)
+          case Free(freeSize) +: newFileSystem :+ (file@File(id, fileSize)) =>
+            if (freeSize == fileSize)
+              helper(newFileSystem, file +: acc)
+            else if (freeSize > fileSize)
+              helper(Free(freeSize - fileSize) +: newFileSystem, file +: acc)
+            else // freeSize < fileSize
+              helper(newFileSystem :+ File(id, fileSize - freeSize), File(id, freeSize) +: acc)
+          case Seq(Free(_)) | Seq() => acc.reverse
+        }
+      }
+
+      helper(filesystem, Vector.empty)
+    }
+  }
+
+  object Part2 extends Part {
+    override def defragment(filesystem: Filesystem): Filesystem = {
+
+      @tailrec
+      def helper(filesystem: Filesystem, acc: Filesystem): Filesystem = {
+        filesystem match {
+          case newFilesystem :+ (free@Free(_)) => helper(newFilesystem, free +: acc)
+          case newFilesystem :+ (file@File(id, fileSize)) =>
+            val moveIndex = newFilesystem.indexWhere({
+              case Free(freeSize) => freeSize >= fileSize
+              case File(_, _) => false
+            })
+            if (moveIndex >= 0) {
+              val (before, Free(freeSize) +: after) = newFilesystem.splitAt(moveIndex): @unchecked // TODO: return from indexWhere?
+              val replace =
+                if (freeSize == fileSize)
+                  Vector(file)
+                else
+                  Vector(file, Free(freeSize - fileSize))
+              helper(before ++ replace ++ after, Free(fileSize) +: acc)
+            }
+            else
+              helper(newFilesystem, file +: acc)
+          case Seq() => acc
+        }
+      }
+
+      helper(filesystem, Vector.empty)
+    }
+  }
+
 
   def parseFilesystem(input: String): Filesystem = {
     input.view.zipWithIndex.map({ case (size, i) =>
@@ -57,7 +95,8 @@ object Day9 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day9.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(defragmentChecksum(parseFilesystem(input)))
+    println(Part1.defragmentChecksum(parseFilesystem(input)))
+    println(Part2.defragmentChecksum(parseFilesystem(input)))
 
     // part 1: 1368861652 - too low (Int overflowed in checksum)
   }
