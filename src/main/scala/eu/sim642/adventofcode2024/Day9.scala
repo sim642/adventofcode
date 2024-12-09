@@ -44,6 +44,7 @@ object Day9 {
             else // freeSize < fileSize
               helper(newFileSystem :+ File(id, fileSize - freeSize), File(id, freeSize) +: acc)
           case Seq(Free(_)) | Seq() => acc.reverse
+          case _ => throw new IllegalStateException("impossible filesystem")
         }
       }
 
@@ -75,6 +76,7 @@ object Day9 {
             else
               helper(newFilesystem, file +: acc)
           case Seq() => acc
+          case _ => throw new IllegalStateException("impossible filesystem")
         }
       }
 
