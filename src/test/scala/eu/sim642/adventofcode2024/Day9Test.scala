@@ -15,7 +15,7 @@ class Day9Test extends AnyFunSuite {
       "0099811188827773336446555566") // trailing Free trimmed
     assert(Part1.compactChecksum(parseFilesystem(exampleInput2)) == 1928)
 
-    assert(Part1.compactChecksum(parseFilesystem(exampleInput)) == 69) // not in text
+    assert(Part1.compactChecksum(parseFilesystem(exampleInput)) == 60) // not in text
   }
 
   test("Part 1 input answer") {
