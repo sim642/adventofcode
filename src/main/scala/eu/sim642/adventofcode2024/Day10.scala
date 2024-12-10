@@ -8,8 +8,16 @@ import eu.sim642.adventofcodelib.pos.Pos
 
 object Day10 {
 
-  def countTrails(grid: Grid[Char], startPos: Pos): Int = {
-    val graphTraversal = new GraphTraversal[Pos] with UnitNeighbors[Pos] {
+  def trailheads(grid: Grid[Char]): Iterable[Pos] = {
+    for {
+      (row, y) <- grid.view.zipWithIndex
+      (cell, x) <- row.view.zipWithIndex
+      if cell == '0'
+    } yield Pos(x, y)
+  }
+
+  def trailTraversal(grid: Grid[Char], startPos: Pos): GraphTraversal[Pos] & UnitNeighbors[Pos] = {
+    new GraphTraversal[Pos] with UnitNeighbors[Pos] {
       override val startNode: Pos = startPos
 
       override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
@@ -22,47 +30,34 @@ object Day10 {
         } yield newPos
       }
     }
+  }
 
+  def trailheadScore(grid: Grid[Char])(startPos: Pos): Int = { // aka countTrails
+    val graphTraversal = trailTraversal(grid, startPos)
     BFS.traverse(graphTraversal).nodes.count(grid(_) == '9')
   }
 
-  def countTrailPaths(grid: Grid[Char], startPos: Pos): Int = {
-    // TODO: better way of counting all paths than just BFS on path nodes?
-    val graphTraversal = new GraphTraversal[List[Pos]] with UnitNeighbors[List[Pos]] {
-      override val startNode: List[Pos] = List(startPos)
+  def sumTrailheadScores(grid: Grid[Char]): Int =
+    trailheads(grid).map(trailheadScore(grid)).sum
 
-      // TODO: deduplicate
-      override def unitNeighbors(node: List[Pos]): IterableOnce[List[Pos]] = {
-        val pos = node.head
-        val height = grid(pos)
-        for {
-          offset <- Pos.axisOffsets
-          newPos = pos + offset
-          if grid.containsPos(newPos)
-          if grid(newPos) == height + 1
-        } yield newPos :: node
-      }
+  // TODO: extract to library?
+  def pathTraversal[A](graphTraversal: GraphTraversal[A] & UnitNeighbors[A]): GraphTraversal[List[A]] & UnitNeighbors[List[A]] = {
+    new GraphTraversal[List[A]] with UnitNeighbors[List[A]] {
+      override val startNode: List[A] = List(graphTraversal.startNode)
+
+      override def unitNeighbors(node: List[A]): IterableOnce[List[A]] =
+        graphTraversal.unitNeighbors(node.head).iterator.map(_ :: node)
     }
+  }
 
+  def trailheadRating(grid: Grid[Char])(startPos: Pos): Int = { // aka countTrailPaths
+    // TODO: better way of counting all paths than just BFS on path nodes?
+    val graphTraversal = pathTraversal(trailTraversal(grid, startPos))
     BFS.traverse(graphTraversal).nodes.count(node => grid(node.head) == '9')
   }
 
-  def sumTrailheadScores(grid: Grid[Char]): Int = {
-    (for {
-      (row, y) <- grid.view.zipWithIndex
-      (cell, x) <- row.view.zipWithIndex
-      if cell == '0'
-    } yield countTrails(grid, Pos(x, y))).sum
-  }
-
-  // TODO: deduplicate
-  def sumTrailheadRatings(grid: Grid[Char]): Int = {
-    (for {
-      (row, y) <- grid.view.zipWithIndex
-      (cell, x) <- row.view.zipWithIndex
-      if cell == '0'
-    } yield countTrailPaths(grid, Pos(x, y))).sum
-  }
+  def sumTrailheadRatings(grid: Grid[Char]): Int =
+    trailheads(grid).map(trailheadRating(grid)).sum
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
 
