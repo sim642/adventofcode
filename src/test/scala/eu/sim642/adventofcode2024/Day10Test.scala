@@ -28,4 +28,12 @@ class Day10Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumTrailheadScores(parseGrid(input)) == 557)
   }
+
+  test("Part 2 examples") {
+    assert(sumTrailheadRatings(parseGrid(exampleInput2)) == 81)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumTrailheadRatings(parseGrid(input)) == 1062)
+  }
 }
