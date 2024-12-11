@@ -38,8 +38,11 @@ object Day11 {
 
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
 
+  val part1Blinks = 25
+  val part2Blinks = 75
+
   def main(args: Array[String]): Unit = {
-    println(countBlinkedStones(parseStones(input), 25))
-    println(countBlinkedStones(parseStones(input), 75))
+    println(countBlinkedStones(parseStones(input), part1Blinks))
+    println(countBlinkedStones(parseStones(input), part2Blinks))
   }
 }
