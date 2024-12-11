@@ -17,4 +17,8 @@ class Day11Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countBlinkedStones(parseStones(input), 25) == 217812)
   }
+
+  test("Part 2 input answer") {
+    assert(countBlinkedStones(parseStones(input), 75) == 259112729857522L)
+  }
 }

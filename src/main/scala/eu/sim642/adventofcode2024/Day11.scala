@@ -40,5 +40,6 @@ object Day11 {
 
   def main(args: Array[String]): Unit = {
     println(countBlinkedStones(parseStones(input), 25))
+    println(countBlinkedStones(parseStones(input), 75))
   }
 }
