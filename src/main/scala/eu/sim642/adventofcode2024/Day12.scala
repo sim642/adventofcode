@@ -11,13 +11,12 @@ object Day12 {
 
   case class Edge(in: Pos, out: Pos)
 
-  case class Region(poss: Set[Pos]) {
+  case class Region(poss: collection.Set[Pos]) {
     def area: Int = poss.size
 
     def perimeter: Int = {
-      4 * area -
-      poss.iterator
-        .map(pos => Pos.axisOffsets.map(pos + _).count(poss)) //.tapEach(println)
+      poss.iterator // iterator to avoid deduplicating same edge counts
+        .map(pos => 4 - Pos.axisOffsets.map(pos + _).count(poss))
         .sum
     }
 
@@ -50,7 +49,7 @@ object Day12 {
     }
   }
 
-  def regions(grid: Grid[Char]): Set[Region] = {
+  def regions(grid: Grid[Char]): collection.Set[Region] = {
     val graphComponents = new GraphComponents[Pos] {
       override def nodes: IterableOnce[Pos] = Box(Pos.zero, Pos(grid(0).size - 1, grid.size - 1)).iterator
 
@@ -65,18 +64,14 @@ object Day12 {
       }
     }
 
-    BFS.components(graphComponents).map(x => Region(x.toSet)).toSet // TODO: avoid weird toSet-s
+    BFS.components(graphComponents).map(Region.apply)
   }
 
   trait Part {
     def regionFencingPrice(region: Region): Int
 
-    def totalFencingPrice(grid: Grid[Char]): Int = {
-      val regs = regions(grid)
-      //for (region <- regs)
-      //  println(s"${grid(region.poss.head)}: area=${region.area} perimeter=${region.perimeter}")
-      regs.iterator.map(regionFencingPrice).sum
-    }
+    def totalFencingPrice(grid: Grid[Char]): Int =
+      regions(grid).iterator.map(regionFencingPrice).sum
   }
 
   object Part1 extends Part {
