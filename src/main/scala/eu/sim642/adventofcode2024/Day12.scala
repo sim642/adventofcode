@@ -47,6 +47,18 @@ object Day12 {
 
       BFS.components(graphComponents).size
     }
+
+    def corners: Int = {
+      (for {
+        pos <- poss.iterator
+        offset <- Pos.axisOffsets
+        rightPos = pos + offset // right of diagPos
+        leftPos = pos + offset.left // left of diagPos
+        diagPos = leftPos + offset
+        if !poss(rightPos) && !poss(leftPos) || poss(rightPos) && poss(leftPos) && !poss(diagPos) // if is external or internal corner
+        //if !poss(rightPos) && (!poss(leftPos) || poss(diagPos)) // from glguy: actually counts beginning of side, not corner itself
+      } yield pos).size
+    }
   }
 
   def regions(grid: Grid[Char]): collection.Set[Region] = {
@@ -78,8 +90,14 @@ object Day12 {
     override def regionFencingPrice(region: Region): Int = region.area * region.perimeter
   }
 
-  object Part2 extends Part {
+  trait Part2Solution extends Part
+
+  object SidesPart2Solution extends Part2Solution {
     override def regionFencingPrice(region: Region): Int = region.area * region.sides
+  }
+
+  object CornersPart2Solution extends Part2Solution {
+    override def regionFencingPrice(region: Region): Int = region.area * region.corners
   }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
@@ -88,6 +106,6 @@ object Day12 {
 
   def main(args: Array[String]): Unit = {
     println(Part1.totalFencingPrice(parseGrid(input)))
-    println(Part2.totalFencingPrice(parseGrid(input)))
+    println(CornersPart2Solution.totalFencingPrice(parseGrid(input)))
   }
 }
