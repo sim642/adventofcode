@@ -1,58 +1,33 @@
 package eu.sim642.adventofcode2024
 
-import eu.sim642.adventofcodelib.graph.{Dijkstra, GraphSearch, TargetNode}
-import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.IntegralImplicits.*
-import eu.sim642.adventofcodelib.NumberTheory
+import eu.sim642.adventofcodelib.pos.Pos
 
 object Day13 {
 
-  case class LongPos(x: Long, y: Long)
+  case class LongPos(x: Long, y: Long) // TODO: generalize library
 
   case class ClawMachine(buttonA: Pos, buttonB: Pos, prize: LongPos)
 
   trait Part {
-    def minWinTokens(clawMachine: ClawMachine): Long
+    def minWinTokens(clawMachine: ClawMachine): Option[Long]
 
-    def sumMinWinTokens(clawMachines: Seq[ClawMachine]): Long = clawMachines.map(minWinTokens).sum
+    def sumMinWinTokens(clawMachines: Seq[ClawMachine]): Long = clawMachines.flatMap(minWinTokens).sum
   }
 
   object Part1 extends Part {
-    override def minWinTokens(clawMachine: ClawMachine): Long = {
+    override def minWinTokens(clawMachine: ClawMachine): Option[Long] = {
       val ClawMachine(buttonA, buttonB, prize) = clawMachine
-
-      /*val graphSearch = new GraphSearch[Pos] with TargetNode[Pos] {
-        override val startNode: Pos = Pos.zero
-
-        override def neighbors(pos: Pos): IterableOnce[(Pos, Int)] = {
-          for {
-            (button, tokens) <- Seq(clawMachine.buttonA -> 3, clawMachine.buttonB -> 1)
-            newPos = pos + button
-            if newPos <= targetNode
-          } yield newPos -> tokens
-        }
-
-        override val targetNode: Pos = clawMachine.prize
-      }
-
-      Dijkstra.search(graphSearch).target.map(_._2).getOrElse(0)*/
-
-      /*(for {
-        timesA <- 0 to 100
-        prizeB = prize - timesA *: buttonA
-        timesB <- prizeB.x /! buttonB.x
-        if timesB * buttonB.y == prizeB.y
-      } yield 3 * timesA + timesB).minOption.getOrElse(0)*/
-
-      (for {
+      // linear system of 2 equations
+      for {
         timesB <- (prize.x * buttonA.y - prize.y * buttonA.x) /! (buttonB.x * buttonA.y - buttonB.y * buttonA.x)
         timesA <- (prize.x - timesB * buttonB.x) /! buttonA.x
-      } yield 3 * timesA + timesB).getOrElse(0)
+      } yield 3 * timesA + timesB
     }
   }
 
   object Part2 extends Part {
-    override def minWinTokens(clawMachine: ClawMachine): Long = {
+    override def minWinTokens(clawMachine: ClawMachine): Option[Long] = {
       val newClawMachine = clawMachine.copy(prize = LongPos(clawMachine.prize.x + 10000000000000L, clawMachine.prize.y + 10000000000000L))
       Part1.minWinTokens(newClawMachine)
     }
