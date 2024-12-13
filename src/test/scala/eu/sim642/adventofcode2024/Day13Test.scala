@@ -23,10 +23,18 @@ class Day13Test extends AnyFunSuite {
       |Prize: X=18641, Y=10279""".stripMargin
 
   test("Part 1 examples") {
-    assert(sumMinWinTokens(parseClawMachines(exampleInput)) == 480)
+    assert(Part1.sumMinWinTokens(parseClawMachines(exampleInput)) == 480)
   }
 
   test("Part 1 input answer") {
-    assert(sumMinWinTokens(parseClawMachines(input)) == 31623)
+    assert(Part1.sumMinWinTokens(parseClawMachines(input)) == 31623)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.sumMinWinTokens(parseClawMachines(exampleInput)) == 875318608908L) // from IRC
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.sumMinWinTokens(parseClawMachines(input)) == 93209116744825L)
   }
 }
