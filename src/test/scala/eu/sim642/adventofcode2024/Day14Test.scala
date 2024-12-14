@@ -27,4 +27,8 @@ class Day14Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(safetyFactor(parseRobots(input)) == 228690000)
   }
+
+  test("Part 2 input answer") {
+    assert(findEasterEgg(parseRobots(input)) == 7093)
+  }
 }

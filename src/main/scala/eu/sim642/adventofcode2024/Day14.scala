@@ -26,6 +26,13 @@ object Day14 {
     quadrants((1, 1)) * quadrants((-1, 1)) * quadrants((1, -1)) * quadrants((-1, -1))
   }
 
+  def findEasterEgg(robots: Seq[Robot], roomSize: Pos = Pos(101, 103)): Int = {
+    Iterator.from(0)
+      .map(t => robots.map(_.step(t, roomSize))) // TODO: optimize
+      .map(newRobots => newRobots.groupCount(_.pos))
+      .indexWhere(_.values.forall(_ <= 1)) // look for arrangement with unique positions
+  }
+
   def parseRobot(s: String): Robot = s match {
     case s"p=$pX,$pY v=$vX,$vY" =>
       Robot(Pos(pX.toInt, pY.toInt), Pos(vX.toInt, vY.toInt))
@@ -37,5 +44,6 @@ object Day14 {
 
   def main(args: Array[String]): Unit = {
     println(safetyFactor(parseRobots(input)))
+    println(findEasterEgg(parseRobots(input)))
   }
 }
