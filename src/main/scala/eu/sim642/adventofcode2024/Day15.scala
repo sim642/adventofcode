@@ -17,7 +17,15 @@ object Day15 {
 
   trait Part {
     def simulateMove(grid: Grid[Char], robot: Pos, move: Pos): (Grid[Char], Pos)
-    def sumBoxGps(grid: Grid[Char]): Int
+    val boxGpsChar: Char
+
+    def sumBoxGps(grid: Grid[Char]): Int = {
+      (for {
+        (row, y) <- grid.view.zipWithIndex
+        (cell, x) <- row.view.zipWithIndex
+        if cell == boxGpsChar
+      } yield 100 * y + x).sum
+    }
 
     def sumMovesBoxGps(input: Input): Int = {
       val initialRobot = input.grid.posOf('@')
@@ -39,13 +47,7 @@ object Day15 {
         (grid, robot)
     }
 
-    override def sumBoxGps(grid: Grid[Char]): Int = {
-      (for {
-        (row, y) <- grid.view.zipWithIndex
-        (cell, x) <- row.view.zipWithIndex
-        if cell == 'O'
-      } yield 100 * y + x).sum
-    }
+    override val boxGpsChar: Char = 'O'
   }
 
   object Part2 extends Part {
@@ -60,28 +62,33 @@ object Day15 {
 
     override def simulateMove(grid: Grid[Char], robot: Pos, move: Pos): (Grid[Char], Pos) = {
 
-      def helper(grid: Grid[Char], pos: Pos): Option[Grid[Char]] = grid(pos) match {
-        case '.' => Some(grid)
-        case '#' => None
-        case '[' if move.x == 0 => // vertical
-          for {
-            newGrid <- helper(grid, pos + move)
-            newGrid2 <- helper(newGrid, pos + Pos(1, 0) + move)
-          } yield newGrid2.updatedGrid(pos + move, '[').updatedGrid(pos + Pos(1, 0) + move, ']').updatedGrid(pos, '.').updatedGrid(pos + Pos(1, 0), '.')
-        case ']' if move.x == 0 => // vertical
-          for {
-            newGrid <- helper(grid, pos + move)
-            newGrid2 <- helper(newGrid, pos - Pos(1, 0) + move)
-          } yield newGrid2.updatedGrid(pos + move, ']').updatedGrid(pos - Pos(1, 0) + move, '[').updatedGrid(pos, '.').updatedGrid(pos - Pos(1, 0), '.')
-        case '[' if move.y == 0 => // horizontal
-          for {
-            newGrid <- helper(grid, pos + move)
-          } yield newGrid.updatedGrid(pos + move, '[').updatedGrid(pos, '.')
-        case ']' if move.y == 0 => // horizontal
-          for {
-            newGrid <- helper(grid, pos + move)
-          } yield newGrid.updatedGrid(pos + move, ']').updatedGrid(pos, '.')
-        case _ => ???
+      def helper(grid: Grid[Char], pos: Pos): Option[Grid[Char]] = {
+        grid(pos) match {
+          case '.' => Some(grid)
+          case '#' => None
+          case '[' if move.x == 0 => // vertical
+            val newPos = pos + move
+            for {
+              newGrid <- helper(grid, newPos)
+              newGrid2 <- helper(newGrid, newPos + Pos(1, 0))
+            } yield
+              newGrid2
+                .updatedGrid(newPos, '[')
+                .updatedGrid(newPos + Pos(1, 0), ']')
+                .updatedGrid(pos, '.')
+                .updatedGrid(pos + Pos(1, 0), '.')
+          case ']' if move.x == 0 => // vertical
+            helper(grid, pos - Pos(1, 0)) // handle [ instead
+          case cell@('[' | ']') if move.y == 0 => // horizontal
+            val newPos = pos + move
+            for {
+              newGrid <- helper(grid, newPos)
+            } yield
+              newGrid
+                .updatedGrid(newPos, cell)
+                .updatedGrid(pos, '.')
+          case _ => throw new IllegalArgumentException("illegal grid cell")
+        }
       }
 
       val newRobot = robot + move
@@ -91,23 +98,13 @@ object Day15 {
       }
     }
 
-    override def sumBoxGps(grid: Grid[Char]): Int = {
-      printGrid(grid)
-      (for {
-        (row, y) <- grid.view.zipWithIndex
-        (cell, x) <- row.view.zipWithIndex
-        if cell == '['
-        //gpsX = x min (row.size - 1 - x)
-        //gpsY = y min (grid.size - 1 - y)
-        gpsX = x
-        gpsY = y
-        () = println((gpsX, gpsY))
-      } yield 100 * gpsY + gpsX).sum
-    }
+    // The text is being unnecessarily confusing/misleading here, referring to "closest",
+    // when it still means left and top...
+    override val boxGpsChar: Char = '['
 
     override def sumMovesBoxGps(input: Input): Int = {
       val scaledGrid = scaleGrid(input.grid)
-      super.sumMovesBoxGps(Input(scaledGrid, input.moves))
+      super.sumMovesBoxGps(input.copy(grid = scaledGrid))
     }
   }
 

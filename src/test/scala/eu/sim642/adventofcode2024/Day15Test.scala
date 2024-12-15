@@ -54,6 +54,7 @@ class Day15Test extends AnyFunSuite {
   test("Part 1 examples") {
     assert(Part1.sumMovesBoxGps(parseInput(exampleInput2)) == 2028)
     assert(Part1.sumMovesBoxGps(parseInput(exampleInput)) == 10092)
+    assert(Part1.sumMovesBoxGps(parseInput(exampleInput3)) == 908) // from glguy
   }
 
   test("Part 1 input answer") {
