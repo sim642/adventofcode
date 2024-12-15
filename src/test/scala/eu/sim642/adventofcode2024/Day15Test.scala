@@ -40,12 +40,33 @@ class Day15Test extends AnyFunSuite {
       |
       |<^^>>>vv<v>>v<<""".stripMargin
 
+  val exampleInput3 =
+    """#######
+      |#...#.#
+      |#.....#
+      |#..OO@#
+      |#..O..#
+      |#.....#
+      |#######
+      |
+      |<vv<<^^<<^^""".stripMargin
+
   test("Part 1 examples") {
-    assert(sumMovesBoxGps(parseInput(exampleInput2)) == 2028)
-    assert(sumMovesBoxGps(parseInput(exampleInput)) == 10092)
+    assert(Part1.sumMovesBoxGps(parseInput(exampleInput2)) == 2028)
+    assert(Part1.sumMovesBoxGps(parseInput(exampleInput)) == 10092)
   }
 
   test("Part 1 input answer") {
-    assert(sumMovesBoxGps(parseInput(input)) == 1476771)
+    assert(Part1.sumMovesBoxGps(parseInput(input)) == 1476771)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.sumMovesBoxGps(parseInput(exampleInput3)) == 618) // from glguy
+    assert(Part2.sumMovesBoxGps(parseInput(exampleInput2)) == 1751) // from glguy
+    assert(Part2.sumMovesBoxGps(parseInput(exampleInput)) == 9021)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.sumMovesBoxGps(parseInput(input)) == 1468005)
   }
 }
