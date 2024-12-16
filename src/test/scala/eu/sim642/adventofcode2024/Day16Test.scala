@@ -49,4 +49,13 @@ class Day16Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(lowestScore(parseGrid(input)) == 73404)
   }
+
+  test("Part 2 examples") {
+    assert(bestPathTiles(parseGrid(exampleInput)) == 45)
+    assert(bestPathTiles(parseGrid(exampleInput2)) == 64)
+  }
+
+  test("Part 2 input answer") {
+    assert(bestPathTiles(parseGrid(input)) == 449)
+  }
 }
