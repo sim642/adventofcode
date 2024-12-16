@@ -1,7 +1,7 @@
 package eu.sim642.adventofcode2024
 
 import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.graph.{Dijkstra, GraphSearch, GraphTraversal, TargetNode}
+import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, GraphTraversal, TargetNode, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcode2018.Day13.DirectionPos
@@ -12,9 +12,8 @@ object Day16 {
 
   case class Reindeer(pos: Pos, direction: Pos = Pos(1, 0))
 
-  def lowestScore(grid: Grid[Char]): Int = {
-
-    val graphSearch = new GraphSearch[Reindeer] {
+  def forwardGraphSearch(grid: Grid[Char]): GraphSearch[Reindeer] = {
+    new GraphSearch[Reindeer] {
       override val startNode: Reindeer = Reindeer(grid.posOf('S'))
 
       override def neighbors(reindeer: Reindeer): IterableOnce[(Reindeer, Int)] = {
@@ -30,7 +29,10 @@ object Day16 {
 
       override def isTargetNode(reindeer: Reindeer, dist: Int): Boolean = reindeer.pos == targetPos
     }
+  }
 
+  def lowestScore(grid: Grid[Char]): Int = {
+    val graphSearch = forwardGraphSearch(grid)
     Dijkstra.search(graphSearch).target.get._2
   }
 
@@ -120,50 +122,28 @@ object Day16 {
   }*/
 
   def bestPathTiles(grid: Grid[Char]): Int = {
-    val graphSearch = new GraphSearch[Reindeer] {
-      override val startNode: Reindeer = Reindeer(grid.posOf('S'))
+    val forwardSearch = forwardGraphSearch(grid)
+    val forwardResult = Dijkstra.search(forwardSearch)
 
-      override def neighbors(reindeer: Reindeer): IterableOnce[(Reindeer, Int)] = {
-        Seq(
-          reindeer.copy(pos = reindeer.pos + reindeer.direction) -> 1,
-          reindeer.copy(direction = reindeer.direction.left) -> 1000,
-          reindeer.copy(direction = reindeer.direction.right) -> 1000,
-        )
-          .filter(reindeer => grid(reindeer._1.pos) != '#')
-      }
+    val backwardTraversal = new GraphTraversal[Reindeer] with UnitNeighbors[Reindeer] {
+      override val startNode: Reindeer = forwardResult.target.get._1 // TODO: other orientations
 
-      private val targetPos: Pos = grid.posOf('E')
-
-      override def isTargetNode(reindeer: Reindeer, dist: Int): Boolean = reindeer.pos == targetPos
-    }
-
-    def backNeighbors(reindeer: Reindeer): IterableOnce[(Reindeer, Int)] = {
-      Seq(
-        reindeer.copy(pos = reindeer.pos - reindeer.direction) -> 1,
-        reindeer.copy(direction = reindeer.direction.left) -> 1000,
-        reindeer.copy(direction = reindeer.direction.right) -> 1000,
-      )
-        .filter(reindeer => grid(reindeer._1.pos) != '#')
-    }
-
-    val graphResult = Dijkstra.search(graphSearch)
-
-    def helper(reindeer: Reindeer): Set[Pos] = {
-      if (reindeer == graphSearch.startNode)
-        Set(reindeer.pos)
-      else {
-        val distance = graphResult.distances(reindeer)
-        val x = for {
-          (oldReindeer, step) <- backNeighbors(reindeer)
-          oldDistance <- graphResult.distances.get(oldReindeer)
-          if oldDistance + step == distance
-        } yield helper(oldReindeer) + reindeer.pos
-
-        x.foldLeft(Set.empty)(_ ++ _)
+      override def unitNeighbors(reindeer: Reindeer): IterableOnce[Reindeer] = {
+        val distance = forwardResult.distances(reindeer)
+        for {
+          (oldReindeer, step) <- Seq(
+            reindeer.copy(pos = reindeer.pos - reindeer.direction) -> 1, // backward steo
+            reindeer.copy(direction = reindeer.direction.left) -> 1000,
+            reindeer.copy(direction = reindeer.direction.right) -> 1000,
+          )
+          if grid(oldReindeer.pos) != '#'
+          oldDistance <- forwardResult.distances.get(oldReindeer)
+          if oldDistance + step == distance // if step on shortest path
+        } yield oldReindeer
       }
     }
 
-    helper(graphResult.target.get._1).size
+    BFS.traverse(backwardTraversal).nodes.map(_.pos).size
   }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
