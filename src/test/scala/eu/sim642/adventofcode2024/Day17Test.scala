@@ -10,6 +10,7 @@ class Day17Test extends Suites(
   new NaivePart2SolutionTest,
   new ReverseEngineeredZ3Part2SolutionTest,
   new GenericZ3Part2SolutionTest,
+  new ReverseEngineeredPart2SolutionTest,
 )
 
 object Day17Test {
@@ -73,4 +74,6 @@ object Day17Test {
   class ReverseEngineeredZ3Part2SolutionTest extends Part2SolutionInputTest(ReverseEngineeredZ3Part2Solution)
 
   class GenericZ3Part2SolutionTest extends Part2SolutionExampleTest(GenericZ3Part2Solution) with Part2SolutionInputTest(GenericZ3Part2Solution)
+
+  class ReverseEngineeredPart2SolutionTest extends Part2SolutionInputTest(ReverseEngineeredPart2Solution)
 }

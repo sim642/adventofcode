@@ -2,6 +2,7 @@ package eu.sim642.adventofcode2024
 
 import com.microsoft.z3.{BitVecExpr, BoolExpr, Context, Status}
 
+import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.*
 
 object Day17 {
@@ -208,6 +209,31 @@ object Day17 {
 
       assert(s.Check() == Status.SATISFIABLE)
       s.getModel.evaluate(initialA, false).toString.toLong
+    }
+  }
+
+  object ReverseEngineeredPart2Solution extends Part2Solution {
+    override def findQuineA(input: Input): Long = {
+      val iterProgram :+ 3 :+ 0 = input.program
+
+      @tailrec
+      def helper(as: Set[Long], expectedOutputsRev: List[Int]): Set[Long] = expectedOutputsRev match {
+        case Nil => as
+        case expectedOutput :: newExpectedOutputsRev =>
+          val newAs =
+            for {
+              a <- as
+              aStep <- 0 to 7
+              newA = (a << 3) | aStep
+              out = runOutput0(Input(Registers((newA & 0b1111111111).toInt, 0, 0), iterProgram))
+              if out == Seq(expectedOutput)
+            } yield newA
+          helper(newAs, newExpectedOutputsRev)
+      }
+
+      val as = helper(Set(0), input.program.reverse.toList)
+      //as.foreach(println)
+      as.min
     }
   }
 
