@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2024
 
-import com.microsoft.z3.{Context, Status}
+import com.microsoft.z3.{BitVecExpr, BoolExpr, Context, Status}
 
 import scala.jdk.CollectionConverters.*
 
@@ -103,7 +103,7 @@ object Day17 {
     }
   }
 
-  object Z3Part2Solution extends Part2Solution {
+  object ReverseEngineeredZ3Part2Solution extends Part2Solution {
     override def findQuineA(input: Input): Long = {
       val Seq(2,4,1,bxl1,7,5,1,bxl2,4,5,0,3,5,5,3,0) = input.program
 
@@ -131,6 +131,86 @@ object Day17 {
     }
   }
 
+  /**
+   * Inspired by https://github.com/glguy/advent/blob/main/solutions/src/2024/17.hs.
+   */
+  object GenericZ3Part2Solution extends Part2Solution {
+    override def findQuineA(input: Input): Long = {
+      val ctx = new Context(Map("model" -> "true").asJava)
+      import ctx._
+      val s = mkOptimize()
+
+      case class Registers(a: BitVecExpr, b: BitVecExpr, c: BitVecExpr)
+
+      val Input(registers, program) = input
+      val bits = input.program.size * 3
+
+      val zeroBV = mkBV(0, bits)
+      val threeBitBV = mkBV(0b111, bits)
+
+      // copied & modified from part 1
+      def helper(ip: Int, registers: Registers, expectedOutputs: List[Int]): BoolExpr = {
+
+        def combo(operand: Int): BitVecExpr = operand match {
+          case 0 | 1 | 2 | 3 => mkBV(operand, bits)
+          case 4 => registers.a
+          case 5 => registers.b
+          case 6 => registers.c
+          case 7 => throw new IllegalArgumentException("illegal combo operand")
+        }
+
+        if (program.indices.contains(ip)) {
+          lazy val literalOperand = mkBV(program(ip + 1), bits)
+          lazy val comboOperand = combo(program(ip + 1))
+
+          program(ip) match {
+            case 0 => // adv
+              helper(ip + 2, registers.copy(a = mkBVLSHR(registers.a, comboOperand)), expectedOutputs)
+            case 1 => // bxl
+              helper(ip + 2, registers.copy(b = mkBVXOR(registers.b, literalOperand)), expectedOutputs)
+            case 2 => // bst
+              helper(ip + 2, registers.copy(b = mkBVAND(comboOperand, threeBitBV)), expectedOutputs)
+            case 3 => // jnz
+              mkOr(
+                mkAnd(mkEq(registers.a, zeroBV), helper(ip + 2, registers, expectedOutputs)),
+                mkAnd(mkDistinct(registers.a, zeroBV), helper(program(ip + 1), registers, expectedOutputs))
+              )
+            case 4 => // bxc
+              helper(ip + 2, registers.copy(b = mkBVXOR(registers.b, registers.c)), expectedOutputs)
+            case 5 => // out
+              expectedOutputs match {
+                case Nil => mkFalse()
+                case expectedOutput :: newExpectedOutputs =>
+                  mkAnd(
+                    mkEq(mkBVAND(comboOperand, threeBitBV), mkBV(expectedOutput, bits)),
+                    helper(ip + 2, registers, newExpectedOutputs)
+                  )
+              }
+            case 6 => // bdv
+              helper(ip + 2, registers.copy(b = mkBVLSHR(registers.a, comboOperand)), expectedOutputs)
+            case 7 => // cdv
+              helper(ip + 2, registers.copy(c = mkBVLSHR(registers.a, comboOperand)), expectedOutputs)
+            case _ => throw new IllegalArgumentException("illegal instruction")
+          }
+        }
+        else {
+          expectedOutputs match {
+            case Nil => mkTrue()
+            case _ :: _ => mkFalse()
+          }
+        }
+      }
+
+      val initialA = mkBVConst("initialA", bits)
+      val constraint = helper(0, Registers(initialA, zeroBV, zeroBV), program.toList)
+      s.Add(constraint)
+      s.MkMinimize(initialA)
+
+      assert(s.Check() == Status.SATISFIABLE)
+      s.getModel.evaluate(initialA, false).toString.toLong
+    }
+  }
+
   def parseInput(input: String): Input = input match {
     case s"Register A: $a\nRegister B: $b\nRegister C: $c\n\nProgram: $programStr" =>
       val registers = Registers(a.toInt, b.toInt, c.toInt)
@@ -141,7 +221,7 @@ object Day17 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    import Z3Part2Solution._
+    import GenericZ3Part2Solution._
     println(runOutput(parseInput(input)))
     println(findQuineA(parseInput(input)))
 

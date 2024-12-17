@@ -8,7 +8,8 @@ import org.scalatest.funsuite.AnyFunSuite
 class Day17Test extends Suites(
   new Part1Test,
   new NaivePart2SolutionTest,
-  new Z3Part2SolutionTest,
+  new ReverseEngineeredZ3Part2SolutionTest,
+  new GenericZ3Part2SolutionTest,
 )
 
 object Day17Test {
@@ -55,13 +56,13 @@ object Day17Test {
     }
   }
 
-  abstract class Part2SolutionExampleTest(part2Solution: Part2Solution) extends AnyFunSuite {
+  trait Part2SolutionExampleTest(part2Solution: Part2Solution) extends AnyFunSuite {
     test("Part 2 examples") {
       assert(part2Solution.findQuineA(parseInput(exampleInput3)) == 117440)
     }
   }
 
-  abstract class Part2SolutionInputTest(part2Solution: Part2Solution) extends AnyFunSuite {
+  trait Part2SolutionInputTest(part2Solution: Part2Solution) extends AnyFunSuite {
     test("Part 2 input answer") {
       assert(part2Solution.findQuineA(parseInput(input)) == 164540892147389L)
     }
@@ -69,5 +70,7 @@ object Day17Test {
 
   class NaivePart2SolutionTest extends Part2SolutionExampleTest(NaivePart2Solution)
 
-  class Z3Part2SolutionTest extends Part2SolutionInputTest(Z3Part2Solution)
+  class ReverseEngineeredZ3Part2SolutionTest extends Part2SolutionInputTest(ReverseEngineeredZ3Part2Solution)
+
+  class GenericZ3Part2SolutionTest extends Part2SolutionExampleTest(GenericZ3Part2Solution) with Part2SolutionInputTest(GenericZ3Part2Solution)
 }
