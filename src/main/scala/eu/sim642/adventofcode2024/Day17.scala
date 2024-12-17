@@ -128,22 +128,7 @@ object Day17 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    /*var a: Int = 30344604
-    var b: Int = 0
-    var c: Int = 0
-    while (a != 0) {
-      b = a & 0b111
-      b = b ^ 1
-      c = a >> b
-      b = b ^ 5
-      b = b ^ c
-      a = a >> 3
-      print(b & 0b111)
-      print(',')
-    }*/
-
-
-    //println(runOutput(parseInput(input)))
+    println(runOutput(parseInput(input)))
     println(findQuineA3(parseInput(input)))
 
     // part 2: 164540892147389 - correct

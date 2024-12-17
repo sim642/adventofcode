@@ -1,0 +1,8 @@
+bst 4 // a
+bxl 1
+cdv 5 // b
+bxl 5
+bxc 5 // -
+adv 3
+out 5 // b
+jnz 0

@@ -48,28 +48,4 @@ class Day17Test extends AnyFunSuite {
   test("Part 2 examples") {
     assert(findQuineA(parseInput(exampleInput3)) == 117440)
   }
-
-  /*
-  do {
-    b = a & 0b111
-    b = b ^ 1
-    c = a / (1 << b)
-    b = b ^ 5
-    b = b ^ c
-    a = a / (1 << 3)
-    output(b & 0b111)
-  } while (a != 0)
-  */
-
-  /*
-  do {
-    b = a & 0b111
-    b = b ^ 1
-    c = a >> b
-    b = b ^ 5
-    b = b ^ c
-    a = a >> 3
-    output(b & 0b111)
-  } while (a != 0)
-  */
 }
