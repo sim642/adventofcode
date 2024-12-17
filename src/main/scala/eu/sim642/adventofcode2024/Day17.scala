@@ -48,7 +48,7 @@ object Day17 {
           case 4 => // bxc
             helper(ip + 2, registers.copy(b = registers.b ^ registers.c))
           case 5 => // out
-            (comboOperand & 0b111) +: helper(ip + 2, registers)
+            (comboOperand & 0b111) #:: helper(ip + 2, registers)
           case 6 => // bdv
             //helper(ip + 2, registers.copy(b = registers.a / (1 << comboOperand)))
             helper(ip + 2, registers.copy(b = registers.a >> comboOperand))
