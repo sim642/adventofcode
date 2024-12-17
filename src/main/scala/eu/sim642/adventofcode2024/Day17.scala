@@ -7,29 +7,23 @@ import scala.jdk.CollectionConverters.*
 
 object Day17 {
 
-  case class Registers(a: Int, b: Int, c: Int)
+  case class Registers(a: Long, b: Long, c: Long) // Long registers for simulating part 2
 
-  type Program = Seq[Int]
+  type Program = Seq[Byte]
 
   case class Input(registers: Registers, program: Program)
 
-  def runOutput0(input: Input): Seq[Int] = {
-    val Input(registers, program) = input
+  def runOutputs(registers: Registers, program: Program): LazyList[Byte] = {
 
-    def helper(ip: Int, registers: Registers): LazyList[Int] = {
-      //println(ip)
-      //println(registers)
+    def helper(ip: Int, registers: Registers): LazyList[Byte] = {
 
-      def combo(operand: Int): Int = operand match {
+      def combo(operand: Byte): Long = operand match {
         case 0 | 1 | 2 | 3 => operand
         case 4 => registers.a
         case 5 => registers.b
         case 6 => registers.c
         case 7 => throw new IllegalArgumentException("illegal combo operand")
       }
-
-      // 0, 5, 3
-      // 2 1 7 4
 
       if (program.indices.contains(ip)) {
         lazy val literalOperand = program(ip + 1)
@@ -48,7 +42,7 @@ object Day17 {
           case 4 => // bxc
             helper(ip + 2, registers.copy(b = registers.b ^ registers.c))
           case 5 => // out
-            (comboOperand & 0b111) #:: helper(ip + 2, registers)
+            (comboOperand & 0b111).toByte #:: helper(ip + 2, registers)
           case 6 => // bdv
             //helper(ip + 2, registers.copy(b = registers.a / (1 << comboOperand)))
             helper(ip + 2, registers.copy(b = registers.a >> comboOperand))
@@ -65,7 +59,8 @@ object Day17 {
     helper(0, registers)
   }
 
-  def runOutput(input: Input): String = runOutput0(input).mkString(",")
+  def runOutputsString(input: Input): String =
+    runOutputs(input.registers, input.program).mkString(",")
 
   trait Part2Solution {
     def findQuineA(input: Input): Long
@@ -73,14 +68,15 @@ object Day17 {
 
   object NaivePart2Solution extends Part2Solution {
     override def findQuineA(input: Input): Long = {
+      val Input(registers, program) = input
       Iterator.from(0)
-        .find(newA => runOutput0(Input(input.registers.copy(a = newA), input.program)) == input.program)
+        .find(newA => runOutputs(registers.copy(a = newA), program) == program) // TODO: does equality check stop running on first mismatch?
         .get
     }
   }
 
   object SemiNaivePart2Solution extends Part2Solution {
-    def myProg(initialA: Int, expectedOutputs: Iterator[Int]): Boolean = {
+    def myProg(initialA: Int, expectedOutputs: Iterator[Byte]): Boolean = {
       var a: Int = initialA
       var b: Int = 0
       var c: Int = 0
@@ -106,14 +102,15 @@ object Day17 {
 
   object ReverseEngineeredZ3Part2Solution extends Part2Solution {
     override def findQuineA(input: Input): Long = {
-      val Seq(2,4,1,bxl1,7,5,1,bxl2,4,5,0,3,5,5,3,0) = input.program
+      val Seq(2, 4, 1, bxl1, 7, 5, 1, bxl2, 4, 5, 0, 3, 5, 5, 3, 0) = input.program // TODO: doesn't support other orders of some operations
 
       val ctx = new Context(Map("model" -> "true").asJava)
       import ctx._
-      val s = mkSolver()
+      val s = mkOptimize()
 
       val bits = input.program.size * 3
       val initialA = mkBVConst("initialA", bits)
+      s.MkMinimize(initialA)
 
       for ((instruction, i) <- input.program.zipWithIndex) {
         val a = mkBVLSHR(initialA, mkBV(i * 3, bits))
@@ -123,11 +120,10 @@ object Day17 {
         b = mkBVXOR(b, mkBV(bxl2, bits))
         b = mkBVXOR(b, c)
         val out = mkBVAND(b, mkBV(0b111, bits))
-        s.add(mkEq(out, mkBV(instruction, bits)))
+        s.Add(mkEq(out, mkBV(instruction, bits)))
       }
 
-      assert(s.check() == Status.SATISFIABLE)
-      // TODO: minimize
+      assert(s.Check() == Status.SATISFIABLE)
       s.getModel.evaluate(initialA, false).toString.toLong
     }
   }
@@ -137,22 +133,22 @@ object Day17 {
    */
   object GenericZ3Part2Solution extends Part2Solution {
     override def findQuineA(input: Input): Long = {
+      val Input(registers, program) = input
+
       val ctx = new Context(Map("model" -> "true").asJava)
       import ctx._
       val s = mkOptimize()
 
       case class Registers(a: BitVecExpr, b: BitVecExpr, c: BitVecExpr)
 
-      val Input(registers, program) = input
       val bits = input.program.size * 3
-
       val zeroBV = mkBV(0, bits)
       val threeBitBV = mkBV(0b111, bits)
 
       // copied & modified from part 1
-      def helper(ip: Int, registers: Registers, expectedOutputs: List[Int]): BoolExpr = {
+      def helper(ip: Int, registers: Registers, expectedOutputs: List[Byte]): BoolExpr = {
 
-        def combo(operand: Int): BitVecExpr = operand match {
+        def combo(operand: Byte): BitVecExpr = operand match {
           case 0 | 1 | 2 | 3 => mkBV(operand, bits)
           case 4 => registers.a
           case 5 => registers.b
@@ -180,7 +176,7 @@ object Day17 {
               helper(ip + 2, registers.copy(b = mkBVXOR(registers.b, registers.c)), expectedOutputs)
             case 5 => // out
               expectedOutputs match {
-                case Nil => mkFalse()
+                case Nil => mkFalse() // does not expect more outputs
                 case expectedOutput :: newExpectedOutputs =>
                   mkAnd(
                     mkEq(mkBVAND(comboOperand, threeBitBV), mkBV(expectedOutput, bits)),
@@ -197,15 +193,16 @@ object Day17 {
         else {
           expectedOutputs match {
             case Nil => mkTrue()
-            case _ :: _ => mkFalse()
+            case _ :: _ => mkFalse() // expects more outputs
           }
         }
       }
 
       val initialA = mkBVConst("initialA", bits)
-      val constraint = helper(0, Registers(initialA, zeroBV, zeroBV), program.toList)
-      s.Add(constraint)
       s.MkMinimize(initialA)
+
+      val constraint = helper(0, Registers(initialA, mkBV(registers.b, bits), mkBV(registers.c, bits)), program.toList)
+      s.Add(constraint)
 
       assert(s.Check() == Status.SATISFIABLE)
       s.getModel.evaluate(initialA, false).toString.toLong
@@ -217,22 +214,21 @@ object Day17 {
       val iterProgram :+ 3 :+ 0 = input.program
 
       @tailrec
-      def helper(as: Set[Long], expectedOutputsRev: List[Int]): Set[Long] = expectedOutputsRev match {
+      def helper(as: Set[Long], expectedOutputsRev: List[Byte]): Set[Long] = expectedOutputsRev match {
         case Nil => as
         case expectedOutput :: newExpectedOutputsRev =>
           val newAs =
             for {
               a <- as
-              aStep <- 0 to 7
-              newA = (a << 3) | aStep
-              out = runOutput0(Input(Registers((newA & 0b1111111111).toInt, 0, 0), iterProgram))
-              if out == Seq(expectedOutput)
+              iterA <- 0 to 7
+              newA = (a << 3) | iterA
+              outputs = runOutputs(input.registers.copy(a = newA), iterProgram)
+              if outputs == Seq(expectedOutput)
             } yield newA
           helper(newAs, newExpectedOutputsRev)
       }
 
       val as = helper(Set(0), input.program.reverse.toList)
-      //as.foreach(println)
       as.min
     }
   }
@@ -240,15 +236,15 @@ object Day17 {
   def parseInput(input: String): Input = input match {
     case s"Register A: $a\nRegister B: $b\nRegister C: $c\n\nProgram: $programStr" =>
       val registers = Registers(a.toInt, b.toInt, c.toInt)
-      val program = programStr.split(",").map(_.toInt).toSeq
+      val program = programStr.split(",").map(_.toByte).toSeq
       Input(registers, program)
   }
 
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    import GenericZ3Part2Solution._
-    println(runOutput(parseInput(input)))
+    import ReverseEngineeredPart2Solution._
+    println(runOutputsString(parseInput(input)))
     println(findQuineA(parseInput(input)))
 
     // part 1: 4,5,0,4,7,4,3,0,0 - wrong (bst used literal not combo operand)
