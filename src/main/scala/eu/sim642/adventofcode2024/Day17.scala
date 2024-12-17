@@ -66,56 +66,66 @@ object Day17 {
 
   def runOutput(input: Input): String = runOutput0(input).mkString(",")
 
-  def findQuineA(input: Input): Int = {
-    Iterator.from(0)
-      .find(newA => runOutput0(Input(input.registers.copy(a = newA), input.program)) == input.program)
-      .get
+  trait Part2Solution {
+    def findQuineA(input: Input): Long
   }
 
-  def myProg(initialA: Int, expectedOutputs: Iterator[Int]): Boolean = {
-    var a: Int = initialA
-    var b: Int = 0
-    var c: Int = 0
-    while (a != 0) {
-      b = a & 0b111
-      b = b ^ 1
-      c = a >> b
-      b = b ^ 5
-      b = b ^ c
-      a = a >> 3
-      if ((b & 0b111) != expectedOutputs.next())
-        return false
+  object NaivePart2Solution extends Part2Solution {
+    override def findQuineA(input: Input): Long = {
+      Iterator.from(0)
+        .find(newA => runOutput0(Input(input.registers.copy(a = newA), input.program)) == input.program)
+        .get
     }
-    !expectedOutputs.hasNext
   }
 
-  def findQuineA2(input: Input): Int = {
-    Iterator.from(0)
-      .find(newA => myProg(newA, input.program.iterator))
-      .get
-  }
-
-  def findQuineA3(input: Input): Long = {
-    val ctx = new Context(Map("model" -> "true").asJava)
-    import ctx._
-    val s = mkSolver()
-
-    val bits = input.program.size * 3
-    val initialA = mkBVConst("initialA", bits)
-
-    for ((instruction, i) <- input.program.zipWithIndex) {
-      val a = mkBVLSHR(initialA, mkBV(i * 3, bits))
-      var b = mkBVAND(a, mkBV(7, bits))
-      b = mkBVXOR(b, mkBV(1, bits))
-      val c = mkBVLSHR(a, b)
-      b = mkBVXOR(b, mkBV(5, bits))
-      b = mkBVXOR(b, c)
-      val out = mkBVAND(b, mkBV(7, bits))
-      s.add(mkEq(out, mkBV(instruction, bits)))
+  object SemiNaivePart2Solution extends Part2Solution {
+    def myProg(initialA: Int, expectedOutputs: Iterator[Int]): Boolean = {
+      var a: Int = initialA
+      var b: Int = 0
+      var c: Int = 0
+      while (a != 0) {
+        b = a & 0b111
+        b = b ^ 1
+        c = a >> b
+        b = b ^ 5
+        b = b ^ c
+        a = a >> 3
+        if ((b & 0b111) != expectedOutputs.next())
+          return false
+      }
+      !expectedOutputs.hasNext
     }
 
-    assert(s.check() == Status.SATISFIABLE)
-    s.getModel.evaluate(initialA, false).toString.toLong
+    override def findQuineA(input: Input): Long = {
+      Iterator.from(0)
+        .find(newA => myProg(newA, input.program.iterator))
+        .get
+    }
+  }
+
+  object Z3Part2Solution extends Part2Solution {
+    override def findQuineA(input: Input): Long = {
+      val ctx = new Context(Map("model" -> "true").asJava)
+      import ctx._
+      val s = mkSolver()
+
+      val bits = input.program.size * 3
+      val initialA = mkBVConst("initialA", bits)
+
+      for ((instruction, i) <- input.program.zipWithIndex) {
+        val a = mkBVLSHR(initialA, mkBV(i * 3, bits))
+        var b = mkBVAND(a, mkBV(7, bits))
+        b = mkBVXOR(b, mkBV(1, bits))
+        val c = mkBVLSHR(a, b)
+        b = mkBVXOR(b, mkBV(5, bits))
+        b = mkBVXOR(b, c)
+        val out = mkBVAND(b, mkBV(7, bits))
+        s.add(mkEq(out, mkBV(instruction, bits)))
+      }
+
+      assert(s.check() == Status.SATISFIABLE)
+      s.getModel.evaluate(initialA, false).toString.toLong
+    }
   }
 
   def parseInput(input: String): Input = input match {
@@ -128,10 +138,9 @@ object Day17 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day17.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import Z3Part2Solution._
     println(runOutput(parseInput(input)))
-    println(findQuineA3(parseInput(input)))
-
-    // part 2: 164540892147389 - correct
+    println(findQuineA(parseInput(input)))
 
     // part 1: 4,5,0,4,7,4,3,0,0 - wrong (bst used literal not combo operand)
   }
