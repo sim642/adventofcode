@@ -105,6 +105,8 @@ object Day17 {
 
   object Z3Part2Solution extends Part2Solution {
     override def findQuineA(input: Input): Long = {
+      val Seq(2,4,1,bxl1,7,5,1,bxl2,4,5,0,3,5,5,3,0) = input.program
+
       val ctx = new Context(Map("model" -> "true").asJava)
       import ctx._
       val s = mkSolver()
@@ -114,16 +116,17 @@ object Day17 {
 
       for ((instruction, i) <- input.program.zipWithIndex) {
         val a = mkBVLSHR(initialA, mkBV(i * 3, bits))
-        var b = mkBVAND(a, mkBV(7, bits))
-        b = mkBVXOR(b, mkBV(1, bits))
+        var b = mkBVAND(a, mkBV(0b111, bits))
+        b = mkBVXOR(b, mkBV(bxl1, bits))
         val c = mkBVLSHR(a, b)
-        b = mkBVXOR(b, mkBV(5, bits))
+        b = mkBVXOR(b, mkBV(bxl2, bits))
         b = mkBVXOR(b, c)
-        val out = mkBVAND(b, mkBV(7, bits))
+        val out = mkBVAND(b, mkBV(0b111, bits))
         s.add(mkEq(out, mkBV(instruction, bits)))
       }
 
       assert(s.check() == Status.SATISFIABLE)
+      // TODO: minimize
       s.getModel.evaluate(initialA, false).toString.toLong
     }
   }
