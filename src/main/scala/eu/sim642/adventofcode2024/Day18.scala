@@ -6,10 +6,10 @@ import eu.sim642.adventofcodelib.pos.Pos
 
 object Day18 {
 
-  def exitSteps(bytes: Seq[Pos], max: Pos = Pos(70, 70), after: Int = 1024): Int = {
+  def bytesGraphSearch(bytes: Seq[Pos], max: Pos = Pos(70, 70), after: Int = 1024): GraphSearch[Pos] & UnitNeighbors[Pos] & TargetNode[Pos] = {
     val fallenBytes = bytes.take(after).toSet
 
-    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
+    new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
       override val startNode: Pos = Pos.zero
 
       override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
@@ -23,37 +23,23 @@ object Day18 {
 
       override val targetNode: Pos = max
     }
+  }
 
+  def exitSteps(bytes: Seq[Pos], max: Pos = Pos(70, 70), after: Int = 1024): Int = {
+    val graphSearch = bytesGraphSearch(bytes, max, after)
     BFS.search(graphSearch).target.get._2
   }
 
-  // TODO: deduplicate
-  def exitSteps2(bytes: Seq[Pos], max: Pos = Pos(70, 70), after: Int = 1024): Boolean = {
-    val fallenBytes = bytes.take(after).toSet
-
-    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
-      override val startNode: Pos = Pos.zero
-
-      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
-        for {
-          offset <- Pos.axisOffsets
-          newPos = pos + offset
-          if Pos.zero <= newPos && newPos <= max
-          if !fallenBytes(newPos)
-        } yield newPos
-      }
-
-      override val targetNode: Pos = max
-    }
-
+  def exitReachable(bytes: Seq[Pos], max: Pos, after: Int): Boolean = {
+    val graphSearch = bytesGraphSearch(bytes, max, after)
     BFS.search(graphSearch).target.isDefined
   }
 
   def findBlockingByte(bytes: Seq[Pos], max: Pos = Pos(70, 70)): String = {
-    def f(after: Int): Boolean = !exitSteps2(bytes, max, after)
-    val after = OrderedSearch.binaryLower(f, 0, bytes.size + 1)(true)
-    val afterPos = bytes(after - 1)
-    s"${afterPos.x},${afterPos.y}"
+    def f(after: Int): Boolean = !exitReachable(bytes, max, after)
+    val blockingAfter = OrderedSearch.binaryLower(f, 0, bytes.size + 1)(true)
+    val blockingByte = bytes(blockingAfter - 1)
+    s"${blockingByte.x},${blockingByte.y}"
   }
 
   def parseByte(s: String): Pos = s match {
