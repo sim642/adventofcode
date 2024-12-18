@@ -45,7 +45,7 @@ class Day18Test extends AnyFunSuite {
     assert(findBlockingByte(parseBytes(exampleInput), Pos(6, 6)) == "6,1")
   }
 
-  ignore("Part 2 input answer") { // TODO: optimize (~5.7s)
+  test("Part 2 input answer") {
     assert(findBlockingByte(parseBytes(input)) == "50,28")
   }
 }

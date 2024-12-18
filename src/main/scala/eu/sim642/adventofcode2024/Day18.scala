@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2024
 
+import eu.sim642.adventofcodelib.OrderedSearch
 import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, TargetNode, UnitNeighbors}
 import eu.sim642.adventofcodelib.pos.Pos
 
@@ -49,8 +50,8 @@ object Day18 {
   }
 
   def findBlockingByte(bytes: Seq[Pos], max: Pos = Pos(70, 70)): String = {
-    // TODO: optimize (~5.7s)
-    val after = (0 to bytes.size).find(after => !exitSteps2(bytes, max, after)).get
+    def f(after: Int): Boolean = !exitSteps2(bytes, max, after)
+    val after = OrderedSearch.binaryLower(f, 0, bytes.size + 1)(true)
     val afterPos = bytes(after - 1)
     s"${afterPos.x},${afterPos.y}"
   }
