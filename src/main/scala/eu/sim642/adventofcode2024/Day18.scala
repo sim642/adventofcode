@@ -26,6 +26,35 @@ object Day18 {
     BFS.search(graphSearch).target.get._2
   }
 
+  // TODO: deduplicate
+  def exitSteps2(bytes: Seq[Pos], max: Pos = Pos(70, 70), after: Int = 1024): Boolean = {
+    val fallenBytes = bytes.take(after).toSet
+
+    val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
+      override val startNode: Pos = Pos.zero
+
+      override def unitNeighbors(pos: Pos): IterableOnce[Pos] = {
+        for {
+          offset <- Pos.axisOffsets
+          newPos = pos + offset
+          if Pos.zero <= newPos && newPos <= max
+          if !fallenBytes(newPos)
+        } yield newPos
+      }
+
+      override val targetNode: Pos = max
+    }
+
+    BFS.search(graphSearch).target.isDefined
+  }
+
+  def findBlockingByte(bytes: Seq[Pos], max: Pos = Pos(70, 70)): String = {
+    // TODO: optimize (~5.7s)
+    val after = (0 to bytes.size).find(after => !exitSteps2(bytes, max, after)).get
+    val afterPos = bytes(after - 1)
+    s"${afterPos.x},${afterPos.y}"
+  }
+
   def parseByte(s: String): Pos = s match {
     case s"$x,$y" => Pos(x.toInt, y.toInt)
   }
@@ -36,5 +65,6 @@ object Day18 {
 
   def main(args: Array[String]): Unit = {
     println(exitSteps(parseBytes(input)))
+    println(findBlockingByte(parseBytes(input)))
   }
 }
