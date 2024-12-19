@@ -64,14 +64,12 @@ object Day18 {
 
       @tailrec
       def helper(after: Int, path: Set[Pos]): Int = {
-        if (path(bytes(after))) {
-          exitPath(bytes, max, after + 1) match {
-            case Some(newPath) => helper(after + 1, newPath.toSet)
-            case None => after + 1
-          }
+        val newAfter = bytes.indexWhere(path, after) + 1
+        assert(newAfter >= 1) // indexWhere didn't return -1
+        exitPath(bytes, max, newAfter) match {
+          case Some(newPath) => helper(newAfter, newPath.toSet)
+          case None => newAfter
         }
-        else
-          helper(after + 1, path)
       }
 
       val blockingAfter = helper(0, exitPath(bytes, max, 0).get.toSet)
