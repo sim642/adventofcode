@@ -28,6 +28,9 @@ trait Paths[A] {
       node -> (node +: LazyList.unfold0(node)(prevNodes.get)).reverse
     )
   }
+
+  /*def paths(node: A): Seq[A] =
+    (node +: LazyList.unfold0(node)(prevNodes.get)).reverse*/
 }
 
 trait Order[A] {
