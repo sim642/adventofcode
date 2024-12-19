@@ -57,7 +57,7 @@ object Day18 {
   object LinearOnPathPart2Solution extends Part2Solution {
     def exitPath(bytes: Seq[Pos], max: Pos, after: Int): Option[Seq[Pos]] = {
       val graphSearch = bytesGraphSearch(bytes, max, after + 1)
-      BFS.searchPaths(graphSearch).paths.get(graphSearch.targetNode) // TODO: optimize paths to not compute everything
+      BFS.searchPaths(graphSearch).paths.lift(graphSearch.targetNode)
     }
 
     override def findBlockingByte(bytes: Seq[Pos], max: Pos = Pos(70, 70)): Pos = {

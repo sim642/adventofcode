@@ -23,14 +23,10 @@ trait Distances[A] {
 trait Paths[A] {
   def prevNodes: collection.Map[A, A]
 
-  def paths: collection.Map[A, Seq[A]] = {
-    prevNodes.map((node, _) =>
-      node -> (node +: LazyList.unfold0(node)(prevNodes.get)).reverse
+  def paths: PartialFunction[A, Seq[A]] =
+    prevNodes.andThen(node =>
+      (node #:: LazyList.unfold0(node)(prevNodes.get)).reverse // TODO: don't bother with LazyList now that it's a function
     )
-  }
-
-  /*def paths(node: A): Seq[A] =
-    (node +: LazyList.unfold0(node)(prevNodes.get)).reverse*/
 }
 
 trait Order[A] {
