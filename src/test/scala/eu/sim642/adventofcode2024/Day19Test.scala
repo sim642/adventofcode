@@ -24,4 +24,12 @@ class Day19Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countPossibleDesigns(parseInput(input)) == 226)
   }
+
+  test("Part 2 examples") {
+    assert(sumDesignWays(parseInput(exampleInput)) == 16)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumDesignWays(parseInput(input)) == 601201576113503L)
+  }
 }
