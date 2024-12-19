@@ -11,7 +11,7 @@ object Day19 {
 
   def patternsRegex(patterns: Seq[Towel]): Regex = {
     val one = patterns.mkString("|")
-    ("^(" + one + ")*$").r // TODO: why s"..." doesn't work?
+    s"^($one)*$$".r
   }
 
   def countPossibleDesigns(input: Input): Int = {
