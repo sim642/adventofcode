@@ -28,7 +28,7 @@ object Day20 {
   trait Part {
     val maxCheat: Int
 
-    def findCheats(grid: Grid[Char]): Set[Cheat] = {
+    def findCheats(grid: Grid[Char]): Iterable[Cheat] = {
       val forwardSearch = gridGraphSearch(grid, 'S', 'E')
       val forwardResult = BFS.search(forwardSearch)
       val backwardSearch = gridGraphSearch(grid, 'E', 'S')
@@ -36,9 +36,7 @@ object Day20 {
 
       val noCheatDistance = forwardResult.target.get._2
 
-      // TODO: optimize
-
-      (for {
+      for {
         (row, y) <- grid.view.zipWithIndex
         (cell, x) <- row.view.zipWithIndex
         if cell != '#'
@@ -55,7 +53,7 @@ object Day20 {
         cheatDistance = forwardResult.distances(start) + (startCheat + endCheat) + backwardResult.distances(end)
         //if cheatDistance <= noCheatDistance
         save = noCheatDistance - cheatDistance
-      } yield Cheat(start, end, save)).toSet
+      } yield Cheat(start, end, save)
     }
 
     def countGoodCheats(grid: Grid[Char]): Int = findCheats(grid).count(_.save >= 100)
