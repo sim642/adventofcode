@@ -24,7 +24,7 @@ class Day20Test extends AnyFunSuite {
       |###############""".stripMargin
 
   test("Part 1 examples") {
-    val cheats = findCheats(parseGrid(exampleInput)).groupCount(_.save)
+    val cheats = Part1.findCheats(parseGrid(exampleInput)).groupCount(_.save)
     assert(cheats(2) == 14)
     assert(cheats(4) == 14)
     assert(cheats(6) == 2)
@@ -39,6 +39,28 @@ class Day20Test extends AnyFunSuite {
   }
 
   test("Part 1 input answer") {
-    assert(countGoodCheats(parseGrid(input)) == 1490)
+    assert(Part1.countGoodCheats(parseGrid(input)) == 1490)
+  }
+
+  test("Part 2 examples") {
+    val cheats = Part2.findCheats(parseGrid(exampleInput)).groupCount(_.save)
+    assert(cheats(50) == 32)
+    assert(cheats(52) == 31)
+    assert(cheats(54) == 29)
+    assert(cheats(56) == 39)
+    assert(cheats(58) == 25)
+    assert(cheats(60) == 23)
+    assert(cheats(62) == 20)
+    assert(cheats(64) == 19)
+    assert(cheats(66) == 12)
+    assert(cheats(68) == 14)
+    assert(cheats(70) == 12)
+    assert(cheats(72) == 22)
+    assert(cheats(74) == 4)
+    assert(cheats(76) == 3)
+  }
+
+  ignore("Part 2 input answer") { // TODO: optimize (~4.3s)
+    assert(Part2.countGoodCheats(parseGrid(input)) == 1011325)
   }
 }
