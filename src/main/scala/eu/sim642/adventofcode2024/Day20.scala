@@ -41,14 +41,12 @@ object Day20 {
         (cell, x) <- row.view.zipWithIndex
         if cell != '#'
         start = Pos(x, y)
-        xOffset <- -maxCheat to maxCheat
-        pos = start + Pos(xOffset, 0)
-        if grid.containsPos(pos)
+        xOffset <- -(maxCheat min x) to (maxCheat min (grid(0).size - 1 - x))
         startCheat = xOffset.abs
         maxEndCheat = maxCheat - startCheat
-        yOffset <- (-maxEndCheat) to maxEndCheat
-        end = pos + Pos(0, yOffset)
-        if grid.containsPos(end) && grid(end) != '#'
+        yOffset <- -(maxEndCheat min y) to (maxEndCheat min (grid.size - 1 - y))
+        end = start + Pos(xOffset, yOffset)
+        if grid(end) != '#'
         endCheat = yOffset.abs
         cheatDistance = forwardResult.distances(start) + (startCheat + endCheat) + backwardResult.distances(end)
         //if cheatDistance <= noCheatDistance
