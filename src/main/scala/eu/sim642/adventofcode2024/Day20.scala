@@ -26,41 +26,9 @@ object Day20 {
   }
 
   trait Part {
-    def findCheats(grid: Grid[Char]): Set[Cheat]
+    val maxCheat: Int
 
-    def countGoodCheats(grid: Grid[Char]): Int = findCheats(grid).count(_.save >= 100)
-  }
-
-  object Part1 extends Part {
-    override def findCheats(grid: Grid[Char]): Set[Cheat] = {
-      val forwardSearch = gridGraphSearch(grid, 'S', 'E')
-      val forwardResult = BFS.search(forwardSearch)
-      val backwardSearch = gridGraphSearch(grid, 'E', 'S')
-      val backwardResult = BFS.search(backwardSearch)
-
-      val noCheatDistance = forwardResult.target.get._2
-
-      (for {
-        (row, y) <- grid.view.zipWithIndex
-        (cell, x) <- row.view.zipWithIndex
-        if cell == '#'
-        pos = Pos(x, y)
-        startOffset <- Pos.axisOffsets
-        start = pos + startOffset
-        if grid.containsPos(start) && grid(start) != '#'
-        endOffset <- Pos.axisOffsets
-        if startOffset != endOffset
-        end = pos + endOffset
-        if grid.containsPos(end) && grid(end) != '#'
-        cheatDistance = forwardResult.distances(start) + 2 + backwardResult.distances(end)
-        //if cheatDistance <= noCheatDistance
-        save = noCheatDistance - cheatDistance
-      } yield Cheat(start, end, save)).toSet
-    }
-  }
-
-  object Part2 extends Part {
-    override def findCheats(grid: Grid[Char]): Set[Cheat] = {
+    def findCheats(grid: Grid[Char]): Set[Cheat] = {
       val forwardSearch = gridGraphSearch(grid, 'S', 'E')
       val forwardResult = BFS.search(forwardSearch)
       val backwardSearch = gridGraphSearch(grid, 'E', 'S')
@@ -70,35 +38,16 @@ object Day20 {
 
       // TODO: optimize
 
-      /*(for {
-        (row, y) <- grid.view.zipWithIndex
-        (cell, x) <- row.view.zipWithIndex
-        if cell == '.'
-        start = Pos(x, y)
-        startOffset <- Pos.axisOffsets
-        startCheat <- 0 to 20
-        pos = start + startCheat *: startOffset
-        if grid.containsPos(pos)
-        endOffset <- Pos.axisOffsets
-        if startOffset != endOffset && startOffset != -endOffset
-        endCheat <- 0 to (20 - startCheat)
-        end = pos + endCheat *: endOffset
-        if grid.containsPos(end) && grid(end) != '#'
-        cheatDistance = forwardResult.distances(start) + (startCheat + endCheat) + backwardResult.distances(end)
-        //if cheatDistance <= noCheatDistance
-        save = noCheatDistance - cheatDistance
-      } yield Cheat(start, end, save)).toSet*/
-
       (for {
         (row, y) <- grid.view.zipWithIndex
         (cell, x) <- row.view.zipWithIndex
         if cell != '#'
         start = Pos(x, y)
-        xOffset <- -20 to 20
+        xOffset <- -maxCheat to maxCheat
         pos = start + Pos(xOffset, 0)
         if grid.containsPos(pos)
         startCheat = xOffset.abs
-        maxEndCheat = 20 - startCheat
+        maxEndCheat = maxCheat - startCheat
         yOffset <- (-maxEndCheat) to maxEndCheat
         end = pos + Pos(0, yOffset)
         if grid.containsPos(end) && grid(end) != '#'
@@ -108,6 +57,16 @@ object Day20 {
         save = noCheatDistance - cheatDistance
       } yield Cheat(start, end, save)).toSet
     }
+
+    def countGoodCheats(grid: Grid[Char]): Int = findCheats(grid).count(_.save >= 100)
+  }
+
+  object Part1 extends Part {
+    override val maxCheat: Int = 2
+  }
+
+  object Part2 extends Part {
+    override val maxCheat: Int = 20
   }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector

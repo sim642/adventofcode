@@ -60,7 +60,7 @@ class Day20Test extends AnyFunSuite {
     assert(cheats(76) == 3)
   }
 
-  ignore("Part 2 input answer") { // TODO: optimize (~4.3s)
+  test("Part 2 input answer") { // TODO: optimize (~4.3s)
     assert(Part2.countGoodCheats(parseGrid(input)) == 1011325)
   }
 }
