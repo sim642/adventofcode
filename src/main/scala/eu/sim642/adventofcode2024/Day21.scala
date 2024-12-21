@@ -1,10 +1,10 @@
 package eu.sim642.adventofcode2024
 
 import eu.sim642.adventofcodelib.Grid
-import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, GraphTraversal, Heuristic, SimultaneousBFS, TargetNode, UnitNeighbors}
-import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.GridImplicits.*
 import eu.sim642.adventofcodelib.box.Box
+import eu.sim642.adventofcodelib.graph.*
+import eu.sim642.adventofcodelib.pos.Pos
 
 import scala.collection.mutable
 
@@ -46,7 +46,7 @@ object Day21 {
 
     case class State(directionalPoss: List[Pos], numericPos: Pos, input: Code) {
 
-      def numericPress(button: Char): Option[State] = button match {
+      private def numericPress(button: Char): Option[State] = button match {
         case 'A' =>
           val newButton = numericKeypad(numericPos)
           Some(copy(input = input + newButton))
@@ -59,7 +59,7 @@ object Day21 {
             None // out of keypad
       }
 
-      def directionalPress(button: Char): Option[State] = directionalPoss match {
+      private def directionalPress(button: Char): Option[State] = directionalPoss match {
         case Nil => numericPress(button)
         case directionalPos :: newDirectionalPoss =>
           button match {
@@ -84,9 +84,11 @@ object Day21 {
     override def shortestSequenceLength(code: Code, directionalKeypads: Int): Long = {
 
       val graphSearch = new GraphSearch[State] with UnitNeighbors[State] {
-        override val startNode: State = State(List.fill(directionalKeypads)(directionalKeypad.posOf('A')), numericKeypad.posOf('A'), "")
+        override val startNode: State =
+          State(List.fill(directionalKeypads)(directionalKeypad.posOf('A')), numericKeypad.posOf('A'), "")
 
-        override def unitNeighbors(state: State): IterableOnce[State] = "<v>^A".iterator.flatten(state.userPress).filter(s => code.startsWith(s.input))
+        override def unitNeighbors(state: State): IterableOnce[State] =
+          "<v>^A".iterator.flatten(state.userPress).filter(newState => code.startsWith(newState.input))
 
         override def isTargetNode(state: State, dist: Int): Boolean = state.input == code
       }
@@ -110,14 +112,18 @@ object Day21 {
       }
     }
 
+    private val offsetDirectionals: Map[Pos, Char] = directionalOffsets.map(_.swap)
+
     private def keypadPaths(keypad: Grid[Char]): Map[(Char, Char), Set[Code]] = {
       val box = Box(Pos.zero, Pos(keypad(0).size - 1, keypad.size - 1))
+      // TODO: use one traversal per position (to all other positions), instead of pairwise
       (for {
         startPos <- box.iterator
         if keypad(startPos) != ' '
         targetPos <- box.iterator
         if keypad(targetPos) != ' '
       } yield {
+        // TODO: use multi-predecessor BFS to construct all shortest paths
         val graphSearch = new GraphSearch[Pos] with UnitNeighbors[Pos] with TargetNode[Pos] {
           override val startNode: Pos = startPos
 
@@ -132,7 +138,7 @@ object Day21 {
             .filter(_.head == targetPos)
             .map(poss =>
               (poss lazyZip poss.tail)
-                .map({ case (p2, p1) => directionalOffsets.find(_._2 == p1 - p2).get._1 })
+                .map({ (p2, p1) => offsetDirectionals(p1 - p2) })
                 .mkString
             )
             .toSet
@@ -142,26 +148,25 @@ object Day21 {
     private val numericPaths: Map[(Char, Char), Set[Code]] = keypadPaths(numericKeypad)
     private val directionalPaths: Map[(Char, Char), Set[Code]] = keypadPaths(directionalKeypad)
 
+    def keypadPaths(keypad: Int): Map[(Char, Char), Set[Code]] = if (keypad == 0) numericPaths else directionalPaths
+
     override def shortestSequenceLength(code: Code, directionalKeypads: Int): Long = {
       val memo = mutable.Map.empty[(Code, Int), Long]
 
-      def helper(code: Code, i: Int): Long = {
-        memo.getOrElseUpdate((code, i), {
-          //assert(directionalKeypads == 0)
-          code.foldLeft(('A', 0L))({ case ((prev, length), cur) =>
-            val newLength =
-              (for {
-                path <- if (i == 0) numericPaths((prev, cur)) else directionalPaths((prev, cur))
-                path2 = path + 'A'
-                len =
-                  if (i == directionalKeypads)
-                    path2.length.toLong
-                  else
-                    helper(path2, i + 1)
-              } yield len).min
-            (cur, length + newLength)
-          })._2
-        })
+      def helper(code: Code, keypad: Int): Long = {
+        if (keypad == directionalKeypads + 1)
+          code.length
+        else {
+          memo.getOrElseUpdate((code, keypad), {
+            (("A" + code) lazyZip code) // start moving from A
+              .map({ (prev, cur) =>
+                keypadPaths(keypad)((prev, cur))
+                  .map(path => helper(path + 'A', keypad + 1)) // end at A to press
+                  .min
+              })
+              .sum
+          })
+        }
       }
 
       helper(code, 0)
@@ -176,7 +181,7 @@ object Day21 {
   val part2DirectionalKeypads = 25
 
   def main(args: Array[String]): Unit = {
-    import DynamicProgrammingSolution._
+    import DynamicProgrammingSolution.*
     println(sumCodeComplexity(parseCodes(input), part1DirectionalKeypads))
     println(sumCodeComplexity(parseCodes(input), part2DirectionalKeypads))
 
