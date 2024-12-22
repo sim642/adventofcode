@@ -21,11 +21,32 @@ object Day22 {
   def sumSecretsAfter(secrets: Seq[Secret], after: Int = 2000): Secret =
     secrets.map(secretAfter(_, after)).sum
 
+  def mostBananas(secrets: Seq[Secret]): Int = {
+    // TODO: optimize (~4.7s)
+    val secretMaps = secrets
+      .map({ initialSecret =>
+        Iterator.iterate(initialSecret, 2000 + 1)(nextSecret)
+          .map(_ % 10)
+          .map(_.toInt)
+          .sliding(5)
+          .map({ prices =>
+            val changes = (prices lazyZip prices.tail).map((a, b) => b - a)
+            changes -> prices.last
+          })
+          .groupMapReduce(_._1)(_._2)((a, _) => a)
+      })
+    val secretMaps2 = secretMaps
+      .flatten
+      .groupMapReduce(_._1)(_._2)(_ + _)
+    secretMaps2.values.max
+  }
+
   def parseSecrets(input: String): Seq[Secret] = input.linesIterator.map(_.toLong).toSeq
 
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day22.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
     println(sumSecretsAfter(parseSecrets(input)))
+    println(mostBananas(parseSecrets(input)))
   }
 }

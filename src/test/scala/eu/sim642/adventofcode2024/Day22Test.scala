@@ -11,6 +11,12 @@ class Day22Test extends AnyFunSuite {
       |100
       |2024""".stripMargin
 
+  val exampleInput2 =
+    """1
+      |2
+      |3
+      |2024""".stripMargin
+
   test("Part 1 examples") {
     assert(secretAfter(123, 1) == 15887950)
     assert(secretAfter(123, 2) == 16495136)
@@ -27,5 +33,13 @@ class Day22Test extends AnyFunSuite {
 
   test("Part 1 input answer") {
     assert(sumSecretsAfter(parseSecrets(input)) == 21147129593L)
+  }
+
+  test("Part 2 examples") {
+    assert(mostBananas(parseSecrets(exampleInput2)) == 23)
+  }
+
+  test("Part 2 input answer") {
+    assert(mostBananas(parseSecrets(input)) == 2445)
   }
 }
