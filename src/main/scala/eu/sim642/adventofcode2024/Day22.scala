@@ -15,17 +15,17 @@ object Day22 {
     prune(mix(secret2, secret2 * 2048))
   }
 
-  def secretAfter(initialSecret: Secret, after: Int = 2000): Secret =
-    Iterator.iterate(initialSecret)(nextSecret)(after)
+  def secretIterator(initialSecret: Secret): Iterator[Secret] =
+    Iterator.iterate(initialSecret)(nextSecret)
 
   def sumSecretsAfter(secrets: Seq[Secret], after: Int = 2000): Secret =
-    secrets.map(secretAfter(_, after)).sum
+    secrets.map(secretIterator(_)(after)).sum
 
   def mostBananas(secrets: Seq[Secret]): Int = {
     // TODO: optimize (~4.7s)
     val secretMaps = secrets
       .map({ initialSecret =>
-        Iterator.iterate(initialSecret, 2000 + 1)(nextSecret)
+        secretIterator(initialSecret).take(2000 + 1)
           .map(_ % 10)
           .map(_.toInt)
           .sliding(5)

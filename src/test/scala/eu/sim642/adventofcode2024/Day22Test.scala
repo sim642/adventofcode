@@ -1,9 +1,10 @@
 package eu.sim642.adventofcode2024
 
-import Day22._
+import Day22.*
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-class Day22Test extends AnyFunSuite {
+class Day22Test extends AnyFunSuite with ScalaCheckPropertyChecks {
 
   val exampleInput =
     """1
@@ -18,16 +19,26 @@ class Day22Test extends AnyFunSuite {
       |2024""".stripMargin
 
   test("Part 1 examples") {
-    assert(secretAfter(123, 1) == 15887950)
-    assert(secretAfter(123, 2) == 16495136)
-    assert(secretAfter(123, 3) == 527345)
-    assert(secretAfter(123, 4) == 704524)
-    assert(secretAfter(123, 5) == 1553684)
-    assert(secretAfter(123, 6) == 12683156)
-    assert(secretAfter(123, 7) == 11100544)
-    assert(secretAfter(123, 8) == 12249484)
-    assert(secretAfter(123, 9) == 7753432)
-    assert(secretAfter(123, 10) == 5908254)
+    val secrets = Table(
+      "secret",
+      123,
+      15887950,
+      16495136,
+      527345,
+      704524,
+      1553684,
+      12683156,
+      11100544,
+      12249484,
+      7753432,
+      5908254,
+    )
+
+    val it = secretIterator(123)
+    forAll (secrets) { secret =>
+      assert(it.next() == secret)
+    }
+
     assert(sumSecretsAfter(parseSecrets(exampleInput)) == 37327623)
   }
 
