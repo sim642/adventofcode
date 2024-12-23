@@ -7,12 +7,12 @@ object Day22 {
   type Secret = Long
 
   def mix(secret: Secret, value: Secret): Secret = value ^ secret
-  def prune(secret: Secret): Secret = secret % 16777216 // TODO: bitwise
+  def prune(secret: Secret): Secret = secret & 0xFFFFFF // % 16777216
 
   def nextSecret(secret: Secret): Secret = {
-    val secret1 = prune(mix(secret, secret * 64))
-    val secret2 = prune(mix(secret1, secret1 / 32))
-    prune(mix(secret2, secret2 * 2048))
+    val secret1 = prune(mix(secret, secret << 6)) // * 64
+    val secret2 = mix(secret1, secret1 >> 5) // / 32, no prune needed after right shift
+    prune(mix(secret2, secret2 << 11)) // * 2048
   }
 
   def secretIterator(initialSecret: Secret): Iterator[Secret] =
