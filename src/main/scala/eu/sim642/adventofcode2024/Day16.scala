@@ -34,29 +34,50 @@ object Day16 {
     Dijkstra.search(graphSearch).target.get._2
   }
 
-  def bestPathTiles(grid: Grid[Char]): Int = {
-    val forwardSearch = forwardGraphSearch(grid)
-    val forwardResult = Dijkstra.search(forwardSearch)
+  trait Part2Solution {
+    def bestPathTiles(grid: Grid[Char]): Int
+  }
 
-    val backwardTraversal = new GraphTraversal[Reindeer] with UnitNeighbors[Reindeer] {
-      override val startNode: Reindeer = forwardResult.target.get._1 // TODO: other orientations
+  object BackwardNeighborsPart2Solution extends Part2Solution {
+    override def bestPathTiles(grid: Grid[Char]): Int = {
+      val forwardSearch = forwardGraphSearch(grid)
+      val forwardResult = Dijkstra.search(forwardSearch)
 
-      override def unitNeighbors(reindeer: Reindeer): IterableOnce[Reindeer] = {
-        val distance = forwardResult.distances(reindeer)
-        for {
-          (oldReindeer, step) <- Seq(
-            reindeer.copy(pos = reindeer.pos - reindeer.direction) -> 1, // backward steo
-            reindeer.copy(direction = reindeer.direction.left) -> 1000,
-            reindeer.copy(direction = reindeer.direction.right) -> 1000,
-          )
-          if grid(oldReindeer.pos) != '#'
-          oldDistance <- forwardResult.distances.get(oldReindeer)
-          if oldDistance + step == distance // if step on shortest path
-        } yield oldReindeer
+      val backwardTraversal = new GraphTraversal[Reindeer] with UnitNeighbors[Reindeer] {
+        override val startNode: Reindeer = forwardResult.target.get._1 // TODO: other orientations
+
+        override def unitNeighbors(reindeer: Reindeer): IterableOnce[Reindeer] = {
+          val distance = forwardResult.distances(reindeer)
+          for {
+            (oldReindeer, step) <- Seq(
+              reindeer.copy(pos = reindeer.pos - reindeer.direction) -> 1, // backward step
+              reindeer.copy(direction = reindeer.direction.left) -> 1000,
+              reindeer.copy(direction = reindeer.direction.right) -> 1000,
+            )
+            if grid(oldReindeer.pos) != '#'
+            oldDistance <- forwardResult.distances.get(oldReindeer)
+            if oldDistance + step == distance // if step on shortest path
+          } yield oldReindeer
+        }
       }
-    }
 
-    BFS.traverse(backwardTraversal).nodes.map(_.pos).size
+      BFS.traverse(backwardTraversal).nodes.map(_.pos).size
+    }
+  }
+
+  object AllPathsPart2Solution extends Part2Solution {
+    override def bestPathTiles(grid: Grid[Char]): Int = {
+      val forwardSearch = forwardGraphSearch(grid)
+      val forwardResult = Dijkstra.searchAllPaths(forwardSearch)
+
+      val backwardTraversal = new GraphTraversal[Reindeer] with UnitNeighbors[Reindeer] {
+        override val startNode: Reindeer = forwardResult.target.get._1 // TODO: other orientations
+
+        override def unitNeighbors(reindeer: Reindeer): IterableOnce[Reindeer] = forwardResult.allPrevNodes.getOrElse(reindeer, Set.empty)
+      }
+
+      BFS.traverse(backwardTraversal).nodes.map(_.pos).size
+    }
   }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
@@ -64,6 +85,7 @@ object Day16 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day16.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
+    import AllPathsPart2Solution._
     println(lowestScore(parseGrid(input)))
     println(bestPathTiles(parseGrid(input)))
   }

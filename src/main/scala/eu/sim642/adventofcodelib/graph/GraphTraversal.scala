@@ -29,6 +29,10 @@ trait Paths[A] {
     )
 }
 
+trait AllPaths[A] { // does not extend Paths, because prevNodes is Map, not function
+  def allPrevNodes: collection.Map[A, collection.Set[A]]
+}
+
 trait Order[A] {
   def nodeOrder: collection.Seq[A]
 }
