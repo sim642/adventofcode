@@ -46,4 +46,12 @@ class Day23Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(count3CliquesT(parseEdges(input)) == 1437)
   }
+
+  test("Part 2 examples") {
+    assert(lanPartyPassword(parseEdges(exampleInput)) == "co,de,ka,ta")
+  }
+
+  test("Part 2 input answer") {
+    assert(lanPartyPassword(parseEdges(input)) == "da,do,gx,ly,mb,ns,nt,pz,sc,si,tp,ul,vl")
+  }
 }
