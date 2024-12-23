@@ -68,6 +68,16 @@ object Day16Test {
       assert(bestPathTiles(parseGrid(exampleInput2)) == 64)
     }
 
+    test("Part 2 target with multiple predecessors") {
+      assert(bestPathTiles(parseGrid(
+        """#####
+          |#...#
+          |#S#E#
+          |#...#
+          |#####
+          |""".stripMargin)) == 8)
+    }
+
     test("Part 2 input answer") {
       assert(bestPathTiles(parseGrid(input)) == 449)
     }
