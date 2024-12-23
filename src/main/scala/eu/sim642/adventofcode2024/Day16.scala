@@ -43,8 +43,8 @@ object Day16 {
       val forwardSearch = forwardGraphSearch(grid)
       val forwardResult = Dijkstra.search(forwardSearch)
 
-      val backwardTraversal = new GraphTraversal[Reindeer] with UnitNeighbors[Reindeer] {
-        override val startNode: Reindeer = forwardResult.target.get._1 // TODO: other orientations
+      val backwardTraversal = new GraphTraversal0[Reindeer] with UnitNeighbors[Reindeer] {
+        override def startNodes: IterableOnce[Reindeer] = Pos.axisOffsets.map(d => forwardResult.target.get._1.copy(direction = d)).filter(forwardResult.nodes.contains)
 
         override def unitNeighbors(reindeer: Reindeer): IterableOnce[Reindeer] = {
           val distance = forwardResult.distances(reindeer)

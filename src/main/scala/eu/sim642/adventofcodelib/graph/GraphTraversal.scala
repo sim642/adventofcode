@@ -2,12 +2,20 @@ package eu.sim642.adventofcodelib.graph
 
 import eu.sim642.adventofcodelib.LazyListImplicits._
 
-trait GraphTraversal[A] {
-  val startNode: A
+trait GraphTraversal0[A] {
+  def startNodes: IterableOnce[A] // TODO: should be val?
   def neighbors(node: A): IterableOnce[(A, Int)]
 }
 
-trait UnitNeighbors[A] { this: GraphTraversal[A] =>
+trait GraphTraversal[A] extends GraphTraversal0[A] {
+  val startNode: A
+
+  override def startNodes: IterableOnce[A] = Iterator.single(startNode)
+
+  def neighbors(node: A): IterableOnce[(A, Int)]
+}
+
+trait UnitNeighbors[A] { this: GraphTraversal0[A] =>
   def unitNeighbors(node: A): IterableOnce[A]
 
   override final def neighbors(node: A): IterableOnce[(A, Int)] = unitNeighbors(node).iterator.map(_ -> 1)

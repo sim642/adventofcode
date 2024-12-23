@@ -7,7 +7,7 @@ object BFS {
   // TODO: reduce duplication without impacting performance
 
   // copied from Dijkstra
-  def traverse[A](graphTraversal: GraphTraversal[A] & UnitNeighbors[A]): Distances[A] = {
+  def traverse[A](graphTraversal: GraphTraversal0[A] & UnitNeighbors[A]): Distances[A] = {
     val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
     val toVisit: mutable.Queue[(Int, A)] = mutable.Queue.empty
 
@@ -15,7 +15,7 @@ object BFS {
       toVisit.enqueue((dist, node))
     }
 
-    enqueue(graphTraversal.startNode, 0)
+    graphTraversal.startNodes.iterator.foreach(enqueue(_, 0))
 
     while (toVisit.nonEmpty) {
       val (dist, node) = toVisit.dequeue()
