@@ -4,6 +4,7 @@ import eu.sim642.adventofcodelib.box.{Box3, Box4}
 import eu.sim642.adventofcodelib.pos.Pos3
 import eu.sim642.adventofcodelib.pos.Pos4
 import eu.sim642.adventofcodelib.IntegralImplicits.*
+import eu.sim642.adventofcodelib.graph.BronKerbosch
 
 import scala.collection.mutable
 import scala.util.boundary
@@ -40,35 +41,9 @@ object Day23 {
   }
 
   object NaiveCliquePart2Solution extends Part2Solution {
-    def maximumClique(neighbors: Map[Nanobot, Set[Nanobot]]): Set[Nanobot] = {
-      var best: Set[Nanobot] = Set.empty
-
-      def bronKerbosh(r: Set[Nanobot], p: Set[Nanobot], x: Set[Nanobot]): Unit = {
-        if (p.isEmpty && x.isEmpty) {
-          //println(r)
-          if (r.size > best.size)
-            best = r
-        }
-        else {
-          //val u = p.headOption.getOrElse(x.head)
-          val u = (p ++ x).maxBy(neighbors(_).size) // pivot on highest degree
-          var p2 = p
-          var x2 = x
-          for (v <- p -- neighbors(u)) {
-            bronKerbosh(r + v, p2 intersect neighbors(v), x2 intersect neighbors(v))
-            p2 -= v
-            x2 += v
-          }
-        }
-      }
-
-      bronKerbosh(Set.empty, neighbors.keySet, Set.empty)
-      best
-    }
-
     def maximumOverlap(nanobots: Seq[Nanobot]): Set[Nanobot] = {
       val neighbors: Map[Nanobot, Set[Nanobot]] = nanobots.map(nanobot1 => nanobot1 -> nanobots.filter(nanobot2 => nanobot2 != nanobot1 && nanobot1.overlaps(nanobot2)).toSet).toMap
-      maximumClique(neighbors)
+      BronKerbosch.maximumClique(neighbors)
     }
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
