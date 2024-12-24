@@ -45,6 +45,21 @@ object Day24 {
       })
   }
 
+  def swap(circuit: Circuit, name1: String, name2: String): Circuit =
+    circuit + (name1 -> circuit(name2)) + (name2 -> circuit(name1))
+
+  def changeInput(circuit: Circuit, prefix: String, value: Long): Circuit = {
+    val (a, b) = circuit.keys
+      .filter(_.startsWith(prefix))
+      .toSeq
+      .sorted
+      .foldLeft((circuit, value))({ case ((circuit, value), prefixName) =>
+        (circuit + (prefixName -> Wire.Input((value & 1) == 1L)), value >> 1)
+      })
+    assert(b == 0)
+    a
+  }
+
   def parseInput(s: String): (String, Wire.Input) = s match {
     case s"$name: 0" => name -> Wire.Input(false)
     case s"$name: 1" => name -> Wire.Input(true)
@@ -63,9 +78,35 @@ object Day24 {
       inputMap ++ gateMap
   }
 
+  def printCircuitDot(circuit: Circuit): Unit = {
+    println("digraph circuit {")
+    for ((name, wire) <- circuit) {
+      wire match {
+        case Wire.Input(value) =>
+          println(s"  $name;")
+        case Wire.Gate(lhs, op, rhs) =>
+          println(s"  $name [label=\"$name $op\"];")
+          println(s"  $lhs -> $name;")
+          println(s"  $rhs -> $name;")
+      }
+    }
+    println("}")
+  }
+
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day24.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(getZValue(parseCircuit(input)))
+    val circuit = parseCircuit(input)
+    println(getZValue(circuit))
+    val circuit2 = swap(swap(swap(swap(circuit, "z21", "nhn"), "tvb", "khg"), "z33", "gst"), "z12", "vdc")
+    printCircuitDot(circuit2)
+    println(getZValue(circuit2))
+    println("51401618891888")
+
+    val circuit3 = changeInput(changeInput(circuit2, "x", 0), "asdasd", 0)
+    println(getZValue(circuit3))
+
+    println(Seq("z21", "nhn", "tvb", "khg", "z33", "gst", "z12", "vdc").sorted.mkString(","))
+    // part 2: gst,khg,nhn,tvb,vdc,z12,z21,z33 - correct
   }
 }
