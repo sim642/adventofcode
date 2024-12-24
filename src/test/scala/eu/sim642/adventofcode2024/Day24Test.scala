@@ -74,4 +74,8 @@ class Day24Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(parseCircuit(input).zValue == 51410244478064L)
   }
+
+  test("Part 2 input answer") {
+    assert(findWrongBitsString(parseCircuit(input)) == "gst,khg,nhn,tvb,vdc,z12,z21,z33")
+  }
 }
