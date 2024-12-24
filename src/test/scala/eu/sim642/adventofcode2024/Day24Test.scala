@@ -76,6 +76,6 @@ class Day24Test extends AnyFunSuite {
   }
 
   test("Part 2 input answer") {
-    assert(findWrongBitsString(parseCircuit(input)) == "gst,khg,nhn,tvb,vdc,z12,z21,z33")
+    assert(findWireSwapsString(parseCircuit(input)) == "gst,khg,nhn,tvb,vdc,z12,z21,z33")
   }
 }
