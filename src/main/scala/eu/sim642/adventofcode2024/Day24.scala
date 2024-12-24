@@ -15,49 +15,51 @@ object Day24 {
     case Gate(lhs: String, op: Op, rhs: String)
   }
 
-  type Circuit = Map[String, Wire]
+  case class Circuit(wireMap: Map[String, Wire]) {
+    def zValue: Long = {
+      val memo = mutable.Map.empty[String, Boolean]
 
-  def getZValue(circuit: Circuit): Long = {
+      def evalName(name: String): Boolean =
+        memo.getOrElseUpdate(name, evalWire(wireMap(name)))
 
-    val memo = mutable.Map.empty[String, Boolean]
+      def evalWire(wire: Wire): Boolean = wire match {
+        case Wire.Input(value) => value
+        case Wire.Gate(lhs, op, rhs) =>
+          val left = evalName(lhs)
+          val right = evalName(rhs)
+          op match {
+            case Op.And => left && right
+            case Op.Or => left || right
+            case Op.Xor => left != right
+          }
+      }
 
-    def evalName(name: String): Boolean =
-      memo.getOrElseUpdate(name, evalWire(circuit(name)))
-
-    def evalWire(wire: Wire): Boolean = wire match {
-      case Wire.Input(value) => value
-      case Wire.Gate(lhs, op, rhs) =>
-        val left = evalName(lhs)
-        val right = evalName(rhs)
-        op match {
-          case Op.And => left && right
-          case Op.Or => left || right
-          case Op.Xor => left != right
-        }
+      wireMap.keys
+        .filter(_.startsWith("z"))
+        .toSeq
+        .sorted
+        .foldRight(0L)({ case (zName, acc) =>
+          acc << 1 | (if (evalName(zName)) 1 else 0)
+        })
     }
 
-    circuit.keys
-      .filter(_.startsWith("z"))
-      .toSeq
-      .sorted
-      .foldRight(0L)({ case (zName, acc) =>
-        acc << 1 | (if (evalName(zName)) 1 else 0)
-      })
-  }
+    def swapped(name1: String, name2: String): Circuit =
+      Circuit(wireMap + (name1 -> wireMap(name2)) + (name2 -> wireMap(name1)))
 
-  def swap(circuit: Circuit, name1: String, name2: String): Circuit =
-    circuit + (name1 -> circuit(name2)) + (name2 -> circuit(name1))
+    private def withInputValue(inputPrefix: String, value: Long): Circuit = {
+      val (newCircuit, remainingValue) = wireMap.keys
+        .filter(_.startsWith(inputPrefix))
+        .toSeq
+        .sorted
+        .foldLeft((wireMap, value))({ case ((circuit, value), prefixName) =>
+          (circuit + (prefixName -> Wire.Input((value & 1) == 1L)), value >> 1)
+        })
+      assert(remainingValue == 0)
+      Circuit(newCircuit)
+    }
 
-  def changeInput(circuit: Circuit, prefix: String, value: Long): Circuit = {
-    val (a, b) = circuit.keys
-      .filter(_.startsWith(prefix))
-      .toSeq
-      .sorted
-      .foldLeft((circuit, value))({ case ((circuit, value), prefixName) =>
-        (circuit + (prefixName -> Wire.Input((value & 1) == 1L)), value >> 1)
-      })
-    assert(b == 0)
-    a
+    def withXValue(value: Long): Circuit = withInputValue("x", value)
+    def withYValue(value: Long): Circuit = withInputValue("y", value)
   }
 
   def parseInput(s: String): (String, Wire.Input) = s match {
@@ -75,12 +77,12 @@ object Day24 {
     case s"$inputs\n\n$gates" =>
       val inputMap = inputs.linesIterator.map(parseInput).toMap
       val gateMap = gates.linesIterator.map(parseGate).toMap
-      inputMap ++ gateMap
+      Circuit(inputMap ++ gateMap)
   }
 
   def printCircuitDot(circuit: Circuit): Unit = {
     println("digraph circuit {")
-    for ((name, wire) <- circuit) {
+    for ((name, wire) <- circuit.wireMap) {
       wire match {
         case Wire.Input(value) =>
           println(s"  $name;")
@@ -97,14 +99,14 @@ object Day24 {
 
   def main(args: Array[String]): Unit = {
     val circuit = parseCircuit(input)
-    println(getZValue(circuit))
-    val circuit2 = swap(swap(swap(swap(circuit, "z21", "nhn"), "tvb", "khg"), "z33", "gst"), "z12", "vdc")
+    println(circuit.zValue)
+    val circuit2 = circuit.swapped("z21", "nhn").swapped("tvb", "khg").swapped("z33", "gst").swapped("z12", "vdc")
     printCircuitDot(circuit2)
-    println(getZValue(circuit2))
+    println(circuit2.zValue)
     println("51401618891888")
 
-    val circuit3 = changeInput(changeInput(circuit2, "x", 0), "asdasd", 0)
-    println(getZValue(circuit3))
+    val circuit3 = circuit2.withXValue(0)
+    println(circuit3.zValue)
 
     println(Seq("z21", "nhn", "tvb", "khg", "z33", "gst", "z12", "vdc").sorted.mkString(","))
     // part 2: gst,khg,nhn,tvb,vdc,z12,z21,z33 - correct

@@ -67,11 +67,11 @@ class Day24Test extends AnyFunSuite {
       |tnw OR pbm -> gnj""".stripMargin
 
   test("Part 1 examples") {
-    assert(getZValue(parseCircuit(exampleInput)) == 4)
-    assert(getZValue(parseCircuit(exampleInput2)) == 2024)
+    assert(parseCircuit(exampleInput).zValue == 4)
+    assert(parseCircuit(exampleInput2).zValue == 2024)
   }
 
   test("Part 1 input answer") {
-    assert(getZValue(parseCircuit(input)) == 51410244478064L)
+    assert(parseCircuit(input).zValue == 51410244478064L)
   }
 }
