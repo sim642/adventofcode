@@ -13,11 +13,7 @@ object Day25 {
 
   def countLockKeyFits(lockKeys: Seq[Grid[Boolean]]): Int = {
     val (keys, locks) = lockKeys.partition(isKey)
-    (for {
-      key <- keys
-      lock <- locks
-      if fits(key, lock)
-    } yield ()).size
+    keys.view.map(key => locks.count(fits(key, _))).sum
   }
 
   def parseLockKey(s: String): Grid[Boolean] = s.linesIterator.map(_.map(_ == '#').toVector).toVector
