@@ -33,6 +33,7 @@ object Day23 {
 
     private case class PathData(length: Int, pathPoss: Set[Pos])
 
+    // https://en.wikipedia.org/wiki/Transit_node_routing
     private val posNeighbors: collection.Map[Pos, collection.Map[Pos, PathData]] = {
       val allPoss: Set[Pos] = hallways ++ room2amphipod.keySet
 

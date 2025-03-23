@@ -12,6 +12,7 @@ object Day16 {
 
   case class ValveData(flowRate: Int, tunnels: Seq[Valve])
 
+  // https://en.wikipedia.org/wiki/Transit_node_routing
   def valveDists(valves: Map[Valve, ValveData]): collection.Map[Valve, collection.Map[Valve, Int]] = {
     val dists: mutable.Map[Valve, mutable.Map[Valve, Int]] = valves.view.mapValues(_.tunnels.map(_ -> 1).to(mutable.Map)).to(mutable.Map)
     // Floyd-Warshall

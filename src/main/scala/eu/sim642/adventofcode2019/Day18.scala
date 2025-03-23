@@ -23,6 +23,7 @@ object Day18 {
   trait KeyNeighborsSolution extends Solution {
     case class PathData(distance: Int, pathDoors: Set[Pos], pathKeys: Set[Pos])
 
+    // https://en.wikipedia.org/wiki/Transit_node_routing
     def getKeyNeighbors(input: Input): collection.Map[Pos, collection.Map[Pos, PathData]]
 
     override def collectKeysSteps(input: Input): Int = {
