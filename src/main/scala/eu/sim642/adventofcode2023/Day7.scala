@@ -17,10 +17,10 @@ object Day7 {
     case HighCard
   }
 
-  val handTypeOrdering: Ordering[HandType] = Ordering.by[HandType, Int](_.ordinal)(Ordering[Int]).reverse
+  val handTypeOrdering: Ordering[HandType] = Ordering.by[HandType, Int](_.ordinal)(using Ordering[Int]).reverse
 
   def handFrequency(hand: Hand): Seq[Int] =
-    hand.groupCount(identity).values.toSeq.sorted(Ordering[Int].reverse)
+    hand.groupCount(identity).values.toSeq.sorted(using Ordering[Int].reverse)
 
   def frequencyHandType(freq: Seq[Int]): HandType = freq match {
     case Seq(5) => HandType.FiveOfAKind
@@ -40,11 +40,11 @@ object Day7 {
 
     def handType(hand: Hand): HandType
 
-    val handOrdering: Ordering[Hand] = Ordering.by(handType)(handTypeOrdering).orElse(Ordering.Implicits.seqOrdering(cardOrdering))
+    val handOrdering: Ordering[Hand] = Ordering.by(handType)(using handTypeOrdering).orElse(Ordering.Implicits.seqOrdering(using cardOrdering))
 
     def totalWinnings(hands: Seq[(Hand, Int)]): Int = {
       hands
-        .sortBy(_._1)(handOrdering)
+        .sortBy(_._1)(using handOrdering)
         .zipWithIndex
         .map({ case ((hand, bid), i) => (i + 1) * bid })
         .sum

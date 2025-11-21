@@ -6,7 +6,7 @@ object AStar {
   // moved from 2018 Day 22
   def search[A](graphSearch: GraphSearch[A] & Heuristic[A]): Distances[A] & Target[A] = {
     val visitedDistance: mutable.Map[A, Int] = mutable.Map.empty
-    val toVisit: mutable.PriorityQueue[(Int, Int, A)] = mutable.PriorityQueue.empty(Ordering.by(-_._1))
+    val toVisit: mutable.PriorityQueue[(Int, Int, A)] = mutable.PriorityQueue.empty(using Ordering.by(-_._1))
 
     def enqueueHeuristically(node: A, dist: Int): Unit = {
       toVisit.enqueue((dist + graphSearch.heuristic(node), dist, node))

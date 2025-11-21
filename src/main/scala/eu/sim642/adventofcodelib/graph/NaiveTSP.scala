@@ -19,7 +19,7 @@ object NaiveTSP {
       .permutations
       .map({ path =>
         totalPathLength(distanceMatrix, path)
-      }).min(lengthOrdering)
+      }).min(using lengthOrdering)
   }
 
   // moved from 2016 Day 24
@@ -29,7 +29,7 @@ object NaiveTSP {
       .map({ path =>
         distanceMatrix(start)(path.head) +
           totalPathLength(distanceMatrix, path)
-      }).min(lengthOrdering)
+      }).min(using lengthOrdering)
   }
 
   // moved from 2016 Day 24
@@ -40,7 +40,7 @@ object NaiveTSP {
         distanceMatrix(start)(path.head) +
           totalPathLength(distanceMatrix, path) +
           distanceMatrix(path.last)(start)
-      }).min(lengthOrdering)
+      }).min(using lengthOrdering)
   }
 
   def cycleLength[A](distanceMatrix: DistanceMatrix[A])(using lengthOrdering: Ordering[Int]): Int = {

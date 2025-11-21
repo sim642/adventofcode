@@ -70,7 +70,7 @@ object NumberTheory {
   }
 
   def sieveCrt[A](ans: Seq[(A, A)])(using aIntegral: Integral[A]): (A, A) = {
-    ans.sortBy(_._2)(aIntegral.reverse)
+    ans.sortBy(_._2)(using aIntegral.reverse)
       .reduceLeft(sieveCrt2(_, _))
   }
 }

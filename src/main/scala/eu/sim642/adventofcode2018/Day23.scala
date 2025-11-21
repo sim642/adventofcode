@@ -143,7 +143,7 @@ object Day23 {
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
       val queue: mutable.PriorityQueue[(Nanobot, (Int, Int), Int)] =
-        mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
+        mutable.PriorityQueue.empty(using Ordering.by({ case (octahedron, (lower, upper), originDist) =>
           (upper, lower, -originDist)
           //(upper, -octahedron.radius, -originDist) // much faster but possibly incorrect?
         }))
@@ -241,7 +241,7 @@ object Day23 {
 
     def closestMostNanobots(nanobots: Seq[Nanobot]): Int = {
       val queue: mutable.PriorityQueue[(Box3, (Int, Int), Int)] =
-        mutable.PriorityQueue.empty(Ordering.by({ case (octahedron, (lower, upper), originDist) =>
+        mutable.PriorityQueue.empty(using Ordering.by({ case (octahedron, (lower, upper), originDist) =>
           (upper, lower, -originDist)
           //(upper, -octahedron.radius, -originDist) // much faster but possibly incorrect?
         }))

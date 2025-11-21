@@ -87,8 +87,10 @@ object Day21 {
         override val startNode: State =
           State(List.fill(directionalKeypads)(directionalKeypad.posOf('A')), numericKeypad.posOf('A'), "")
 
-        override def unitNeighbors(state: State): IterableOnce[State] =
-          "<v>^A".iterator.flatten(state.userPress).filter(newState => code.startsWith(newState.input))
+        override def unitNeighbors(state: State): IterableOnce[State] = {
+          // TODO: why not flatMap?
+          "<v>^A".iterator.flatten(using state.userPress).filter(newState => code.startsWith(newState.input))
+        }
 
         override def isTargetNode(state: State, dist: Int): Boolean = state.input == code
       }

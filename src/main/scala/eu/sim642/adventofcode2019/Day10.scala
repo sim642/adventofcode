@@ -65,7 +65,7 @@ object Day10 {
       Seq.empty
     else {
       val visible = filterVisible(monitoring, asteroids)
-      val vaporizeRotation = visible.toSeq.sortBy(laserAngle(monitoring, _))(Ordering.Double.TotalOrdering)
+      val vaporizeRotation = visible.toSeq.sortBy(laserAngle(monitoring, _))(using Ordering.Double.TotalOrdering)
       vaporizeRotation ++ vaporizeSeq(monitoring, asteroids -- visible)
     }
   }
