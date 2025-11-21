@@ -16,6 +16,8 @@ object Day13 {
       case (acc, LazyList(x, y, tile)) =>
         val pos = Pos(x.toInt, y.toInt)
         acc + (pos -> tile.toInt)
+      case (_, _) =>
+        throw new IllegalArgumentException("incomplete output")
     })
   }
 

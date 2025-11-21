@@ -85,6 +85,7 @@ object Day22 {
           case Pos(0, 1) => Pos(pos.x, mapTranspose(pos.x).indexWhere(_ != ' '))
           case Pos(-1, 0) => Pos(map(pos.y).lastIndexWhere(_ != ' '), pos.y)
           case Pos(0, -1) => Pos(pos.x, mapTranspose(pos.x).lastIndexWhere(_ != ' '))
+          case _ => throw new IllegalArgumentException("illegal facing")
         }
         PosFacing(newPos, facing)
       }
@@ -120,6 +121,7 @@ object Day22 {
       case Pos(0, 1) => Pos(edgeLength - 1, edgeLength - 1)
       case Pos(-1, 0) => Pos(0, edgeLength - 1)
       case Pos(0, -1) => Pos(0, 0)
+      case _ => throw new IllegalArgumentException("illegal edge")
     }
 
     def wrap(posFacing: PosFacing): PosFacing = {

@@ -15,6 +15,7 @@ object Day8 {
     instructions.cycle.scanLeft(startNode)({
       case (node, 'L') => network(node)._1
       case (node, 'R') => network(node)._2
+      case _ => throw new IllegalArgumentException("illegal instruction")
     })
   }
 
