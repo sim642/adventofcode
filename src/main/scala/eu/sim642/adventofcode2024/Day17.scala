@@ -102,7 +102,7 @@ object Day17 {
 
   object ReverseEngineeredZ3Part2Solution extends Part2Solution {
     override def findQuineA(input: Input): Long = {
-      val Seq(2, 4, 1, bxl1, 7, 5, 1, bxl2, 4, 5, 0, 3, 5, 5, 3, 0) = input.program // TODO: doesn't support other orders of some operations
+      val Seq(2, 4, 1, bxl1, 7, 5, 1, bxl2, 4, 5, 0, 3, 5, 5, 3, 0) = input.program: @unchecked // TODO: doesn't support other orders of some operations
 
       val ctx = new Context(Map("model" -> "true").asJava)
       import ctx._
@@ -211,7 +211,7 @@ object Day17 {
 
   object ReverseEngineeredPart2Solution extends Part2Solution {
     override def findQuineA(input: Input): Long = {
-      val iterProgram :+ 3 :+ 0 = input.program
+      val iterProgram :+ 3 :+ 0 = input.program: @unchecked
 
       @tailrec
       def helper(as: Set[Long], expectedOutputsRev: List[Byte]): Set[Long] = expectedOutputsRev match {
