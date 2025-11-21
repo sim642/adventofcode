@@ -16,11 +16,11 @@ scalacOptions ++= Seq(
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.19"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % "test"
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.18.1" % "test" // TODO: 1.19 available, but not corresponding scalatestplus
 libraryDependencies += "org.scalatestplus" %% "scalacheck-1-18" % "3.2.19.0" % "test"
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0"
-libraryDependencies += "com.lihaoyi" %% "ujson" % "4.0.2"
-libraryDependencies += "tools.aqua" % "z3-turnkey" % "4.13.0.1"
+libraryDependencies += "com.lihaoyi" %% "ujson" % "4.4.1"
+libraryDependencies += "tools.aqua" % "z3-turnkey" % "4.14.1"
 libraryDependencies += "io.github.hughsimpson" %% "scalameter" % "0.22.1" % "test" // Scala 3 compatible scalameter fork
 
 // TODO: scalameter tests don't work in SBT
