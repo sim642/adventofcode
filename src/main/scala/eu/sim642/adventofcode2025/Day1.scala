@@ -18,13 +18,9 @@ object Day1 {
 
   object Part2 extends Part {
     override def password(rotations: Seq[Int]): Int = {
-      rotations
-        .flatMap({ // expand all rotations to single to make each tick observable, this is silly but works
-          case i if i >= 0 => Seq.fill(i)(1)
-          case i if i < 0 => Seq.fill(-i)(-1)
-        })
-        .scanLeft[Int](50)((a, b) => (a + b) %+ 100) // TODO: why can't use implicit arguments?
-        .count(_ == 0)
+      // expand all rotations to single to make each click observable, this is silly but works
+      val newRotations = rotations.flatMap(i => Seq.fill(i.abs)(i.sign))
+      Part1.password(newRotations)
     }
   }
 
