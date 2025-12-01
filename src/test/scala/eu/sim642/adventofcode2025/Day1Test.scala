@@ -17,11 +17,20 @@ class Day1Test extends AnyFunSuite {
       |R14
       |L82""".stripMargin
 
-  test("Part 1 example") {
-    assert(actualPassword(parseRotations(exampleInput)) == 3)
+  test("Part 1 examples") {
+    assert(Part1.password(parseRotations(exampleInput)) == 3)
   }
 
   test("Part 1 input answer") {
-    assert(actualPassword(parseRotations(input)) == 995)
+    assert(Part1.password(parseRotations(input)) == 995)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.password(parseRotations(exampleInput)) == 6)
+    assert(Part2.password(parseRotations("R1000")) == 10)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.password(parseRotations(input)) == 5847)
   }
 }
