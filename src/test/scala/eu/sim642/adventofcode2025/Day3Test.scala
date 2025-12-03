@@ -12,10 +12,21 @@ class Day3Test extends AnyFunSuite {
       |818181911112111""".stripMargin
 
   test("Part 1 examples") {
-    assert(totalJoltage(parseBanks(exampleInput)) == 357)
+    assert(Part1.maxJoltage("98") == 98)
+    assert(Part1.maxJoltage("987") == 98)
+    assert(Part1.totalJoltage(parseBanks(exampleInput)) == 357)
   }
 
   test("Part 1 input answer") {
-    assert(totalJoltage(parseBanks(input)) == 17301)
+    assert(Part1.totalJoltage(parseBanks(input)) == 17301)
+  }
+
+  test("Part 2 examples") {
+    assert(Part2.maxJoltage("987654321111111") == 987654321111L)
+    assert(Part2.totalJoltage(parseBanks(exampleInput)) == 3121910778619L)
+  }
+
+  test("Part 2 input answer") {
+    assert(Part2.totalJoltage(parseBanks(input)) == 172162399742349L)
   }
 }
