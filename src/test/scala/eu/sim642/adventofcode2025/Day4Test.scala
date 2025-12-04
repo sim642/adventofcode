@@ -24,4 +24,12 @@ class Day4Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countAccessibleRolls(parseGrid(input)) == 1527)
   }
+
+  test("Part 2 examples") {
+    assert(countRemovableRolls(parseGrid(exampleInput)) == 43)
+  }
+
+  test("Part 2 input answer") {
+    assert(countRemovableRolls(parseGrid(input)) == 8690)
+  }
 }

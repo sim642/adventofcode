@@ -6,7 +6,8 @@ import eu.sim642.adventofcodelib.pos.Pos
 
 object Day4 {
 
-  def countAccessibleRolls(grid: Grid[Char]): Int = {
+  // TODO: make this more like cellular automaton?
+  def accessibleRolls(grid: Grid[Char]): Seq[Pos] = {
     (for {
       (row, y) <- grid.view.zipWithIndex
       (cell, x) <- row.view.zipWithIndex
@@ -14,7 +15,21 @@ object Day4 {
       if grid(pos) == '@'
       neighbors = Pos.allOffsets.map(pos + _).filter(grid.containsPos)
       if neighbors.count(grid(_) == '@') < 4
-    } yield pos).size
+    } yield pos).toSeq
+  }
+
+  def countAccessibleRolls(grid: Grid[Char]): Int = {
+    accessibleRolls(grid).size
+  }
+
+  def countRemovableRolls(grid: Grid[Char]): Int = {
+    val accessible = accessibleRolls(grid)
+    if (accessible.isEmpty)
+      0
+    else {
+      val newGrid = accessible.foldLeft(grid)(_.updatedGrid(_, '.'))
+      accessible.size + countRemovableRolls(newGrid)
+    }
   }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
@@ -23,5 +38,6 @@ object Day4 {
 
   def main(args: Array[String]): Unit = {
     println(countAccessibleRolls(parseGrid(input)))
+    println(countRemovableRolls(parseGrid(input)))
   }
 }
