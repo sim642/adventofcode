@@ -25,4 +25,12 @@ class Day5Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countFreshAvailable(parseDatabase(input)) == 679)
   }
+
+  test("Part 2 examples") {
+    assert(countFresh(parseDatabase(exampleInput)) == 14)
+  }
+
+  test("Part 2 input answer") {
+    assert(countFresh(parseDatabase(input)) == 358155203664116L)
+  }
 }

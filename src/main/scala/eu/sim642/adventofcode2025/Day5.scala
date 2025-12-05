@@ -1,6 +1,6 @@
 package eu.sim642.adventofcode2025
 
-import eu.sim642.adventofcode2016.Day20.Interval
+import eu.sim642.adventofcode2016.Day20.{Interval, mergeIntervals}
 
 object Day5 {
 
@@ -9,6 +9,10 @@ object Day5 {
   def countFreshAvailable(database: Database): Int = {
     val Database(fresh, available) = database
     available.count(id => fresh.exists(_.contains(id)))
+  }
+
+  def countFresh(database: Database): Long = {
+    mergeIntervals(database.fresh).map(_.size).sum
   }
 
   def parseInterval(s: String): Interval = s match {
@@ -26,5 +30,6 @@ object Day5 {
 
   def main(args: Array[String]): Unit = {
     println(countFreshAvailable(parseDatabase(input)))
+    println(countFresh(parseDatabase(input)))
   }
 }
