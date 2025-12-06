@@ -12,10 +12,18 @@ class Day6Test extends AnyFunSuite {
       |*   +   *   +""".stripMargin
 
   test("Part 1 examples") {
-    assert(sumAnswers(parseProblems(exampleInput)) == 4277556)
+    assert(sumAnswers(Part1.parseProblems(exampleInput)) == 4277556)
   }
 
   test("Part 1 input answer") {
-    assert(sumAnswers(parseProblems(input)) == 5361735137219L)
+    assert(sumAnswers(Part1.parseProblems(input)) == 5361735137219L)
+  }
+
+  test("Part 2 examples") {
+    assert(sumAnswers(Part2.parseProblems(exampleInput)) == 3263827)
+  }
+
+  test("Part 2 input answer") {
+    assert(sumAnswers(Part2.parseProblems(input)) == 11744693538946L)
   }
 }
