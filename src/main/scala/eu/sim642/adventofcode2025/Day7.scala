@@ -26,7 +26,7 @@ object Day7 {
 
     BFS.traverse(graphTraversal)
       .nodes
-      .count(pos => grid(pos) == '^')
+      .count(grid(_) == '^')
   }
 
   def countTimelines(grid: Grid[Char]): Long = {
@@ -48,7 +48,8 @@ object Day7 {
       }
     }
 
-    helper(0, Map(grid.posOf('S').x -> 1))
+    val startPos = grid.posOf('S')
+    helper(startPos.y, Map(startPos.x -> 1))
   }
 
   def parseGrid(input: String): Grid[Char] = input.linesIterator.map(_.toVector).toVector
