@@ -30,4 +30,12 @@ class Day7Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(countBeamSplits(parseGrid(input)) == 1587)
   }
+
+  test("Part 2 examples") {
+    assert(countTimelines(parseGrid(exampleInput)) == 40)
+  }
+
+  test("Part 2 input answer") {
+    assert(countTimelines(parseGrid(input)) == 5748679033029L)
+  }
 }
