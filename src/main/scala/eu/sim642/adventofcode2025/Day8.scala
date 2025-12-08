@@ -14,6 +14,17 @@ object Day8 {
     }
   }
 
+  def closestPairsSeq(junctionBoxes: Seq[Pos3]): Seq[(Pos3, Pos3)] = {
+    //noinspection ConvertibleToMethodValue
+    (for {
+      // faster than combinations(2)
+      (p1, i) <- junctionBoxes.iterator.zipWithIndex
+      p2 <- junctionBoxes.view.slice(i + 1, junctionBoxes.size).iterator
+    } yield (p1, p2))
+      .toSeq
+      .sortBy(_ euclideanDistance _)
+  }
+
   class UnionFind[A](val reprs: Map[A, A]) {
     // TODO: optimize
 
@@ -46,11 +57,7 @@ object Day8 {
   }
 
   def multiplySizesAfter(junctionBoxes: Seq[Pos3], after: Int = 1000, sizes: Int = 3): Int = {
-    val closestPairs =
-      junctionBoxes.combinations(2)
-        .map({ case Seq(p1, p2) => (p1, p2) })
-        .toSeq
-        .sortBy(_ euclideanDistance _)
+    val closestPairs = closestPairsSeq(junctionBoxes)
 
     val ufAfter = closestPairs.iterator
       .scanLeft(new UnionFind(junctionBoxes))({ case (uf, (p1, p2)) =>
@@ -66,11 +73,7 @@ object Day8 {
 
   // TODO: deduplicate
   def multiplyLastXs(junctionBoxes: Seq[Pos3]): Int = {
-    val closestPairs =
-      junctionBoxes.combinations(2)
-        .map({ case Seq(p1, p2) => (p1, p2) })
-        .toSeq
-        .sortBy(_ euclideanDistance _)
+    val closestPairs = closestPairsSeq(junctionBoxes)
 
     // TODO: clean up
     val size = junctionBoxes.size
@@ -94,7 +97,7 @@ object Day8 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    //println(multiplySizesAfter(parseJunctionBoxes(input)))
+    println(multiplySizesAfter(parseJunctionBoxes(input)))
     println(multiplyLastXs(parseJunctionBoxes(input)))
   }
 }
