@@ -39,8 +39,9 @@ object Day8 {
     val closestPairs = iterateClosestPairs(junctionBoxes)
     val (ufAfter, _) = Kruskal.iterate(junctionBoxes, closestPairs)(after)
 
-    ufAfter.groups()
+    ufAfter.rootNodes
       .map(_.size)
+      .toSeq
       .sorted(using Ordering.Int.reverse)
       .take(sizes)
       .product

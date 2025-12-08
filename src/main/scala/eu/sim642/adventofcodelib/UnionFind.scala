@@ -38,8 +38,11 @@ class UnionFind[A](val nodes: Map[A, Node[A]]) {
       new UnionFind(nodes + (yRepr -> yNode.copy(size = xNode.size + yNode.size)) + (xRepr -> xNode.copy(parent = yRepr)))
   }
 
-  def groups(): Seq[Seq[A]] =
-    nodes.keys.groupBy(findRepr).values.map(_.toSeq).toSeq
+  def components: Iterable[Iterable[A]] =
+    nodes.keys.groupBy(findRepr).values
+
+  def rootNodes: Iterable[Node[A]] =
+    nodes.view.filter((x, node) => x == node.parent).values
 
   override def toString: String = nodes.toString()
 }
