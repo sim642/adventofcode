@@ -20,9 +20,10 @@ object Day8 {
       // faster than combinations(2)
       (p1, i) <- junctionBoxes.iterator.zipWithIndex
       p2 <- junctionBoxes.view.slice(i + 1, junctionBoxes.size).iterator
-    } yield (p1, p2))
+    } yield (p1, p2) -> (p1 euclideanDistance p2))
       .toSeq
-      .sortBy(_ euclideanDistance _)
+      .sortBy(_._2)
+      .map(_._1)
   }
 
   class UnionFind[A](val reprs: Map[A, A]) {
