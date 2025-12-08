@@ -34,4 +34,12 @@ class Day8Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(multiplySizesAfter(parseJunctionBoxes(input)) == 52668)
   }
+
+  test("Part 2 examples") {
+    assert(multiplyLastXs(parseJunctionBoxes(exampleInput)) == 25272)
+  }
+
+  test("Part 2 input answer") {
+    assert(multiplyLastXs(parseJunctionBoxes(input)) == 1474050600)
+  }
 }

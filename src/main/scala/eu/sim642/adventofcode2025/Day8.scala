@@ -64,6 +64,27 @@ object Day8 {
       .product
   }
 
+  // TODO: deduplicate
+  def multiplyLastXs(junctionBoxes: Seq[Pos3]): Int = {
+    val closestPairs =
+      junctionBoxes.combinations(2)
+        .map({ case Seq(p1, p2) => (p1, p2) })
+        .toSeq
+        .sortBy(_ euclideanDistance _)
+
+    // TODO: clean up
+    val size = junctionBoxes.size
+    val ufAfter = closestPairs.iterator
+      .scanLeft((new UnionFind(junctionBoxes), 0))({ case ((uf, edges), (p1, p2)) =>
+        if (uf.sameRepr(p1, p2))
+          (uf, edges)
+        else
+          (uf.unioned(p1, p2), edges + 1)
+      }).tail.zip(closestPairs).find(_._1._2 == size - 1).get._2
+
+    ufAfter._1.x * ufAfter._2.x
+  }
+
   def parseJunctionBox(s: String): Pos3 = s match {
     case s"$x,$y,$z" => Pos3(x.toInt, y.toInt, z.toInt)
   }
@@ -73,6 +94,7 @@ object Day8 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day8.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(multiplySizesAfter(parseJunctionBoxes(input)))
+    //println(multiplySizesAfter(parseJunctionBoxes(input)))
+    println(multiplyLastXs(parseJunctionBoxes(input)))
   }
 }
