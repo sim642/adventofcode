@@ -46,11 +46,10 @@ object Day8 {
       .product
   }
 
-  // TODO: deduplicate
   def multiplyLastXs(junctionBoxes: Seq[Pos3]): Int = {
     val closestPairs = iterateClosestPairs(junctionBoxes)
-    val lastPair = Kruskal.iterateEdges(junctionBoxes, closestPairs).last
-    lastPair._1.x * lastPair._2.x
+    val (p1, p2) = Kruskal.iterateEdges(junctionBoxes, closestPairs).last
+    p1.x * p2.x
   }
 
   def parseJunctionBox(s: String): Pos3 = s match {
