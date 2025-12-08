@@ -1,7 +1,8 @@
 package eu.sim642.adventofcode2025
 
 import eu.sim642.adventofcodelib.pos.Pos3
-import eu.sim642.adventofcodelib.IteratorImplicits._
+import eu.sim642.adventofcodelib.IteratorImplicits.*
+import eu.sim642.adventofcodelib.UnionFind
 
 import scala.annotation.tailrec
 
@@ -24,37 +25,6 @@ object Day8 {
       .toSeq
       .sortBy(_._2)
       .map(_._1)
-  }
-
-  class UnionFind[A](val reprs: Map[A, A]) {
-    // TODO: optimize
-
-    def this(items: Seq[A]) = {
-      this(items.map(x => x -> x).toMap)
-    }
-
-    @tailrec
-    final def findRepr(x: A): A = {
-      val repr = reprs(x)
-      if (x == repr)
-        repr
-      else
-        findRepr(repr)
-    }
-
-    def sameRepr(x: A, y: A): Boolean =
-      findRepr(x) == findRepr(y)
-
-    def unioned(x: A, y: A): UnionFind[A] = {
-      val xRepr = findRepr(x)
-      val yRepr = findRepr(y)
-      new UnionFind(reprs + (yRepr -> xRepr))
-    }
-
-    def groups(): Seq[Seq[A]] =
-      reprs.keys.groupBy(findRepr).values.map(_.toSeq).toSeq
-
-    override def toString: String = reprs.toString()
   }
 
   def multiplySizesAfter(junctionBoxes: Seq[Pos3], after: Int = 1000, sizes: Int = 3): Int = {
