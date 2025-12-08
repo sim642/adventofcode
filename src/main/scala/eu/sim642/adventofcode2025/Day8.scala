@@ -1,10 +1,8 @@
 package eu.sim642.adventofcode2025
 
-import eu.sim642.adventofcodelib.pos.Pos3
 import eu.sim642.adventofcodelib.IteratorImplicits.*
-import eu.sim642.adventofcodelib.UnionFind
-
-import scala.annotation.tailrec
+import eu.sim642.adventofcodelib.graph.Kruskal
+import eu.sim642.adventofcodelib.pos.Pos3
 
 object Day8 {
 
@@ -29,11 +27,7 @@ object Day8 {
 
   def multiplySizesAfter(junctionBoxes: Seq[Pos3], after: Int = 1000, sizes: Int = 3): Int = {
     val closestPairs = closestPairsSeq(junctionBoxes)
-
-    val ufAfter = closestPairs.iterator
-      .scanLeft(new UnionFind(junctionBoxes))({ case (uf, (p1, p2)) =>
-        uf.unioned(p1, p2)
-      })(after)
+    val (ufAfter, _) = Kruskal.iterate(junctionBoxes, closestPairs)(after)
 
     ufAfter.groups()
       .map(_.size)
@@ -45,18 +39,8 @@ object Day8 {
   // TODO: deduplicate
   def multiplyLastXs(junctionBoxes: Seq[Pos3]): Int = {
     val closestPairs = closestPairsSeq(junctionBoxes)
-
-    // TODO: clean up
-    val size = junctionBoxes.size
-    val ufAfter = closestPairs.iterator
-      .scanLeft((new UnionFind(junctionBoxes), 0))({ case ((uf, edges), (p1, p2)) =>
-        if (uf.sameRepr(p1, p2))
-          (uf, edges)
-        else
-          (uf.unioned(p1, p2), edges + 1)
-      }).tail.zip(closestPairs).find(_._1._2 == size - 1).get._2
-
-    ufAfter._1.x * ufAfter._2.x
+    val lastPair = Kruskal.iterateEdges(junctionBoxes, closestPairs).last
+    lastPair._1.x * lastPair._2.x
   }
 
   def parseJunctionBox(s: String): Pos3 = s match {
