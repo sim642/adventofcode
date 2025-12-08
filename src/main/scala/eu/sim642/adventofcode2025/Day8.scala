@@ -7,9 +7,9 @@ import eu.sim642.adventofcodelib.pos.Pos3
 object Day8 {
 
   extension (pos: Pos3) {
-    infix def euclideanDistance(that: Pos3): Double = {
+    infix def euclideanDistanceSqr(that: Pos3): Long = {
       val d = that - pos
-      math.sqrt(d.x.toDouble * d.x + d.y.toDouble * d.y + d.z.toDouble * d.z)
+      d.x.toLong * d.x + d.y.toLong * d.y + d.z.toLong * d.z
     }
   }
 
@@ -19,7 +19,7 @@ object Day8 {
       // faster than combinations(2)
       (p1, i) <- junctionBoxes.iterator.zipWithIndex
       p2 <- junctionBoxes.view.slice(i + 1, junctionBoxes.size).iterator
-    } yield (p1, p2) -> (p1 euclideanDistance p2))
+    } yield (p1, p2) -> (p1 euclideanDistanceSqr p2)) // no need to sqrt distance just for sorting
       .toSeq
       .sortBy(_._2)
       .map(_._1)
