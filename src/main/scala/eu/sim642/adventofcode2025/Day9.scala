@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2025
 
+import eu.sim642.adventofcode2018.Day11.SumGrid
 import eu.sim642.adventofcodelib.box.Box
 import eu.sim642.adventofcodelib.pos.Pos
 import eu.sim642.adventofcodelib.SeqImplicits.*
@@ -29,6 +30,36 @@ object Day9 {
   object Part1 extends Part {
     override def makeIsValid(redTiles: Seq[Pos]): Box => Boolean =
       _ => true
+  }
+
+  // Copied & modified from 2018 day 11
+  class ArrayPartialSumGrid(f: Pos => Int, box: Box) extends SumGrid {
+    val Box(min, max) = box
+    val Pos(width, height) = max - min + Pos(1, 1)
+    val partialSums: mutable.ArraySeq[mutable.ArraySeq[Int]] = mutable.ArraySeq.fill(height, width)(0)
+    // TODO: should be larger by 1 to allow min-coordinate queries?
+
+    for (y <- 0 until height) {
+      for (x <- 0 until width) {
+        val pos = min + Pos(x, y)
+        val sum =
+          (if (y >= 1) partialSums(y - 1)(x) else 0) +
+            (if (x >= 1) partialSums(y)(x - 1) else 0) -
+            (if (x >= 1 && y >= 1) partialSums(y - 1)(x - 1) else 0) +
+            f(pos)
+        partialSums(y)(x) = sum
+      }
+    }
+
+    override def sumBox(box: Box): Int = {
+      //val Box(topLeft, bottomRight) = box
+      val topLeft = box.min - min
+      val bottomRight = box.max - min
+      val bottomLeft1 = Pos(topLeft.x - 1, bottomRight.y)
+      val topRight1 = Pos(bottomRight.x, topLeft.y - 1)
+      val topLeft1 = Pos(topLeft.x - 1, topLeft.y - 1)
+      partialSums(bottomRight.y)(bottomRight.x) - partialSums(bottomLeft1.y)(bottomLeft1.x) - partialSums(topRight1.y)(topRight1.x) + partialSums(topLeft1.y)(topLeft1.x)
+    }
   }
 
   object Part2 extends Part {
@@ -73,30 +104,12 @@ object Day9 {
 
       val outside = BFS.traverse(graphTraversal).nodes
 
-      val outsidePrefix = mutable.ArraySeq.fill(ys.size * 2 - 1 + 2, xs.size * 2 - 1 + 2)(0)
-      for (y <- outsidePrefix.indices) {
-        for (x <- outsidePrefix(y).indices) {
-          outsidePrefix(y)(x) =
-            (if (y >= 1) outsidePrefix(y - 1)(x) else 0) +
-              (if (x >= 1) outsidePrefix(y)(x - 1) else 0) -
-              (if (x >= 1 && y >= 1) outsidePrefix(y - 1)(x - 1) else 0) +
-              (if (outside(Pos(x, y))) 1 else 0)
-        }
-      }
-
-      //for (row <- outsidePrefix) {
-      //  for (cell <- row)
-      //    print(s"$cell\t")
-      //  println()
-      //}
+      val outsideSumGrid = new ArrayPartialSumGrid(pos => if (outside(pos)) 1 else 0, Box(Pos.zero, Pos(xs.size * 2, ys.size * 2)))
 
       def isValid(box: Box): Boolean = {
         val gridBox = Box(mapPos(box.min), mapPos(box.max))
         //!gridBox.iterator.exists(outside)
-        (outsidePrefix(gridBox.max.y)(gridBox.max.x) -
-          outsidePrefix(gridBox.min.y - 1)(gridBox.max.x) -
-          outsidePrefix(gridBox.max.y)(gridBox.min.x - 1) +
-          outsidePrefix(gridBox.min.y - 1)(gridBox.min.x - 1)) == 0
+        outsideSumGrid.sumBox(gridBox) == 0
       }
 
       isValid
