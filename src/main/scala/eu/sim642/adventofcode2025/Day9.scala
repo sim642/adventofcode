@@ -11,21 +11,28 @@ import scala.collection.mutable
 object Day9 {
 
   trait Part {
-    def largestArea(redTiles: Seq[Pos]): Long
-  }
+    def makeIsValid(redTiles: Seq[Pos]): Box => Boolean
 
-  object Part1 extends Part {
-    override def largestArea(redTiles: Seq[Pos]): Long = {
+    def largestArea(redTiles: Seq[Pos]): Long = {
+      val isValid = makeIsValid(redTiles)
+
       (for {
         // faster than combinations(2)
         (p1, i) <- redTiles.iterator.zipWithIndex
         p2 <- redTiles.view.slice(i + 1, redTiles.size).iterator
-      } yield Box.bounding(Seq(p1, p2)).size[Long]).max
+        box = Box.bounding(Seq(p1, p2))
+        if isValid(box)
+      } yield box.size[Long]).max
     }
   }
 
+  object Part1 extends Part {
+    override def makeIsValid(redTiles: Seq[Pos]): Box => Boolean =
+      _ => true
+  }
+
   object Part2 extends Part {
-    override def largestArea(redTiles: Seq[Pos]): Long = {
+    override def makeIsValid(redTiles: Seq[Pos]): Box => Boolean = {
       // TODO: clean up
       // TODO: optimize (with polygon checks?)
       val xs = redTiles.map(_.x).distinct.sorted
@@ -92,13 +99,7 @@ object Day9 {
           outsidePrefix(gridBox.min.y - 1)(gridBox.min.x - 1)) == 0
       }
 
-      (for {
-        // faster than combinations(2)
-        (p1, i) <- redTiles.iterator.zipWithIndex
-        p2 <- redTiles.view.slice(i + 1, redTiles.size).iterator
-        box = Box.bounding(Seq(p1, p2))
-        if isValid(box)
-      } yield box.size[Long]).max
+      isValid
     }
   }
 
