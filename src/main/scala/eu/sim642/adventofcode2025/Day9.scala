@@ -61,6 +61,8 @@ object Day9 {
   /**
    * Solution, which compresses the grid to 2-unit distances between occurring coordinates
    * and checks validity by counting outside cells (in the compressed grid) using a [[SumGrid]].
+   *
+   * Grid compression assumes no adjacent coordinates occur.
    */
   object CompressGridPart2Solution extends Part2Solution {
     def makeCompressPos(redTiles: Seq[Pos]): Pos => Pos = {
@@ -113,6 +115,9 @@ object Day9 {
 
   /**
    * Solution, which checks validity geometrically using axis-aligned line-box intersection.
+   *
+   * Assumes largest area won't be outside.
+   * Assumes no adjacent coordinates occur.
    */
   object IntersectionPart2Solution extends Part2Solution {
     override def makeIsValid(redTiles: Seq[Pos]): Box => Boolean = {
