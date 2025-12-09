@@ -27,7 +27,7 @@ class Day9Test extends AnyFunSuite {
     assert(Part2.largestArea(parseRedTiles(exampleInput)) == 24)
   }
 
-  ignore("Part 2 input answer") { // TODO: optimize (~8.5s)
+  test("Part 2 input answer") {
     assert(Part2.largestArea(parseRedTiles(input)) == 1474477524L)
   }
 }

@@ -66,9 +66,30 @@ object Day9 {
 
       val outside = BFS.traverse(graphTraversal).nodes
 
+      val outsidePrefix = mutable.ArraySeq.fill(ys.size * 2 - 1 + 2, xs.size * 2 - 1 + 2)(0)
+      for (y <- outsidePrefix.indices) {
+        for (x <- outsidePrefix(y).indices) {
+          outsidePrefix(y)(x) =
+            (if (y >= 1) outsidePrefix(y - 1)(x) else 0) +
+              (if (x >= 1) outsidePrefix(y)(x - 1) else 0) -
+              (if (x >= 1 && y >= 1) outsidePrefix(y - 1)(x - 1) else 0) +
+              (if (outside(Pos(x, y))) 1 else 0)
+        }
+      }
+
+      //for (row <- outsidePrefix) {
+      //  for (cell <- row)
+      //    print(s"$cell\t")
+      //  println()
+      //}
+
       def isValid(box: Box): Boolean = {
         val gridBox = Box(mapPos(box.min), mapPos(box.max))
-        !gridBox.iterator.exists(outside)
+        //!gridBox.iterator.exists(outside)
+        (outsidePrefix(gridBox.max.y)(gridBox.max.x) -
+          outsidePrefix(gridBox.min.y - 1)(gridBox.max.x) -
+          outsidePrefix(gridBox.max.y)(gridBox.min.x - 1) +
+          outsidePrefix(gridBox.min.y - 1)(gridBox.min.x - 1)) == 0
       }
 
       (for {
