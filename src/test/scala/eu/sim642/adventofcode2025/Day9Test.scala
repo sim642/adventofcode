@@ -1,9 +1,17 @@
 package eu.sim642.adventofcode2025
 
-import Day9._
+import Day9.*
+import Day9Test.*
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day9Test extends AnyFunSuite {
+class Day9Test extends Suites(
+  new Part1Test,
+  new CompressGridPart2SolutionTest,
+  new IntersectionPart2SolutionTest,
+)
+
+object Day9Test {
 
   val exampleInput =
     """7,1
@@ -15,19 +23,29 @@ class Day9Test extends AnyFunSuite {
       |2,3
       |7,3""".stripMargin
 
-  test("Part 1 examples") {
-    assert(Part1.largestArea(parseRedTiles(exampleInput)) == 50)
+  class Part1Test extends AnyFunSuite {
+
+    test("Part 1 examples") {
+      assert(Part1.largestArea(parseRedTiles(exampleInput)) == 50)
+    }
+
+    test("Part 1 input answer") {
+      assert(Part1.largestArea(parseRedTiles(input)) == 4729332959L)
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(Part1.largestArea(parseRedTiles(input)) == 4729332959L)
+  abstract class Part2SolutionTest(part2Solution: Part2Solution) extends AnyFunSuite {
+
+    test("Part 2 examples") {
+      assert(part2Solution.largestArea(parseRedTiles(exampleInput)) == 24)
+    }
+
+    test("Part 2 input answer") {
+      assert(part2Solution.largestArea(parseRedTiles(input)) == 1474477524L)
+    }
   }
 
-  test("Part 2 examples") {
-    assert(Part2.largestArea(parseRedTiles(exampleInput)) == 24)
-  }
+  class CompressGridPart2SolutionTest extends Part2SolutionTest(CompressGridPart2Solution)
 
-  test("Part 2 input answer") {
-    assert(Part2.largestArea(parseRedTiles(input)) == 1474477524L)
-  }
+  class IntersectionPart2SolutionTest extends Part2SolutionTest(IntersectionPart2Solution)
 }

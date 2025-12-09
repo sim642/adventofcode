@@ -31,6 +31,8 @@ object Day9 {
       _ => true
   }
 
+  trait Part2Solution extends Part
+
   // Copied & modified from 2018 day 11
   class ArrayPartialSumGrid(f: Pos => Int, box: Box) extends SumGrid {
     val Box(min, max) = box
@@ -56,7 +58,11 @@ object Day9 {
     }
   }
 
-  object Part2 extends Part {
+  /**
+   * Solution, which compresses the grid to 2-unit distances between occurring coordinates
+   * and checks validity by counting outside cells (in the compressed grid) using a [[SumGrid]].
+   */
+  object CompressGridPart2Solution extends Part2Solution {
     def makeCompressPos(redTiles: Seq[Pos]): Pos => Pos = {
       val xs = redTiles.map(_.x).distinct.sorted
       val ys = redTiles.map(_.y).distinct.sorted
@@ -105,9 +111,31 @@ object Day9 {
     }
   }
 
+  /**
+   * Solution, which checks validity geometrically using axis-aligned line-box intersection.
+   */
+  object IntersectionPart2Solution extends Part2Solution {
+    override def makeIsValid(redTiles: Seq[Pos]): Box => Boolean = {
+      val lines =
+        (redTiles lazyZip redTiles.rotateLeft(1))
+          .toSeq
+          .map((p1, p2) => Box.bounding(Seq(p1, p2))) // convert line to box of width/height 1
+
+      def isValid(box: Box): Boolean = {
+        // construct box interior, otherwise box intersects with its own edges
+        val innerMin = box.min + Pos(1, 1)
+        val innerMax = box.max - Pos(1, 1)
+        //innerMin <= innerMax &&
+        !(innerMin <= innerMax) || // box has no/empty interior // TODO: this is wrong for line-line intersections
+          !lines.exists(_.intersect(Box(innerMin, innerMax)).nonEmpty) // interior doesn't intersect any line
+      }
+
+      isValid
+    }
+  }
+
   // TODO: line of sight in all directions solution (single iteration over corners, not all pairs!)
   // TODO: glguy's solution
-  // TODO: polygon-based solution?
 
   def parseRedTile(s: String): Pos = s match {
     case s"$x,$y" => Pos(x.toInt, y.toInt)
@@ -119,6 +147,6 @@ object Day9 {
 
   def main(args: Array[String]): Unit = {
     println(Part1.largestArea(parseRedTiles(input)))
-    println(Part2.largestArea(parseRedTiles(input)))
+    println(CompressGridPart2Solution.largestArea(parseRedTiles(input)))
   }
 }
