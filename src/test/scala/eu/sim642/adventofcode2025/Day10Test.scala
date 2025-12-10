@@ -17,4 +17,12 @@ class Day10Test extends AnyFunSuite {
   test("Part 1 input answer") {
     assert(sumFewestPresses(parseMachines(input)) == 449)
   }
+
+  test("Part 2 examples") {
+    assert(sumFewestPresses2(parseMachines(exampleInput)) == 33)
+  }
+
+  test("Part 2 input answer") {
+    //assert(sumFewestPresses2(parseMachines(input)) == 449)
+  }
 }
