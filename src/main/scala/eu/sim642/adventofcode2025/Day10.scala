@@ -13,70 +13,85 @@ object Day10 {
 
   case class Machine(lights: Lights, buttons: Buttons, joltages: Joltages)
 
-  def fewestPresses(machine: Machine): Int = {
-    val graphSearch = new GraphSearch[Lights] with UnitNeighbors[Lights] with TargetNode[Lights] {
-      override val startNode: Lights = machine.lights.map(_ => false)
+  trait Part {
+    def fewestPresses(machine: Machine): Int
 
-      override def unitNeighbors(lights: Lights): IterableOnce[Lights] =
-        machine.buttons.map(_.foldLeft(lights)((acc, i) => acc.updated(i, !acc(i))))
-
-      override val targetNode: Lights = machine.lights
-    }
-
-    BFS.search(graphSearch).target.get._2
+    def sumFewestPresses(machines: Seq[Machine]): Int = machines.map(fewestPresses).sum
   }
 
-  def sumFewestPresses(machines: Seq[Machine]): Int = machines.map(fewestPresses).sum
+  object Part1 extends Part {
+    override def fewestPresses(machine: Machine): Int = {
+      val graphSearch = new GraphSearch[Lights] with UnitNeighbors[Lights] with TargetNode[Lights] {
+        override val startNode: Lights = machine.lights.map(_ => false)
 
-  /*
-     x0  x1    x2  x3    x4    x5
-     (3) (1,3) (2) (2,3) (0,2) (0,1)
-  0:                     x4    x5    = 3
-  1:     x1                    x5    = 5
-  2:           x2  x3    x4          = 4
-  3: x0            x3                = 7
+        override def unitNeighbors(lights: Lights): IterableOnce[Lights] =
+          machine.buttons.map(_.foldLeft(lights)((acc, i) => acc.updated(i, !acc(i))))
 
+        override val targetNode: Lights = machine.lights
+      }
+
+      BFS.search(graphSearch).target.get._2
+    }
+  }
+
+  trait Part2Solution extends Part
+
+  /**
+   * Solution, which naively finds fewest presses by BFS.
+   * Does not scale to inputs.
    */
+  object NaivePart2Solution extends Part2Solution {
+    override def fewestPresses(machine: Machine): Int = {
+      val graphSearch = new GraphSearch[Joltages] with UnitNeighbors[Joltages] with TargetNode[Joltages] {
+        override val startNode: Joltages = machine.joltages.map(_ => 0)
 
-  // TODO: optimize
-  def fewestPresses2(machine: Machine): Int = {
-    /*val graphSearch = new GraphSearch[Joltages] with UnitNeighbors[Joltages] with TargetNode[Joltages] {
-      override val startNode: Joltages = machine.joltages.map(_ => 0)
+        override def unitNeighbors(joltages: Joltages): IterableOnce[Joltages] =
+          machine.buttons.map(_.foldLeft(joltages)((acc, i) => acc.updated(i, acc(i) + 1)))
 
-      override def unitNeighbors(joltages: Joltages): IterableOnce[Joltages] =
-        machine.buttons.map(_.foldLeft(joltages)((acc, i) => acc.updated(i, acc(i) + 1)))
+        override val targetNode: Joltages = machine.joltages
+      }
 
-      override val targetNode: Joltages = machine.joltages
+      BFS.search(graphSearch).target.get._2
     }
-
-    BFS.search(graphSearch).target.get._2*/
-
-    val ctx = new Context(Map("model" -> "true").asJava)
-    import ctx._
-    val s = mkOptimize()
-
-    val buttonVars = machine.buttons.zipWithIndex.map((_, i) => mkIntConst(s"x$i"))
-    val lhss =
-      machine.buttons
-        .lazyZip(buttonVars)
-        .foldLeft(machine.joltages.map[ArithExpr[IntSort]](i => mkInt(i)))({ case (accs, (button, buttonVar)) =>
-          button.foldLeft(accs)((accs, i) => accs.updated(i, mkSub(accs(i), buttonVar)))
-        })
-
-    for (lhs <- lhss)
-      s.Add(mkEq(lhs, mkInt(0)))
-
-    for (v <- buttonVars)
-      s.Add(mkGe(v, mkInt(0)))
-
-    val presses = buttonVars.foldLeft[ArithExpr[IntSort]](mkInt(0))((acc, v) => mkAdd(acc, v))
-    s.MkMinimize(presses)
-    assert(s.Check() == Status.SATISFIABLE)
-    //println(s.getModel)
-    s.getModel.evaluate(presses, false).toString.toInt
   }
 
-  def sumFewestPresses2(machines: Seq[Machine]): Int = machines.map(fewestPresses2).tapEach(println).sum
+  /**
+   * Solution, which finds fewest presses via an ILP problem, solved by Z3.
+   */
+  object Z3Part2Solution extends Part2Solution {
+    /*
+       x0  x1    x2  x3    x4    x5
+       (3) (1,3) (2) (2,3) (0,2) (0,1)
+    0:                     x4    x5    = 3
+    1:     x1                    x5    = 5
+    2:           x2  x3    x4          = 4
+    3: x0            x3                = 7
+    */
+
+    override def fewestPresses(machine: Machine): Int = {
+      val ctx = new Context(Map("model" -> "true").asJava)
+      import ctx._
+      val s = mkOptimize()
+
+      val buttonPresses = machine.buttons.zipWithIndex.map((_, i) => mkIntConst(s"x$i"))
+      for (presses <- buttonPresses)
+        s.Add(mkGe(presses, mkInt(0)))
+
+      val totalPresses = buttonPresses.foldLeft[ArithExpr[IntSort]](mkInt(0))(mkAdd(_, _))
+      s.MkMinimize(totalPresses)
+
+      (machine.buttons lazyZip buttonPresses)
+        .foldLeft(machine.joltages.map[ArithExpr[IntSort]](mkInt))({ case (acc, (button, presses)) =>
+          button.foldLeft(acc)((acc, i) => acc.updated(i, mkSub(acc(i), presses)))
+        })
+        .foreach(joltageLeft =>
+          s.Add(mkEq(joltageLeft, mkInt(0)))
+        )
+
+      assert(s.Check() == Status.SATISFIABLE)
+      s.getModel.evaluate(totalPresses, false).toString.toInt
+    }
+  }
 
   def parseMachine(s: String): Machine = s match {
     case s"[$lightsStr] $buttonsStr {$joltagesStr}" =>
@@ -91,7 +106,7 @@ object Day10 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day10.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(sumFewestPresses(parseMachines(input)))
-    println(sumFewestPresses2(parseMachines(input)))
+    println(Part1.sumFewestPresses(parseMachines(input)))
+    println(Z3Part2Solution.sumFewestPresses(parseMachines(input)))
   }
 }
