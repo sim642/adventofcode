@@ -62,27 +62,26 @@ object Day11 {
   /**
    * Optimized version of [[ViaMapSolution]], which only keeps the largest key pair from the mapping.
    * Others are useless for passing all the vias.
+   * Also, just the size of the visited vias set is tracked, because incompatible sets can't arise.
    */
   object ViaPairSolution extends Solution {
 
-    case class ViaPair(via: Set[Device], count: Long) {
+    case class ViaPair(via: Int, count: Long) {
       infix def combine(that: ViaPair): ViaPair = {
         if (via == that.via)
           ViaPair(via, count + that.count)
-        else if (via subsetOf that.via)
+        else if (via < that.via)
           that
-        else if (that.via subsetOf via)
+        else // that.via < via
           this
-        else
-          throw new IllegalArgumentException("incomparable via pairs") // doesn't happen on DAG
       }
 
-      def unionVia(thatVia: Set[Device]): ViaPair =
-        copy(via = via union thatVia)
+      def unionVia(thatVia: Int): ViaPair =
+        copy(via = via + thatVia)
     }
 
     object ViaPair {
-      val empty = ViaPair(Set.empty, 0)
+      val empty = ViaPair(0, 0)
     }
 
     trait ViaPairPartSolution extends PartSolution {
@@ -91,7 +90,7 @@ object Day11 {
 
         def helper(device: Device): ViaPair = {
           memo.getOrElseUpdate(device, {
-            val deviceVia = via.intersect(Set(device))
+            val deviceVia = if (via(device)) 1 else 0
             if (device == to)
               ViaPair(deviceVia, 1)
             else
@@ -100,7 +99,7 @@ object Day11 {
         }
 
         val viaPair = helper(from)
-        assert(viaPair.via == via)
+        assert(viaPair.via == via.size)
         viaPair.count
       }
     }
