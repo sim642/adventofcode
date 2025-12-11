@@ -33,18 +33,18 @@ class Day11Test extends AnyFunSuite {
       |hhh: out""".stripMargin
 
   test("Part 1 examples") {
-    assert(countPaths(parseDevices(exampleInput)) == 5)
+    assert(Part1.countPaths(parseDevices(exampleInput)) == 5)
   }
 
   test("Part 1 input answer") {
-    assert(countPaths(parseDevices(input)) == 643)
+    assert(Part1.countPaths(parseDevices(input)) == 643)
   }
 
   test("Part 2 examples") {
-    assert(countPaths2(parseDevices(exampleInput2)) == 2)
+    assert(Part2.countPaths(parseDevices(exampleInput2)) == 2)
   }
 
   test("Part 2 input answer") {
-    assert(countPaths2(parseDevices(input)) == 417190406827152L)
+    assert(Part2.countPaths(parseDevices(input)) == 417190406827152L)
   }
 }

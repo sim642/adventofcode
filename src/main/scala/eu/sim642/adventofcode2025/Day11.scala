@@ -6,36 +6,36 @@ object Day11 {
 
   type Device = String
 
-  def countPaths(devices: Map[Device, Seq[Device]], from: Device = "you", to: Device = "out"): Int = {
-    val memo = mutable.Map.empty[Device, Int]
+  trait Part {
+    val from: Device
+    val via: Set[Device]
+    val to: Device = "out"
 
-    def helper(device: Device): Int = {
-      memo.getOrElseUpdate(device, {
-        if (device == to)
-          1
-        else
-          devices(device).map(helper).sum
-      })
+    def countPaths(devices: Map[Device, Seq[Device]]): Long = {
+      val memo = mutable.Map.empty[Device, Map[Set[Device], Long]]
+
+      def helper(device: Device): Map[Set[Device], Long] = {
+        memo.getOrElseUpdate(device, {
+          val deviceVia = via.intersect(Set(device))
+          if (device == to)
+            Map(deviceVia -> 1)
+          else
+            devices(device).flatMap(helper).groupMapReduce(_._1 ++ deviceVia)(_._2)(_ + _)
+        })
+      }
+
+      helper(from)(via)
     }
-
-    helper(from)
   }
 
-  def countPaths2(devices: Map[Device, Seq[Device]], from: Device = "svr", to: Device = "out"): Long = {
-    val vias = Set("dac", "fft")
+  object Part1 extends Part {
+    override val from: Device = "you"
+    override val via: Set[Device] = Set.empty
+  }
 
-    val memo = mutable.Map.empty[Device, Map[Set[Device], Long]]
-
-    def helper(device: Device): Map[Set[Device], Long] = {
-      memo.getOrElseUpdate(device, {
-        if (device == to)
-          Map(Set.empty -> 1)
-        else
-          devices(device).flatMap(helper).groupMapReduce(_._1)(_._2)(_ + _).map((k, v) => (k.union(vias.intersect(Set(device)))) -> v)
-      })
-    }
-
-    helper(from)(vias)
+  object Part2 extends Part {
+    override val from: Device = "svr"
+    override val via: Set[Device] = Set("dac", "fft")
   }
 
   def parseDevice(s: String): (Device, Seq[Device]) = s match {
@@ -47,7 +47,7 @@ object Day11 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day11.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countPaths(parseDevices(input)))
-    println(countPaths2(parseDevices(input)))
+    println(Part1.countPaths(parseDevices(input)))
+    println(Part2.countPaths(parseDevices(input)))
   }
 }
