@@ -1,5 +1,6 @@
 package eu.sim642.adventofcode2025
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 object Day11 {
@@ -58,7 +59,45 @@ object Day11 {
     override object Part2 extends ViaMapPartSolution with Part2Devices
   }
 
-  // TODO: path count product solution
+  /**
+   * Solution, which tries all permutations of vias and counts each one by multiplying adjacent steps.
+   */
+  object PermutationSolution extends Solution {
+    trait PermutationPartSolution extends PartSolution {
+      def countPathsTo(devices: Devices)(to: Device): Device => Long = {
+        val memo = mutable.Map.empty[Device, Long]
+
+        def helper(device: Device): Long = {
+          memo.getOrElseUpdate(device, {
+            if (device == to)
+              1
+            else
+              devices.getOrElse(device, Set.empty).map(helper).sum // need getOrElse for "out" when from is different, but reaches "out"
+          })
+        }
+
+        helper
+      }
+
+      override def countPaths(devices: Devices): Long = {
+        val memo = mutable.Map.empty[Device, Device => Long]
+
+        def countPathsFromTo(from: Device, to: Device): Long = // memoize by to, because same to will be reused
+          memo.getOrElseUpdate(to, countPathsTo(devices)(to))(from)
+
+        @tailrec
+        def helper(prevDevice: Device, acc: Long, via: List[Device]): Long = via match {
+          case Nil => acc * countPathsFromTo(prevDevice, to)
+          case device :: newVia => helper(device, acc * countPathsFromTo(prevDevice, device), newVia) // TODO: optimize: stop when countPathsFromTo is zero
+        }
+
+        via.toList.permutations.map(helper(from, 1L, _)).sum // TODO: optimize: only one can be non-zero, stop on first
+      }
+    }
+
+    override object Part1 extends PermutationPartSolution with Part1Devices
+    override object Part2 extends PermutationPartSolution with Part2Devices
+  }
 
   def parseDevice(s: String): (Device, Seq[Device]) = s match {
     case s"$key: $values" => key -> values.split(" ").toSeq
