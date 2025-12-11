@@ -64,37 +64,48 @@ object Day11 {
    * Others are useless for passing all the vias.
    */
   object ViaPairSolution extends Solution {
+
+    case class ViaPair(via: Set[Device], count: Long) {
+      infix def combine(that: ViaPair): ViaPair = {
+        if (via == that.via)
+          ViaPair(via, count + that.count)
+        else if (via subsetOf that.via)
+          that
+        else if (that.via subsetOf via)
+          this
+        else
+          throw new IllegalArgumentException("incomparable via pairs") // doesn't happen on DAG
+      }
+
+      def unionVia(thatVia: Set[Device]): ViaPair =
+        copy(via = via union thatVia)
+    }
+
+    object ViaPair {
+      val empty = ViaPair(Set.empty, 0)
+    }
+
     trait ViaPairPartSolution extends PartSolution {
       override def countPaths(devices: Devices): Long = {
-        val memo = mutable.Map.empty[Device, (Set[Device], Long)]
+        val memo = mutable.Map.empty[Device, ViaPair]
 
-        def helper(device: Device): (Set[Device], Long) = {
+        def helper(device: Device): ViaPair = {
           memo.getOrElseUpdate(device, {
             val deviceVia = via.intersect(Set(device))
             if (device == to)
-              deviceVia -> 1
-            else {
-              val (a, b) = devices(device).map(helper).foldLeft(Set.empty[Device] -> 0L)({ case (a@(accVia, acc), n@(newVia, newCount)) =>
-                if (accVia == newVia)
-                  accVia -> (acc + newCount)
-                else if (accVia subsetOf newVia)
-                  n
-                else if (newVia subsetOf accVia)
-                  a
-                else
-                  throw new IllegalStateException("")
-              })
-              a.union(deviceVia) -> b
-            }
+              ViaPair(deviceVia, 1)
+            else
+              devices(device).map(helper).foldLeft(ViaPair.empty)(_ combine _).unionVia(deviceVia)
           })
         }
 
-        helper(from)._2
+        val viaPair = helper(from)
+        assert(viaPair.via == via)
+        viaPair.count
       }
     }
 
     override object Part1 extends ViaPairPartSolution with Part1Devices
-
     override object Part2 extends ViaPairPartSolution with Part2Devices
   }
 
