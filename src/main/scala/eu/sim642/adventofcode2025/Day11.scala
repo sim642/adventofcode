@@ -88,10 +88,15 @@ object Day11 {
         @tailrec
         def helper(prevDevice: Device, acc: Long, via: List[Device]): Long = via match {
           case Nil => acc * countPathsFromTo(prevDevice, to)
-          case device :: newVia => helper(device, acc * countPathsFromTo(prevDevice, device), newVia) // TODO: optimize: stop when countPathsFromTo is zero
+          case device :: newVia =>
+            val newAcc = countPathsFromTo(prevDevice, device)
+            if (newAcc == 0)
+              0 // this step is impossible, so no need to continue (multiplying 0)
+            else
+              helper(device, acc * newAcc, newVia)
         }
 
-        via.toList.permutations.map(helper(from, 1L, _)).sum // TODO: optimize: only one can be non-zero, stop on first
+        via.toList.permutations.map(helper(from, 1L, _)).find(_ != 0).get // this could be a sum, but only one vias permutation can be non-zero, so stop after finding that one, no need to continue (adding 0s)
       }
     }
 
