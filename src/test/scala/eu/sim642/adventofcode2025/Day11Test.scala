@@ -17,11 +17,34 @@ class Day11Test extends AnyFunSuite {
       |hhh: ccc fff iii
       |iii: out""".stripMargin
 
+  val exampleInput2 =
+    """svr: aaa bbb
+      |aaa: fft
+      |fft: ccc
+      |bbb: tty
+      |tty: ccc
+      |ccc: ddd eee
+      |ddd: hub
+      |hub: fff
+      |eee: dac
+      |dac: fff
+      |fff: ggg hhh
+      |ggg: out
+      |hhh: out""".stripMargin
+
   test("Part 1 examples") {
     assert(countPaths(parseDevices(exampleInput)) == 5)
   }
 
   test("Part 1 input answer") {
     assert(countPaths(parseDevices(input)) == 643)
+  }
+
+  test("Part 2 examples") {
+    assert(countPaths2(parseDevices(exampleInput2)) == 2)
+  }
+
+  test("Part 2 input answer") {
+    assert(countPaths2(parseDevices(input)) == 417190406827152L)
   }
 }
