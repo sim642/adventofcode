@@ -60,6 +60,45 @@ object Day11 {
   }
 
   /**
+   * Optimized version of [[ViaMapSolution]], which only keeps the largest key pair from the mapping.
+   * Others are useless for passing all the vias.
+   */
+  object ViaPairSolution extends Solution {
+    trait ViaPairPartSolution extends PartSolution {
+      override def countPaths(devices: Devices): Long = {
+        val memo = mutable.Map.empty[Device, (Set[Device], Long)]
+
+        def helper(device: Device): (Set[Device], Long) = {
+          memo.getOrElseUpdate(device, {
+            val deviceVia = via.intersect(Set(device))
+            if (device == to)
+              deviceVia -> 1
+            else {
+              val (a, b) = devices(device).map(helper).foldLeft(Set.empty[Device] -> 0L)({ case (a@(accVia, acc), n@(newVia, newCount)) =>
+                if (accVia == newVia)
+                  accVia -> (acc + newCount)
+                else if (accVia subsetOf newVia)
+                  n
+                else if (newVia subsetOf accVia)
+                  a
+                else
+                  throw new IllegalStateException("")
+              })
+              a.union(deviceVia) -> b
+            }
+          })
+        }
+
+        helper(from)._2
+      }
+    }
+
+    override object Part1 extends ViaPairPartSolution with Part1Devices
+
+    override object Part2 extends ViaPairPartSolution with Part2Devices
+  }
+
+  /**
    * Solution, which tries all permutations of vias and counts each one by multiplying adjacent steps.
    */
   object PermutationSolution extends Solution {

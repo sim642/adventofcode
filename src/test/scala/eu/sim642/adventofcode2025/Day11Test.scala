@@ -7,6 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class Day11Test extends Suites(
   new ViaMapSolutionTest,
+  new ViaPairSolutionTest,
   new PermutationSolutionTest,
 )
 
@@ -58,6 +59,8 @@ object Day11Test {
   }
 
   class ViaMapSolutionTest extends SolutionTest(ViaMapSolution)
+
+  class ViaPairSolutionTest extends SolutionTest(ViaPairSolution)
 
   class PermutationSolutionTest extends SolutionTest(PermutationSolution)
 }
