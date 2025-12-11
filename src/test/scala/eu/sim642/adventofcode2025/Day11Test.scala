@@ -1,9 +1,15 @@
 package eu.sim642.adventofcode2025
 
-import Day11._
+import Day11.*
+import Day11Test.*
+import org.scalatest.Suites
 import org.scalatest.funsuite.AnyFunSuite
 
-class Day11Test extends AnyFunSuite {
+class Day11Test extends Suites(
+  new ViaMapSolutionTest,
+)
+
+object Day11Test {
 
   val exampleInput =
     """aaa: you hhh
@@ -32,19 +38,23 @@ class Day11Test extends AnyFunSuite {
       |ggg: out
       |hhh: out""".stripMargin
 
-  test("Part 1 examples") {
-    assert(Part1.countPaths(parseDevices(exampleInput)) == 5)
+  abstract class SolutionTest(solution: Solution) extends AnyFunSuite {
+    test("Part 1 examples") {
+      assert(solution.Part1.countPaths(parseDevices(exampleInput)) == 5)
+    }
+
+    test("Part 1 input answer") {
+      assert(solution.Part1.countPaths(parseDevices(input)) == 643)
+    }
+
+    test("Part 2 examples") {
+      assert(solution.Part2.countPaths(parseDevices(exampleInput2)) == 2)
+    }
+
+    test("Part 2 input answer") {
+      assert(solution.Part2.countPaths(parseDevices(input)) == 417190406827152L)
+    }
   }
 
-  test("Part 1 input answer") {
-    assert(Part1.countPaths(parseDevices(input)) == 643)
-  }
-
-  test("Part 2 examples") {
-    assert(Part2.countPaths(parseDevices(exampleInput2)) == 2)
-  }
-
-  test("Part 2 input answer") {
-    assert(Part2.countPaths(parseDevices(input)) == 417190406827152L)
-  }
+  class ViaMapSolutionTest extends SolutionTest(ViaMapSolution)
 }
