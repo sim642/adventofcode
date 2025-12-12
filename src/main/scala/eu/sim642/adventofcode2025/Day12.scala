@@ -41,14 +41,12 @@ object Day12 {
         if (shapeI < 0)
           true // nothing more to fit
         else {
-          //val newShapeCounts = shapeCounts.updated(shapeI, shapeCounts(shapeI) - 1)
-          //val shape = shapes(shapeI)
           if (poss.isEmpty)
             false
           else {
             val pos = poss.head
             //print(s"$indent $pos")
-            val todo = region.size.x * region.size.y - pos.x * region.size.y - pos.y
+            val todo = region.size.x * region.size.y - pos.x * region.size.y - pos.y - (if (pos.x == shapeOrientationBox.max.x) pos.y * 2 else 0)
             val areaLowerBound = // only counting the #-s in shapes
               shapes
                 .map(_.countGrid(identity))
