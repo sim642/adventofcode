@@ -15,7 +15,15 @@ object Day12 {
 
   case class Input(shapes: Seq[Shape], regions: Seq[Region])
 
-  /*def fits(shapes: Seq[Shape])(region: Region): Boolean = {
+  trait Solution {
+    def fits(shapes: Seq[Shape])(region: Region): Boolean
+
+    def countFits(input: Input): Int =
+      input.regions.count(fits(input.shapes))
+  }
+
+  object NaiveSolution extends Solution {
+    /*def fits(shapes: Seq[Shape])(region: Region): Boolean = {
 
     def helper(grid: Grid[Boolean], shapeCounts: Seq[Int]): Boolean = {
       val shapeI = shapeCounts.indexWhere(_ > 0)
@@ -40,35 +48,33 @@ object Day12 {
     helper(initialGrid, region.shapeCounts)
   }*/
 
+    // probably broken: skips over poss when finding place for a shape
+    override def fits(shapes: Seq[Shape])(region: Region): Boolean = {
+      val shapeOrientationBox = Box(Pos.zero, region.size - Pos(3, 3)) // assuming all shappes of same size
 
-  /*// probably broken: skips over poss when finding place for a shape
-  def fits(shapes: Seq[Shape])(region: Region): Boolean = {
-    val shapeOrientationBox = Box(Pos.zero, region.size - Pos(3, 3)) // assuming all shappes of same size
-
-    def helper(grid: Grid[Boolean], shapeCounts: Seq[Int], poss: List[Pos]): Boolean = {
-      val shapeI = shapeCounts.indexWhere(_ > 0)
-      if (shapeI < 0)
-        true // nothing more to fit
-      else {
-        val newShapeCounts = shapeCounts.updated(shapeI, shapeCounts(shapeI) - 1)
-        val shape = shapes(shapeI)
-        (for {
-          shapeOrientation <- shape.orientations.iterator
-          shapeOrientationSize = Pos(shapeOrientation(0).size, shapeOrientation.size)
-          shapeOrientationBox2 = Box(Pos.zero, shapeOrientationSize - Pos(1, 1))
-          case pos :: newPoss <- poss.tails
-          if shapeOrientationBox2.iterator.forall(p => !(shapeOrientation(p) && grid(pos + p)))
-          newGrid = shapeOrientationBox2.iterator.foldLeft(grid)((newGrid, p) => newGrid.updatedGrid(pos + p, shapeOrientation(p)))
-        } yield helper(newGrid, newShapeCounts, newPoss)).exists(identity)
+      def helper(grid: Grid[Boolean], shapeCounts: Seq[Int], poss: List[Pos]): Boolean = {
+        val shapeI = shapeCounts.indexWhere(_ > 0)
+        if (shapeI < 0)
+          true // nothing more to fit
+        else {
+          val newShapeCounts = shapeCounts.updated(shapeI, shapeCounts(shapeI) - 1)
+          val shape = shapes(shapeI)
+          (for {
+            shapeOrientation <- shape.orientations.iterator
+            shapeOrientationSize = Pos(shapeOrientation(0).size, shapeOrientation.size)
+            shapeOrientationBox2 = Box(Pos.zero, shapeOrientationSize - Pos(1, 1))
+            case pos :: newPoss <- poss.tails
+            if shapeOrientationBox2.iterator.forall(p => !(shapeOrientation(p) && grid(pos + p)))
+            newGrid = shapeOrientationBox2.iterator.foldLeft(grid)((newGrid, p) => newGrid.updatedGrid(pos + p, shapeOrientation(p)))
+          } yield helper(newGrid, newShapeCounts, newPoss)).exists(identity)
+        }
       }
+
+      val initialGrid = Vector.fill(region.size.y, region.size.x)(false)
+      helper(initialGrid, region.shapeCounts, shapeOrientationBox.iterator.toList)
     }
 
-    val initialGrid = Vector.fill(region.size.y, region.size.x)(false)
-    helper(initialGrid, region.shapeCounts, shapeOrientationBox.iterator.toList)
-  }*/
-
-
-  /*def fits(shapes: Seq[Shape])(region: Region): Boolean = {
+    /*def fits(shapes: Seq[Shape])(region: Region): Boolean = {
     val shapeOrientationBox = Box(Pos.zero, region.size - Pos(3, 3)) // assuming all shappes of same size
 
     def helper(grid: Grid[Boolean], shapeCounts: Seq[Int], poss: List[Pos]): Boolean = {
@@ -100,18 +106,31 @@ object Day12 {
     val initialGrid = Vector.fill(region.size.y, region.size.x)(false)
     helper(initialGrid, region.shapeCounts, shapeOrientationBox.iterator.toList)
   }*/
-
-  // cheat solution
-  def fits(shapes: Seq[Shape])(region: Region): Boolean = {
-    shapes
-      .map(_.countGrid(identity))
-      .lazyZip(region.shapeCounts)
-      .map(_ * _)
-      .sum <= Box(Pos.zero, region.size - Pos(1, 1)).size[Int]
   }
 
-  def countFits(input: Input): Int =
-    input.regions.count(fits(input.shapes))
+  object SanitySolution extends Solution {
+    override def fits(shapes: Seq[Shape])(region: Region): Boolean = {
+      val area = Box(Pos(1, 1), region.size).size[Int]
+      val areaLowerBound = // only counting the #-s in shapes
+        shapes
+          .map(_.countGrid(identity))
+          .lazyZip(region.shapeCounts)
+          .map(_ * _)
+          .sum
+      val areaUpperBound = // counting area needed if no "overlaps" are possible
+        shapes
+          .map(_.sizeGrid)
+          .lazyZip(region.shapeCounts)
+          .map(_ * _)
+          .sum
+      if (areaUpperBound <= area)
+        true
+      else if (areaLowerBound > area)
+        false
+      else
+        throw IllegalArgumentException("undecidable by sanity check")
+    }
+  }
 
   def parseShape(s: String): Shape = s.linesIterator.tail.map(_.map(_ == '#').toVector).toVector
 
@@ -128,6 +147,6 @@ object Day12 {
   lazy val input: String = scala.io.Source.fromInputStream(getClass.getResourceAsStream("day12.txt")).mkString.trim
 
   def main(args: Array[String]): Unit = {
-    println(countFits(parseInput(input)))
+    println(SanitySolution.countFits(parseInput(input)))
   }
 }
