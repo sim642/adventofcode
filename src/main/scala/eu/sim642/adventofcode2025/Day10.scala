@@ -65,7 +65,7 @@ object Day10 {
     0:                     x4    x5    = 3
     1:     x1                    x5    = 5
     2:           x2  x3    x4          = 4
-    3: x0            x3                = 7
+    3: x0  x1        x3                = 7
     */
 
     override def fewestPresses(machine: Machine): Int = {
