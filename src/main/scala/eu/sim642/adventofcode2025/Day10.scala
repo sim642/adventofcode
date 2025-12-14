@@ -2,7 +2,7 @@ package eu.sim642.adventofcode2025
 
 import eu.sim642.adventofcodelib.IteratorImplicits.*
 import com.microsoft.z3.{ArithExpr, Context, IntExpr, IntSort, Status}
-import eu.sim642.adventofcodelib.NumberTheory
+import eu.sim642.adventofcodelib.{GaussianElimination, NumberTheory}
 import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, TargetNode, UnitNeighbors}
 
 import scala.collection.mutable
@@ -124,80 +124,8 @@ object Day10 {
             button.foldLeft(zeroCol)((acc, i) => acc.updated(i, 1L))
           )
           .transpose
-          .zip(machine.joltages.map(_.toLong))
 
-      val m: mutable.ArraySeq[mutable.ArraySeq[Long]] = rows.map((a, b) => (a :+ b).to(mutable.ArraySeq)).to(mutable.ArraySeq)
-
-      def swapRows(y1: Int, y2: Int): Unit = {
-        val row1 = m(y1)
-        m(y1) = m(y2)
-        m(y2) = row1
-      }
-
-      def multiplyRow(y: Int, factor: Long): Unit = {
-        for (x2 <- 0 until (machine.buttons.size + 1))
-          m(y)(x2) *= factor
-      }
-
-      def simplifyRow(y: Int): Unit = {
-        val factor = NumberTheory.gcd(m(y).toSeq) // TODO: avoid conversion
-        if (factor.abs > 1) {
-          for (x2 <- 0 until (machine.buttons.size + 1))
-            m(y)(x2) /= factor
-        }
-      }
-
-      def reduceDown(x: Int, y1: Int, y2: Int): Unit = {
-        val c2 = m(y2)(x)
-        if (c2 != 0) {
-          val c1 = m(y1)(x)
-          val (_, _, (factor, factor2)) = NumberTheory.extendedGcd(c1, c2)
-          for (x2 <- 0 until x) // must start from 0 because we're now multiplying entire row y2
-            m(y2)(x2) = factor2 * m(y2)(x2)
-          for (x2 <- x until (machine.buttons.size + 1))
-            m(y2)(x2) = factor2 * m(y2)(x2) + factor * m(y1)(x2)
-          //simplifyRow(y2)
-        }
-      }
-
-      var y = 0
-      for (x <- machine.buttons.indices) {
-        val y2opt = m.indices.find(y2 => y2 >= y && m(y2)(x) != 0)
-        y2opt match {
-          case None => // move to next x
-          case Some(y2) =>
-            swapRows(y, y2)
-            for (y3 <- (y + 1) until m.size)
-              reduceDown(x, y, y3)
-
-            y += 1
-        }
-      }
-
-      // check consistency
-      for (y2 <- y until m.size)
-        assert(m(y2).last == 0)
-
-      val mainVars = mutable.ArrayBuffer.empty[Int]
-      val freeVars = mutable.ArrayBuffer.empty[Int]
-      y = 0
-      for (x <- machine.buttons.indices) {
-        if (y < m.size) { // TODO: break if y too big
-          if (m(y)(x) == 0) {
-            freeVars += x
-            ()
-          } // move to next x
-          else {
-            mainVars += x
-            for (y3 <- 0 until y)
-              reduceDown(x, y, y3)
-
-            y += 1
-          }
-        }
-        else
-          freeVars += x // can't break if this is here
-      }
+      val sol = GaussianElimination.solve(rows, machine.joltages.map(_.toLong))
 
       //val mSum = m.transpose.map(_.sum) // TODO: use?
 
@@ -216,25 +144,13 @@ object Day10 {
         }
       }
 
-      def eval(freeVals: List[Int]): List[Long] = {
-        val mainVals = mainVars.view.zipWithIndex.map((mainVar, y) => {
-          val row = m(y)
-          val r = row.last - (freeVars lazyZip freeVals).map((freeVar, freeVal) => row(freeVar) * freeVal).sum
-          if (r % row(mainVar) == 0)
-            r / row(mainVar)
-          else
-            -1
-        }).toList
-        mainVals
-      }
-
-      val bound = freeVars.map(maxVals).sum
-      val choices = (0 to bound).iterator.flatMap(helper0(_, freeVars.map(maxVals).toList))
+      val bound = sol.freeVars.map(maxVals).sum
+      val choices = (0 to bound).iterator.flatMap(helper0(_, sol.freeVars.map(maxVals).toList))
 
       val answer =
         choices
-          .map(freeVals => (eval(freeVals), freeVals))
-          .filter(p => p._1.forall(_ >= 0) && (p._1 lazyZip mainVars).forall((a, b) => a <= maxVals(b))) // all main vals must be non-negative, but at most their max
+          .map(freeVals => (sol.evaluate(freeVals.map(_.toLong)), freeVals))
+          .filter(p => p._1.forall(_ >= 0) && (p._1 lazyZip sol.dependentVars).forall((a, b) => a <= maxVals(b))) // all main vals must be non-negative, but at most their max
           .map((s1, s2) => s1.sum + s2.sum)
           .min
 
