@@ -120,41 +120,30 @@ object Day10 {
       val zeroCol = machine.joltages.map(_ => 0L)
       val rows =
         machine.buttons
-          .map(button =>
-            button.foldLeft(zeroCol)((acc, i) => acc.updated(i, 1L))
-          )
+          .map(_.foldLeft(zeroCol)(_.updated(_, 1L)))
           .transpose
 
       val sol = GaussianElimination.solve(rows, machine.joltages.map(_.toLong))
-
       //val mSum = m.transpose.map(_.sum) // TODO: use?
 
-      val maxVals = machine.buttons.map(_.map(machine.joltages(_)).min)
-
-      def helper0(sum: Int, maxs: List[Int]): Iterator[List[Int]] = {
-        maxs match {
-          case Nil => Iterator(Nil)
-          case List(m) if sum <= m => Iterator(List(sum))
-          case List(m) => Iterator.empty
-          case m :: newMaxs =>
-            for {
-              x <- (0 to (m min sum)).iterator
-              rest <- helper0(sum - x, newMaxs)
-            } yield x :: rest
-        }
+      def helper(freeMaxs: List[Int]): Iterator[List[Int]] = freeMaxs match { // TODO: this seems like it should exist from earlier somewhere
+        case Nil => Iterator(Nil)
+        case freeMax :: newFreeMaxs =>
+          for {
+            freeVal <- (0 to freeMax).iterator
+            newFreeVals <- helper(newFreeMaxs)
+          } yield freeVal :: newFreeVals
       }
 
-      val bound = sol.freeVars.map(maxVals).sum
-      val choices = (0 to bound).iterator.flatMap(helper0(_, sol.freeVars.map(maxVals).toList))
-
-      val answer =
-        choices
-          .map(freeVals => (sol.evaluate(freeVals.map(_.toLong)), freeVals))
-          .filter(p => p._1.forall(_ >= 0) && (p._1 lazyZip sol.dependentVars).forall((a, b) => a <= maxVals(b))) // all main vals must be non-negative, but at most their max
-          .map((s1, s2) => s1.sum + s2.sum)
-          .min
-
-      answer.toInt
+      val maxs = machine.buttons.map(_.map(machine.joltages).min)
+      val freeMaxs = sol.freeVars.map(maxs)
+      val dependentMaxs = sol.dependentVars.map(maxs)
+      (for {
+        freeVals <- helper(freeMaxs.toList)
+        dependentVals = sol.evaluate(freeVals.map(_.toLong))
+        if dependentVals.forall(_ >= 0)
+        if (dependentVals lazyZip dependentMaxs).forall(_ <= _)
+      } yield dependentVals.sum.toInt + freeVals.sum).min
     }
   }
 
