@@ -10,14 +10,24 @@ object GaussianElimination {
   case class Solution[A: Integral](dependentVars: Seq[Int], dependentGenerator: Seq[A],
                                    freeVars: Seq[Int], freeGenerators: Seq[Seq[A]],
                                    const: Seq[A]) {
+    private lazy val freeGeneratorsTransposed = { // transpose of empty generators needs right length for lazyZip to work below
+      if (freeGenerators.isEmpty)
+        const.map(_ => Nil)
+      else
+        freeGenerators.transpose
+    }
+
+    require(dependentGenerator.size == const.size)
+    require(dependentGenerator.size == freeGeneratorsTransposed.size)
+
     def evaluate(freeVals: Seq[A]): Seq[A] = {
-      (dependentGenerator lazyZip const).zipWithIndex.map({case ((mainVar, v), i) =>
-        val r = v - (freeGenerators lazyZip freeVals).map((freeVar, freeVal) => freeVar(i) * freeVal).sum
+      (const lazyZip freeGeneratorsTransposed lazyZip dependentGenerator).map((v, fgt, mainVar) => {
+        val r = v - (fgt lazyZip freeVals).map(_ * _).sum
         if (r % mainVar == 0)
           r / mainVar
         else
           -summon[Integral[A]].one // TODO: Option
-      }).toList
+      })
     }
   }
 
@@ -101,8 +111,8 @@ object GaussianElimination {
       dependentVars = mainVars.toSeq,
       dependentGenerator = (mainVars lazyZip m).view.map((v, row) => row(v)).toSeq,
       freeVars = freeVars.toSeq,
-      freeGenerators = freeVars.view.map(x => m.view.map(_(x)).toSeq).toSeq,
-      const = m.view.map(_.last).toSeq
+      freeGenerators = freeVars.view.map(x => m.view.take(mainVars.size).map(_(x)).toSeq).toSeq,
+      const = m.view.take(mainVars.size).map(_.last).toSeq
     )
   }
 }
