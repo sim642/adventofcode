@@ -3,6 +3,7 @@ package eu.sim642.adventofcode2025
 import com.microsoft.z3.{ArithExpr, Context, IntExpr, IntSort, Status}
 import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, TargetNode, UnitNeighbors}
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 object Day10 {
@@ -59,15 +60,6 @@ object Day10 {
    * Solution, which finds fewest presses via an ILP problem, solved by Z3.
    */
   object Z3Part2Solution extends Part2Solution {
-    /*
-       x0  x1    x2  x3    x4    x5
-       (3) (1,3) (2) (2,3) (0,2) (0,1)
-    0:                     x4    x5    = 3
-    1:     x1                    x5    = 5
-    2:           x2  x3    x4          = 4
-    3: x0  x1        x3                = 7
-    */
-
     override def fewestPresses(machine: Machine): Int = {
       val ctx = new Context(Map("model" -> "true").asJava)
       import ctx._
@@ -90,6 +82,103 @@ object Day10 {
 
       assert(s.Check() == Status.SATISFIABLE)
       s.getModel.evaluate(totalPresses, false).toString.toInt
+    }
+  }
+
+  object GaussianEliminationPart2Solution extends Part2Solution {
+    /*
+       x0  x1    x2  x3    x4    x5
+       (3) (1,3) (2) (2,3) (0,2) (0,1)
+    0:                     x4    x5    = 3
+    1:     x1                    x5    = 5
+    2:           x2  x3    x4          = 4
+    3: x0  x1        x3                = 7
+
+
+    0   0   0   0   1   1 | 3
+    0   1   0   0   0   1 | 5
+    0   0   1   1   1   0 | 4
+    1   1   0   1   0   0 | 7
+
+    1   1   0   1   0   0 | 7
+    0   1   0   0   0   1 | 5
+    0   0   1   1   1   0 | 4
+    0   0   0   0   1   1 | 3
+
+    1   0   0   1   0  -1 | 2
+    0   1   0   0   0   1 | 5
+    0   0   1   1   0  -1 | 1
+    0   0   0   0   1   1 | 3
+
+    1   1   1   2   1   0 | 11
+               -1       1 | ?
+    */
+
+    override def fewestPresses(machine: Machine): Int = {
+      val zeroCol = machine.joltages.map(_ => 0)
+      val rows =
+        machine.buttons
+          .map(button =>
+            button.foldLeft(zeroCol)((acc, i) => acc.updated(i, 1))
+          )
+          .transpose
+          .zip(machine.joltages)
+
+      val m = rows.map((a, b) => (a :+ b).to(mutable.ArraySeq)).to(mutable.ArraySeq)
+
+      def swapRows(y1: Int, y2: Int): Unit = {
+        val row1 = m(y1)
+        m(y1) = m(y2)
+        m(y2) = row1
+      }
+
+      def reduceDown(x: Int, y1: Int, y2: Int): Unit = {
+        val factor = m(y2)(x) / m(y1)(x)
+        for (x2 <- x until (machine.buttons.size + 1))
+          m(y2)(x2) -= factor * m(y1)(x2)
+      }
+
+      def reduceUp(x: Int, y1: Int, y2: Int): Unit = {
+        val factor = m(y2)(x) / m(y1)(x)
+        for (x2 <- 0 until (machine.buttons.size + 1)) // TODO: enough to also start from x? (before zeros anyway)
+          m(y2)(x2) -= factor * m(y1)(x2)
+      }
+
+      var y = 0
+      for (x <- machine.buttons.indices) {
+        val y2opt = m.indices.find(y2 => y2 >= y && m(y2)(x) != 0)
+        y2opt match {
+          case None => // move to next x
+          case Some(y2) =>
+            swapRows(y, y2)
+            assert(m(y)(x) == 1) // TODO: this will probably change
+
+            for (y3 <- (y + 1) until m.size)
+              reduceDown(x, y, y3)
+
+            y += 1
+        }
+      }
+
+      // check consistency
+      for (y2 <- y until m.size)
+        assert(m(y2).last == 0)
+
+      y = 0
+      for (x <- machine.buttons.indices) {
+        if (y < m.size) { // TODO: break if y too big
+          if (m(y)(x) == 0)
+            () // move to next x
+          else {
+            for (y3 <- 0 until y)
+              reduceUp(x, y, y3)
+
+            y += 1
+          }
+        }
+      }
+
+      ???
     }
   }
 
