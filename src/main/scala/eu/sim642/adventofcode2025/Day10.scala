@@ -117,13 +117,13 @@ object Day10 {
     */
 
     override def fewestPresses(machine: Machine): Int = {
-      val zeroCol = machine.joltages.map(_ => 0L)
+      val zeroCol = machine.joltages.map(_ => 0)
       val rows =
         machine.buttons
-          .map(_.foldLeft(zeroCol)(_.updated(_, 1L)))
+          .map(_.foldLeft(zeroCol)(_.updated(_, 1)))
           .transpose
 
-      val sol = GaussianElimination.solve(rows, machine.joltages.map(_.toLong))
+      val sol = GaussianElimination.solve(rows, machine.joltages)
       //val mSum = m.transpose.map(_.sum) // TODO: use?
 
       def helper(freeMaxs: List[Int]): Iterator[List[Int]] = freeMaxs match { // TODO: this seems like it should exist from earlier somewhere
@@ -140,10 +140,10 @@ object Day10 {
       val dependentMaxs = sol.dependentVars.map(maxs)
       (for {
         freeVals <- helper(freeMaxs.toList)
-        dependentVals = sol.evaluate(freeVals.map(_.toLong))
+        dependentVals = sol.evaluate(freeVals)
         if dependentVals.forall(_ >= 0)
         if (dependentVals lazyZip dependentMaxs).forall(_ <= _)
-      } yield dependentVals.sum.toInt + freeVals.sum).min
+      } yield dependentVals.sum + freeVals.sum).min
     }
   }
 
