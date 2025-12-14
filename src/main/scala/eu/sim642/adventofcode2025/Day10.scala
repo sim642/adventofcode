@@ -136,25 +136,28 @@ object Day10 {
 
       def multiplyRow(y: Int, factor: Long): Unit = {
         for (x2 <- 0 until (machine.buttons.size + 1))
-          m(y)(x2) *= factor.toLong
+          m(y)(x2) *= factor
+      }
+
+      def simplifyRow(y: Int): Unit = {
+        val factor = NumberTheory.gcd(m(y).toSeq) // TODO: avoid conversion
+        if (factor.abs > 1) {
+          for (x2 <- 0 until (machine.buttons.size + 1))
+            m(y)(x2) /= factor
+        }
       }
 
       def reduceDown(x: Int, y1: Int, y2: Int): Unit = {
-        val c1 = m(y1)(x)
-        assert(c1 > 0)
         val c2 = m(y2)(x)
-        val cd = NumberTheory.lcm(c1, c2.abs)
-        multiplyRow(y1, cd / c1)
-        multiplyRow(y2, cd / c2)
-        val factor = m(y2)(x) / m(y1)(x)
-        for (x2 <- x until (machine.buttons.size + 1))
-          m(y2)(x2) -= factor * m(y1)(x2)
-      }
-
-      def reduceUp(x: Int, y1: Int, y2: Int): Unit = {
-        val factor = m(y2)(x) / m(y1)(x)
-        for (x2 <- 0 until (machine.buttons.size + 1)) // TODO: enough to also start from x? (before zeros anyway)
-          m(y2)(x2) -= factor * m(y1)(x2)
+        if (c2 != 0) {
+          val c1 = m(y1)(x)
+          val (_, _, (factor, factor2)) = NumberTheory.extendedGcd(c1, c2)
+          for (x2 <- 0 until x) // must start from 0 because we're now multiplying entire row y2
+            m(y2)(x2) = factor2 * m(y2)(x2)
+          for (x2 <- x until (machine.buttons.size + 1))
+            m(y2)(x2) = factor2 * m(y2)(x2) + factor * m(y1)(x2)
+          //simplifyRow(y2)
+        }
       }
 
       var y = 0
@@ -164,13 +167,8 @@ object Day10 {
           case None => // move to next x
           case Some(y2) =>
             swapRows(y, y2)
-            multiplyRow(y, m(y)(x).sign) // make leading coeff positive
-            //assert(m(y)(x).abs == 1) // TODO: this will probably change
-
-            for (y3 <- (y + 1) until m.size) {
-              if (m(y3)(x) != 0)
-                reduceDown(x, y, y3)
-            }
+            for (y3 <- (y + 1) until m.size)
+              reduceDown(x, y, y3)
 
             y += 1
         }
@@ -191,12 +189,8 @@ object Day10 {
           } // move to next x
           else {
             mainVars += x
-            multiplyRow(y, m(y)(x).sign) // make leading coeff positive
-            for (y3 <- 0 until y) {
-              if (m(y3)(x) != 0)
-                //reduceUp(x, y, y3)
-                reduceDown(x, y, y3)
-            }
+            for (y3 <- 0 until y)
+              reduceDown(x, y, y3)
 
             y += 1
           }
