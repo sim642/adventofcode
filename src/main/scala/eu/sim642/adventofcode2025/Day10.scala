@@ -207,16 +207,18 @@ object Day10 {
 
       //val mSum = m.transpose.map(_.sum) // TODO: use?
 
-      def helper0(sum: Int, len: Int): Iterator[List[Int]] = {
-        if (len == 0)
-          Iterator(Nil)
-        else if (len == 1)
-          Iterator(List(sum))
-        else {
-          for {
-            x <- (0 to sum).iterator
-            rest <- helper0(sum - x, len - 1)
-          } yield x :: rest
+      val maxVals = machine.buttons.map(_.map(machine.joltages(_)).min)
+
+      def helper0(sum: Int, maxs: List[Int]): Iterator[List[Int]] = {
+        maxs match {
+          case Nil => Iterator(Nil)
+          case List(m) if sum <= m => Iterator(List(sum))
+          case List(m) => Iterator.empty
+          case m :: newMaxs =>
+            for {
+              x <- (0 to (m min sum)).iterator
+              rest <- helper0(sum - x, newMaxs)
+            } yield x :: rest
         }
       }
 
@@ -232,26 +234,16 @@ object Day10 {
         mainVals
       }
 
-      // TODO: avoid double search...
-      val bound =
-        Iterator.from(0)
-          .flatMap(helper0(_, freeVars.size))
-          .map(freeVals => (eval(freeVals), freeVals))
-          .filter(_._1.forall(_ >= 0)) // all main vals must be non-negative
-          .map((s1, s2) => s1.sum + s2.sum)
-          .head
-      val choices = (0 to bound.toInt).iterator.flatMap(helper0(_, freeVars.size))
+      val bound = freeVars.map(maxVals).sum
+      val choices = (0 to bound).iterator.flatMap(helper0(_, freeVars.map(maxVals).toList))
 
       val answer =
         choices
           .map(freeVals => (eval(freeVals), freeVals))
-          //.take(1000) // TODO: when to stop?
-          //.tapEach(println)
-          .filter(_._1.forall(_ >= 0)) // all main vals must be non-negative
+          .filter(p => p._1.forall(_ >= 0) && (p._1 lazyZip mainVars).forall((a, b) => a <= maxVals(b))) // all main vals must be non-negative, but at most their max
           .map((s1, s2) => s1.sum + s2.sum)
-          .min // TODO: wrong, freeVals sum is minimal, but mainVals sum isn't
+          .min
 
-      println(answer)
       answer.toInt
     }
   }
