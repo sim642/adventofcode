@@ -40,7 +40,7 @@ object Day10Test {
 
     if (testInput) {
       test("Part 2 input answer") {
-        //assert(part2Solution.sumFewestPresses(parseMachines(input)) == 17848)
+        assert(part2Solution.sumFewestPresses(parseMachines(input)) == 17848)
       }
     }
   }

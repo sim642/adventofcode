@@ -1,8 +1,8 @@
 package eu.sim642.adventofcode2025
 
-import eu.sim642.adventofcodelib.IteratorImplicits._
-
+import eu.sim642.adventofcodelib.IteratorImplicits.*
 import com.microsoft.z3.{ArithExpr, Context, IntExpr, IntSort, Status}
+import eu.sim642.adventofcodelib.NumberTheory
 import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, TargetNode, UnitNeighbors}
 
 import scala.collection.mutable
@@ -117,16 +117,16 @@ object Day10 {
     */
 
     override def fewestPresses(machine: Machine): Int = {
-      val zeroCol = machine.joltages.map(_ => 0)
+      val zeroCol = machine.joltages.map(_ => 0L)
       val rows =
         machine.buttons
           .map(button =>
-            button.foldLeft(zeroCol)((acc, i) => acc.updated(i, 1))
+            button.foldLeft(zeroCol)((acc, i) => acc.updated(i, 1L))
           )
           .transpose
-          .zip(machine.joltages)
+          .zip(machine.joltages.map(_.toLong))
 
-      val m = rows.map((a, b) => (a :+ b).to(mutable.ArraySeq)).to(mutable.ArraySeq)
+      val m: mutable.ArraySeq[mutable.ArraySeq[Long]] = rows.map((a, b) => (a :+ b).to(mutable.ArraySeq)).to(mutable.ArraySeq)
 
       def swapRows(y1: Int, y2: Int): Unit = {
         val row1 = m(y1)
@@ -134,7 +134,18 @@ object Day10 {
         m(y2) = row1
       }
 
+      def multiplyRow(y: Int, factor: Long): Unit = {
+        for (x2 <- 0 until (machine.buttons.size + 1))
+          m(y)(x2) *= factor.toLong
+      }
+
       def reduceDown(x: Int, y1: Int, y2: Int): Unit = {
+        val c1 = m(y1)(x)
+        assert(c1 > 0)
+        val c2 = m(y2)(x)
+        val cd = NumberTheory.lcm(c1, c2.abs)
+        multiplyRow(y1, cd / c1)
+        multiplyRow(y2, cd / c2)
         val factor = m(y2)(x) / m(y1)(x)
         for (x2 <- x until (machine.buttons.size + 1))
           m(y2)(x2) -= factor * m(y1)(x2)
@@ -153,10 +164,13 @@ object Day10 {
           case None => // move to next x
           case Some(y2) =>
             swapRows(y, y2)
-            assert(m(y)(x) == 1) // TODO: this will probably change
+            multiplyRow(y, m(y)(x).sign) // make leading coeff positive
+            //assert(m(y)(x).abs == 1) // TODO: this will probably change
 
-            for (y3 <- (y + 1) until m.size)
-              reduceDown(x, y, y3)
+            for (y3 <- (y + 1) until m.size) {
+              if (m(y3)(x) != 0)
+                reduceDown(x, y, y3)
+            }
 
             y += 1
         }
@@ -177,8 +191,12 @@ object Day10 {
           } // move to next x
           else {
             mainVars += x
-            for (y3 <- 0 until y)
-              reduceUp(x, y, y3)
+            multiplyRow(y, m(y)(x).sign) // make leading coeff positive
+            for (y3 <- 0 until y) {
+              if (m(y3)(x) != 0)
+                //reduceUp(x, y, y3)
+                reduceDown(x, y, y3)
+            }
 
             y += 1
           }
@@ -186,6 +204,8 @@ object Day10 {
         else
           freeVars += x // can't break if this is here
       }
+
+      //val mSum = m.transpose.map(_.sum) // TODO: use?
 
       def helper0(sum: Int, len: Int): Iterator[List[Int]] = {
         if (len == 0)
@@ -200,22 +220,39 @@ object Day10 {
         }
       }
 
-      val choices = Iterator.from(0).flatMap(helper0(_, freeVars.size))
-      val answer =
-        choices
-          .map(freeVals => {
-            val mainVals = mainVars.view.zipWithIndex.map((mainVar, y) => {
-              val row = m(y)
-              row.last - (freeVars lazyZip freeVals).map((freeVar, freeVal) => row(freeVar) * freeVal).sum
-            }).toList
-            (mainVals, freeVals)
-          })
+      def eval(freeVals: List[Int]): List[Long] = {
+        val mainVals = mainVars.view.zipWithIndex.map((mainVar, y) => {
+          val row = m(y)
+          val r = row.last - (freeVars lazyZip freeVals).map((freeVar, freeVal) => row(freeVar) * freeVal).sum
+          if (r % row(mainVar) == 0)
+            r / row(mainVar)
+          else
+            -1
+        }).toList
+        mainVals
+      }
+
+      // TODO: avoid double search...
+      val bound =
+        Iterator.from(0)
+          .flatMap(helper0(_, freeVars.size))
+          .map(freeVals => (eval(freeVals), freeVals))
           .filter(_._1.forall(_ >= 0)) // all main vals must be non-negative
           .map((s1, s2) => s1.sum + s2.sum)
-          .head // TODO: wrong, freeVals sum is minimal, but mainVals sum isn't
+          .head
+      val choices = (0 to bound.toInt).iterator.flatMap(helper0(_, freeVars.size))
+
+      val answer =
+        choices
+          .map(freeVals => (eval(freeVals), freeVals))
+          //.take(1000) // TODO: when to stop?
+          //.tapEach(println)
+          .filter(_._1.forall(_ >= 0)) // all main vals must be non-negative
+          .map((s1, s2) => s1.sum + s2.sum)
+          .min // TODO: wrong, freeVals sum is minimal, but mainVals sum isn't
 
       println(answer)
-      answer
+      answer.toInt
     }
   }
 
