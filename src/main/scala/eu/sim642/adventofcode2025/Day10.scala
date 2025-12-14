@@ -1,5 +1,7 @@
 package eu.sim642.adventofcode2025
 
+import eu.sim642.adventofcodelib.IteratorImplicits._
+
 import com.microsoft.z3.{ArithExpr, Context, IntExpr, IntSort, Status}
 import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, TargetNode, UnitNeighbors}
 
@@ -164,21 +166,56 @@ object Day10 {
       for (y2 <- y until m.size)
         assert(m(y2).last == 0)
 
+      val mainVars = mutable.ArrayBuffer.empty[Int]
+      val freeVars = mutable.ArrayBuffer.empty[Int]
       y = 0
       for (x <- machine.buttons.indices) {
         if (y < m.size) { // TODO: break if y too big
-          if (m(y)(x) == 0)
-            () // move to next x
+          if (m(y)(x) == 0) {
+            freeVars += x
+            ()
+          } // move to next x
           else {
+            mainVars += x
             for (y3 <- 0 until y)
               reduceUp(x, y, y3)
 
             y += 1
           }
         }
+        else
+          freeVars += x // can't break if this is here
       }
 
-      ???
+      def helper0(sum: Int, len: Int): Iterator[List[Int]] = {
+        if (len == 0)
+          Iterator(Nil)
+        else if (len == 1)
+          Iterator(List(sum))
+        else {
+          for {
+            x <- (0 to sum).iterator
+            rest <- helper0(sum - x, len - 1)
+          } yield x :: rest
+        }
+      }
+
+      val choices = Iterator.from(0).flatMap(helper0(_, freeVars.size))
+      val answer =
+        choices
+          .map(freeVals => {
+            val mainVals = mainVars.view.zipWithIndex.map((mainVar, y) => {
+              val row = m(y)
+              row.last - (freeVars lazyZip freeVals).map((freeVar, freeVal) => row(freeVar) * freeVal).sum
+            }).toList
+            (mainVals, freeVals)
+          })
+          .filter(_._1.forall(_ >= 0)) // all main vals must be non-negative
+          .map((s1, s2) => s1.sum + s2.sum)
+          .head // TODO: wrong, freeVals sum is minimal, but mainVals sum isn't
+
+      println(answer)
+      answer
     }
   }
 
