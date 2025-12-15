@@ -1,37 +1,43 @@
 package eu.sim642.adventofcodelib
 
+import eu.sim642.adventofcodelib.IntegralImplicits.ExtraDivModIntegralOps
+
 import scala.collection.mutable
 import scala.math.Integral.Implicits.infixIntegralOps
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.reflect.ClassTag
+import scala.util.boundary
+import scala.util.boundary.break
 
+/**
+ * Integer-only Gaussian elimination.
+ */
 object GaussianElimination {
 
   case class Solution[A: Integral](dependentVars: Seq[Int], dependentGenerator: Seq[A],
                                    freeVars: Seq[Int], freeGenerators: Seq[Seq[A]],
-                                   const: Seq[A]) {
+                                   constGenerator: Seq[A]) {
     private lazy val freeGeneratorsTransposed = { // transpose of empty generators needs right length for lazyZip to work below
       if (freeGenerators.isEmpty)
-        const.map(_ => Nil)
+        constGenerator.map(_ => Nil)
       else
         freeGenerators.transpose
     }
 
-    require(dependentGenerator.size == const.size)
+    require(dependentGenerator.size == constGenerator.size)
     require(dependentGenerator.size == freeGeneratorsTransposed.size)
 
-    def evaluate(freeVals: Seq[A]): Seq[A] = {
-      (const lazyZip freeGeneratorsTransposed lazyZip dependentGenerator).map((v, fgt, mainVar) => {
-        val r = v - (fgt lazyZip freeVals).map(_ * _).sum
-        if (r % mainVar == 0)
-          r / mainVar
-        else
-          -summon[Integral[A]].one // TODO: Option
-      })
+    def evaluate(freeVals: Seq[A]): Option[Seq[A]] = {
+      boundary { // poor man's sequence
+        Some((constGenerator lazyZip freeGeneratorsTransposed lazyZip dependentGenerator).map((const, freeCoeffs, dependentCoeff) => {
+          val r = const - (freeCoeffs lazyZip freeVals).map(_ * _).sum
+          (r /! dependentCoeff).getOrElse(break(None))
+        }))
+      }
     }
   }
 
-  def solve[A: ClassTag](initialA: Seq[Seq[A]], initialb: Seq[A])(using aIntegral: Integral[A]): Solution[A] = {
+  def solve[A: ClassTag](initialA: Seq[Seq[A]], initialb: Seq[A])(using aIntegral: Integral[A]): Option[Solution[A]] = {
     val m = initialA.size
     val n = initialA.head.size
     require(initialb.sizeIs == m)
@@ -83,32 +89,36 @@ object GaussianElimination {
       }
     }
 
-    // check consistency
-    for (y2 <- y until b.size)
-      assert(b(y2) == 0) // TODO: return Option
-
-    // backward elimination
-    val dependentVars = mutable.ArrayBuffer.empty[Int]
-    val freeVars = mutable.ArrayBuffer.empty[Int]
-    y = 0
-    for (x <- 0 until n) {
-      if (y >= m || A(y)(x) == 0)
-        freeVars += x
-      else {
-        dependentVars += x
-        for (y2 <- 0 until y)
-          reduceRow(x, y, y2)
-        y += 1
+    boundary {
+      // check consistency
+      for (y2 <- y until b.size) {
+        if (b(y2) != 0)
+          break(None)
       }
-    }
 
-    val Aview = A.view.take(dependentVars.size)
-    Solution(
-      dependentVars = dependentVars.toSeq,
-      dependentGenerator = (A lazyZip dependentVars).map(_(_)).toSeq,
-      freeVars = freeVars.toSeq,
-      freeGenerators = freeVars.view.map(x => Aview.map(_(x)).toSeq).toSeq,
-      const = b.view.take(dependentVars.size).toSeq
-    )
+      // backward elimination
+      val dependentVars = mutable.ArrayBuffer.empty[Int]
+      val freeVars = mutable.ArrayBuffer.empty[Int]
+      y = 0
+      for (x <- 0 until n) {
+        if (y >= m || A(y)(x) == 0)
+          freeVars += x
+        else {
+          dependentVars += x
+          for (y2 <- 0 until y)
+            reduceRow(x, y, y2)
+          y += 1
+        }
+      }
+
+      val Aview = A.view.take(dependentVars.size)
+      Some(Solution(
+        dependentVars = dependentVars.toSeq,
+        dependentGenerator = (A lazyZip dependentVars).map(_(_)).toSeq,
+        freeVars = freeVars.toSeq,
+        freeGenerators = freeVars.view.map(x => Aview.map(_(x)).toSeq).toSeq,
+        constGenerator = b.view.take(dependentVars.size).toSeq
+      ))
+    }
   }
 }
