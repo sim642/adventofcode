@@ -32,33 +32,40 @@ object GaussianElimination {
   }
 
   def solve[A: ClassTag](initialA: Seq[Seq[A]], initialb: Seq[A])(using aIntegral: Integral[A]): Solution[A] = {
-    val rows = initialA zip initialb // TODO: lazyZip
-    val m: mutable.ArraySeq[mutable.ArraySeq[A]] = rows.map((a, b) => (a :+ b).to(mutable.ArraySeq)).to(mutable.ArraySeq)
+    val m = initialA.size
     val n = initialA.head.size
+    require(initialb.sizeIs == m)
+
+    val A: mutable.ArraySeq[mutable.ArraySeq[A]] = initialA.map(_.to(mutable.ArraySeq)).to(mutable.ArraySeq)
+    val b: mutable.ArraySeq[A] = initialb.to(mutable.ArraySeq)
 
     def swapRows(y1: Int, y2: Int): Unit = {
-      val row1 = m(y1)
-      m(y1) = m(y2)
-      m(y2) = row1
+      val A1 = A(y1)
+      A(y1) = A(y2)
+      A(y2) = A1
+      val b1 = b(y1)
+      b(y1) = b(y2)
+      b(y2) = b1
     }
 
     def simplifyRow(y: Int): Unit = {
-      val factor = NumberTheory.gcd(m(y).toSeq) // TODO: avoid conversion
+      val factor = NumberTheory.gcd(NumberTheory.gcd(A(y).toSeq), b(y)) // TODO: avoid conversion
       if (factor.abs > summon[Integral[A]].one) {
-        for (x <- 0 until (n + 1))
-          m(y)(x) /= factor
+        A(y).mapInPlace(_ / factor)
+        b(y) /= factor
       }
     }
 
     def reduceRow(x: Int, y1: Int, y2: Int): Unit = {
-      val c2 = m(y2)(x)
+      val c2 = A(y2)(x)
       if (c2 != 0) {
-        val c1 = m(y1)(x)
+        val c1 = A(y1)(x)
         val (factor1, factor2) = NumberTheory.extendedGcd(c1, c2)._3
         for (x2 <- 0 until x) // must start from 0 because we're now multiplying entire row y2
-          m(y2)(x2) = factor2 * m(y2)(x2)
-        for (x2 <- x until (n + 1))
-          m(y2)(x2) = factor2 * m(y2)(x2) + factor1 * m(y1)(x2)
+          A(y2)(x2) = factor2 * A(y2)(x2)
+        for (x2 <- x until n)
+          A(y2)(x2) = factor2 * A(y2)(x2) + factor1 * A(y1)(x2)
+        b(y2) = factor2 * b(y2) + factor1 * b(y1)
         //simplifyRow(y2) // TODO: helps?
       }
     }
@@ -66,26 +73,26 @@ object GaussianElimination {
     // forward elimination
     var y = 0
     for (x <- 0 until n) {
-      (y until m.size).find(m(_)(x) != 0) match {
+      (y until m).find(A(_)(x) != 0) match {
         case None => // move to next x
         case Some(y2) =>
           swapRows(y, y2)
-          for (y3 <- (y + 1) until m.size)
+          for (y3 <- (y + 1) until m)
             reduceRow(x, y, y3)
           y += 1
       }
     }
 
     // check consistency
-    for (y2 <- y until m.size)
-      assert(m(y2).last == 0) // TODO: return Option
+    for (y2 <- y until b.size)
+      assert(b(y2) == 0) // TODO: return Option
 
     // backward elimination
     val dependentVars = mutable.ArrayBuffer.empty[Int]
     val freeVars = mutable.ArrayBuffer.empty[Int]
     y = 0
     for (x <- 0 until n) {
-      if (y >= m.size || m(y)(x) == 0)
+      if (y >= m || A(y)(x) == 0)
         freeVars += x
       else {
         dependentVars += x
@@ -95,12 +102,13 @@ object GaussianElimination {
       }
     }
 
+    val Aview = A.view.take(dependentVars.size)
     Solution(
       dependentVars = dependentVars.toSeq,
-      dependentGenerator = (dependentVars lazyZip m).view.map((v, row) => row(v)).toSeq,
+      dependentGenerator = (A lazyZip dependentVars).map(_(_)).toSeq,
       freeVars = freeVars.toSeq,
-      freeGenerators = freeVars.view.map(x => m.view.take(dependentVars.size).map(_(x)).toSeq).toSeq,
-      const = m.view.take(dependentVars.size).map(_.last).toSeq
+      freeGenerators = freeVars.view.map(x => Aview.map(_(x)).toSeq).toSeq,
+      const = b.view.take(dependentVars.size).toSeq
     )
   }
 }
