@@ -8,7 +8,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class Day10Test extends Suites(
   new Part1Test,
   new NaivePart2SolutionTest,
-  //new Z3Part2SolutionTest,
+  new Z3Part2SolutionTest,
   new GaussianEliminationPart2SolutionTest,
 )
 

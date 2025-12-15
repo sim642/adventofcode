@@ -87,6 +87,9 @@ object Day10 {
     }
   }
 
+  /**
+   * Solution, which performs Gaussian elimination and then brute forces free variables in their ranges.
+   */
   object GaussianEliminationPart2Solution extends Part2Solution {
     /*
        x0  x1    x2  x3    x4    x5
@@ -161,6 +164,6 @@ object Day10 {
 
   def main(args: Array[String]): Unit = {
     println(Part1.sumFewestPresses(parseMachines(input)))
-    println(Z3Part2Solution.sumFewestPresses(parseMachines(input)))
+    println(GaussianEliminationPart2Solution.sumFewestPresses(parseMachines(input)))
   }
 }
