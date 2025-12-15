@@ -42,42 +42,36 @@ object GaussianElimination {
       m(y2) = row1
     }
 
-    def multiplyRow(y: Int, factor: A): Unit = {
-      for (x2 <- 0 until (n + 1))
-        m(y)(x2) *= factor
-    }
-
     def simplifyRow(y: Int): Unit = {
       val factor = NumberTheory.gcd(m(y).toSeq) // TODO: avoid conversion
       if (factor.abs > summon[Integral[A]].one) {
-        for (x2 <- 0 until (n + 1))
-          m(y)(x2) /= factor
+        for (x <- 0 until (n + 1))
+          m(y)(x) /= factor
       }
     }
 
-    def reduceDown(x: Int, y1: Int, y2: Int): Unit = {
+    def reduceRow(x: Int, y1: Int, y2: Int): Unit = {
       val c2 = m(y2)(x)
       if (c2 != 0) {
         val c1 = m(y1)(x)
-        val (_, _, (factor, factor2)) = NumberTheory.extendedGcd(c1, c2)
+        val (factor1, factor2) = NumberTheory.extendedGcd(c1, c2)._3
         for (x2 <- 0 until x) // must start from 0 because we're now multiplying entire row y2
           m(y2)(x2) = factor2 * m(y2)(x2)
         for (x2 <- x until (n + 1))
-          m(y2)(x2) = factor2 * m(y2)(x2) + factor * m(y1)(x2)
+          m(y2)(x2) = factor2 * m(y2)(x2) + factor1 * m(y1)(x2)
         //simplifyRow(y2) // TODO: helps?
       }
     }
 
+    // forward elimination
     var y = 0
     for (x <- 0 until n) {
-      val y2opt = m.indices.find(y2 => y2 >= y && m(y2)(x) != 0)
-      y2opt match {
+      (y until m.size).find(m(_)(x) != 0) match {
         case None => // move to next x
         case Some(y2) =>
           swapRows(y, y2)
           for (y3 <- (y + 1) until m.size)
-            reduceDown(x, y, y3)
-
+            reduceRow(x, y, y3)
           y += 1
       }
     }
@@ -86,33 +80,27 @@ object GaussianElimination {
     for (y2 <- y until m.size)
       assert(m(y2).last == 0) // TODO: return Option
 
-    val mainVars = mutable.ArrayBuffer.empty[Int]
+    // backward elimination
+    val dependentVars = mutable.ArrayBuffer.empty[Int]
     val freeVars = mutable.ArrayBuffer.empty[Int]
     y = 0
     for (x <- 0 until n) {
-      if (y < m.size) { // TODO: break if y too big
-        if (m(y)(x) == 0) {
-          freeVars += x
-          ()
-        } // move to next x
-        else {
-          mainVars += x
-          for (y3 <- 0 until y)
-            reduceDown(x, y, y3)
-
-          y += 1
-        }
+      if (y >= m.size || m(y)(x) == 0)
+        freeVars += x
+      else {
+        dependentVars += x
+        for (y2 <- 0 until y)
+          reduceRow(x, y, y2)
+        y += 1
       }
-      else
-        freeVars += x // can't break if this is here
     }
 
     Solution(
-      dependentVars = mainVars.toSeq,
-      dependentGenerator = (mainVars lazyZip m).view.map((v, row) => row(v)).toSeq,
+      dependentVars = dependentVars.toSeq,
+      dependentGenerator = (dependentVars lazyZip m).view.map((v, row) => row(v)).toSeq,
       freeVars = freeVars.toSeq,
-      freeGenerators = freeVars.view.map(x => m.view.take(mainVars.size).map(_(x)).toSeq).toSeq,
-      const = m.view.take(mainVars.size).map(_.last).toSeq
+      freeGenerators = freeVars.view.map(x => m.view.take(dependentVars.size).map(_(x)).toSeq).toSeq,
+      const = m.view.take(dependentVars.size).map(_.last).toSeq
     )
   }
 }
