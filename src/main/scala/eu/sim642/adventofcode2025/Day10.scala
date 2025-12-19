@@ -4,6 +4,7 @@ import com.microsoft.z3.{ArithExpr, Context, IntSort, Status}
 import eu.sim642.adventofcodelib.GaussianElimination
 import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, TargetNode, UnitNeighbors}
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 object Day10 {
@@ -170,18 +171,22 @@ object Day10 {
           .groupBy((joltages, _) => parity(joltages))
           .withDefaultValue(Seq.empty)
 
+      val memo = mutable.Map.empty[Joltages, Option[Int]] // memoization is a bonus, but not strictly necessary
+
       def helper(joltages: Joltages): Option[Int] = {
-        if (joltages == zeroJoltages)
-          Some(0)
-        else if (joltages.exists(_ < 0))
-          None
-        else {
-          (for {
-            (pressJoltages, presses) <- parityPresses(parity(joltages))
-            newJoltages = (joltages lazyZip pressJoltages).map(_ - _).map(_ / 2)
-            newPresses <- helper(newJoltages)
-          } yield 2 * newPresses + presses).minOption
-        }
+        memo.getOrElseUpdate(joltages, {
+          if (joltages == zeroJoltages)
+            Some(0)
+          else if (joltages.exists(_ < 0))
+            None
+          else {
+            (for {
+              (pressJoltages, presses) <- parityPresses(parity(joltages))
+              newJoltages = (joltages lazyZip pressJoltages).map(_ - _).map(_ / 2)
+              newPresses <- helper(newJoltages)
+            } yield 2 * newPresses + presses).minOption
+          }
+        })
       }
 
       helper(machine.joltages).get
