@@ -1,11 +1,9 @@
 package eu.sim642.adventofcode2025
 
-import eu.sim642.adventofcodelib.IteratorImplicits.*
-import com.microsoft.z3.{ArithExpr, Context, IntExpr, IntSort, Status}
-import eu.sim642.adventofcodelib.{GaussianElimination, NumberTheory}
-import eu.sim642.adventofcodelib.graph.{BFS, Dijkstra, GraphSearch, TargetNode, UnitNeighbors}
+import com.microsoft.z3.{ArithExpr, Context, IntSort, Status}
+import eu.sim642.adventofcodelib.GaussianElimination
+import eu.sim642.adventofcodelib.graph.{BFS, GraphSearch, TargetNode, UnitNeighbors}
 
-import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 
 object Day10 {
@@ -64,7 +62,7 @@ object Day10 {
   object Z3Part2Solution extends Part2Solution {
     override def fewestPresses(machine: Machine): Int = {
       val ctx = new Context(Map("model" -> "true").asJava)
-      import ctx._
+      import ctx.*
       val s = mkOptimize()
 
       val buttonPresses = machine.buttons.zipWithIndex.map((_, i) => mkIntConst(s"x$i"))
@@ -150,6 +148,46 @@ object Day10 {
     }
   }
 
+  /**
+   * Solution, which reduces parity of joltages to part 1-like problem.
+   * @see [[https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/]]
+   */
+  object BifurcatePart2Solution extends Part2Solution {
+    override def fewestPresses(machine: Machine): Int = {
+      def parity(joltages: Joltages): Lights =
+        joltages.map(i => if (i % 2 != 0) true else false)
+
+      val zeroJoltages: Joltages = machine.joltages.map(_ => 0)
+      val parityPresses =
+        machine.buttons.toSet
+          .subsets()
+          .map(buttons =>
+            buttons.foldLeft(zeroJoltages)((acc, button) =>
+              button.foldLeft(acc)((acc, i) => acc.updated(i, acc(i) + 1))
+            ) -> buttons.size
+          )
+          .toSeq
+          .groupBy((joltages, _) => parity(joltages))
+          .withDefaultValue(Seq.empty)
+
+      def helper(joltages: Joltages): Option[Int] = {
+        if (joltages == zeroJoltages)
+          Some(0)
+        else if (joltages.exists(_ < 0))
+          None
+        else {
+          (for {
+            (pressJoltages, presses) <- parityPresses(parity(joltages))
+            newJoltages = (joltages lazyZip pressJoltages).map(_ - _).map(_ / 2)
+            newPresses <- helper(newJoltages)
+          } yield 2 * newPresses + presses).minOption
+        }
+      }
+
+      helper(machine.joltages).get
+    }
+  }
+
   def parseMachine(s: String): Machine = s match {
     case s"[$lightsStr] $buttonsStr {$joltagesStr}" =>
       val lights = lightsStr.map(_ == '#').toVector
@@ -164,6 +202,6 @@ object Day10 {
 
   def main(args: Array[String]): Unit = {
     println(Part1.sumFewestPresses(parseMachines(input)))
-    println(GaussianEliminationPart2Solution.sumFewestPresses(parseMachines(input)))
+    println(BifurcatePart2Solution.sumFewestPresses(parseMachines(input)))
   }
 }

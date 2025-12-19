@@ -10,6 +10,7 @@ class Day10Test extends Suites(
   new NaivePart2SolutionTest,
   new Z3Part2SolutionTest,
   new GaussianEliminationPart2SolutionTest,
+  new BifurcatePart2SolutionTest,
 )
 
 object Day10Test {
@@ -52,4 +53,6 @@ object Day10Test {
   class Z3Part2SolutionTest extends Part2SolutionTest(Z3Part2Solution)
 
   class GaussianEliminationPart2SolutionTest extends Part2SolutionTest(GaussianEliminationPart2Solution)
+
+  class BifurcatePart2SolutionTest extends Part2SolutionTest(BifurcatePart2Solution)
 }
